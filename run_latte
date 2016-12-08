@@ -1,0 +1,123 @@
+#!/bin/bash
+# 
+# Script to call the LATTE code from any external folder.
+#
+
+set -e                                          # This will exit the script if there is any error
+MY_PATH=`pwd`                                   # Capturing the local path of the folder where we are running.
+
+# The latte path is wherever this script is located.
+# We assume this file it is located in the LATTE main directory.
+LATTE_PATH=$(dirname $0)
+
+RUN_PATH="."
+RUN="No"
+
+MY_JOB=`grep "JOBNAME=" ${RUN_PATH}/control.in | sed 's/JOBNAME=//g'`  # To find if there is any job name define in control.in.
+if [ "${MY_JOB}" = "" ]; then
+  MY_JOB="OUT"						       # If not, the name out is given.
+fi
+
+MY_JOB=`echo "${MY_JOB}" | sed 's/^ *//g' | sed 's/ *$//g'`
+
+
+if [ "${BASH_ARGV[0]}" != "" ]; then
+
+  if [ "${BASH_ARGV[0]}" == "--help" ] ; then     # Display a help menu for this script.
+    echo -e "\n Usage:"
+    echo "      $ run_latte --help : Displays this information."
+    echo "      $ run_latte --prepare : Prepare full Latte callculation."
+    echo "      $ run_latte --inputs : Get basic input files."
+    echo "      $ run_latte --pure : Runs latte taking the info located in the existing running folders (parameters in running forders are conserved)."
+    echo "      $ run_latte --xyz2latte : Just transforms the coordinates in coords.xyz to inputblock.dat."
+    echo "      $ run_latte --inputblock : Takes inputblock.dat as the coordinates of the system (parameters in running forders are rewritten)."
+    echo "      $ run_latte molecule.xyz : Uses molecule.xyz as coordinates for the system (parameters in running forders are rewritten)."
+    echo "      $ run_latte --MDdata <file> : Extracts the MD data from the <file> output file."
+    echo -e "      $ run_latte : Runs latte using the local input files (parameters in running forders are rewritten). \n"
+    exit
+
+  elif [ "${BASH_ARGV[0]}" == "--inputs" ]; then
+    echo -e "\n Getting sample input files ... \n"
+    cp -v  ${LATTE_PATH}/latte.in  ${RUN_PATH}         # Retrieving sampleinput.
+    exit
+
+  elif [ "${BASH_ARGV[0]}" == "--pure" ]; then
+    echo -e "\n Running LATTE with the existing files ... \n"
+    ${LATTE_PATH}/LATTE_DOUBLE | tee "LATTE_"$MY_JOB".out"          # Just run latte taking the existing folder/files.
+    exit
+
+  elif [ "${BASH_ARGV[0]}" == "--prepare" ]; then
+    echo -e "\n Preparing LATTE job ... \n"
+
+  elif [  `echo "${BASH_ARGV[0]}" | tail -c 5` == ".xyz" ]; then
+    cp ${BASH_ARGV[0]} coords.xyz
+    echo -e "\n Taking" ${BASH_ARGV[0]} "as the coordinates of the system ... \n"
+    ${LATTE_PATH}/tools/xyz2latte
+    RUN="Yes"
+
+  elif [ "${BASH_ARGV[0]}" == "--xyz2latte" ] ; then     # Just run xyz2latte program.
+    echo -e "\n Running xyz2latte program ..."
+    ${LATTE_PATH}/tools/xyz2latte
+    exit
+
+  elif [ "${BASH_ARGV[0]}" == "--inputblock" ] ; then     # Runs latte using the info from inputblock.dat directly.
+    echo -e "\n Using inputblock.dat as input file ..."
+    RUN="Yes"
+
+  elif [ "${BASH_ARGV[0]}" == "--clean" ] ; then     # Cleans all the previous calcs and the folders.
+    read -p "All previous results are about to be removed. Are you sure? (press ctrl+c to abort)"
+    set +e
+    echo -e "\n Cleaning everything ..."
+    rm ${RUN_PATH}/LATTE_*  ${RUN_PATH}/restartREL.dat ${RUN_PATH}/fort.*
+    rm ${RUN_PATH}/fittingoutput.dat ${RUN_PATH}/lastsystem* ${RUN_PATH}/restart_singlepoint.dat
+    rm ${RUN_PATH}/energy.out ${RUN_PATH}/trajectory* ${RUN_PATH}/gmon.out
+    rm ${RUN_PATH}/mylastLATTEcalc
+    rm -rf ${RUN_PATH}/Restarts ${RUN_PATH}/TBparam ${RUN_PATH}/animate ${RUN_PATH}/bl
+    exit
+
+  elif [ "${BASH_ARGV[1]}" == "--MDdata" ] ; then     # Extracts the MD data from file
+    echo -e "Getting the md data from the ${BASH_ARGV[0]} file ..."
+    set +e
+    grep "MD_data"  ${BASH_ARGV[0]} | sed 's/MD_data/ /g' >  "energy.out"
+    exit
+
+  else
+
+    echo -e "\n Wrong flag or input file. Type $ run_latte -help for more information ... \n"
+    exit
+  fi
+else
+  echo -e "\n Using information from inputblock.in, control.in and MDcontroller ... \n"
+  RUN="Yes"  
+fi
+
+# This is always done unless exited previouselly:
+mkdir -p ${RUN_PATH}/Restarts
+mkdir -p ${RUN_PATH}/TBparam
+mkdir -p ${RUN_PATH}/animate
+mkdir -p ${RUN_PATH}/bl
+
+echo "Copying essential files ..."
+
+if [ -f "latte.in" ]; then 
+  echo "Using latte.in file ..."
+else
+  cp -v control.in ${RUN_PATH}/TBparam              # This files sets the main keywords used by LATTE.
+fi
+
+cp -v inputblock.dat ${RUN_PATH}/bl               # This contains the coordinates of the system.
+cp -v ${LATTE_PATH}/TBparam/bondints.nonortho* ${RUN_PATH}/TBparam
+cp -v ${LATTE_PATH}/TBparam/electrons.dat ${RUN_PATH}/TBparam
+cp -v ${LATTE_PATH}/TBparam/ppots.nonortho* ${RUN_PATH}/TBparam
+
+set +e
+if [ "$RUN" == "Yes" ]; then
+${LATTE_PATH}/LATTE_DOUBLE | tee "LATTE_""$MY_JOB"".out"          # Executing and dumping everything into out.out.
+
+# Extracting as many info as we can if they are available:
+mv lastsystem.xyz "LATTE_""$MY_JOB""_lastsystem.xyz" 2> silent.out # renaming the last coordinates after and optimization.
+grep "MD_data"  "LATTE_""$MY_JOB"".out"  | sed 's/MD_data/ /g' >  "LATTE_""$MY_JOB""_energy.out" 2> silent.out
+rm silent.out
+fi
+
+echo -e "\n End of run_latte script"

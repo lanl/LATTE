@@ -1,0 +1,36 @@
+#
+# Compilation and link flags for LATTE
+#
+
+#
+# Precision - double or single
+#
+PRECISION = DOUBLE
+#PRECISION = SINGLE
+
+#
+# GPU available - OFF or ON
+GPUOPT = OFF
+
+#
+# Using DBCSR library from cp2k? OFF or ON
+#
+DBCSR_OPT = OFF
+
+#
+# CPU Fortran options
+#
+FC = pgf90
+FCL = $(FC) -fast  -mp 
+FFLAGS =  -fast -mp 
+LINKFLAG = 
+LIB =  -lacml_mp 
+DBCSR_LIB = -L/home/cawkwell/cp2k/lib/cawkwell/popt -lcp2k_dbcsr_lib
+DBCSR_MOD = -I/home/cawkwell/cp2k/obj/cawkwell/popt
+
+#
+# GPU options
+#
+
+GPU_CUDA_LIB = -L/opt/cudatoolkit-5.0/lib64 -lcublas -lcudart
+GPU_ARCH = sm_20 

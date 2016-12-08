@@ -1,0 +1,18 @@
+/SharedMem.cuh/1.1/Wed Mar 23 20:14:13 2011//
+/AddMatrix.cu/1.3/Mon Aug 15 14:21:52 2011//
+/AddVector.cu/1.2/Mon Aug 15 14:21:52 2011//
+/MatrixFastDotProduct.cu/1.1/Mon Aug 15 14:21:52 2011//
+/MultiplyScalarMatrix.cu/1.3/Mon Aug 15 14:21:52 2011//
+/MultiplyScalarMatrixAdd.cu/1.1/Mon Aug 15 14:21:52 2011//
+/MultiplyScalarMatrixAddMatrix.cu/1.1/Mon Aug 15 14:21:52 2011//
+/MultiplyScalarMatrixSub.cu/1.1/Mon Aug 15 14:21:52 2011//
+/MultiplyScalarMatrixSubMatrix.cu/1.1/Mon Aug 15 14:21:52 2011//
+/SubtractVector.cu/1.2/Mon Aug 15 14:21:52 2011//
+/SubtractMatrix.cu/1.4/Mon Aug 15 14:21:52 2011//
+/AddIdentity.cu/1.4/Thu Nov  3 18:28:39 2011//
+/CGIterate.cu/1.5/Thu Nov  3 18:28:56 2011//
+/FastDotProduct.cu/1.5/Thu Nov  3 18:29:21 2011//
+/Kernels.h/1.7/Thu Nov  3 18:29:35 2011//
+/MatrixFastTrace.cu/1.5/Thu Nov  3 18:29:58 2011//
+/MatrixFastTraceX2.cu/1.5/Thu Nov  3 18:30:15 2011//
+D

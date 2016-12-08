@@ -1,0 +1,742 @@
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Copyright 2010.  Los Alamos National Security, LLC. This material was    !
+! produced under U.S. Government contract DE-AC52-06NA25396 for Los Alamos !
+! National Laboratory (LANL), which is operated by Los Alamos National     !
+! Security, LLC for the U.S. Department of Energy. The U.S. Government has !
+! rights to use, reproduce, and distribute this software.  NEITHER THE     !
+! GOVERNMENT NOR LOS ALAMOS NATIONAL SECURITY, LLC MAKES ANY WARRANTY,     !
+! EXPRESS OR IMPLIED, OR ASSUMES ANY LIABILITY FOR THE USE OF THIS         !
+! SOFTWARE.  If software is modified to produce derivative works, such     !
+! modified software should be clearly marked, so as not to confuse it      !
+! with the version available from LANL.                                    !
+!                                                                          !
+! Additionally, this program is free software; you can redistribute it     !
+! and/or modify it under the terms of the GNU General Public License as    !
+! published by the Free Software Foundation; version 2.0 of the License.   !
+! Accordingly, this program is distributed in the hope that it will be     !
+! useful, but WITHOUT ANY WARRANTY; without even the implied warranty of   !
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General !
+! Public License for more details.                                         !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
+#include <math.h>
+#include <stdio.h>
+
+#include "Matrix.h"
+
+// Niklasson's SP2 density matrix purification
+void sp2pure_nospin0(REAL bndfil, int  hdim, REAL *bo_pointer, REAL maxeval, 
+	     REAL *h_pointer, REAL maxminusmin, int minsp2iter) {
+  int iter, breakloop;
+  REAL trx, occ, trx2, tr2xx2;
+  REAL TWO;
+  
+#if REALSIZE==4
+  TWO = 2.0f;
+#elif REALSIZE==8
+  TWO = 2.0;
+#endif
+
+  Matrix x2, bo, h;
+
+  M_Init(x2, hdim, hdim);
+  M_InitWithLocal(bo, bo_pointer, hdim, hdim);
+  M_InitWithLocal(h, h_pointer, hdim, hdim);
+  
+  REAL idemperr0 = 0.0, idemperr1 = 0.0, idemperr2 = 0.0, trxold;
+
+  occ=bndfil*hdim;
+
+  for (int i = 0; i < hdim; i++) {
+    for (int j = 0; j < hdim; j++) {
+      bo_pointer[i*hdim + j] = -h_pointer[i*hdim + j]/maxminusmin;
+    }
+  }
+
+  for (int i = 0; i < hdim; i++) {
+    bo_pointer[i*hdim + i] = maxeval/maxminusmin + bo_pointer[i*hdim + i];
+  }
+
+  M_Push(bo);
+
+  iter=0;
+  breakloop=0;
+
+
+  while( breakloop==0 && iter < 100 ) {
+    iter++;
+
+    M_Multiply(bo, bo, x2);
+
+// Doing these traces in a slightly smarter way - MJC 1/7/11
+
+    trx2 = M_Trace(x2);
+    tr2xx2 = M_Trace(bo);
+
+    tr2xx2 = TWO*tr2xx2 - trx2;
+
+    trxold=trx;	
+
+    if ( fabs(trx2-occ)  < fabs(tr2xx2-occ) ) {
+
+      M_Copy(x2, bo);
+
+      trx = trx2;
+
+    }
+    else {
+
+      M_MultiplySub(2.0, bo, x2, bo);
+      
+      trx = tr2xx2;
+    }
+
+    idemperr2 = idemperr1;
+    idemperr1 = idemperr0;
+    idemperr0 = fabs(trx-trxold);
+
+    if (iter>minsp2iter && idemperr0>=idemperr2) {
+	breakloop=1;
+    }
+  }
+
+  M_Multiply(TWO, bo, bo);
+  M_Pull(bo);
+
+  //printf("sp2pure done trace = %f\n", trx);
+
+  M_DeallocateLocal(x2);
+  M_DeallocateDevice(x2);
+  M_DeallocateDevice(bo);
+  M_DeallocateDevice(h);
+}
+
+/*
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Calculates the density matrix X0 from a Recursive Fermi  %
+%       Operator Expansion of the Hamiltonian H0            %
+%   A.M.N. Niklasson, Phys. Rev. B. vol. 66. 155115 (2002)  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [X0] = RecFermiOpEx(H0,h1,hN,N,Ne)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   h1, hN are approximate eigenvalue bounds of the         %
+% symmtetric N x N matrix H0, Ne the required trace of X0   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%% Initialize %%%
+  I = eye(N);
+  X0 = ((hN*I-H0)/(hN-h1)); 
+  trX0 = trace(X0); trX0_old = trX0;
+  Idemp_Err = 1; It = 0; eps = 1e-20;
+
+  %%% Recursive expansion %%%
+  while Idemp_Err > eps & It < 100
+     trX02 = trace(X0*X0);
+     sgm = sign(abs(2*trX0_old-trX02-Ne) - abs(trX02-Ne));
+
+     a = sgm; b = (1-sgm);
+     X0 = a*X0*X0 + b*X0;  %%% xGEMM
+
+     trX0 = trace(X0);
+     Idemp_Err = abs(trX0-trX0_old);
+     trX0_old = trX0;
+     It = It + 1;
+  end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*/
+void sp2pure_nospin2(REAL bndfil, int  hdim, REAL *x0_pointer, REAL maxeval,
+             REAL *h_pointer, REAL maxminusmin, int minsp2iter) {
+
+  int iter, breakloop;
+  REAL trx, trxold, trx2;
+  REAL  occ, TWO, RZERO;
+  REAL idemperr0 = 0.0, idemperr1 = 0.0, idemperr2 = 0.0;
+
+#if REALSIZE==4
+  TWO = 2.0f;
+  RZERO = 0.0f;
+#elif REALSIZE==8
+  TWO = 2.0;
+  RZERO = 0.0;
+#endif
+
+  Matrix x2, x0, h;
+
+  M_Init(x2, hdim, hdim);
+  M_InitWithLocal(x0, x0_pointer, hdim, hdim);
+  M_InitWithLocal(h, h_pointer, hdim, hdim);
+
+  occ=bndfil*hdim;
+
+  for (int i = 0; i < hdim; i++) {
+    for (int j = 0; j < hdim; j++) {
+      x0_pointer[i*hdim + j] = -h_pointer[i*hdim + j]/maxminusmin;
+    }
+  }
+
+  trx = RZERO;
+
+  for (int i = 0; i < hdim; i++) {
+    x0_pointer[i*hdim + i] = maxeval/maxminusmin + x0_pointer[i*hdim + i];
+    trx += x0_pointer[i*hdim + i];
+  }
+
+  M_Push(x0);
+
+  // Define limits
+  iter=0;
+  breakloop = 0;
+
+  while( breakloop == 0 && iter < 100 ) {
+
+    iter++;
+
+    M_Multiply(x0, x0, x2);
+    trx2 = M_Trace(x2);
+
+    if ((fabs(TWO * trxold - trx2 - occ) - fabs(trx2-occ)) > 0) {
+
+      M_Copy(x2, x0);
+      trx = trx2;
+
+    }
+    else {
+
+      M_MultiplySub(TWO, x0, x2, x0);
+      trx = TWO * trx - trx2;
+
+    }
+
+    idemperr2 = idemperr1;
+    idemperr1 = idemperr0;
+    idemperr0 = fabs(trx-trxold);
+
+    if (iter > minsp2iter && idemperr0 >= idemperr2) breakloop=1;
+
+    trxold = trx;
+
+  }
+
+  //printf("sp2pure done trace = %f\n", trx0);
+  //printf("sp2pure Number of It = %d\n", iter);
+
+    if (iter >= 100) {
+      printf("SP2 pure has reached 100 iterations: something is wrong! \n");
+      exit(1);
+  }
+
+  M_Multiply(TWO, x0, x0);
+  M_Pull(x0);
+
+  M_DeallocateLocal(x2);
+  M_DeallocateDevice(x2);
+  M_DeallocateDevice(x0);
+  M_DeallocateDevice(h);
+}
+
+/*
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Calculates the density matrix X0 from a Recursive Fermi  %
+%       Operator Expansion of the Hamiltonian H0            %
+%   A.M.N. Niklasson, Phys. Rev. B. vol. 66. 155115 (2002)  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [X0] = RecFermiOpEx(H0,h1,hN,N,Ne)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   h1, hN are approximate eigenvalue bounds of the         %
+% symmtetric N x N matrix H0, Ne the required trace of X0   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%% Initialize %%%
+  I = eye(N);
+  X0 = ((hN*I-H0)/(hN-h1)); 
+  trX0 = trace(X0); trX0_old = trX0;
+  Idemp_Err = 1; It = 0; eps = 1e-20;
+
+  %%% Recursive expansion %%%
+  while Idemp_Err > eps & It < 100
+     trX02 = trace(X0*X0);
+     sgm = sign(abs(2*trX0_old-trX02-Ne) - abs(trX02-Ne));
+
+     a = sgm; b = (1-sgm);
+     X0 = a*X0*X0 + b*X0;  %%% xGEMM
+
+     trX0 = trace(X0);
+     Idemp_Err = abs(trX0-trX0_old);
+     trX0_old = trX0;
+     It = It + 1;
+  end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*/
+void sp2pure_nospin1(REAL bndfil, int  hdim, REAL *x0_pointer, REAL maxeval,
+             REAL *h_pointer, REAL maxminusmin, int minsp2iter) {
+
+  int iter, breakloop;
+  REAL trx, trxold, trx2;
+  REAL occ, RZERO, TWO, PLUS1, MINUS1;
+  REAL Alpha, Beta;
+  REAL idemperr0 = 0.0, idemperr1 = 0.0, idemperr2 = 0.0;
+
+#if REALSIZE==4
+  TWO = 2.0f;
+  MINUS1 = -1.0f;
+  PLUS1 = 1.0f;
+  RZERO = 0.0f;
+#elif REALSIZE==8
+  TWO = 2.0;
+  MINUS1 = -1.0;
+  PLUS1 = 1.0;
+  RZERO = 0.0;
+#endif
+
+  Matrix xtmp, x0, h;
+
+  M_Init(xtmp, hdim, hdim);
+  M_InitWithLocal(x0, x0_pointer, hdim, hdim);
+  M_InitWithLocal(h, h_pointer, hdim, hdim);
+
+  occ=bndfil*hdim;
+
+  for (int i = 0; i < hdim; i++) {
+    for (int j = 0; j < hdim; j++) {
+      x0_pointer[i*hdim + j] = -h_pointer[i*hdim + j]/maxminusmin;
+    }
+  }
+
+  trx = RZERO;
+
+  for (int i = 0; i < hdim; i++) {
+    x0_pointer[i*hdim + i] = maxeval/maxminusmin + x0_pointer[i*hdim + i];
+    trx += x0_pointer[i*hdim + i];
+  }
+
+  M_Push(x0);
+
+  // Define limits
+  iter=0;
+  breakloop = 0;
+
+  while( breakloop == 0 && iter < 100) {
+
+    iter++;
+
+    trx2 = M_TraceX2(x0);
+
+    trxold = trx;
+
+    //M_Copy(x0, xtmp);
+    if ((fabs(TWO * trxold - trx2 - occ) - fabs(trx2-occ)) > 0) {
+
+      //M_Multiply(xtmp, xtmp, x0);
+      Alpha = PLUS1; Beta = RZERO;
+      trx = trx2;
+
+    }
+    else {
+
+      //M_Multiply(MINUS1, xtmp, xtmp, TWO, x0);
+      Alpha = MINUS1; Beta = TWO;
+      trx = TWO * trx - trx2;
+
+    }
+
+    M_Copy(x0, xtmp);
+    M_Multiply(Alpha, xtmp, xtmp, Beta, x0);
+
+    idemperr2 = idemperr1;
+    idemperr1 = idemperr0;
+    idemperr0 = fabs(trx-trxold);
+  
+    if (iter > minsp2iter && idemperr0 >= idemperr2) breakloop=1;
+  }
+
+  //printf("sp2pure done trace = %f\n", trx);
+  //printf("sp2pure Number of It = %d\n", iter);
+
+  if (iter >= 100) {
+      printf("SP2 pure has reached 100 iterations: something is wrong! \n");
+      exit(1);
+  }
+
+  M_Multiply(TWO, x0, x0);
+  M_Pull(x0);
+
+  M_DeallocateLocal(xtmp);
+  M_DeallocateDevice(xtmp);
+  M_DeallocateDevice(x0);
+  M_DeallocateDevice(h);
+}
+
+/*
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Calculates the density matrix X0 from a Recursive Fermi  %
+%       Operator Expansion of the Hamiltonian H0            %
+%   A.M.N. Niklasson, Phys. Rev. B. vol. 66. 155115 (2002)  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [X0] = RecFermiOpEx(H0,h1,hN,N,Ne)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   h1, hN are approximate eigenvalue bounds of the         %
+% symmtetric N x N matrix H0, Ne the required trace of X0   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%% Initialize %%%
+  I = eye(N);
+  X0 = ((hN*I-H0)/(hN-h1)); 
+  trx = trace(X0); trxold = trx;
+  Idemp_Err = 1; It = 0; eps = 1e-20;
+
+  %%% Recursive expansion %%%
+  while Idemp_Err > eps & It < 100
+     Y = -1 * X0*X0 + X0 [or Y = X0 * (I - X0)]
+     try = trace(Y);
+     sgm = sign(abs(trx-try-Ne) - abs(trx+try-Ne));
+     X0 = X0 + sgm * Y
+     trx = trace(X0);
+     Idemp_Err = abs(trX-trXold);
+     trxold = trx;
+     It = It + 1;
+  end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*/
+void sp2pure_nospin3(REAL bndfil, int  hdim, REAL *x0_pointer, REAL maxeval,
+             REAL *h_pointer, REAL maxminusmin, int minsp2iter) {
+
+  int iter, breakloop;
+  REAL trx, trxold, trx2;
+  REAL occ, RZERO, TWO, PLUS1, MINUS1;
+  REAL idemperr0 = 0.0, idemperr1 = 0.0, idemperr2 = 0.0;
+
+#if REALSIZE==4
+  TWO = 2.0f;
+  MINUS1 = -1.0f;
+  PLUS1 = 1.0f;
+  RZERO = 0.0f;
+#elif REALSIZE==8
+  TWO = 2.0;
+  MINUS1 = -1.0;
+  PLUS1 = 1.0;
+  RZERO = 0.0;
+#endif
+
+  Matrix xtmp, x0, h;
+
+  M_Init(xtmp, hdim, hdim);
+  M_InitWithLocal(x0, x0_pointer, hdim, hdim);
+  M_InitWithLocal(h, h_pointer, hdim, hdim);
+
+  occ=bndfil*hdim;
+
+  for (int i = 0; i < hdim; i++) {
+    for (int j = 0; j < hdim; j++) {
+      x0_pointer[i*hdim + j] = -h_pointer[i*hdim + j]/maxminusmin;
+    }
+  }
+
+  trx = RZERO;
+
+  for (int i = 0; i < hdim; i++) {
+    x0_pointer[i*hdim + i] = maxeval/maxminusmin + x0_pointer[i*hdim + i];
+    trx += x0_pointer[i*hdim + i];
+  }
+
+  M_Push(x0);
+
+  // Define limits
+  iter=0;
+  breakloop = 0;
+
+  trxold = trx;
+
+  while( breakloop == 0 && iter < 100) {
+
+    iter++;
+
+    M_Copy(x0, xtmp);
+    M_Multiply(MINUS1, x0, x0, PLUS1, xtmp);
+    trx2 = M_Trace(xtmp);
+
+    if ((fabs(trx-trx2-occ) - fabs(trx+trx2-occ)) > 0) {
+
+      M_Add(x0, xtmp, x0);
+      trx = trx + trx2;
+
+    }
+    else {
+
+      M_Subtract(x0, xtmp, x0);
+      trx = trx - trx2;
+
+    }
+
+    idemperr2 = idemperr1;
+    idemperr1 = idemperr0;
+    idemperr0 = fabs(trx-trxold);
+
+    trxold = trx;
+
+    if (iter > minsp2iter && idemperr0 >= idemperr2) breakloop=1;
+  }
+
+  //printf("sp2pure done trace = %f\n", trx);
+  //printf("sp2pure Number of It = %d\n", iter);
+
+  if (iter >= 100) {
+      printf("SP2 pure has reached 100 iterations: something is wrong! \n");
+      exit(1);
+  }
+
+  M_Multiply(TWO, x0, x0);
+  M_Pull(x0);
+
+  M_DeallocateLocal(xtmp);
+  M_DeallocateDevice(xtmp);
+  M_DeallocateDevice(x0);
+  M_DeallocateDevice(h);
+}
+
+/*
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Calculates the density matrix X0 from a Recursive Fermi  %
+%       Operator Expansion of the Hamiltonian H0            % 
+%   A.M.N. Niklasson, Phys. Rev. B. vol. 66. 155115 (2002)  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [X0] = RecFermiOpEx_0(H0,h1,hN,N,Ne)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   h1, hN are approximate eigenvalue bounds of the         %
+% symmtetric N x N matrix H0, Ne the required trace of X0   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ %%% Initialize %%%
+ I = eye(N); % returns an NxN identity matrix
+ X0 = ((hN*I-H0)/(hN-h1));
+ trX0 = trace(X0); trX0_old = trX0;
+ Idemp_Err = 1; It = 0;
+%%% Precision dependent convergence %%%
+%  eps = 1e-14; % Double precision
+ eps = 1e-5;  % Single precision
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+ %%% Recursive expansion %%%
+ while Idemp_Err > eps & It < 100
+    sgm = sign(trX0-Ne);
+    a = sgm;
+    b = (1-sgm);
+    X0 = a*X0*X0 + b*X0;  %%% xGEMM
+
+    trX0_old = trX0;
+    trX0 = trace(X0);
+    Idemp_Err = abs(trX0-trX0_old);
+    It = It + 1;
+ end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*/
+void sp2pure_nospin4(REAL bndfil, int  hdim, REAL *x0_pointer, REAL maxeval,
+             REAL *h_pointer, REAL maxminusmin, int minsp2iter) {
+
+  int iter, breakloop;
+  REAL trx, trxold, occ;
+  REAL RZERO, TWO;
+  REAL idemperr0 = 0.0, idemperr1 = 0.0, idemperr2 = 0.0;
+
+#if REALSIZE==4
+  RZERO = 0.0f;
+  TWO = 2.0f;
+#elif REALSIZE==8
+  RZERO = 0.0;
+  TWO = 2.0;
+#endif
+
+  Matrix x2, x0, h;
+
+  M_Init(x2, hdim, hdim);
+  M_InitWithLocal(x0, x0_pointer, hdim, hdim);
+  M_InitWithLocal(h, h_pointer, hdim, hdim);
+
+  occ=bndfil*hdim;
+
+  for (int i = 0; i < hdim; i++) {
+    for (int j = 0; j < hdim; j++) {
+      x0_pointer[i*hdim + j] = -h_pointer[i*hdim + j]/maxminusmin;
+    }
+  }
+
+  trx = RZERO;
+
+  for (int i = 0; i < hdim; i++) {
+    x0_pointer[i*hdim + i] = maxeval/maxminusmin + x0_pointer[i*hdim + i];
+    trx += x0_pointer[i*hdim + i];
+  }
+
+  M_Push(x0);
+
+  trxold = trx;
+ 
+  // Set iteration count
+  iter = 0;
+  breakloop = 0;
+
+  // Recursive expansion
+  while( breakloop == 0 && iter < 100 ) {
+
+    iter++;
+
+    // X0 = a*X0*X0 + b*X0
+    //
+    // if sign(trx-occ) == 1 then X0 = X0*X0
+    // else X0 = -1 * X0*X0 + 2.0 * X0
+    //
+    M_Multiply(x0, x0, x2);
+
+    if ((trx - occ) > 0) {
+      M_Copy(x2, x0);
+    }
+    else {
+      M_MultiplySub(TWO, x0, x2, x0);
+    } 
+ 
+    trxold = trx;
+    trx = M_Trace(x0);
+
+    idemperr2 = idemperr1;
+    idemperr1 = idemperr0;
+    idemperr0 = fabs(trx-trxold);
+
+    if (iter > minsp2iter && idemperr0 >= idemperr2) breakloop=1;
+
+  }
+
+  //printf("sp2pure done trace = %f\n", trx0);
+
+  if (iter >= 100) {
+      printf("SP2 pure has reached 100 iterations: something is wrong! \n");
+      exit(1);
+  }
+
+  M_Multiply(TWO, x0, x0);
+  M_Pull(x0);
+
+  M_DeallocateLocal(x2);
+  M_DeallocateDevice(x2);
+  M_DeallocateDevice(x0);
+  M_DeallocateDevice(h);
+}
+
+
+void sp2pure_spin(REAL bndfil, int  hdim, REAL *rhoup_pointer, REAL *rhodown_pointer, 
+             REAL maxeval, REAL *hup_pointer, REAL *hdown_pointer, REAL maxminusmin, int minsp2iter) {
+  //
+  // This subroutine implements Niklasson's SP2 density matrix purification
+  // algorithm. 
+  //
+
+  int iter, breakloop;
+  REAL trx, totne, occ, trx2, tr2xx2, limit1, limit2;
+  
+  Matrix x2up, x2down, rhoup, rhodown, hup, hdown;
+  M_Init(x2up, hdim, hdim);
+  M_Init(x2down, hdim, hdim);
+  M_InitWithLocal(rhoup, rhoup_pointer, hdim, hdim);
+  M_InitWithLocal(rhodown, rhodown_pointer, hdim, hdim);
+  M_InitWithLocal(hup, hup_pointer, hdim, hdim);
+  M_InitWithLocal(hdown, hdown_pointer, hdim, hdim);
+  
+  //
+  // We're also using Niklasson's scheme to determine convergence
+  //
+
+  REAL idemperr0=0.0, idemperr1=0.0, idemperr2=0.0, trxold;
+
+  occ=bndfil*hdim;
+  totne=2.0*occ;
+
+  //
+  // Start by remapping the two H matrices such that 
+  // all eigenvalues are [0:1]. We have the Gersgorin bounds
+  // for both Hup and Hdown
+  //
+
+  for (int i=0; i<hdim; i++) {
+    for (int j=i; j<hdim; j++) {
+      if (i==j) {
+	rhoup_pointer[i*hdim+j]=(maxeval-hup_pointer[i*hdim+i])/maxminusmin;
+	rhodown_pointer[i*hdim+j]=(maxeval-hdown_pointer[i*hdim+i])/maxminusmin;
+      }
+      else {
+	rhoup_pointer[i*hdim+j]=-hup_pointer[i*hdim+j]/maxminusmin;
+	rhoup_pointer[j*hdim+i]=rhoup_pointer[i*hdim+j];
+	rhodown_pointer[i*hdim+j]=-hdown_pointer[i*hdim+j]/maxminusmin;
+	rhodown_pointer[j*hdim+i]=rhodown_pointer[i*hdim+j];
+      }
+    }
+  }
+  M_Push(rhoup);
+  M_Push(rhodown);
+  trx=M_Trace(rhoup)+M_Trace(rhodown);
+//  printf("Initial trace=%f\n", trx);
+  
+  iter=0;
+  breakloop=0;
+
+  while(!breakloop) {
+    iter++;
+    if (iter==100) {
+      printf("SP2 purification not converging: STOP!\n");
+      exit(1);
+    }
+    
+    //
+    // Now we're calculating X*X for the spin-up and spin-down
+    // density matrices
+    //
+
+    M_Multiply(rhoup, rhoup, x2up);
+    M_Multiply(rhodown, rhodown, x2down);
+
+    trx2=M_Trace(x2up)+M_Trace(x2down);
+
+    // new way of doing the trace...
+
+    tr2xx2= M_Trace(rhoup)+M_Trace(rhodown);
+
+    tr2xx2 = 2.0*tr2xx2 - trx2;
+      
+    limit1=fabs(trx2-totne);
+    limit2=fabs(tr2xx2-totne);
+
+    trxold=trx;
+
+    if (limit1<limit2) {
+      M_Copy(x2up, rhoup);
+      M_Copy(x2down, rhodown);
+      
+      trx = trx2;
+
+    }
+    else {
+      //M_Multiply(2.0, rhoup, rhoup);
+      //M_Subtract(rhoup, x2up, rhoup);
+      M_MultiplySub(2.0, rhoup, x2up, rhoup);
+      //M_Multiply(2.0, rhodown, rhodown);
+      //M_Subtract(rhodown, x2down, rhodown);
+      M_MultiplySub(2.0, rhodown, x2down, rhodown);
+
+      trx = tr2xx2;
+    }
+
+    
+    idemperr2 = idemperr1;
+    idemperr1 = idemperr0;
+    idemperr0 = fabs(trx - trxold);
+
+    if (iter>minsp2iter && idemperr0 >= idemperr2) {
+	breakloop = 1;
+    }
+  }
+  M_Pull(rhoup);
+  M_Pull(rhodown);
+
+  M_DeallocateLocal(x2up);
+  M_DeallocateDevice(x2up);
+  M_DeallocateLocal(x2down);
+  M_DeallocateDevice(x2down);
+  M_DeallocateDevice(rhoup);
+  M_DeallocateDevice(rhodown);
+  M_DeallocateDevice(hup);
+  M_DeallocateDevice(hdown);
+}
+

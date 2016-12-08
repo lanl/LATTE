@@ -1,0 +1,47 @@
+DEBUG=-g
+PROF=-pg
+CUDA_OPT_LEVEL=0
+CC_OPT_LEVEL=3
+
+CUDA_CC= nvcc -arch sm_13 -DCUDA -O${CUDA_OPT_LEVEL} ${PROF} ${DEBUG}
+CPP_CC=g++ -DBLAS -O${CC_OPT_LEVEL} ${PROF} ${DEBUG} -Wall
+
+#GOTO= /home/cawkwell/GotoBLAS2/libgoto2.a -lpthread
+#CUDA= -L/usr/local/cuda/lib64 -lcublas -lcudart
+
+KERNEL_SOURCES=$(wildcard Kernels/*.cu)
+KERNEL_OBJECTS=$(KERNEL_SOURCES:.cu=.8.o) $(KERNEL_SOURCES:.cu=.4.o)
+
+MATRIX_SOURCES=$(wildcard M_*.cu) $(wildcard F_*.cu) SP2Pure.cu SP2Fermi.cu SolveMatrixCG.cu Allocate.cu
+MATRIX_CUDA_OBJECTS=$(MATRIX_SOURCES:.cu=.cuda.8.o) $(MATRIX_SOURCES:.cu=.cuda.4.o)
+MATRIX_BLAS_OBJECTS=$(MATRIX_SOURCES:.cu=.blas.8.o) $(MATRIX_SOURCES:.cu=.blas.4.o)
+
+#all: libmatrix_cuda.a
+all: libmatrix_blas.a libmatrix_cuda.a
+
+libmatrix_cuda.a: $(MATRIX_CUDA_OBJECTS) $(KERNEL_OBJECTS)
+	ar r libmatrix_cuda.a $(MATRIX_CUDA_OBJECTS) $(KERNEL_OBJECTS)
+
+libmatrix_blas.a: $(MATRIX_BLAS_OBJECTS)
+	ar r libmatrix_blas.a $(MATRIX_BLAS_OBJECTS)
+
+%.cuda.4.o: %.cu
+	${CUDA_CC} -DREALSIZE=4 -c $< -o $@ 
+
+%.cuda.8.o: %.cu
+	${CUDA_CC} -DREALSIZE=8 -c $< -o $@ 
+
+%.blas.4.o: %.cu
+	${CPP_CC} -DREALSIZE=4 -x c++ -c $< -o $@ 
+
+%.blas.8.o: %.cu
+	${CPP_CC} -DREALSIZE=8 -x c++ -c $< -o $@ 
+
+%.4.o: %.cu
+	${CUDA_CC} -DREALSIZE=4 -c $< -o $@ 
+
+%.8.o: %.cu
+	${CUDA_CC} -DREALSIZE=8 -c $< -o $@ 
+
+clean:
+	- rm *~ *.o *.a

@@ -1,0 +1,1 @@
+gfortran -o xyz2latte xyz2latte.f90
