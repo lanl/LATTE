@@ -1,0 +1,71 @@
+#
+# Compilation and link flags for LATTE
+#
+
+
+# Precision - double or single
+PRECISION = DOUBLE
+#PRECISION = SINGLE
+
+# Make the latte library
+# AR and RUNLIB executable default path to compile 
+# latte as a library (change accordingly)
+MAKELIB = ON
+AR = /usr/bin/ar cq
+RANLIB = /usr/bin/ranlib
+
+# Use the PROGRESS and BML libraries
+PROGRESS = ON
+PROGRESS_PATH= $(HOME)/qmd-progress/install/lib
+BML_PATH= $(HOME)/bml/install/lib
+
+# Use the METIS library for graph partitioning
+METIS = OFF
+METIS_PATH= $(HOME)/metis/metis-5.1.0/install
+
+# GPU available - OFF or ON
+GPUOPT = OFF
+
+# Using DBCSR library from cp2k? OFF or ON
+DBCSR_OPT = OFF
+
+# Parallelizing over k-points?
+MPIOPT = OFF
+
+#
+# CPU Fortran options
+#
+#FC = mpif90
+FC = gfortran
+FCL = $(FC)
+FFLAGS = -O3 -fopenmp -cpp
+#FFLAGS =  -fast -Mpreprocess -mp
+LINKFLAG = -fopenmp
+
+#LIB = -framework Accelerate
+#LIB = -L/usr/projects/hpcsoft/toss2/common/acml/5.3.1/gfortran64/lib -lacml
+LIB = -llapack -lblas
+
+#LIB = -Wl,--no-as-needed -L${MKLROOT}/lib/intel64 \
+ -lmkl_lapack95_lp64 -lmkl_gf_lp64 -lmkl_gnu_thread -lmkl_core \
+ -lmkl_gnu_thread -lmkl_core -ldl -lpthread -lm
+
+ifeq ($(PROGRESS), ON)
+	LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml
+        FFLAGS += -I$(BML_PATH)/../include -I$(PROGRESS_PATH)/../include
+endif
+
+ifeq ($(GRAPH), ON) 
+	LIB += -L$(METIS_PATH)/lib -lmetis
+        FFLAGS += -I$(METIS_PATH)/include
+endif
+
+#DBCSR_LIB = -L/home/cawkwell/cp2k/lib/cawkwell/popt -lcp2k_dbcsr_lib
+#DBCSR_MOD = -I/home/cawkwell/cp2k/obj/cawkwell/popt
+
+#
+# GPU options
+#
+
+GPU_CUDA_LIB = -L/opt/cudatoolkit-5.5/lib64 -lcublas -lcudart
+GPU_ARCH = sm_20 
