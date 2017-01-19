@@ -17,6 +17,14 @@ src :
 
 docs :
 	(doxygen ./src/Doxyfile.in)
+	(cd ./doc/latex/ ; make ; cd ../../)
+	(cp ./doc/latex/refman.pdf ./Manual/)
+
+test : 
+	(./tests/run_test.sh)
+
+test_lmp : 
+	(./example_lmp/run_test.sh)
 
 matrix : 
 ifeq ($(GPUOPT),ON)
