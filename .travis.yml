@@ -1,0 +1,31 @@
+language: c
+
+sudo: required
+dist: trusty
+
+sources:
+  - ubuntu-toolchain-r-test
+  - llvm-toolchain-precise-3.6
+
+os:
+  - linux
+
+before_install:
+  - sudo apt-get install gfortran libblas-dev liblapack-dev
+  - sudo apt-get install cmake python gcc cmake-data g++
+  - cd; git clone git@github.com:qmmd/bml.git
+  - cd; git clone git@github.com:losalamos/qmd-progress.git
+
+before_script:
+  - cd ~/build/lanl/LATTE/
+
+env:
+  - CMAKE_BUILD_TYPE=Release FC=gfortran CC=gcc CXX=g++ CHOICES=gfort.lapack
+#  - CMAKE_BUILD_TYPE=Release FC=gfortran CC=gcc CXX=g++ CHOICES=gfort.lapack.progress
+
+script:
+  -  cp -f -v ./makefiles/makefile.CHOICES.${CHOICES} makefile.CHOICES
+  -  make; make test
+
+after_success:
+  - echo "success"
