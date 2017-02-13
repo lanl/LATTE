@@ -19,8 +19,8 @@ if [ "${BASH_ARGV[0]}" != "" ]; then
     echo "      $ run_latte --setup : Setup a Latte calculation environment with sample input files."
     echo "      $ run_latte --setuplmp : Setup a full Lammps-Latte calculation environment with sample input files."
     echo "      $ run_latte --run : Runs latte taking the info located in the existing running folders."
-    echo "      $ run_latte --clean : Runs latte taking the info located in the existing running folders."
-    echo "      $ run_latte --cleanall : Runs latte taking the info located in the existing running folders."
+    echo "      $ run_latte --clean : Cleans previous running files."
+    echo "      $ run_latte --cleanall : Cleans previous running files including folders."
     exit
 
   elif [ "${BASH_ARGV[0]}" == "--setup" ]; then
