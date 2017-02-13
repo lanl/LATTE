@@ -15,7 +15,7 @@ AR = /usr/bin/ar cq
 RANLIB = /usr/bin/ranlib
 
 # Use the PROGRESS and BML libraries
-PROGRESS = ON
+PROGRESS = OFF
 PROGRESS_PATH= $(HOME)/qmd-progress/install/lib
 BML_PATH= $(HOME)/bml/install/lib
 
@@ -43,9 +43,10 @@ FFLAGS = -O3 -fopenmp -cpp
 LINKFLAG = -fopenmp
 #LIB = -framework Accelerate
 #LIB = -L/usr/projects/hpcsoft/toss2/common/acml/5.3.1/gfortran64/lib -lacml
-LIB = -Wl,--no-as-needed -L${MKLROOT}/lib/intel64 \
+#LIB = -Wl,--no-as-needed -L${MKLROOT}/lib/intel64 \
  -lmkl_lapack95_lp64 -lmkl_gf_lp64 -lmkl_gnu_thread -lmkl_core \
  -lmkl_gnu_thread -lmkl_core -ldl -lpthread -lm
+LIB = -llapack -lblas
 
 ifeq ($(PROGRESS), ON)
 	LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml
