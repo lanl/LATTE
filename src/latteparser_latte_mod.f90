@@ -379,7 +379,7 @@ CONTAINS
          'THERMRUN=', 'NVTON=', 'NPTON=', 'AVEPER=', 'SEED=', 'SHOCKON=',&
          'SHOCKSTART=','SHOCKDIR=','MDADAPT=','GETHUG=']
     INTEGER :: valvector_int(nkey_int) = (/ &
-         5000,25,250,500,25,1,500, &
+         5000,1,250,500,25,1,500, &
          50000,0,0,1000,54,0, &
          100000,1,0,0/)
 
