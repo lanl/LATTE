@@ -7,7 +7,7 @@
 module kernelparser_mod
 
   use openfiles_mod
-  use parallel_mod
+!  use parallel_mod
 
   implicit none
 
@@ -73,7 +73,7 @@ contains
 
     close(io_control)
 
-    !Look up for floating dashes (#)
+    !Look up for floating hashes (#)
     totalwords = 0
     do i=1,readmaxi
       do k=1,readmaxj
@@ -83,7 +83,7 @@ contains
           write(*,*)" "
           write(*,*)"For this parsing routine everything is a comment by default unless theres an = sign"
           write(*,*)"next to a word in which case it will be recognized as a keyword."
-          write(*,*)"This parser does not accept floating dashes (# symbol) to make sure"
+          write(*,*)"This parser does not accept floating hash (#) symbols to make sure"
           write(*,*)"that we are sure that we want to comment a specific keyword"
           write(*,*)" "
           write(*,*)"Make sure all the commented keywords have a # right next them"
@@ -319,9 +319,9 @@ contains
 
     deallocate(checkmissing_char,checkmissing_re, checkmissing_int, checkmissing_log)
 
-    ! Only rank 0 prints parameters
+    ! Only rank 0 prints parameters if compiled with MPI
     write(*,*)' '
-    if (printRank() .eq. 1) then
+!    if (printRank() .eq. 1) then
 
       write(*,*)"############### Parameters used for this run ################"
       if(start)write(*,*)" ",startstop(1)
@@ -342,7 +342,7 @@ contains
       end do
       if(start)write(*,*)" ",startstop(2)
 
-    endif
+ !   endif
     write(*,*)' '
 
     if(stopparsing)then
