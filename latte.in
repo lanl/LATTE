@@ -1,9 +1,14 @@
-LATTE INPUT FILE
-================
-#This input file resumes the content of MDcontroller and TBparam/control.in
-#The parser will only read it if it is present inside the running folder. 
-#In case this file is not present Latte will read the two files as original.
-#The order of the kewords is not important in this file. 
+#LATTE INPUT FILE
+#================
+
+This input file resumes the content of MDcontroller and TBparam/control.in
+The parser will read it only if it is present inside the running folder. 
+In case this file is not present Latte will read the two files as original.
+The order of the keywords is not important in this file. 
+Everything is a comment by default unless a word contains an "equal" sign.
+To comment a particular keyword the "#" symbol has to be added next to the 
+keyword. Example: #MyCommentedKeyword=
+
 
 #General controls
 CONTROL{
