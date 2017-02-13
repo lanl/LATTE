@@ -1,31 +1,31 @@
-!> Some general parsing functions. 
+!> Some general parsing functions.
 !! \ingroup PROGRESS
-!! 
+!!
 !! \author C. F. A. Negre
 !! (cnegre@lanl.gov)
 !!
 module kernelparser_mod
 
   use openfiles_mod
-  use myprecision
+  use parallel_mod
 
   implicit none
 
   private
 
-  integer, parameter :: dp = latteprec
+  integer, parameter :: dp = kind(1.0d0)
 
-  public :: parsing_kernel 
+  public :: parsing_kernel
 
 contains
 
   !> The general parsing function.
-  !! It is used to vectorize a set of "keywords" "value" pairs 
-  !! as included in a general parsing routine.  
-  !! \note This parsing strategy can only parse a file of 
+  !! It is used to vectorize a set of "keywords" "value" pairs
+  !! as included in a general input file.
+  !! \note This parsing strategy can only parse a file of
   !! 500 lines by 500 words.
   !! \warning If the length of variable vect is changed, this could produce a
-  !! segmentation fault. 
+  !! segmentation fault.
   !!
   subroutine parsing_kernel(keyvector_char,valvector_char&
       ,keyvector_int,valvector_int,keyvector_re,valvector_re,&
@@ -68,93 +68,96 @@ contains
     vect = '                    '
 
     do i=1,readmaxi !Here we read all the input into vect
-      read(io_control,*,iostat=ios)(vect(i,j),j=1,readmaxj )
+      read(io_control,*,iostat=ios)(vect(i,j),j=1,readmaxj)
     end do
 
     close(io_control)
 
-    !Look up for floating dashes (#) 
-
+    !Look up for floating dashes (#)
     totalwords = 0
-    do i=1,readmaxi  
+    do i=1,readmaxi
       do k=1,readmaxj
-        if(adjustl(trim(vect(i,k))).ne."")totalwords = totalwords + 1        
-!         if(adjustl(trim(vect(i,k))).ne."")write(*,*)i,k,readmaxj,adjustl(trim(vect(i,k)))
-        if(adjustl(trim(vect(i,k))).eq."#")then                   
-          write(*,*)"ERROR in the the input file ..." 
-          write(*,*)" " 
-          write(*,*)"The new version of the parser does not accept floating dashes (# symbol)"
-          write(*,*)"Make sure all the commented lines have a # right next to the commented keyword"
-          write(*,*)"   "
-          write(*,*)"   The following is correct: "
-          write(*,*)"                #KeyWord= 1 " 
-          write(*,*)" " 
-          write(*,*)"   The following is NOT correct: "
-          write(*,*)"                # KeyWord= 1 " 
+        if(adjustl(trim(vect(i,k))).ne."")totalwords = totalwords + 1
+        if(adjustl(trim(vect(i,k))).eq."#")then
+          write(*,*)"ERROR in the the input file ..."
           write(*,*)" "
-          stop 
+          write(*,*)"For this parsing routine everything is a comment by default unless theres an = sign"
+          write(*,*)"next to a word in which case it will be recognized as a keyword."
+          write(*,*)"This parser does not accept floating dashes (# symbol) to make sure"
+          write(*,*)"that we are sure that we want to comment a specific keyword"
+          write(*,*)" "
+          write(*,*)"Make sure all the commented keywords have a # right next them"
+          write(*,*)"   "
+          write(*,*)"   The following commented keyword is correct: "
+          write(*,*)"                #KeyWord= 1 "
+          write(*,*)" "
+          write(*,*)"   The following commented keyword is NOT correct: "
+          write(*,*)"                # KeyWord= 1 "
+          write(*,*)" "
+          stop
         endif
         if(adjustl(trim(vect(i,k))).eq."STOP{}")stopparsing = .true.
       enddo
     enddo
 
-     if(totalwords > readmaxi*readmaxj - 100) then 
-      write(*,*)""; write(*,*)"Stopping ... Maximum allowed (keys + values + comment) words closed to the limit "
-      write(*,*)"Increase the readmaxj variable in the parsing_kernel subroutine or reduce the comment in the input"
+     if(totalwords > readmaxi*readmaxj - 100) then
+      write(*,*)""; write(*,*)"Stopping ... Maximum allowed (keys + values + comments) words close to the limit "
+      write(*,*)"Increase the readmaxj variable in the parsing_kernel subroutine or reduce the comments in the input"
       stop
-     endif         
-    
-    !Look up for boundaries 
+     endif
+
+    !Look up for boundaries
     readmini=1
     start=.false.
-    if(present(startstop))then     
-      do i=1,readmaxi  
+    if(present(startstop))then
+      do i=1,readmaxi
         do k=1,readmaxj
-          if(trim(vect(i,k)).eq.trim(startstop(1)))then 
+          if(trim(vect(i,k)).eq.trim(startstop(1)))then
             readmini=i
-            startatj = k
+            startatj=k
             start=.true.
-          endif  
-          if(start.and.trim(vect(i,k)).eq.trim(startstop(2)))then 
+          endif
+          if(start.and.trim(vect(i,k)).eq.trim(startstop(2)))then
             readmaxi=i
           endif
         enddo
       enddo
-    endif    
+    endif
     write(*,*)start,startstop
+
     ! Look for invalid characters if startstop is present
-    if(start)then 
+    if(start)then
       start=.false.
-      stopl=.false.      
+      stopl=.false.
       do i=readmini,readmaxi
-        do k=1,readmaxj        
-          if(trim(vect(i,k)).eq.trim(startstop(1)))start=.true.          
+        do k=1,readmaxj
+          if(trim(vect(i,k)).eq.trim(startstop(1)))start=.true.
           valid = .false.
-          if(start)then 
+          if(start)then
             if(vect(i,k).ne.'                    ')then
               do j=1,nkey_char
                 if(trim(vect(i,k)).eq.trim(keyvector_char(j)))then
                   valid = .true.
                 endif
-              enddo    
+              enddo
               do j=1,nkey_int
                 if(trim(vect(i,k)).eq.trim(keyvector_int(j)))then
                   valid = .true.
                 endif
-              enddo    
+              enddo
               do j=1,nkey_re
                 if(trim(vect(i,k)).eq.trim(keyvector_re(j)))then
                   valid = .true.
                 endif
-              enddo    
+              enddo
               do j=1,nkey_log
                 if(trim(vect(i,k)).eq.trim(keyvector_log(j)))then
                   valid = .true.
                 endif
-              enddo                  
-              if(trim(vect(i,k)).eq.trim(startstop(2)))then 
-                stopl=.true.              
-              endif              
+              enddo
+              if(trim(vect(i,k)).eq.trim(startstop(2)))then
+                stopl=.true.
+              endif
               if(.not.valid.and..not.stopl)call check_valid(vect(i,k))
             endif
           endif
@@ -165,30 +168,30 @@ contains
     stopl = .false.
     do i=readmini,readmaxi  !We search for the character keys
       if(stopl)exit
-      do k=1,readmaxj        
+      do k=1,readmaxj
         if(stopl)exit
         if(vect(i,k).ne.'                    ')then
           if(start)then !If we have a start key:
             if(readmaxj*(i-1)+k .ge.readmaxj*(readmini-1)+startatj) then !If the position is beyond the start key:
-              if(trim(vect(i,k)).ne.'}')then  !If we don't have a stop key:         
+              if(trim(vect(i,k)).ne.'}')then  !If we don't have a stop key:
                 do j=1,nkey_char
                   if(adjustl(trim(vect(i,k))).eq.adjustl(trim(keyvector_char(j))))then
                     valvector_char(j)=adjustl(trim(vect(i,k+1)))
-                    checkmissing_char(j) = .true.                  
-                  endif  
+                    checkmissing_char(j) = .true.
+                  endif
                 end do
               else
                 stopl = .true.
               endif
-            endif              
+            endif
           else  !If we don't have a start key:
             do j=1,nkey_char
               if(trim(vect(i,k)).eq.trim(keyvector_char(j)))then
                 valvector_char(j)=trim(vect(i,k+1))
-                 checkmissing_char(j) = .true.                  
-              endif  
+                 checkmissing_char(j) = .true.
+              endif
             end do
-          endif  
+          endif
         else
           exit
         end if
@@ -201,9 +204,9 @@ contains
       do k=1,readmaxj
         if(stopl)exit
         if(vect(i,k).ne.'                    ')then
-          if(start)then             
+          if(start)then
             if(readmaxj*(i-1)+k .ge.readmaxj*(readmini-1)+startatj) then
-              if(adjustl(trim(vect(i,k))).ne.'}')then 
+              if(adjustl(trim(vect(i,k))).ne.'}')then
                 do j=1,nkey_int
                   if(trim(vect(i,k)).eq.trim(keyvector_int(j)))then
                     read(vect(i,k+1),*)valvector_int(j)
@@ -213,16 +216,16 @@ contains
               else
                 stopl = .true.
               endif
-            endif  
-          else 
+            endif
+          else
             do j=1,nkey_int
               if(trim(vect(i,k)).eq.trim(keyvector_int(j)))then
                 read(vect(i,k+1),*)valvector_int(j)
                 checkmissing_int(j) = .true.
               end if
-            end do  
+            end do
           endif
-        else      
+        else
           exit
         end if
       end do
@@ -234,9 +237,9 @@ contains
       do k=1,readmaxj
         if(stopl)exit
         if(vect(i,k).ne.'                    ')then
-          if(start)then 
-            if(readmaxj*(i-1)+k .ge.readmaxj*(readmini-1)+startatj) then 
-              if(trim(vect(i,k)).ne.'}')then 
+          if(start)then
+            if(readmaxj*(i-1)+k .ge.readmaxj*(readmini-1)+startatj) then
+              if(trim(vect(i,k)).ne.'}')then
                 do j=1,nkey_re
                   if(trim(vect(i,k)).eq.trim(keyvector_re(j)))then
                     read(vect(i,k+1),*)valvector_re(j)
@@ -245,16 +248,16 @@ contains
                 end do
               else
                 stopl = .true.
-              endif 
-            endif              
+              endif
+            endif
           else
             do j=1,nkey_re
               if(trim(vect(i,k)).eq.trim(keyvector_re(j)))then
                 read(vect(i,k+1),*)valvector_re(j)
                 checkmissing_re(j) = .true.
               end if
-            end do            
-          endif   
+            end do
+          endif
         else
           exit
         end if
@@ -267,27 +270,27 @@ contains
       do k=1,readmaxj
         if(stopl)exit
         if(vect(i,k).ne.'                    ')then
-          if(start)then 
+          if(start)then
             if(readmaxj*(i-1)+k .ge.readmaxj*(readmini-1)+startatj) then
-              if(trim(vect(i,k)).ne.'}')then           
+              if(trim(vect(i,k)).ne.'}')then
                 do j=1,nkey_log
                   if(trim(vect(i,k)).eq.trim(keyvector_log(j)))then
                     read(vect(i,k+1),*)valvector_log(j)
                     checkmissing_log(j) = .true.
-                  end if                
+                  end if
                 end do
               else
                 stopl = .true.
-              endif  
-            endif      
+              endif
+            endif
           else
             do j=1,nkey_log
               if(trim(vect(i,k)).eq.trim(keyvector_log(j)))then
                 read(vect(i,k+1),*)valvector_log(j)
                 checkmissing_log(j) = .true.
-              end if                
-            end do            
-          endif  
+              end if
+            end do
+          endif
         else
           exit
         end if
@@ -316,7 +319,10 @@ contains
 
     deallocate(checkmissing_char,checkmissing_re, checkmissing_int, checkmissing_log)
 
- 
+    ! Only rank 0 prints parameters
+    write(*,*)' '
+    if (printRank() .eq. 1) then
+
       write(*,*)"############### Parameters used for this run ################"
       if(start)write(*,*)" ",startstop(1)
       do j=1,nkey_int
@@ -336,21 +342,23 @@ contains
       end do
       if(start)write(*,*)" ",startstop(2)
 
+    endif
+    write(*,*)' '
 
-    if(stopparsing)then 
+    if(stopparsing)then
       write(*,*)"" ; write(*,*)"STOP key found. Stop parsing ... "; write(*,*)""
       stop
-    endif  
-    
+    endif
+
     deallocate(vect)
-    
+
   end subroutine parsing_kernel
 
   !> Check for valid keywords (checks for an = sign)
   !! \param invalidc Keyword to check.
-  !! 
+  !!
   subroutine check_valid(invalidc)
-    implicit none 
+    implicit none
     character(1), allocatable     ::  tempc(:)
     character(len=*), intent(in)  ::  invalidc
     character(len=100)            ::  tempcflex
@@ -361,11 +369,11 @@ contains
     do l = 1,len(adjustl(trim(invalidc)))
       tempcflex = adjustl(trim(invalidc))
       tempc(l) = tempcflex(l:l)
-      if(tempc(l).eq."=".and.tempc(1).ne."#")then 
+      if(tempc(l).eq."=".and.tempc(1).ne."#")then
         write(*,*)"Input ERROR: ",adjustl(trim(invalidc))," is not a valid keyword"
         stop
-      endif               
-    enddo                          
+      endif
+    enddo
 
   end subroutine check_valid
 
