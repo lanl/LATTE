@@ -29,7 +29,7 @@ if [ "${BASH_ARGV[0]}" != "" ]; then
     mkdir -p ${RUN_PATH}/TBparam
     mkdir -p ${RUN_PATH}/animate
     mkdir -p ${RUN_PATH}/bl
-    cp -v ${LATTE_PATH}/control.in ${RUN_PATH}/TBparam
+    cp -v ${LATTE_PATH}/TBparam/control.in ${RUN_PATH}/TBparam
     cp -v ${LATTE_PATH}/MDcontroller ${RUN_PATH}/
     cp -v ${LATTE_PATH}/TBparam/bondints.nonortho* ${RUN_PATH}/TBparam
     cp -v ${LATTE_PATH}/TBparam/electrons.dat ${RUN_PATH}/TBparam
