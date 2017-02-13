@@ -20,7 +20,7 @@ PROGRESS_PATH= $(HOME)/qmd-progress/install/lib
 BML_PATH= $(HOME)/bml/install/lib
 
 # Use the METIS library for graph partitioning
-METIS = ON
+METIS = OFF
 METIS_PATH= $(HOME)/metis/metis-5.1.0/install
 
 # GPU available - OFF or ON
