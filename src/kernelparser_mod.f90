@@ -59,7 +59,7 @@ contains
     allocate(checkmissing_char(nkey_char),checkmissing_re(nkey_re), &
          checkmissing_int(nkey_int), checkmissing_log(nkey_log))
 
-    !Initialize the checkmissing flags and the vect array
+    !Initialize the checkmissing flags and the vect arrays
     checkmissing_char = .false.
     checkmissing_re = .false.
     checkmissing_int = .false.
@@ -196,9 +196,9 @@ contains
              endif
           else
              exit
-          end if
-       end do
-    end do
+          endif
+       enddo
+    enddo
 
     stopl = .false.
     do i=readmini,readmaxi  !We search for the integer keys
@@ -213,8 +213,8 @@ contains
                          if(trim(vect(i,k)).eq.trim(keyvector_int(j)))then
                             read(vect(i,k+1),*)valvector_int(j)
                             checkmissing_int(j) = .true.
-                         end if
-                      end do
+                         endif
+                      enddo
                    else
                       stopl = .true.
                    endif
@@ -224,14 +224,14 @@ contains
                    if(trim(vect(i,k)).eq.trim(keyvector_int(j)))then
                       read(vect(i,k+1),*)valvector_int(j)
                       checkmissing_int(j) = .true.
-                   end if
-                end do
+                   endif
+                enddo
              endif
           else
              exit
-          end if
-       end do
-    end do
+          endif
+       enddo
+    enddo
 
     stopl = .false.
     do i=readmini,readmaxi  !We search for the real keys
@@ -312,18 +312,19 @@ contains
        endif
        if(checkmissing_char(i).neqv..true.)  write(*,*)'WARNING: variable ',trim(keyvector_char(i)),&
             ' is missing. I will use a default value instead ...'
-    end do
+    enddo
     do i = 1,nkey_int
        if(defaultnone .eqv..true.)then
           if(checkmissing_int(i).neqv..true..and.trim(keyvector_int(i)).ne."DUMMY=")then
              write(*,*)'ERROR: variable ',trim(keyvector_int(i)),&
                   ' is missing. Set this variable or remove the DEFAULTNONE keyword from the input file...'
              write(*,*)'Default value is:',valvector_int(i)
+             stop
           endif
        endif
        if(checkmissing_int(i).neqv..true.) write(*,*)'WARNING: variable ',trim(keyvector_int(i)),&
             ' is missing. I will use a default value instead ...'
-    end do
+    enddo
     do i = 1,nkey_re
        if(defaultnone .eqv..true.)then
           if(checkmissing_re(i).neqv..true..and.trim(keyvector_re(i)).ne."DUMMY=")then
@@ -335,7 +336,7 @@ contains
        endif
        if(checkmissing_re(i).neqv..true.) write(*,*)'WARNING: variable ',trim(keyvector_re(i)),&
             ' is missing. I will use a default value instead ...'
-    end do
+    enddo
     do i = 1,nkey_log
        if(defaultnone .eqv..true.)then
           if(checkmissing_log(i).neqv..true..and.trim(keyvector_log(i)).ne."DUMMY=")then
@@ -347,7 +348,7 @@ contains
        endif
        if(checkmissing_log(i).neqv..true.) write(*,*)'WARNING: variable ',trim(keyvector_log(i)),&
             ' is missing. I will use a default value instead ...'
-    end do
+    enddo
     write(*,*)' '
 
     deallocate(checkmissing_char,checkmissing_re, checkmissing_int, checkmissing_log)
@@ -360,19 +361,19 @@ contains
     if(start)write(*,*)" ",startstop(1)
     do j=1,nkey_int
        write(*,*)" ",trim(keyvector_int(j)),valvector_int(j)
-    end do
+    enddo
 
     do j=1,nkey_re
        write(*,*)" ",trim(keyvector_re(j)),valvector_re(j)
-    end do
+    enddo
 
     do j=1,nkey_char
        write(*,*)" ",trim(keyvector_char(j)),valvector_char(j)
-    end do
+    enddo
 
     do j=1,nkey_log
        write(*,*)" ",trim(keyvector_log(j)),valvector_log(j)
-    end do
+    enddo
     if(start)write(*,*)" ",startstop(2)
 
     !   endif
