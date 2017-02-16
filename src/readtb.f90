@@ -37,6 +37,8 @@ SUBROUTINE READTB
   REAL(LATTEPREC) :: TAILPARAMS(6)
   LOGICAL :: LATTEINEXISTS
 
+  write(*,*)trim(PARAMPATH)//"/electrons.dat"
+  
   OPEN(UNIT=22,STATUS="OLD", FILE=trim(PARAMPATH)//"/electrons.dat")
 
   READ(22,*) HD, NOELEM
@@ -44,13 +46,13 @@ SUBROUTINE READTB
   IF(.NOT.ALLOCATED(WSS))THEN
     ALLOCATE(WSS(NOELEM),WPP(NOELEM),WDD(NOELEM),WFF(NOELEM))
   ENDIF
-  
+
   ALLOCATE(ELE(NOELEM), BASIS(NOELEM), ATOCC(NOELEM), HES(NOELEM), &
        HEP(NOELEM), HED(NOELEM), HEF(NOELEM), MASS(NOELEM), &
        HUBBARDU(NOELEM))
-       
+
   READ(22,*) HD, HD, HD, HD, HD, HD, HD, HD, HD, HD, HD, HD, HD
-       
+
   DO I = 1, NOELEM
      READ(22,*) ELE(I), BASIS(I), ATOCC(I), HES(I), HEP(I), HED(I), HEF(I), &
        MASS(I), HUBBARDU(I), WSS(I), WPP(I), WDD(I), WFF(I)
@@ -71,29 +73,29 @@ SUBROUTINE READTB
 
 
   IF (BASISTYPE .EQ. "ORTHO") THEN
-     
+
      READ(11,*) HD, HD, HD, HD, HD, HD, HD, HD, HD, HD, HD
-      
+
      DO I = 1, NOINT
-        
+
         READ(11,*) ELE1(I), ELE2(I), BTYPE(I), (BOND(J,I), J = 1, 8)
-        
+
      ENDDO
 
   ELSE
-     
+
      ALLOCATE( OVERL(14,NOINT) )
- 
+
      READ(11,*) HD, HD, HD, HD, HD, HD, HD, HD, HD, HD, HD, &
           HD, HD, HD, HD, HD, HD, HD, HD
-    
+
      DO I = 1, NOINT
-        
+
         READ(11,*) ELE1(I), ELE2(I), BTYPE(I), (BOND(J,I), J = 1, 8), &
              (OVERL(K,I), K = 1, 8)
-        
+
      ENDDO
-     
+
   ENDIF
 
   CLOSE(11)
@@ -114,7 +116,7 @@ SUBROUTINE READTB
     NKTOT = NKX*NKY*NKZ
 
   ENDIF
-     
+
   DO I = 1, NOINT
 
      CALL UNIVTAILCOEF(BOND(:,I))
@@ -122,7 +124,7 @@ SUBROUTINE READTB
      IF (BASISTYPE .EQ. "NONORTHO") CALL UNIVTAILCOEF(OVERL(:,I))
 
   ENDDO
-  
+
   RETURN
-  
+
 END SUBROUTINE READTB
