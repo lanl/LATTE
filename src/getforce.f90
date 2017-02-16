@@ -52,7 +52,7 @@ SUBROUTINE GETFORCE
         ELSE
 
            ! Otherwise use the complex but general expansions Josh Coe implemented 
-           
+           CALL PULAY
            IF (ELECTRO .EQ. 1) CALL FCOULNONO
            IF (SPINON .EQ. 1) CALL FSPINNONO
            
