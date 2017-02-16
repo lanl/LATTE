@@ -10,12 +10,14 @@ To comment a particular keyword the "hash" symbol has to be added next to the
 keyword. Example: #MyCommentedKeyword=
 
 
-#Uncoment the following keyword to force variable setting
-#DEFAULTNONE  
+#Uncoment the following keyword to force variable settings
+DEFAULTNONE  
 
 #General controls
 CONTROL{
   JobName= MyJob
+  PARAMPATH= "./TBparam"
+  COORDSFILE= "./bl/inputblock.dat"
   xControl= 1
   BASISTYPE= NONORTHO
   DEBUGON= 0
@@ -78,6 +80,11 @@ MDCONTROL{
   UPARTICLE= 500.0 USHOCK= -4590.0 C0= 1300.0
   MDADAPT= 0
   GETHUG= 0 E0= -795.725  V0= 896.984864 P0= 0.083149
+}
+
+KMESH{
+  NKX= 8 NKY= 8 NKZ= 8
+  KSHIFTX= 0.0 KSHIFTY= 0.0 KSHIFTZ= 0.0
 }
 
 

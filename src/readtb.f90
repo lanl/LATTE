@@ -28,14 +28,16 @@ SUBROUTINE READTB
   USE NONOARRAY
   USE SPINARRAY
   USE KSPACEARRAY
+  USE LATTEPARSER_LATTE_MOD
 
   IMPLICIT NONE
 
   INTEGER :: I, J, K
   CHARACTER(LEN=20) :: HD
   REAL(LATTEPREC) :: TAILPARAMS(6)
+  LOGICAL :: LATTEINEXISTS
 
-  OPEN(UNIT=22,STATUS="OLD", FILE="TBparam/electrons.dat")
+  OPEN(UNIT=22,STATUS="OLD", FILE=trim(PARAMPATH)//"/electrons.dat")
 
   READ(22,*) HD, NOELEM
 
@@ -57,9 +59,9 @@ SUBROUTINE READTB
   CLOSE(22)
 
   IF (BASISTYPE .EQ. "ORTHO") THEN
-     OPEN(UNIT=11,STATUS="OLD", FILE="TBparam/bondints.ortho")
+     OPEN(UNIT=11,STATUS="OLD", FILE=trim(PARAMPATH)//"/bondints.ortho")
   ELSE
-     OPEN(UNIT=11,STATUS="OLD", FILE="TBparam/bondints.nonortho")
+     OPEN(UNIT=11,STATUS="OLD", FILE=trim(PARAMPATH)//"/bondints.nonortho")
   ENDIF
 
   READ(11,*) HD, NOINT
@@ -99,12 +101,17 @@ SUBROUTINE READTB
   ! If we're doing k-space integration, let's read in the k point mesh
   IF (KON .EQ. 1) THEN
 
-     OPEN(UNIT=11, STATUS="OLD", FILE="TBparam/kmesh.in")
+    INQUIRE( FILE="latte.in", exist=LATTEINEXISTS )
+    IF (LATTEINEXISTS) THEN
+      CALL PARSE_KMESH("latte.in")
+    ELSE
+      OPEN(UNIT=11, STATUS="OLD", FILE=trim(PARAMPATH)//"/kmesh.in")
+      READ(11,*) NKX, NKY, NKZ
+      READ(11,*) KSHIFT(1), KSHIFT(2), KSHIFT(3)
+      CLOSE (11)
+    ENDIF
 
-     READ(11,*) NKX, NKY, NKZ
-     NKTOT = NKX*NKY*NKZ
-     READ(11,*) KSHIFT(1), KSHIFT(2), KSHIFT(3)
-     CLOSE (11)
+    NKTOT = NKX*NKY*NKZ
 
   ENDIF
      

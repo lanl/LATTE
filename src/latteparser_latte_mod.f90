@@ -19,6 +19,7 @@ module latteparser_latte_mod
   use SPARSEARRAY
   use RELAXCOMMON
   use MDARRAY
+  USE KSPACEARRAY
 
   use openfiles_mod
   use kernelparser_mod
@@ -29,7 +30,7 @@ module latteparser_latte_mod
 
   integer, parameter :: dp = latteprec
 
-  public :: parse_control, parse_md
+  public :: parse_control, parse_md, parse_kmesh
 
 contains
 
@@ -40,14 +41,14 @@ contains
     use FERMICOMMON
 
     implicit none
-    integer, parameter :: nkey_char = 5, nkey_int = 48, nkey_re = 21, nkey_log = 1
+    integer, parameter :: nkey_char = 6, nkey_int = 48, nkey_re = 21, nkey_log = 1
     character(len=*) :: filename
 
     !Library of keywords with the respective defaults.
     character(len=50), parameter :: keyvector_char(nkey_char) = [character(len=100) :: &
-         'JobName=','BASISTYPE=','SP2CONV=','RELAXTYPE=','DUMMY=']
+         'JobName=','BASISTYPE=','SP2CONV=','RELAXTYPE=','PARAMPATH=','COORDSFILE=']
     character(len=100) :: valvector_char(nkey_char) = [character(len=100) :: &
-         'MyJob','NONORTHO','RELAX','SD','DUMMY']
+         'MyJob','NONORTHO','RELAX','SD','.TBParams/','./bl/inputblock.dat']
 
     character(len=50), parameter :: keyvector_int(nkey_int) = [character(len=50) :: &
          'xControl=', 'DEBUGON=', 'FERMIM=', 'CGORLIB=', 'NORECS=', 'ENTROPYKIND=',&
@@ -356,6 +357,11 @@ contains
 
     RELPERM = valvector_re(21)
 
+    ! Coordinates and parameter paths
+
+    PARAMPATH = valvector_char(5)
+    COORDSFILE = valvector_char(6)
+
   end subroutine parse_control
 
 
@@ -536,5 +542,50 @@ contains
     !   write(*,*)"E0,V0,P0",E0,V0,P0
 
   end subroutine parse_md
+
+
+  !> The parser for K Mesh input variables.
+  !!
+  subroutine parse_kmesh(filename)
+
+    implicit none
+    integer, parameter :: nkey_char = 1, nkey_int = 3, nkey_re = 3, nkey_log = 1
+    character(len=*) :: filename
+
+    !Library of keywords with the respective defaults.
+    character(len=50), parameter :: keyvector_char(nkey_char) = [character(len=100) :: &
+         'DUMMY=']
+    character(len=100) :: valvector_char(nkey_char) = [character(len=100) :: &
+         'DUMMY']
+
+    character(len=50), parameter :: keyvector_int(nkey_int) = [character(len=50) :: &
+         'KNX=','KNY=','KNZ=']
+    integer :: valvector_int(nkey_int) = (/ &
+         1,1,1/)
+
+    character(len=50), parameter :: keyvector_re(nkey_re) = [character(len=50) :: &
+         'KSHIFTX=','KSHIFTY=','KSHIFTZ=']
+    real(dp) :: valvector_re(nkey_re) = (/&
+         0.0,0.0,0.0/)
+
+    character(len=50), parameter :: keyvector_log(nkey_log) = [character(len=100) :: &
+         'DUMMY=']
+    logical :: valvector_log(nkey_log) = (/&
+         .false./)
+
+    !Start and stop characters
+    character(len=50), parameter :: startstop(2) = [character(len=50) :: &
+         'KMESH{', '}']
+
+    call parsing_kernel(keyvector_char,valvector_char&
+         ,keyvector_int,valvector_int,keyvector_re,valvector_re,&
+         keyvector_log,valvector_log,trim(filename),startstop)
+
+      NKX= valvector_int(1); NKY= valvector_int(2); NKZ=valvector_int(3)
+      KSHIFT(1)= valvector_re(1); KSHIFT(2)= valvector_re(2); KSHIFT(3)= valvector_re(3)
+
+
+  end subroutine parse_kmesh
+
 
 end module latteparser_latte_mod
