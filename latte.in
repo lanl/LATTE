@@ -2,16 +2,20 @@
 #================
 
 This input file resumes the content of MDcontroller and TBparam/control.in
-The parser will read it only if it is present inside the running folder. 
-In case this file is not present Latte will read the two files as original.
+The parser will read this file only if it is present inside the running folder. 
+In case this file is not present Latte will read the two files as originally.
 The order of the keywords is not important in this file. 
 Everything is a comment by default unless a word contains an "equal" sign.
-To comment a particular keyword the "#" symbol has to be added next to the 
+To comment a particular keyword the "hash" symbol has to be added next to the 
 keyword. Example: #MyCommentedKeyword=
 
 
+#Uncoment the following keyword to force variable setting
+#DEFAULTNONE  
+
 #General controls
 CONTROL{
+  JobName= MyJob
   xControl= 1
   BASISTYPE= NONORTHO
   DEBUGON= 0
@@ -51,6 +55,7 @@ CONTROL{
   PPBETA= 1000.0 PPSIGMA= 0.01 PPNMOL= 10 PPNGEOM= 200
   PARREP= 0
   ER= 1.0
+  INITIALIZED= F
 }
 
 #Controls for QMD 

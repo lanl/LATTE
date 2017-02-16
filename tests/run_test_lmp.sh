@@ -5,7 +5,7 @@
 set -e                                          # This will exit the script if there is any error
 MY_PATH=`pwd`                                   # Capturing the local path of the folder where we are running.
 
-RUN=$HOME"/lammps/src/lmp_serial"  #EXAALT version of Lammps program  
+RUN=$HOME"/lammps/src/lmp_serial"  #EXAALT version of Lammps program
 
 for name in 0scf fullscf ; do
 
@@ -14,10 +14,10 @@ for name in 0scf fullscf ; do
   REF="energy."$name".out"
   COORDS="data."$name".lmp"
 
-  cp  ./example_lmp/tests/$INLATTEFILE latte.in
-  cp  ./example_lmp/tests/$INLAMMPSFILE .
-  cp  ./example_lmp/tests/$REF .
-  cp  ./example_lmp/tests/$COORDS .
+  cp  ./tests/tests_lmp/$INLATTEFILE latte.in
+  cp  ./tests/tests_lmp/$INLAMMPSFILE .
+  cp  ./tests/tests_lmp/$REF .
+  cp  ./tests/tests_lmp/$COORDS .
 
   echo -e "\nTesting for "$name" \n"
 
@@ -26,7 +26,7 @@ for name in 0scf fullscf ; do
   echo ""
 
   grep Energy out | sed -e s/"PAR"/$STRR/g  >  input_tmp.in
-  python ./example_lmp/test-energy.py --reference $REF --current energy.out --reltol 0.0000001
+  python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.0000001
 
 done
 

@@ -5,52 +5,51 @@
 !! - If the variable is real, we have to increase nkey_re.
 !! - Add the keyword (character type) in the keyvector_re vector.
 !! - Add a default value (real type) in the valvector_re.
-!! - Define a new variable int he latte type and pass the value through valvector_re(num)
-!! where num is the position of the new keyword in the vector.
+!! - Define a new variable int the latte type and pass the value through valvector_re(num)
+!!   where num is the position of the new keyword in the vector.
+!! - Use DUMMY= as a placeholder. This variable will be ignored by not searched by the parser.
 !!
-MODULE latteparser_latte_mod
+module latteparser_latte_mod
 
-  USE CONSTANTS_MOD
-  USE SETUPARRAY
-  USE PPOTARRAY
-  USE NEBLISTARRAY
-  USE COULOMBARRAY
-  USE SPARSEARRAY
-  USE RELAXCOMMON
-  USE MDARRAY
+  use CONSTANTS_MOD
+  use SETUPARRAY
+  use PPOTARRAY
+  use NEBLISTARRAY
+  use COULOMBARRAY
+  use SPARSEARRAY
+  use RELAXCOMMON
+  use MDARRAY
 
-  USE openfiles_mod
-  USE kernelparser_mod
+  use openfiles_mod
+  use kernelparser_mod
 
-  IMPLICIT NONE
+  implicit none
 
-  PRIVATE
+  private
 
-  INTEGER, PARAMETER :: dp = latteprec
+  integer, parameter :: dp = latteprec
 
-  PUBLIC :: parse_control, parse_md
+  public :: parse_control, parse_md
 
-CONTAINS
+contains
 
   !> The parser for Latte General input variables.
   !!
-  SUBROUTINE parse_control(filename)
+  subroutine parse_control(filename)
 
-    USE FERMICOMMON
+    use FERMICOMMON
 
-    IMPLICIT NONE
-    INTEGER, PARAMETER :: nkey_char = 7, nkey_int = 48, nkey_re = 21, nkey_log = 2
-    CHARACTER(len=*) :: filename
+    implicit none
+    integer, parameter :: nkey_char = 5, nkey_int = 48, nkey_re = 21, nkey_log = 1
+    character(len=*) :: filename
 
     !Library of keywords with the respective defaults.
-    CHARACTER(len=50), PARAMETER :: keyvector_char(nkey_char) = [CHARACTER(len=100) :: &
-         'JobName=','BASISTYPE=','SP2CONV=','RELAXTYPE=','C4=','C5=', &
-         'C6=']
-    CHARACTER(len=100) :: valvector_char(nkey_char) = [CHARACTER(len=100) :: &
-         'MyJob','NONORTHO','RELAX','SD','A5','A6', &
-         'A7']
+    character(len=50), parameter :: keyvector_char(nkey_char) = [character(len=100) :: &
+         'JobName=','BASISTYPE=','SP2CONV=','RELAXTYPE=','DUMMY=']
+    character(len=100) :: valvector_char(nkey_char) = [character(len=100) :: &
+         'MyJob','NONORTHO','RELAX','SD','DUMMY']
 
-    CHARACTER(len=50), PARAMETER :: keyvector_int(nkey_int) = [CHARACTER(len=50) :: &
+    character(len=50), parameter :: keyvector_int(nkey_int) = [character(len=50) :: &
          'xControl=', 'DEBUGON=', 'FERMIM=', 'CGORLIB=', 'NORECS=', 'ENTROPYKIND=',&
          'PPOTON=', 'VDWON=', 'SPINON=', 'ELECTRO=', 'ELECMETH=', 'MAXSCF=',& !12
          'MINSP2ITER=','FULLQCONV=','QITER=','ORDERNMOL=','SPARSEON=','THRESHOLDON=',& !18
@@ -59,7 +58,7 @@ CONTAINS
          'KON=','COMPFORCE=','DOSFIT=','INTS2FIT=','NFITSTEP=','QFIT=',& !39
          'PPFITON=','ALLFITON=','PPSTEP=','BISTEP=','PP2FIT=','BINT2FIT=','PPNMOL=',& !46
          'PPNGEOM=','PARREP=']
-    INTEGER :: valvector_int(nkey_int) = (/ &
+    integer :: valvector_int(nkey_int) = (/ &
          1,0,6,1,1,1, &
          1,0,0,1,0,250, &
          22,0,1,0,0,1, &
@@ -69,27 +68,27 @@ CONTAINS
          0,1,500,500,2,6,10,&
          200,0 /)
 
-    CHARACTER(len=50), PARAMETER :: keyvector_re(nkey_re) = [CHARACTER(len=50) :: &
+    character(len=50), parameter :: keyvector_re(nkey_re) = [character(len=50) :: &
          'CGTOL=','KBT=','SPINTOL=','ELEC_ETOL=','ELEC_QTOL=','COULACC=','COULCUT=', 'COULR1=',& !8
          'BREAKTOL=','QMIX=','SPINMIX=','MDMIX=','NUMTHRESH=','CHTOL=','SKIN=',& !15
          'RLXFTOL=','BETA=','MCSIGMA=','PPBETA=','PPSIGMA=','ER='] !21
-    REAL(dp) :: valvector_re(nkey_re) = (/&
+    real(dp) :: valvector_re(nkey_re) = (/&
          1.0e-6,0.0,1.0e-4,0.001,1.0e-6,-500.0,500.0,&
          1.0E-12,0.2,0.25,0.25,1.0e-6,0.01,500.0,1.0,&
          0.00001,1000.0,0.2,1000.0,0.01,1.0/)
 
-    CHARACTER(len=50), PARAMETER :: keyvector_log(nkey_log) = [CHARACTER(len=100) :: &
-         'INITIALIZED=', 'L2=']
-    LOGICAL :: valvector_log(nkey_log) = (/&
-         .FALSE., .FALSE./)
+    character(len=50), parameter :: keyvector_log(nkey_log) = [character(len=100) :: &
+         'INITIALIZED=']
+    logical :: valvector_log(nkey_log) = (/&
+         .false./)
 
     !Start and stop characters
-    CHARACTER(len=50), PARAMETER :: startstop(2) = [CHARACTER(len=50) :: &
+    character(len=50), parameter :: startstop(2) = [character(len=50) :: &
          'CONTROL{', '}']
 
-    CALL parsing_kernel(keyvector_char,valvector_char&
+    call parsing_kernel(keyvector_char,valvector_char&
          ,keyvector_int,valvector_int,keyvector_re,valvector_re,&
-         keyvector_log,valvector_log,TRIM(filename),startstop)
+         keyvector_log,valvector_log,trim(filename),startstop)
 
 
     JOB = valvector_char(1)
@@ -108,10 +107,10 @@ CONTAINS
 
     BASISTYPE = valvector_char(2)
 
-    IF (BASISTYPE .NE. "ORTHO" .AND. BASISTYPE .NE. "NONORTHO") THEN
-       PRINT*, "Error defining basis type (ortho/nonortho)"
-       STOP
-    ENDIF
+    if (BASISTYPE .ne. "ORTHO" .and. BASISTYPE .ne. "NONORTHO") then
+       print*, "Error defining basis type (ortho/nonortho)"
+       stop
+    endif
 
     DEBUGON = valvector_int(2)
 
@@ -357,51 +356,51 @@ CONTAINS
 
     RELPERM = valvector_re(21)
 
-  END SUBROUTINE parse_control
+  end subroutine parse_control
 
 
   !> The parser for Latte General input variables.
   !!
-  SUBROUTINE parse_md(filename)
+  subroutine parse_md(filename)
 
-    IMPLICIT NONE
-    INTEGER, PARAMETER :: nkey_char = 3, nkey_int = 17, nkey_re = 10, nkey_log = 2
-    CHARACTER(len=*) :: filename
+    implicit none
+    integer, parameter :: nkey_char = 3, nkey_int = 17, nkey_re = 10, nkey_log = 1
+    character(len=*) :: filename
 
     !Library of keywords with the respective defaults.
-    CHARACTER(len=50), PARAMETER :: keyvector_char(nkey_char) = [CHARACTER(len=100) :: &
+    character(len=50), parameter :: keyvector_char(nkey_char) = [character(len=100) :: &
          'RNDIST=','SEEDINIT=','NPTTYPE=']
-    CHARACTER(len=100) :: valvector_char(nkey_char) = [CHARACTER(len=100) :: &
+    character(len=100) :: valvector_char(nkey_char) = [character(len=100) :: &
          'GAUSSIAN','UNIFORM','ISO']
 
-    CHARACTER(len=50), PARAMETER :: keyvector_int(nkey_int) = [CHARACTER(len=50) :: &
+    character(len=50), parameter :: keyvector_int(nkey_int) = [character(len=50) :: &
          'MAXITER=', 'UDNEIGH=', 'DUMPFREQ=','RSFREQ=', 'WRTFREQ=', 'TOINITTEMP5=', 'THERMPER=',& !7
          'THERMRUN=', 'NVTON=', 'NPTON=', 'AVEPER=', 'SEED=', 'SHOCKON=',&
          'SHOCKSTART=','SHOCKDIR=','MDADAPT=','GETHUG=']
-    INTEGER :: valvector_int(nkey_int) = (/ &
+    integer :: valvector_int(nkey_int) = (/ &
          5000,1,250,500,25,1,500, &
          50000,0,0,1000,54,0, &
          100000,1,0,0/)
 
-    CHARACTER(len=50), PARAMETER :: keyvector_re(nkey_re) = [CHARACTER(len=50) :: &
+    character(len=50), parameter :: keyvector_re(nkey_re) = [character(len=50) :: &
          'DT=','TEMPERATURE=','FRICTION=','PTARGET=','UPARTICLE=','USHOCK=','C0=', 'E0=',&
          'V0=','P0=']
-    REAL(dp) :: valvector_re(nkey_re) = (/&
+    real(dp) :: valvector_re(nkey_re) = (/&
          0.25,300.00,1000.0,0.0,500.0,-4590.0,1300.0,-795.725,&
          896.984864,0.083149/)
 
-    CHARACTER(len=50), PARAMETER :: keyvector_log(nkey_log) = [CHARACTER(len=100) :: &
-         'L1=', 'L2=']
-    LOGICAL :: valvector_log(nkey_log) = (/&
-         .FALSE., .FALSE./)
+    character(len=50), parameter :: keyvector_log(nkey_log) = [character(len=100) :: &
+         'DUMMY=']
+    logical :: valvector_log(nkey_log) = (/&
+         .false./)
 
     !Start and stop characters
-    CHARACTER(len=50), PARAMETER :: startstop(2) = [CHARACTER(len=50) :: &
+    character(len=50), parameter :: startstop(2) = [character(len=50) :: &
          'MDCONTROL{', '}']
 
-    CALL parsing_kernel(keyvector_char,valvector_char&
+    call parsing_kernel(keyvector_char,valvector_char&
          ,keyvector_int,valvector_int,keyvector_re,valvector_re,&
-         keyvector_log,valvector_log,TRIM(filename),startstop)
+         keyvector_log,valvector_log,trim(filename),startstop)
 
 
     !
@@ -484,11 +483,11 @@ CONTAINS
     !   write(*,*)"AVEPER,FRICTION,SEEDTH",AVEPER,FRICTION,SEEDTH
 
 
-    IF (NVTON .EQ. 1 .AND. NPTON .EQ. 1) THEN
-       WRITE(6,*) "You can't have NVTON = 1 and NPTON = 1"
-       WRITE(6,*) "STOP!!!"
-       STOP
-    ENDIF
+    if (NVTON .eq. 1 .and. NPTON .eq. 1) then
+       write(6,*) "You can't have NVTON = 1 and NPTON = 1"
+       write(6,*) "STOP!!!"
+       stop
+    endif
 
     ! PTARGET = Target pressure (in GPa) when running NPT
     ! NPTTYPE = ISO or ANISO
@@ -536,6 +535,6 @@ CONTAINS
     E0 = valvector_re(8); V0 = valvector_re(9); P0 = valvector_re(10)
     !   write(*,*)"E0,V0,P0",E0,V0,P0
 
-  END SUBROUTINE parse_md
+  end subroutine parse_md
 
-END MODULE latteparser_latte_mod
+end module latteparser_latte_mod
