@@ -298,15 +298,11 @@ SUBROUTINE ADDQDEP
         
         DO I = 1, HDIM
            DO J = 1, HDIM
-              
-              H(J,I) = H0(J,I) + SMAT(J,I)*HJJ(I)
+ 
+              H(J,I) = H0(J,I) + SMAT(J,I)*(HJJ(I) + HJJ(J))/TWO
               
            ENDDO
         ENDDO
-        
-        ! Make H Hermitian
-        
-        H = ( H + TRANSPOSE(H) )/TWO
         
      ENDIF
      
@@ -426,15 +422,12 @@ SUBROUTINE ADDQDEP
         DO K = 1, NKTOT
            DO I = 1, HDIM
               DO J = 1, HDIM
-                 
-                 HK(J,I,K) = HK0(J,I,K) + (SK(J,I,K)*ZHJJ(I) + CONJG(SK(I,J,K)*ZHJJ(I)))/TWO
+ 
+                 HK(J,I,K) = HK0(J,I,K) + SK(J,I,K)*(ZHJJ(I) + ZHJJ(J))/TWO
                  
               ENDDO
            ENDDO
         ENDDO
-        ! Make H Hermitian                                                            
-
-!        H = ( H + TRANSPOSE(H) )/TWO
 
      ENDIF
 
