@@ -48,7 +48,7 @@ contains
     character(len=50), parameter :: keyvector_char(nkey_char) = [character(len=100) :: &
          'JobName=','BASISTYPE=','SP2CONV=','RELAXTYPE=','PARAMPATH=','COORDSFILE=']
     character(len=100) :: valvector_char(nkey_char) = [character(len=100) :: &
-         'MyJob','NONORTHO','RELAX','SD','.TBParams/','./bl/inputblock.dat']
+         'MyJob','NONORTHO','RELAX','SD','./TBparam','./bl/inputblock.dat']
 
     character(len=50), parameter :: keyvector_int(nkey_int) = [character(len=50) :: &
          'xControl=', 'DEBUGON=', 'FERMIM=', 'CGORLIB=', 'NORECS=', 'ENTROPYKIND=',&
