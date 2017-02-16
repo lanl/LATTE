@@ -32,6 +32,10 @@ SUBROUTINE GETDELTAQ
   IMPLICIT NONE
 
   INTEGER :: I, J, K, INDEX, NUMORB
+  COMPLEX(LATTEPREC) :: QTMP
+!  COMPLEX(LATTEPREC), ALLOCATABLE :: TMPQ(:)
+
+!  ALLOCATE(TMPQ(HDIM))
 
   INDEX = 0
 
@@ -96,15 +100,27 @@ SUBROUTINE GETDELTAQ
 
      ELSE
 
+!        TMPQ = (ZERO, ZERO)
         DO K = 1, NKTOT
            DO I = 1, HDIM
               DO J = 1, HDIM
-                 QLIST(I) = QLIST(I) + REAL(KBO(J,I,K)*CONJG(SK(J,I,K)))
+!                 TMPQ(I) = TMPQ(I) + KBO(J,I,K)*CONJG(SK(I,J,K))
+                 QTMP = HALF*((KBO(J,I,K))*SK(I,J,K) + &
+                      (KBO(I,J,K))*SK(J,I,K))
+!                 QTMP = HALF*((KBO(J,I,K))*SK(I,J,K) + &
+!                      (KBO(J,I,K))*SK(I,J,K))
+                 QLIST(I) = QLIST(I) + REAL(QTMP)
+!                 QLIST(I) = QLIST(I) + REAL(KBO(J,I,K)*CONJG(SK(J,I,K)))
               ENDDO
            ENDDO
         ENDDO
+!        TMPQ = TMPQ/REAL(NKTOT)
 
         QLIST = QLIST/REAL(NKTOT)
+!         DO I =1, HDIM
+!           PRINT*, I, TMPQ(I), QLIST(I)
+!        ENDDO
+
 
 !        PRINT*, "K-space not yet implemented with non-orthogonal basis"
 !        STOP
@@ -191,6 +207,7 @@ SUBROUTINE GETDELTAQ
      DELTAQ(I) = MYCHARGE(I) - ATOCC(ELEMPOINTER(I))
      
   ENDDO
+!  deallocate(tmpq)
   
   RETURN
 
