@@ -60,7 +60,7 @@ SUBROUTINE TOTENG
               DO I = 1, HDIM
                  DO J = 1, HDIM
                     
-                    ZTRRHOH = ZTRRHOH + KBO(J,I,K)*CONJG(HK(J,I,K))
+                    ZTRRHOH = ZTRRHOH + KBO(J,I,K)*(HK(I,J,K))
                     
                  ENDDO
                  
