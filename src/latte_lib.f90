@@ -124,8 +124,7 @@ CONTAINS
       LIBCALLS = LIBCALLS + 1
     ENDIF
 
-
-    open(unit=6, file="log.latte", form="formatted")
+    OPEN(UNIT=6, FILE="log.latte", FORM="formatted")
 
     IF(.NOT. INITIALIZED)THEN
       write(*,*)INITIALIZED, LIBCALLS
