@@ -124,6 +124,9 @@ CONTAINS
       LIBCALLS = LIBCALLS + 1
     ENDIF
 
+
+    open(unit=6, file="log.latte", form="formatted")
+
     IF(.NOT. INITIALIZED)THEN
       write(*,*)INITIALIZED, LIBCALLS
 
@@ -140,6 +143,9 @@ CONTAINS
       ELSE
         IF(.NOT. INITIALIZED) CALL READCONTROLS
       ENDIF
+
+      WRITE(6,*)"The log file for latte_lib"
+      WRITE(6,*)""
 
       CALL READTB
 
@@ -546,10 +552,8 @@ CONTAINS
 
       VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
 
-      write(*,*)"components",TRRHOH, EREP, ENTE, ECOUL
-
-      write(*,*)"Epot", VENERG
-
+      write(6,*)"Energy Components (TRRHOH, EREP, ENTE, ECOUL)",TRRHOH, EREP, ENTE, ECOUL
+      write(6,*)"Epot", VENERG
 
       FTOT_OUT = FTOT
 
