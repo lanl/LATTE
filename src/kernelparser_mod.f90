@@ -80,14 +80,15 @@ contains
        do k=1,readmaxj
           if(adjustl(trim(vect(i,k))).ne."")totalwords = totalwords + 1
           if(adjustl(trim(vect(i,k))).eq."#")then
+            write(*,*)" "
              write(*,*)"ERROR in the the input file ..."
              write(*,*)" "
-             write(*,*)"For this parsing routine everything is a comment by default unless theres an = sign"
-             write(*,*)"next to a word in which case it will be recognized as a keyword."
-             write(*,*)"This parser does not accept floating hash (#) symbols to make sure"
-             write(*,*)"that we are sure that we want to comment a specific keyword"
+             write(*,*)"In the LATTE parsing routine everything is a comment by default unless theres an = sign"
+             write(*,*)"next to a word, in which case, it will be recognized as a keyword."
+             write(*,*)"This parser does not accept floating hashes (#). This is done in order to make sure"
+             write(*,*)"that a specific keyword is commented"
              write(*,*)" "
-             write(*,*)"Make sure all the commented keywords have a # right next them"
+             write(*,*)"If you have a commented keyword make sure there is a # symbol right next to it"
              write(*,*)"   "
              write(*,*)"   The following commented keyword is correct: "
              write(*,*)"                #KeyWord= 1 "

@@ -127,7 +127,9 @@ CONTAINS
     OPEN(UNIT=6, FILE="log.latte", FORM="formatted")
 
     IF(.NOT. INITIALIZED)THEN
-      write(*,*)INITIALIZED, LIBCALLS
+
+      WRITE(6,*)"The log file for latte_lib"
+      WRITE(6,*)""
 
       NUMSCF = 0
       CHEMPOT = ZERO
@@ -142,9 +144,6 @@ CONTAINS
       ELSE
         IF(.NOT. INITIALIZED) CALL READCONTROLS
       ENDIF
-
-      WRITE(6,*)"The log file for latte_lib"
-      WRITE(6,*)""
 
       CALL READTB
 
