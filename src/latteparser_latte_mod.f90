@@ -48,7 +48,7 @@ contains
     character(len=50), parameter :: keyvector_char(nkey_char) = [character(len=100) :: &
          'JobName=','BASISTYPE=','SP2CONV=','RELAXTYPE=','PARAMPATH=','COORDSFILE=']
     character(len=100) :: valvector_char(nkey_char) = [character(len=100) :: &
-         'MyJob','NONORTHO','RELAX','SD','./TBparam','./bl/inputblock.dat']
+         'MyJob','NONORTHO','REL','SD','./TBparam','./bl/inputblock.dat']
 
     character(len=50), parameter :: keyvector_int(nkey_int) = [character(len=50) :: &
          'xControl=', 'DEBUGON=', 'FERMIM=', 'CGORLIB=', 'NORECS=', 'ENTROPYKIND=',&
@@ -74,9 +74,9 @@ contains
          'BREAKTOL=','QMIX=','SPINMIX=','MDMIX=','NUMTHRESH=','CHTOL=','SKIN=',& !15
          'RLXFTOL=','BETA=','MCSIGMA=','PPBETA=','PPSIGMA=','ER='] !21
     real(dp) :: valvector_re(nkey_re) = (/&
-         1.0e-6,0.0,1.0e-4,0.001,1.0e-6,-500.0,500.0,&
-         1.0E-12,0.2,0.25,0.25,1.0e-6,0.01,500.0,1.0,&
-         0.00001,1000.0,0.2,1000.0,0.01,1.0/)
+         1.0e-6,0.0,1.0e-4,0.001,1.0e-8,1.0e-6,-500.0, 500.0,&
+         1.0e-6,0.25,0.25,0.25,1.0e-6,0.01,1.0,&
+         1.0e-7,1000.0,0.2,1000.0,0.01,1.0/)
 
     character(len=50), parameter :: keyvector_log(nkey_log) = [character(len=100) :: &
          'INITIALIZED=']
