@@ -427,7 +427,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
 
            IF (PPOTON .NE. 0) THEN
               
-              IF (MAGR2 .GT. MINR .AND. MAGR2 .LT. RCUTTB2) THEN
+              IF (MAGR2 .GT. MINR .AND. MAGR2 .LT. PPMAX2) THEN
                  
                  TOTNEBPP(I) = TOTNEBPP(I) + 1
                  NEBPP( 1, TOTNEBPP(I), I ) = J
@@ -441,7 +441,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
               
            IF (ELECTRO .NE. 0) THEN
 
-              IF (MAGR2 .GT. MINR .AND. MAGR2 .LT. RCUTTB2) THEN
+              IF (MAGR2 .GT. MINR .AND. MAGR2 .LT. RCUTCOUL2) THEN
                  
                  TOTNEBCOUL(I) = TOTNEBCOUL(I) + 1
                  NEBCOUL( 1, TOTNEBCOUL(I), I ) = J
