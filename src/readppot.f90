@@ -30,9 +30,9 @@ SUBROUTINE READPPOT()
   CHARACTER(LEN=20) :: HD
 
   IF (BASISTYPE .EQ. "ORTHO") THEN
-     OPEN(UNIT=14,STATUS="OLD", FILE="TBparam/ppots.ortho")
+     OPEN(UNIT=14,STATUS="OLD", FILE=trim(PARAMPATH)//"/ppots.ortho")
   ELSEIF (BASISTYPE .EQ. "NONORTHO") THEN
-     OPEN(UNIT=14, STATUS="OLD", FILE="TBparam/ppots.nonortho")
+     OPEN(UNIT=14, STATUS="OLD", FILE=trim(PARAMPATH)//"/ppots.nonortho")
   ENDIF
 
   READ(14,*) HD, NOPPS
