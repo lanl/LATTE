@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/lanl/LATTE.svg?branch=master)](https://travis-ci.org/lanl/LATTE)
 
 
-# LATTE: Los Alamos Transferable Tight-binding for Energetics
+# LATTE
 
 Open source density functional tight binding molecular dynamics.
 
