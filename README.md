@@ -4,7 +4,7 @@
 
 # LATTE: Los Alamos Transferable Tight-binding for Energetics
 
-An open source density functional tight binding molecular dynamics.
+Open source density functional tight binding molecular dynamics.
 
 #LA-CC-10-004
 
