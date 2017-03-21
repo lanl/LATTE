@@ -74,6 +74,7 @@ CONTAINS
   !! \param VENERG This is the potential Energy that is given back from latte to the hosting code.
   !! \param VEL Velocities passed to latte.
   !! \param DT integration step passed to latte.
+  !! \param VIRIALINOUT Components of the second virial coefficient
   !!
   !! \brief This routine will be used load call latte_lib from a C/C++ program:
   !!
@@ -90,7 +91,7 @@ CONTAINS
   !! \brief Note: All units are LATTE units by default. See https://github.com/losalamos/LATTE/blob/master/Manual/LATTE_manual.pdf
   !!
   SUBROUTINE LATTE(NTYPES,TYPES,CR_IN,MASSES_IN,XLO,XHI,FTOT_OUT, &
-                   MAXITER_IN, VENERG, VEL_IN, DT_IN)
+                   MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIALINOUT)
 
     IMPLICIT NONE
 
@@ -104,6 +105,7 @@ CONTAINS
     REAL(LATTEPREC), INTENT(IN) :: CR_IN(:,:),VEL_IN(:,:), MASSES_IN(:),XLO(3),XHI(3)
     REAL(LATTEPREC), INTENT(IN) :: DT_IN
     REAL(LATTEPREC), INTENT(OUT) :: FTOT_OUT(:,:), VENERG
+    REAL(LATTEPREC), INTENT(OUT) :: VIRIALINOUT(6)
     INTEGER, INTENT(IN) ::  NTYPES, TYPES(:), MAXITER_IN
 
 #ifdef PROGRESSON
@@ -533,7 +535,7 @@ CONTAINS
       ESPIN = ZERO
       IF (SPINON .EQ. 1) CALL GETSPINE
 
-      !CALL GETPRESSURE
+!      CALL GETPRESSURE
 
       IF (CONTROL .NE. 1 .AND. CONTROL .NE. 2 .AND. KBT .GT. 0.000001 ) THEN
 
@@ -555,6 +557,19 @@ CONTAINS
 
       FTOT_OUT = FTOT
 
+      IF (BASISTYPE .EQ. "NONORTHO") THEN
+
+        VIRIAL = VIRBOND + VIRPAIR + VIRCOUL
+
+         IF (SPINON .EQ. 0) THEN
+            VIRIAL = VIRIAL - VIRPUL + VIRSCOUL
+         ELSE
+            VIRIAL = VIRIAL - VIRPUL + VIRSCOUL + VIRSSPIN
+         ENDIF
+
+      ENDIF
+
+      VIRIALINOUT = -VIRIAL
 
       INITIALIZED = .true.
 
