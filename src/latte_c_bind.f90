@@ -23,54 +23,51 @@
 !! \param FLAGS Different control flags that can be passed to LATTE (not in use yet)
 !! \param NATS Number of atoms
 !! \param COORDS Coordinates. Example: y-coordinate of atom 1 = COORDS(2,1)
-!! \param TYPES An index for all the different atoms in the system. 
+!! \param TYPES An index for all the different atoms in the system.
 !! \param NTYPES Number of different elements in the system
-!! \param MASSES Element masses for every different element of the system. 
+!! \param MASSES Element masses for every different element of the system.
 !! \param XLO Lowest dimensions of the box
 !! \param XHI Highest dimensions of the box
 !! \param FORCES Forces for every atom as output.
-!! \param MAXITER Latte MAXITER keyword. If MAXITER = -1, only the Forces are computed. 
+!! \param MAXITER Latte MAXITER keyword. If MAXITER = -1, only the Forces are computed.
 !!        If MAXITER = 0, MAXITER is read from latte.in file.
 !!        IF MAXITER > 0, MAXITER is passed trough the library call.
 !! \param VENERG This is the potential Energy that is given back from latte to the hosting code.
 !! \param VEL Velocities passed to latte.
-!! \param DT integration step passed to latte. 
+!! \param DT integration step passed to latte.
 !!
-!! \brief This routine will be used load call latte_lib from a C/C++ program: 
+!! \brief This routine will be used load call latte_lib from a C/C++ program:
 !!
 !! \brief Note: To get the mass of atom 3 we do:
-!! \verbatim  
+!! \verbatim
 !!      MASS(TYPES(3))
 !! \endverbatim
 !!
 !! \brief Note: To get the lattice vectors as formated in LATTE we do:
-!! \verbatim  
+!! \verbatim
 !!      BOX(1,1) = XHI(1) - XLO(1); ...
 !! \endverbatim
 !!
 !! \brief Note: All units are LATTE units by default. See https://github.com/losalamos/LATTE/blob/master/Manual/LATTE_manual.pdf
 !!
 SUBROUTINE LATTE_C_BIND (FLAGS,NATS,COORDS,TYPES,NTYPES,MASSES,XLO &
-           ,XHI,FORCES, MAXITER, VENERG, VEL, DT) BIND (C, NAME="latte")
+           ,XHI,FORCES, MAXITER, VENERG, VEL, DT, VIRIALINOUT) BIND (C, NAME="latte")
 
   USE ISO_C_BINDING, ONLY: C_CHAR, C_NULL_CHAR, C_DOUBLE, C_INT
-  USE LATTE_LIB    
-   
+  USE LATTE_LIB
+
   IMPLICIT NONE
-  
+
   INTEGER(C_INT)                 ::  NATS, NTYPES, MAXITER
   INTEGER(C_INT)                 ::  TYPES(NATS), FLAGS(5)
   REAL(C_DOUBLE)                 ::  COORDS(3,NATS), MASSES(NTYPES), XHI(3)
   REAL(C_DOUBLE)                 ::  XLO(3), EKIN, VENERG, DT
-  REAL(C_DOUBLE), INTENT(INOUT)  ::  FORCES(3, NATS), VEL(3, NATS)   
+  REAL(C_DOUBLE), INTENT(INOUT)  ::  FORCES(3, NATS), VEL(3, NATS)
+  REAL(C_DOUBLE), INTENT(INOUT)  ::  VIRIALINOUT(6)
   INTEGER                        ::  I
-      
-  
-  CALL LATTE(NTYPES,TYPES,COORDS,MASSES,XLO,XHI,FORCES, MAXITER, VENERG, VEL, DT)
-  
-   
+
+  CALL LATTE(NTYPES,TYPES,COORDS,MASSES,XLO,XHI,FORCES, MAXITER, VENERG, VEL, DT, VIRIALINOUT)
+
   RETURN
-  
-END SUBROUTINE LATTE_C_BIND       
 
-
+END SUBROUTINE LATTE_C_BIND
