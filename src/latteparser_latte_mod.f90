@@ -41,7 +41,7 @@ contains
     use FERMICOMMON
 
     implicit none
-    integer, parameter :: nkey_char = 6, nkey_int = 48, nkey_re = 21, nkey_log = 1
+    integer, parameter :: nkey_char = 6, nkey_int = 49, nkey_re = 21, nkey_log = 1
     character(len=*) :: filename
 
     !Library of keywords with the respective defaults.
@@ -58,7 +58,7 @@ contains
          'MDON=','PBCON=','RESTART=','CHARGE=','XBO=','XBODISON=','XBODISORDER=','NGPU=',& !33
          'KON=','COMPFORCE=','DOSFIT=','INTS2FIT=','NFITSTEP=','QFIT=',& !39
          'PPFITON=','ALLFITON=','PPSTEP=','BISTEP=','PP2FIT=','BINT2FIT=','PPNMOL=',& !46
-         'PPNGEOM=','PARREP=']
+         'PPNGEOM=','PARREP=','VERBOSE=']
     integer :: valvector_int(nkey_int) = (/ &
          1,0,6,1,1,1, &
          1,0,0,1,0,250, &
@@ -67,7 +67,7 @@ contains
          1,1,0,0,1,1,5,2, &
          0,1,0,1,5000,0,&
          0,0,500,500,2,6,10,&
-         200,0 /)
+         200,0,0 /)
 
     character(len=50), parameter :: keyvector_re(nkey_re) = [character(len=50) :: &
          'CGTOL=','KBT=','SPINTOL=','ELEC_ETOL=','ELEC_QTOL=','COULACC=','COULCUT=', 'COULR1=',& !8
@@ -352,6 +352,10 @@ contains
     PPNMOL = valvector_int(46); PPNGEOM = valvector_int(47)
 
     PARREP = valvector_int(48)
+
+    ! Verbosity level to control general output
+
+    VERBOSE = valvector_int(49)
 
     ! Dielectric constant
 
