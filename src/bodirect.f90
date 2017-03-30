@@ -163,7 +163,7 @@ SUBROUTINE BOEVECS
      ! This definition of the chemical potential is a little arbitrary
      !
 
-     LOOPTARGET = INT(OCCTARGET)
+     LOOPTARGET = NINT(OCCTARGET)
 
      CHEMPOT = HALF*(EVALS(LOOPTARGET) + EVALS(LOOPTARGET + 1))
      EGAP = EVALS(LOOPTARGET + 1) - EVALS(LOOPTARGET)
