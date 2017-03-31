@@ -557,16 +557,13 @@ CONTAINS
 
       FTOT_OUT = FTOT
 
+      ! Get the seccond virial coefficient to pass it to the application program
+      VIRIAL = VIRBOND + VIRPAIR + VIRCOUL
+
+      IF (SPINON .EQ. 1) VIRIAL = VIRIAL + VIRSSPIN
+
       IF (BASISTYPE .EQ. "NONORTHO") THEN
-
-        VIRIAL = VIRBOND + VIRPAIR + VIRCOUL
-
-         IF (SPINON .EQ. 0) THEN
             VIRIAL = VIRIAL - VIRPUL + VIRSCOUL
-         ELSE
-            VIRIAL = VIRIAL - VIRPUL + VIRSCOUL + VIRSSPIN
-         ENDIF
-
       ENDIF
 
       VIRIALINOUT = -VIRIAL
@@ -574,7 +571,6 @@ CONTAINS
       INITIALIZED = .true.
 
       RETURN
-
 
   ELSEIF (MDON .EQ. 1 .AND. RELAXME .EQ. 0 .AND. MAXITER_IN >= 0) THEN
 
