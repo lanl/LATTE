@@ -40,7 +40,8 @@ To cite the code, please proceed as follows:
 with the following `bibtex` citation:
 
     @misc{LATTE,
-      url = {\url{https://github.com/lanl/LATTE}}
-      author = {Nicolas Bock, Marc J. Cawkwell, Josh D. Coe, Aditi Krishnapriyan, Matthew P. Kroonblawd, Adam Lang, Enrique Martinez Saez, Susan M. Mniszewski, Christian F. A. Negre, Anders M. N. Niklasson, Edward Sanville, Mitchell A. Wood, Ping Yang },
+      title = {Los Alamos Transferable Tight-binding for Energetics (LATTE)},
+      url = {https://github.com/lanl/LATTE},
+      author = {N. Bock and M. J. Cawkwell and J. D. Coe and A. Krishnapriyan and M. P. Kroonblawd and A. Lang, E. Martinez Saez, S. M. Mniszewski and C. F. A. Negre and A. M. N. Niklasson and E. Sanville and M. A. Wood and P. Yang},
       year = {2017}
     }
