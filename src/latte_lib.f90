@@ -570,6 +570,8 @@ CONTAINS
 
       INITIALIZED = .true.
 
+      CALL FLUSH(6) !To force writing to file at every call 
+
       RETURN
 
   ELSEIF (MDON .EQ. 1 .AND. RELAXME .EQ. 0 .AND. MAXITER_IN >= 0) THEN
