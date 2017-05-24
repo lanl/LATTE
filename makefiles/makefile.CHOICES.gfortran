@@ -25,6 +25,7 @@ MPIOPT = OFF
 #
 FC = gfortran
 FCL = $(FC)  -fopenmp
+# FCL = $(FC) -static -static-libgfortran
 FFLAGS =  -O3 -fopenmp
 LINKFLAG = 
 #LIB = -L/usr/projects/hpcsoft/toss2/common/acml/5.3.1/gfortran64_mp/lib -lacml_mp
