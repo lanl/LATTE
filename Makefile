@@ -13,10 +13,10 @@ endif
 	(cd src; make; cd ..)
 
 src : 
-	(cd src; make; cd ..)
+	(rm liblatte.a; cd src; make; cd ..)
 
 docs :
-	(doxygen ./src/Doxyfile.in)
+	(cd ./src; doxygen Doxyfile.in)
 	(cd ./doc/latex/ ; make ; cd ../../)
 	(cp ./doc/latex/refman.pdf ./Manual/)
 
@@ -24,7 +24,7 @@ test :
 	(./tests/run_test.sh)
 
 test_lmp : 
-	(./example_lmp/run_test.sh)
+	(./tests/run_test_lmp.sh)
 
 matrix : 
 ifeq ($(GPUOPT),ON)
