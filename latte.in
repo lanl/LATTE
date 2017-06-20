@@ -11,7 +11,7 @@ keyword. Example: #MyCommentedKeyword=
 
 
 #Uncoment the following keyword to force variable settings
-DEFAULTNONE  
+#DEFAULTNONE  
 
 #General controls
 CONTROL{
@@ -31,7 +31,7 @@ CONTROL{
   ELECTRO= 1 ELECMETH= 0 ELEC_ETOL= 0.001 ELEC_QTOL= 1.0e-4
   COULACC= 1.0e-6 COULCUT= -500.0 COULR1= 500.0
   MAXSCF= 250
-  BREAKTOL= 1.0E-12 MINSP2ITER= 22 SP2CONV= REL
+  BREAKTOL= 1.0E-12 # MINSP2ITER= 22 SP2CONV= REL
   FULLQCONV= 0 QITER= 1
   QMIX= 0.2 SPINMIX= 0.25 MDMIX= 0.25
   ORDERNMOL= 0
