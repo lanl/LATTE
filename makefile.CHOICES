@@ -2,6 +2,7 @@
 # Compilation and link flags for LATTE
 #
 
+
 # Precision - double or single
 PRECISION = DOUBLE
 #PRECISION = SINGLE
