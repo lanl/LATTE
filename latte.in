@@ -10,7 +10,7 @@ To comment a particular keyword the "hash" symbol has to be added next to the
 keyword. Example: #MyCommentedKeyword=
 
 
-#Uncoment the following keyword to force variable settings
+#Uncomment the following keyword to force variable settings
 #DEFAULTNONE  
 
 #General controls
