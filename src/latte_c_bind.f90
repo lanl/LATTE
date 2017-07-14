@@ -28,6 +28,10 @@
 !! \param MASSES Element masses for every different element of the system.
 !! \param XLO Lowest dimensions of the box
 !! \param XHI Highest dimensions of the box
+!! \param XY Tilt factor.
+!! \param XZ Tilt factor.
+!! \param YZ Tilt factor. The lattice vectors are constructed as:
+!! a = (xhi-xlo,0,0); b = (xy,yhi-ylo,0); c = (xz,yz,zhi-zlo).
 !! \param FORCES Forces for every atom as output.
 !! \param MAXITER Latte MAXITER keyword. If MAXITER = -1, only the Forces are computed.
 !!        If MAXITER = 0, MAXITER is read from latte.in file.
@@ -48,10 +52,12 @@
 !!      BOX(1,1) = XHI(1) - XLO(1); ...
 !! \endverbatim
 !!
-!! \brief Note: All units are LATTE units by default. See https://github.com/losalamos/LATTE/blob/master/Manual/LATTE_manual.pdf
+!! \brief Note: All units are LATTE units by default.
+!! See https://github.com/losalamos/LATTE/blob/master/Manual/LATTE_manual.pdf
 !!
 SUBROUTINE LATTE_C_BIND (FLAGS,NATS,COORDS,TYPES,NTYPES,MASSES,XLO &
-           ,XHI,FORCES, MAXITER, VENERG, VEL, DT, VIRIALINOUT) BIND (C, NAME="latte")
+           ,XHI,XY,XZ,YZ,FORCES,MAXITER,VENERG, &
+           VEL,DT,VIRIALINOUT) BIND (C, NAME="latte")
 
   USE ISO_C_BINDING, ONLY: C_CHAR, C_NULL_CHAR, C_DOUBLE, C_INT
   USE LATTE_LIB
@@ -62,11 +68,13 @@ SUBROUTINE LATTE_C_BIND (FLAGS,NATS,COORDS,TYPES,NTYPES,MASSES,XLO &
   INTEGER(C_INT)                 ::  TYPES(NATS), FLAGS(5)
   REAL(C_DOUBLE)                 ::  COORDS(3,NATS), MASSES(NTYPES), XHI(3)
   REAL(C_DOUBLE)                 ::  XLO(3), EKIN, VENERG, DT
+  REAL(C_DOUBLE)                 ::  XY, XZ, YZ
   REAL(C_DOUBLE), INTENT(INOUT)  ::  FORCES(3, NATS), VEL(3, NATS)
   REAL(C_DOUBLE), INTENT(INOUT)  ::  VIRIALINOUT(6)
   INTEGER                        ::  I
 
-  CALL LATTE(NTYPES,TYPES,COORDS,MASSES,XLO,XHI,FORCES, MAXITER, VENERG, VEL, DT, VIRIALINOUT)
+  CALL LATTE(NTYPES,TYPES,COORDS,MASSES,XLO,XHI,XY,XZ,YZ,FORCES, &
+            MAXITER, VENERG, VEL, DT, VIRIALINOUT)
 
   RETURN
 
