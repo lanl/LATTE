@@ -67,6 +67,10 @@ CONTAINS
   !! \param MASSES Element masses for every different element of the system.
   !! \param XLO Lowest dimensions of the box
   !! \param XHI Highest dimensions of the box
+  !! \param XY Tilt factor.
+  !! \param XZ Tilt factor.
+  !! \param YZ Tilt factor. The lattice vectors are constructed as:
+  !! a = (xhi-xlo,0,0); b = (xy,yhi-ylo,0); c = (xz,yz,zhi-zlo).
   !! \param FORCES Forces for every atom as output.
   !! \param MAXITER Latte MAXITER keyword. If MAXITER = -1, only the Forces are computed.
   !!        If MAXITER = 0, MAXITER is read from latte.in file.
@@ -90,8 +94,8 @@ CONTAINS
   !!
   !! \brief Note: All units are LATTE units by default. See https://github.com/losalamos/LATTE/blob/master/Manual/LATTE_manual.pdf
   !!
-  SUBROUTINE LATTE(NTYPES,TYPES,CR_IN,MASSES_IN,XLO,XHI,FTOT_OUT, &
-                   MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIALINOUT)
+  SUBROUTINE LATTE(NTYPES,TYPES,CR_IN,MASSES_IN,XLO,XHI,XY,XZ,YZ,FTOT_OUT, &
+       MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIALINOUT)
 
     IMPLICIT NONE
 
@@ -102,8 +106,8 @@ CONTAINS
     CHARACTER(LEN=50) :: FLNM
     LOGICAL :: EXISTS
 
-    REAL(LATTEPREC), INTENT(IN) :: CR_IN(:,:),VEL_IN(:,:), MASSES_IN(:),XLO(3),XHI(3)
-    REAL(LATTEPREC), INTENT(IN) :: DT_IN
+    REAL(LATTEPREC), INTENT(IN)  :: CR_IN(:,:),VEL_IN(:,:), MASSES_IN(:),XLO(3),XHI(3)
+    REAL(LATTEPREC), INTENT(IN)  :: DT_IN, XY, XZ, YZ
     REAL(LATTEPREC), INTENT(OUT) :: FTOT_OUT(:,:), VENERG
     REAL(LATTEPREC), INTENT(OUT) :: VIRIALINOUT(6)
     INTEGER, INTENT(IN) ::  NTYPES, TYPES(:), MAXITER_IN
@@ -121,106 +125,113 @@ CONTAINS
 #endif
 
     IF(.NOT. INITIALIZED)THEN
-      LIBCALLS = 0 ; MAXITER = -10
+       LIBCALLS = 0 ; MAXITER = -10
     ELSE
-      LIBCALLS = LIBCALLS + 1
+       LIBCALLS = LIBCALLS + 1
     ENDIF
 
     OPEN(UNIT=6, FILE="log.latte", FORM="formatted")
 
     IF(.NOT. INITIALIZED)THEN
 
-      WRITE(6,*)"The log file for latte_lib"
-      WRITE(6,*)""
+       WRITE(6,*)"The log file for latte_lib"
+       WRITE(6,*)""
 
-      NUMSCF = 0
-      CHEMPOT = ZERO
+       NUMSCF = 0
+       CHEMPOT = ZERO
 
-      ! Start timers
-      TX = INIT_TIMER()
-      TX = START_TIMER(LATTE_TIMER)
+       ! Start timers
+       TX = INIT_TIMER()
+       TX = START_TIMER(LATTE_TIMER)
 
-      INQUIRE( FILE="latte.in", exist=EXISTS )
-      IF (EXISTS) THEN
-        IF(.NOT. INITIALIZED) CALL PARSE_CONTROL("latte.in")
-      ELSE
-        IF(.NOT. INITIALIZED) CALL READCONTROLS
-      ENDIF
+       INQUIRE( FILE="latte.in", exist=EXISTS )
+       IF (EXISTS) THEN
+          IF(.NOT. INITIALIZED) CALL PARSE_CONTROL("latte.in")
+       ELSE
+          IF(.NOT. INITIALIZED) CALL READCONTROLS
+       ENDIF
 
-      CALL READTB
+       CALL READTB
 
-      IF (RESTART .EQ. 0) THEN
+       IF (RESTART .EQ. 0) THEN
 
-        BOX = 0.0d0
-        BOX(1,1) = xhi(1) - xlo(1)
-        BOX(2,2) = xhi(2) - xlo(2)
-        BOX(3,3) = xhi(3) - xlo(3)
+          BOX = 0.0d0
+          BOX(1,1) = xhi(1) - xlo(1)
+          BOX(2,1) = XY
+          BOX(2,2) = xhi(2) - xlo(2)
+          BOX(3,1) = XZ
+          BOX(3,2) = YZ
+          BOX(3,3) = xhi(3) - xlo(3)
 
-        NATS = SIZE(CR_IN,DIM=2)
+          WRITE(*,*)"Lattice vectors"
+          WRITE(*,*)"a=",BOX(1,1),BOX(1,2),BOX(1,3)
+          WRITE(*,*)"b=",BOX(2,1),BOX(2,2),BOX(2,3)
+          WRITE(*,*)"c=",BOX(3,1),BOX(3,2),BOX(3,3)
 
-        IF(.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
-        CR = CR_IN
+          NATS = SIZE(CR_IN,DIM=2)
 
-        !     IF(.NOT.INITIALIZED)then
-        ALLOCATE(ATELE(NATS))
-        CALL MASSES2SYMBOLS(TYPES,NTYPES,MASSES_IN,NATS,ATELE)
-        !     ENDIF
+          IF(.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
+          CR = CR_IN
 
-        CALL READCR
+          !     IF(.NOT.INITIALIZED)then
+          ALLOCATE(ATELE(NATS))
+          CALL MASSES2SYMBOLS(TYPES,NTYPES,MASSES_IN,NATS,ATELE)
+          !     ENDIF
 
-      ELSE
-        CALL READRESTART
-      ENDIF
+          CALL READCR
 
-      IF (PPOTON .EQ. 1) CALL READPPOT
-      IF (PPOTON .EQ. 2) CALL READPPOTTAB
+       ELSE
+          CALL READRESTART
+       ENDIF
+
+       IF (PPOTON .EQ. 1) CALL READPPOT
+       IF (PPOTON .EQ. 2) CALL READPPOTTAB
 
 
-      IF (DEBUGON .EQ. 1) THEN
-        CALL PLOTUNIV
-        IF (PPOTON .EQ. 1) CALL PLOTPPOT
-      ENDIF
+       IF (DEBUGON .EQ. 1) THEN
+          CALL PLOTUNIV
+          IF (PPOTON .EQ. 1) CALL PLOTPPOT
+       ENDIF
 
-      CALL GETHDIM
+       CALL GETHDIM
 
-      CALL GETMATINDLIST
+       CALL GETMATINDLIST
 
-      CALL RHOZERO
+       CALL RHOZERO
 
-      CALL GETBNDFIL()
+       CALL GETBNDFIL()
 
 #ifdef GPUON
 
-      CALL initialize( NGPU )
+       CALL initialize( NGPU )
 
 #endif
 
 #ifdef DBCSR_ON
 
-
-      IF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 1) CALL INIT_DBCSR
+       IF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 1) CALL INIT_DBCSR
 
 #endif
 
-      IF (KBT .LT. 0.0000001 .OR. CONTROL .EQ. 2) ENTE = ZERO
+       IF (KBT .LT. 0.0000001 .OR. CONTROL .EQ. 2) ENTE = ZERO
 
     ELSE
 
-      BOX = 0.0d0
-      BOX(1,1) = xhi(1) - xlo(1)
-      BOX(2,2) = xhi(2) - xlo(2)
-      BOX(3,3) = xhi(3) - xlo(3)
+       BOX = 0.0d0
+       BOX(1,1) = xhi(1) - xlo(1)
+       BOX(2,2) = xhi(2) - xlo(2)
+       BOX(3,3) = xhi(3) - xlo(3)
 
-      NATS = SIZE(CR_IN,DIM=2)
+       NATS = SIZE(CR_IN,DIM=2)
 
-      IF(.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
-      CR = CR_IN
+       IF(.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
+       CR = CR_IN
 
     ENDIF
 
     !END OF INITIALIZATION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-#ifdef PROGRESSON
+    ! #ifdef PROGRESSON
     ! SY%NATS = NATS
     ! IF(.NOT. ALLOCATED(SY%COORDINATE))ALLOCATE(SY%COORDINATE(3,NATS))
     ! SY%COORDINATE = CR
@@ -228,465 +239,494 @@ CONTAINS
     ! SY%lattice_vector = BOX
     ! call write_trajectory(sy,LIBCALLS,1,0.01d0,"traj","pdb")
     ! call write_system(sy,"sy","pdb")
-#endif
+    ! #endif
 
 
     IF (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. DOSFITON .EQ. 0 &
-      .AND. PPFITON .EQ. 0 .AND. ALLFITON .EQ. 0) THEN
+         .AND. PPFITON .EQ. 0 .AND. ALLFITON .EQ. 0) THEN
 
-      !
-      ! Start the timers
-      !
+       !
+       ! Start the timers
+       !
 
-      CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
-      CALL DTIME(TARRAY, RESULT)
+       CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
+       CALL DTIME(TARRAY, RESULT)
 
-      ! Set up neighbor lists for building the H and pair potentials
+       ! Set up neighbor lists for building the H and pair potentials
 
-      CALL ALLOCATENEBARRAYS
+       CALL ALLOCATENEBARRAYS
 
-      IF (ELECTRO .EQ. 1) THEN
+       IF (ELECTRO .EQ. 1) THEN
 
-        CALL ALLOCATECOULOMB
+          CALL ALLOCATECOULOMB
 
-        CALL INITCOULOMB
+          CALL INITCOULOMB
 
-      ENDIF
+       ENDIF
 
-      IF (BASISTYPE .EQ. "NONORTHO") CALL ALLOCATENONO
+       IF (BASISTYPE .EQ. "NONORTHO") CALL ALLOCATENONO
 
-      CALL NEBLISTS(0)
+       CALL NEBLISTS(0)
 
-      ! Build the charge independent H matrix
+       ! Build the charge independent H matrix
 
-      IF (KON .EQ. 0) THEN
-
-        IF (SPONLY .EQ. 0) THEN
-          CALL BLDNEWHS_SP
-        ELSE
-          CALL BLDNEWHS
-        ENDIF
-
-      ELSE
-
-        CALL KBLDNEWH
-
-      ENDIF
-
-      !
-      ! If we're starting from a restart file, we need to modify H such
-      ! that it agrees with the density matrix elements read from file
-      !
-
-      IF (RESTART .EQ. 1) CALL IFRESTART
-
-
-      !
-      ! See whether we need spin-dependence too
-      !
-
-      IF (SPINON .EQ. 1) THEN
-        CALL GETDELTASPIN
-        CALL BLDSPINH
-      ENDIF
-
-      IF (CONTROL .EQ. 1) THEN
-        CALL ALLOCATEDIAG
-      ELSEIF (CONTROL .EQ. 2 .OR. CONTROL .EQ. 4 .OR. CONTROL .EQ. 5) THEN
-        CALL ALLOCATEPURE
-      ELSEIF (CONTROL .EQ. 3) THEN
-        CALL FERMIALLOCATE
-      ENDIF
-
-      IF (CONTROL .EQ. 5) THEN
-
-        CALL GERSHGORIN
-        CALL SP2FERMIINIT
-
-      ENDIF
-
-
-      IF (ELECTRO .EQ. 0) CALL QNEUTRAL(0,1) ! Local charge neutrality
-
-      IF (ELECTRO .EQ. 1) CALL QCONSISTENCY(0,1) ! Self-consistent charges
-
-      ! We have to build our NKTOT complex H matrices and compute the
-      ! self consistent density matrix
-
-
-
-      ! Tr[rho dH/dR], Pulay force, and Tr[rho H] need to de-orthogonalized rho
-
-      IF (KON .EQ. 1) CALL KGETDOS
-
-      ! OPEN(UNIT=31, STATUS="UNKNOWN", FILE="myrho.dat")
-
-      !         DO I = 1, HDIM
-      !           DO J = 1,HDIM
-
-      !              IF (ABS(BO(J,I)) .GT. 1.0D-5) WRITE(31,99) I, J
-
-      !                  ENDDO
-      !                  ENDDO
-
-      !99 FORMAT(2I9)
-
-      !     CLose(31)
-      IF (DEBUGON .EQ. 1 .AND. SPINON .EQ. 0 .AND. KON .EQ. 0) THEN
-
-        PRINT*, "Caution - you're writing to file the density matrix!"
-
-        OPEN(UNIT=31, STATUS="UNKNOWN", FILE="myrho.dat")
-
-        DO I = 1, HDIM
-          WRITE(31,10) (BO(I,J), J = 1, HDIM)
-        ENDDO
-
-        CLOSE(31)
-
-        10      FORMAT(100G18.8)
-
-      ENDIF
-
-      FTOT = ZERO
-
-      IF (COMPFORCE .EQ. 1) THEN
-
-        IF (KON .EQ. 0) THEN
+       IF (KON .EQ. 0) THEN
 
           IF (SPONLY .EQ. 0) THEN
-            CALL GRADHSP
+             CALL BLDNEWHS_SP
           ELSE
-            CALL GRADH
+             CALL BLDNEWHS
           ENDIF
 
-        ELSE
-          CALL KGRADH
-        ENDIF
+       ELSE
 
-        FTOT = TWO * F
+          CALL KBLDNEWH
 
-      ENDIF
+       ENDIF
 
-      EREP = ZERO
-      IF (PPOTON .EQ. 1) THEN
-        CALL PAIRPOT
-        FTOT = FTOT + FPP
-      ENDIF
+       !
+       ! If we're starting from a restart file, we need to modify H such
+       ! that it agrees with the density matrix elements read from file
+       !
 
-      IF (PPOTON .EQ. 2) THEN
-        CALL PAIRPOTTAB
-        FTOT = FTOT + FPP
-      ENDIF
+       IF (RESTART .EQ. 1) CALL IFRESTART
 
-      IF (ELECTRO .EQ. 1) FTOT = FTOT + FCOUL
 
-      IF (BASISTYPE .EQ. "NONORTHO") THEN
+       !
+       ! See whether we need spin-dependence too
+       !
 
-        IF (SPONLY .EQ. 0) THEN
-          ! s/sp orbitals only so we can use the analytic code
-          CALL FCOULNONO_SP
-          CALL PULAY_SP
-          IF (SPINON .EQ. 1) CALL FSPINNONO_SP
-        ELSE
-          ! Otherwise use the complex but general expansions Josh
-          ! Coe implemented
-          CALL FCOULNONO
-          CALL PULAY
-          IF (SPINON .EQ. 1) CALL FSPINNONO
-        ENDIF
+       IF (SPINON .EQ. 1) THEN
+          CALL GETDELTASPIN
+          CALL BLDSPINH
+       ENDIF
 
-        FTOT = FTOT - TWO*FPUL + FSCOUL
+       IF (CONTROL .EQ. 1) THEN
+          CALL ALLOCATEDIAG
+       ELSEIF (CONTROL .EQ. 2 .OR. CONTROL .EQ. 4 .OR. CONTROL .EQ. 5) THEN
+          CALL ALLOCATEPURE
+       ELSEIF (CONTROL .EQ. 3) THEN
+          CALL FERMIALLOCATE
+       ENDIF
 
-        IF (SPINON .EQ. 1) FTOT = FTOT + FSSPIN
+       IF (CONTROL .EQ. 5) THEN
 
-      ENDIF
+          CALL GERSHGORIN
+          CALL SP2FERMIINIT
 
-      CALL TOTENG
+       ENDIF
 
-      ECOUL = ZERO
-      IF (ELECTRO .EQ. 1) CALL GETCOULE
 
-      ESPIN = ZERO
-      IF (SPINON .EQ. 1) CALL GETSPINE
+       IF (ELECTRO .EQ. 0) CALL QNEUTRAL(0,1) ! Local charge neutrality
 
-      IF (CONTROL .NE. 1 .AND. CONTROL .NE. 2 .AND. KBT .GT. 0.000001 ) THEN
+       IF (ELECTRO .EQ. 1) CALL QCONSISTENCY(0,1) ! Self-consistent charges
 
-        ! We get the entropy automatically when using diagonalization.
-        ! This is only required when employing the recursive expansion
-        ! of the Fermi-operator at finite electronic temperature
+       ! We have to build our NKTOT complex H matrices and compute the
+       ! self consistent density matrix
 
-        CALL ENTROPY
 
-      ENDIF
 
-      CALL WRTRESTART(0)
+       ! Tr[rho dH/dR], Pulay force, and Tr[rho H] need to de-orthogonalized rho
 
-      IF (CONTROL .EQ. 1) THEN
-        !        CALL DEALLOCATEDIAG
-      ELSEIF (CONTROL .EQ. 2 .OR. CONTROL .EQ. 4 .OR. CONTROL .EQ. 5) THEN
-        CALL DEALLOCATEPURE
-      ELSEIF (CONTROL .EQ. 3) THEN
-        CALL FERMIDEALLOCATE
-      ENDIF
+       IF (KON .EQ. 1) CALL KGETDOS
 
-      !
-      ! Stop the clocks
-      !
+       ! OPEN(UNIT=31, STATUS="UNKNOWN", FILE="myrho.dat")
 
-      TX = STOP_TIMER(LATTE_TIMER)
-      CALL DTIME(TARRAY, RESULT)
-      CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
+       !         DO I = 1, HDIM
+       !           DO J = 1,HDIM
 
-      CALL GETPRESSURE
+       !              IF (ABS(BO(J,I)) .GT. 1.0D-5) WRITE(31,99) I, J
 
-      !     WRITE(6,*) "Force ", FPP(1,1), FPP(2,1), FPP(3,1)
-      !     PRINT*, "PCHECK ", (1.0/3.0)*(VIRBOND(1)+VIRBOND(2) + VIRBOND(3)), &
-      !          (1.0/3.0)*(VIRCOUL(1)+VIRCOUL(2) + VIRCOUL(3)), &
-      !          (1.0/3.0)*(VIRPAIR(1)+VIRPAIR(2) + VIRPAIR(3)), &
-      !          (1.0/3.0)*(VIRPUL(1)+VIRPUL(2) + VIRPUL(3)), &
-      !          (1.0/3.0)*(VIRSCOUL(1)+VIRSCOUL(2) + VIRSCOUL(3))
+       !                  ENDDO
+       !                  ENDDO
+
+       !99 FORMAT(2I9)
+
+       !     CLose(31)
+       IF (DEBUGON .EQ. 1 .AND. SPINON .EQ. 0 .AND. KON .EQ. 0) THEN
+
+          PRINT*, "Caution - you're writing to file the density matrix!"
+
+          OPEN(UNIT=31, STATUS="UNKNOWN", FILE="myrho.dat")
+
+          DO I = 1, HDIM
+             WRITE(31,10) (BO(I,J), J = 1, HDIM)
+          ENDDO
+
+          CLOSE(31)
+
+10        FORMAT(100G18.8)
+
+       ENDIF
+
+       FTOT = ZERO
+
+       IF (COMPFORCE .EQ. 1) THEN
+
+          IF (KON .EQ. 0) THEN
+
+             IF (SPONLY .EQ. 0) THEN
+                CALL GRADHSP
+             ELSE
+                CALL GRADH
+             ENDIF
+
+          ELSE
+             CALL KGRADH
+          ENDIF
+
+          FTOT = TWO * F
+
+       ENDIF
+
+       EREP = ZERO
+       IF (PPOTON .EQ. 1) THEN
+          CALL PAIRPOT
+          FTOT = FTOT + FPP
+       ENDIF
+
+       IF (PPOTON .EQ. 2) THEN
+          CALL PAIRPOTTAB
+          FTOT = FTOT + FPP
+       ENDIF
+
+       IF (ELECTRO .EQ. 1) FTOT = FTOT + FCOUL
+
+       IF (BASISTYPE .EQ. "NONORTHO") THEN
+
+          IF (SPONLY .EQ. 0) THEN
+             ! s/sp orbitals only so we can use the analytic code
+             CALL FCOULNONO_SP
+             CALL PULAY_SP
+             IF (SPINON .EQ. 1) CALL FSPINNONO_SP
+          ELSE
+             ! Otherwise use the complex but general expansions Josh
+             ! Coe implemented
+             CALL FCOULNONO
+             CALL PULAY
+             IF (SPINON .EQ. 1) CALL FSPINNONO
+          ENDIF
+
+          FTOT = FTOT - TWO*FPUL + FSCOUL
+
+          IF (SPINON .EQ. 1) FTOT = FTOT + FSSPIN
+
+       ENDIF
+
+       CALL TOTENG
+
+       ECOUL = ZERO
+       IF (ELECTRO .EQ. 1) CALL GETCOULE
+
+       ESPIN = ZERO
+       IF (SPINON .EQ. 1) CALL GETSPINE
+
+       IF (CONTROL .NE. 1 .AND. CONTROL .NE. 2 .AND. KBT .GT. 0.000001 ) THEN
+
+          ! We get the entropy automatically when using diagonalization.
+          ! This is only required when employing the recursive expansion
+          ! of the Fermi-operator at finite electronic temperature
+
+          CALL ENTROPY
+
+       ENDIF
+
+       CALL WRTRESTART(0)
+
+       IF (CONTROL .EQ. 1) THEN
+          !        CALL DEALLOCATEDIAG
+       ELSEIF (CONTROL .EQ. 2 .OR. CONTROL .EQ. 4 .OR. CONTROL .EQ. 5) THEN
+          CALL DEALLOCATEPURE
+       ELSEIF (CONTROL .EQ. 3) THEN
+          CALL FERMIDEALLOCATE
+       ENDIF
+
+       !
+       ! Stop the clocks
+       !
+
+       TX = STOP_TIMER(LATTE_TIMER)
+       CALL DTIME(TARRAY, RESULT)
+       CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
+
+       CALL GETPRESSURE
+
+       !     WRITE(6,*) "Force ", FPP(1,1), FPP(2,1), FPP(3,1)
+       !     PRINT*, "PCHECK ", (1.0/3.0)*(VIRBOND(1)+VIRBOND(2) + VIRBOND(3)), &
+       !          (1.0/3.0)*(VIRCOUL(1)+VIRCOUL(2) + VIRCOUL(3)), &
+       !          (1.0/3.0)*(VIRPAIR(1)+VIRPAIR(2) + VIRPAIR(3)), &
+       !          (1.0/3.0)*(VIRPUL(1)+VIRPUL(2) + VIRPUL(3)), &
+       !          (1.0/3.0)*(VIRSCOUL(1)+VIRSCOUL(2) + VIRSCOUL(3))
 
 #ifdef DBCSR_ON
 
-      IF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 1 .AND.  MYNODE .EQ. 0) THEN
+       IF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 1 .AND.  MYNODE .EQ. 0) THEN
 
 #endif
 
-        IF (MYID .EQ. 0) THEN
-          CALL SUMMARY
-          CALL FITTINGOUTPUT(0)
+          IF (MYID .EQ. 0) THEN
+             CALL SUMMARY
+             CALL FITTINGOUTPUT(0)
 
-          !     IF (SPINON .EQ. 0) CALL NORMS
+             !     IF (SPINON .EQ. 0) CALL NORMS
 
-          PRINT*, "# System time  = ", TARRAY(1)
-          PRINT*, "# Wall time = ", FLOAT(STOP_CLOCK - START_CLOCK)/FLOAT(CLOCK_RATE)
-          PRINT*, "# Wall time per SCF =", &
-            FLOAT(STOP_CLOCK - START_CLOCK)/(FLOAT(CLOCK_RATE)*FLOAT(NUMSCF))
-          !     PRINT*, HDIM, FLOAT(STOP_CLOCK - START_CLOCK)/FLOAT(CLOCK_RATE)
-          TX = TIMER_RESULTS()
-          PRINT*, "# NUMSCF = ", NUMSCF
+             PRINT*, "# System time  = ", TARRAY(1)
+             PRINT*, "# Wall time = ", FLOAT(STOP_CLOCK - START_CLOCK)/FLOAT(CLOCK_RATE)
+             PRINT*, "# Wall time per SCF =", &
+                  FLOAT(STOP_CLOCK - START_CLOCK)/(FLOAT(CLOCK_RATE)*FLOAT(NUMSCF))
+             !     PRINT*, HDIM, FLOAT(STOP_CLOCK - START_CLOCK)/FLOAT(CLOCK_RATE)
+             TX = TIMER_RESULTS()
+             PRINT*, "# NUMSCF = ", NUMSCF
 
-        ENDIF
+          ENDIF
 #ifdef DBCSR_ON
 
-      ENDIF
+       ENDIF
 
 #endif
 
-      !     CALL ASSESSOCC
+       !     CALL ASSESSOCC
 
-      IF (ELECTRO .EQ. 1) CALL DEALLOCATECOULOMB
+       IF (ELECTRO .EQ. 1) CALL DEALLOCATECOULOMB
 
-      IF (BASISTYPE .EQ. "NONORTHO") CALL DEALLOCATENONO
+       IF (BASISTYPE .EQ. "NONORTHO") CALL DEALLOCATENONO
 
-      CALL DEALLOCATENEBARRAYS
+       CALL DEALLOCATENEBARRAYS
 
     ELSEIF (MDON .EQ. 1 .AND. RELAXME .EQ. 0 .AND. MAXITER_IN < 0 ) THEN
 
-      DT = DT_IN ! Get the integration step from the hosting code.
+       DT = DT_IN ! Get the integration step from the hosting code.
 
-      IF(LIBCALLS == 0)THEN
+       IF(LIBCALLS == 0)THEN
 
-        IF (BASISTYPE .EQ. "NONORTHO") CALL ALLOCATENONO
+          IF (BASISTYPE .EQ. "NONORTHO") CALL ALLOCATENONO
 
-        IF (XBOON .EQ. 1) CALL ALLOCATEXBO
+          IF (XBOON .EQ. 1) CALL ALLOCATEXBO
 
-        IF (ELECTRO .EQ. 1) THEN
+          IF (ELECTRO .EQ. 1) THEN
+             CALL ALLOCATECOULOMB
+             CALL INITCOULOMB
+          ENDIF
+
+          ! Start the timers
+
+          CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
+          CALL DTIME(TARRAY, RESULT)
+
+          CALL SETUPTBMD
+
+       ENDIF
+
+       IF (MOD(LIBCALLS, UDNEIGH) .EQ. 0) CALL NEBLISTS(1)
+
+       IF (QITER .NE. 0) THEN
+          ECOUL = ZERO
+          IF (ELECTRO .EQ. 1) CALL GETCOULE
+       ENDIF
+
+       WRITE(*,*)"LIBCALLS",LIBCALLS
+
+       IF(LIBCALLS > 0) CALL GETMDF(1, LIBCALLS)
+
+       CALL TOTENG
+
+       ! For the 0 SCF MD the coulomb energy is calculated in GETMDF
+
+       IF (PPOTON .EQ. 1) THEN
+          CALL PAIRPOT
+       ELSEIF (PPOTON .EQ. 2) THEN
+          CALL PAIRPOTTAB
+       ENDIF
+
+       IF (QITER .NE. 0) THEN
+          ECOUL = ZERO
+          IF (ELECTRO .EQ. 1) CALL GETCOULE
+       ENDIF
+
+       ESPIN = ZERO
+       IF (SPINON .EQ. 1) CALL GETSPINE
+
+       !      CALL GETPRESSURE
+
+       IF (CONTROL .NE. 1 .AND. CONTROL .NE. 2 .AND. KBT .GT. 0.000001 ) THEN
+
+          ! Only required when using the recursive expansion of the Fermi operator
+
+          ! 2/26/13
+          ! The entropy is now calculated when we get the density
+          ! matrix in the spin polarized case with diagonalization,
+          ! as it should be...
+
+          CALL ENTROPY
+
+       ENDIF
+
+       VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
+
+       WRITE(6,*)"Energy Components (TRRHOH, EREP, ENTE, ECOUL)",TRRHOH, EREP, ENTE, ECOUL
+       WRITE(6,*)"Epot", VENERG
+
+       FTOT_OUT = FTOT
+
+       ! Get the seccond virial coefficient to pass it to the application program
+       VIRIAL = VIRBOND + VIRPAIR + VIRCOUL
+
+       IF (SPINON .EQ. 1) VIRIAL = VIRIAL + VIRSSPIN
+
+       IF (BASISTYPE .EQ. "NONORTHO") THEN
+          VIRIAL = VIRIAL - VIRPUL + VIRSCOUL
+       ENDIF
+
+       VIRIALINOUT = -VIRIAL
+
+       INITIALIZED = .TRUE.
+
+       CALL FLUSH(6) !To force writing to file at every call
+
+       RETURN
+
+    ELSEIF (MDON .EQ. 1 .AND. RELAXME .EQ. 0 .AND. MAXITER_IN >= 0) THEN
+
+       IF (BASISTYPE .EQ. "NONORTHO") CALL ALLOCATENONO
+
+       IF (XBOON .EQ. 1) CALL ALLOCATEXBO
+
+       IF (ELECTRO .EQ. 1) THEN
           CALL ALLOCATECOULOMB
           CALL INITCOULOMB
-        ENDIF
+       ENDIF
 
-        ! Start the timers
+       ! Start the timers
 
-        CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
-        CALL DTIME(TARRAY, RESULT)
+       CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
+       CALL DTIME(TARRAY, RESULT)
 
-        Call SETUPTBMD
+       !
+       ! Call TBMD
+       !
 
-      ENDIF
-
-      IF (MOD(LIBCALLS, UDNEIGH) .EQ. 0) CALL NEBLISTS(1)
-
-      IF (QITER .NE. 0) THEN
-        ECOUL = ZERO
-        IF (ELECTRO .EQ. 1) CALL GETCOULE
-      ENDIF
-
-      write(*,*)"LIBCALLS",LIBCALLS
-
-      IF(LIBCALLS > 0) CALL GETMDF(1, LIBCALLS)
-
-      CALL TOTENG
-
-      ! For the 0 SCF MD the coulomb energy is calculated in GETMDF
-
-      IF (PPOTON .EQ. 1) THEN
-        CALL PAIRPOT
-      ELSEIF (PPOTON .EQ. 2) THEN
-        CALL PAIRPOTTAB
-      ENDIF
-
-      IF (QITER .NE. 0) THEN
-        ECOUL = ZERO
-        IF (ELECTRO .EQ. 1) CALL GETCOULE
-      ENDIF
-
-      ESPIN = ZERO
-      IF (SPINON .EQ. 1) CALL GETSPINE
-
-!      CALL GETPRESSURE
-
-      IF (CONTROL .NE. 1 .AND. CONTROL .NE. 2 .AND. KBT .GT. 0.000001 ) THEN
-
-        ! Only required when using the recursive expansion of the Fermi operator
-
-        ! 2/26/13
-        ! The entropy is now calculated when we get the density
-        ! matrix in the spin polarized case with diagonalization,
-        ! as it should be...
-
-        CALL ENTROPY
-
-      ENDIF
-
-      VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
-
-      write(6,*)"Energy Components (TRRHOH, EREP, ENTE, ECOUL)",TRRHOH, EREP, ENTE, ECOUL
-      write(6,*)"Epot", VENERG
-
-      FTOT_OUT = FTOT
-
-      ! Get the seccond virial coefficient to pass it to the application program
-      VIRIAL = VIRBOND + VIRPAIR + VIRCOUL
-
-      IF (SPINON .EQ. 1) VIRIAL = VIRIAL + VIRSSPIN
-
-      IF (BASISTYPE .EQ. "NONORTHO") THEN
-            VIRIAL = VIRIAL - VIRPUL + VIRSCOUL
-      ENDIF
-
-      VIRIALINOUT = -VIRIAL
-
-      INITIALIZED = .true.
-
-      CALL FLUSH(6) !To force writing to file at every call 
-
-      RETURN
-
-  ELSEIF (MDON .EQ. 1 .AND. RELAXME .EQ. 0 .AND. MAXITER_IN >= 0) THEN
-
-
-     IF (BASISTYPE .EQ. "NONORTHO") CALL ALLOCATENONO
-
-     IF (XBOON .EQ. 1) CALL ALLOCATEXBO
-
-     IF (ELECTRO .EQ. 1) THEN
-        CALL ALLOCATECOULOMB
-        CALL INITCOULOMB
-     ENDIF
-
-     ! Start the timers
-
-     CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
-     CALL DTIME(TARRAY, RESULT)
-
-     !
-     ! Call TBMD
-     !
-
-     CALL TBMD
+       CALL TBMD
 
 
 #ifdef MPI_ON
-     IF (PARREP .EQ. 1) CALL MPI_BARRIER (MPI_COMM_WORLD, IERR )
+       IF (PARREP .EQ. 1) CALL MPI_BARRIER (MPI_COMM_WORLD, IERR )
 #endif
 
 
-     ! Stop the timers
+       ! Stop the timers
 
-     CALL DTIME(TARRAY, RESULT)
-     CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
+       CALL DTIME(TARRAY, RESULT)
+       CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
 
-     CALL SUMMARY
+       CALL SUMMARY
 
-     IF (PBCON .EQ. 0) CLOSE(23)
+       IF (PBCON .EQ. 0) CLOSE(23)
 
-     IF (BASISTYPE .EQ. "NONORTHO") CALL DEALLOCATENONO
+       IF (BASISTYPE .EQ. "NONORTHO") CALL DEALLOCATENONO
 
-     IF (XBOON .EQ. 1) CALL DEALLOCATEXBO
+       IF (XBOON .EQ. 1) CALL DEALLOCATEXBO
 
-     IF (ELECTRO .EQ. 1) CALL DEALLOCATECOULOMB
+       IF (ELECTRO .EQ. 1) CALL DEALLOCATECOULOMB
 
-!     SYSTPURE = TARRAY(1)
-!     WRITE(6,'("# System time for MD run = ", F12.2, " s")') SYSTPURE
-     WRITE(6,'("# Wall time for MD run = ", F12.2, " s")') &
-          FLOAT(STOP_CLOCK - START_CLOCK)/FLOAT(CLOCK_RATE)
+       !     SYSTPURE = TARRAY(1)
+       !     WRITE(6,'("# System time for MD run = ", F12.2, " s")') SYSTPURE
+       WRITE(6,'("# Wall time for MD run = ", F12.2, " s")') &
+            FLOAT(STOP_CLOCK - START_CLOCK)/FLOAT(CLOCK_RATE)
 
 
     ELSEIF (MDON .EQ. 0 .AND. RELAXME .EQ. 1) THEN
 
-      CALL MSRELAX
+       WRITE(*,*)""
+       WRITE(*,*)"WARNING: RELAXME= 1"
+       WRITE(*,*)"The geometry optimization is being performed by LATTE"
+       WRITE(*,*)""
+
+       CALL MSRELAX
 
     ELSEIF (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. DOSFITON .EQ. 1) THEN
 
-      CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
+       WRITE(*,*)""
+       WRITE(*,*)"WARNING: DOSFITON= 1"
+       WRITE(*,*)"This option was not tested for the library version of LATTE"
+       WRITE(*,*)""
 
-      CALL DOSFIT
+       CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
 
-      CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
+       CALL DOSFIT
 
-      WRITE(6,'("# Wall time = ", F12.2, " s")') &
-        FLOAT(STOP_CLOCK - START_CLOCK)/FLOAT(CLOCK_RATE)
+       CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
+
+       WRITE(6,'("# Wall time = ", F12.2, " s")') &
+            FLOAT(STOP_CLOCK - START_CLOCK)/FLOAT(CLOCK_RATE)
 
     ELSEIF  (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. DOSFITON .EQ. 2) THEN
 
-      CALL MOFIT
+       WRITE(*,*)""
+       WRITE(*,*)"WARNING: DOSFITON= 2"
+       WRITE(*,*)"This option was not tested for the library version of LATTE"
+       WRITE(*,*)""
+
+       CALL MOFIT
 
     ELSEIF (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. DOSFITON .EQ. 3) THEN
 
-      CALL MOFITPLATO
+       WRITE(*,*)""
+       WRITE(*,*)"WARNING: DOSFITON= 3"
+       WRITE(*,*)"This option was not tested for the library version of LATTE"
+       WRITE(*,*)""
+
+       CALL MOFITPLATO
 
     ELSEIF (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. PPFITON .EQ. 1) THEN
 
-      CALL PPFIT
+       WRITE(*,*)""
+       WRITE(*,*)"WARNING: PPFITON= 2"
+       WRITE(*,*)"This option was not tested for the library version of LATTE"
+       WRITE(*,*)""
+
+       CALL PPFIT
 
     ELSEIF (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. ALLFITON .EQ. 1) THEN
 
-      CALL ALLFIT
+       WRITE(*,*)""
+       WRITE(*,*)"WARNING: ALLFITON= 2"
+       WRITE(*,*)"This option was not tested for the library version of LATTE"
+       WRITE(*,*)""
 
-  ELSE
+       CALL ALLFIT
 
-     WRITE(6,*) "You can't have RELAXME = 1 and MDON = 1"
-     STOP
+    ELSE
 
-  ENDIF
+       WRITE(6,*) "You can't have RELAXME = 1 and MDON = 1"
+       STOP
+
+    ENDIF
 
 #ifdef GPUON
 
-  CALL shutdown()
+    CALL shutdown()
 
 #endif
 
 
-  CALL DEALLOCATEALL
+    CALL DEALLOCATEALL
 
 #ifdef DBCSR_ON
 
-  !ends mpi
+    !ends mpi
 
-  IF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 1) CALL SHUTDOWN_DBCSR
+    IF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 1) CALL SHUTDOWN_DBCSR
 
 #endif
 
-  ! Done with timers
-  TX = SHUTDOWN_TIMER()
+    ! Done with timers
+    TX = SHUTDOWN_TIMER()
 
 #ifdef MPI_ON
-  CALL MPI_FINALIZE( IERR )
+    CALL MPI_FINALIZE( IERR )
 #endif
 
-    INITIALIZED = .true.
+    INITIALIZED = .TRUE.
 
   END SUBROUTINE LATTE
 

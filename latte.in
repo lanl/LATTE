@@ -2,16 +2,16 @@
 #================
 
 This input file resumes the content of MDcontroller and TBparam/control.in
-The parser will read this file only if it is present inside the running folder. 
+The parser will read this file only if it is present inside the running folder.
 In case this file is not present Latte will read the two files as originally.
-The order of the keywords is not important in this file. 
+The order of the keywords is not important in this file.
 Everything is a comment by default unless a word contains an "equal" sign.
-To comment a particular keyword the "hash" symbol has to be added next to the 
+To comment a particular keyword the "hash" symbol has to be added next to the
 keyword. Example: #MyCommentedKeyword=
 
 
-#Uncoment the following keyword to force variable settings
-DEFAULTNONE  
+#Uncomment the following keyword to force variable settings
+#DEFAULTNONE
 
 #General controls
 CONTROL{
@@ -53,14 +53,14 @@ CONTROL{
   DOSFIT= 0 INTS2FIT= 1 BETA= 1000.0 NFITSTEP= 5000 QFIT= 0 MCSIGMA= 0.2
   PPFITON=  0
   ALLFITON= 0
-  PPSTEP= 500 BISTEP= 500 PP2FIT= 2 BINT2FIT= 6 
+  PPSTEP= 500 BISTEP= 500 PP2FIT= 2 BINT2FIT= 6
   PPBETA= 1000.0 PPSIGMA= 0.01 PPNMOL= 10 PPNGEOM= 200
   PARREP= 0
   ER= 1.0
   INITIALIZED= F
 }
 
-#Controls for QMD 
+#Controls for QMD
 MDCONTROL{
   MAXITER= 5000
   UDNEIGH= 25
@@ -86,5 +86,3 @@ KMESH{
   NKX= 8 NKY= 8 NKZ= 8
   KSHIFTX= 0.0 KSHIFTY= 0.0 KSHIFTZ= 0.0
 }
-
-
