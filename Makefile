@@ -10,7 +10,7 @@ all :
 ifeq ($(GPUOPT),ON)
 	(cd MATRIX; make; cd ..)
 endif
-	(cd src; make; cd ..)
+	(rm liblatte.a; cd src; make; cd ..)
 
 src : 
 	(rm liblatte.a; cd src; make; cd ..)
