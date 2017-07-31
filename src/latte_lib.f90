@@ -241,7 +241,6 @@ CONTAINS
     ! call write_system(sy,"sy","pdb")
     ! #endif
 
-
     IF (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. DOSFITON .EQ. 0 &
          .AND. PPFITON .EQ. 0 .AND. ALLFITON .EQ. 0) THEN
 
@@ -502,6 +501,7 @@ CONTAINS
        IF (DT_IN == 0) THEN
          IF (VERBOSE == 1) WRITE(*,*)"NOTE: DT = 0 => FULLQCONV = 1"
          FULLQCONV = 1
+         MDMIX = QMIX
        ENDIF
 
        IF(LIBCALLS == 0)THEN
