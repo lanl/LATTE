@@ -497,6 +497,13 @@ CONTAINS
 
        DT = DT_IN ! Get the integration step from the hosting code.
 
+       !Control for implicit geometry optimization.
+       !This will need to be replaced by a proper flag.
+       IF (DT_IN == 0) THEN
+         IF (VERBOSE == 1) WRITE(*,*)"NOTE: DT = 0 => FULLQCONV = 1"
+         FULLQCONV = 1
+       ENDIF
+
        IF(LIBCALLS == 0)THEN
 
           IF (BASISTYPE .EQ. "NONORTHO") CALL ALLOCATENONO
