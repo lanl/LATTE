@@ -40,6 +40,8 @@ MODULE LATTE_LIB
 
 #ifdef PROGRESSON
   USE PRG_SYSTEM_MOD ! FROM PROGRESS
+  USE PRG_PULAYMIXER_MOD
+  USE MIXER_MOD
   USE BML
 #endif
 
@@ -146,8 +148,14 @@ CONTAINS
        TX = START_TIMER(LATTE_TIMER)
 
        INQUIRE( FILE="latte.in", exist=EXISTS )
+
        IF (EXISTS) THEN
           IF(.NOT. INITIALIZED) CALL PARSE_CONTROL("latte.in")
+
+#ifdef PROGRESSON
+          IF(.NOT.INITIALIZED) CALL PRG_PARSE_MIXER(MX,"latte.in")
+#endif
+
        ELSE
           IF(.NOT. INITIALIZED) CALL READCONTROLS
        ENDIF
@@ -165,11 +173,11 @@ CONTAINS
           BOX(3,3) = xhi(3) - xlo(3)
 
           IF(VERBOSE >= 1)THEN
-            WRITE(*,*)"Lattice vectors:"
-            WRITE(*,*)"a=",BOX(1,1),BOX(1,2),BOX(1,3)
-            WRITE(*,*)"b=",BOX(2,1),BOX(2,2),BOX(2,3)
-            WRITE(*,*)"c=",BOX(3,1),BOX(3,2),BOX(3,3)
-            WRITE(*,*)""
+             WRITE(*,*)"Lattice vectors:"
+             WRITE(*,*)"a=",BOX(1,1),BOX(1,2),BOX(1,3)
+             WRITE(*,*)"b=",BOX(2,1),BOX(2,2),BOX(2,3)
+             WRITE(*,*)"c=",BOX(3,1),BOX(3,2),BOX(3,3)
+             WRITE(*,*)""
           ENDIF
 
           NATS = SIZE(CR_IN,DIM=2)
@@ -238,11 +246,11 @@ CONTAINS
        BOX(3,3) = xhi(3) - xlo(3)
 
        IF(VERBOSE >= 1)THEN
-         WRITE(*,*)"Lattice vectors:"
-         WRITE(*,*)"a=",BOX(1,1),BOX(1,2),BOX(1,3)
-         WRITE(*,*)"b=",BOX(2,1),BOX(2,2),BOX(2,3)
-         WRITE(*,*)"c=",BOX(3,1),BOX(3,2),BOX(3,3)
-         WRITE(*,*)""
+          WRITE(*,*)"Lattice vectors:"
+          WRITE(*,*)"a=",BOX(1,1),BOX(1,2),BOX(1,3)
+          WRITE(*,*)"b=",BOX(2,1),BOX(2,2),BOX(2,3)
+          WRITE(*,*)"c=",BOX(3,1),BOX(3,2),BOX(3,3)
+          WRITE(*,*)""
        ENDIF
 
        NATS = SIZE(CR_IN,DIM=2)
@@ -626,6 +634,20 @@ CONTAINS
        VIRIALINOUT = -VIRIAL
 
        INITIALIZED = .TRUE.
+
+#ifdef PROGRESSON
+       IF(WRTFREQ > 0)THEN
+          IF(VERBOSE >= 1)WRITE(*,*)"Writing trajectory into trajectory.pdb ..."
+          SY%NATS = NATS
+          IF(.NOT. ALLOCATED(SY%COORDINATE))ALLOCATE(SY%COORDINATE(3,NATS))
+          SY%COORDINATE = CR
+          SY%SYMBOL = ATELE
+          SY%LATTICE_VECTOR = BOX
+          SY%NET_CHARGE = DELTAQ
+          CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT_IN,"trajectory","pdb")
+          CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT_IN,"trajectory","xyz")
+       ENDIF
+#endif
 
        IF(VERBOSE >= 1 .AND. CONTROL == 1)THEN
           WRITE(*,*)"HOMO=",EVALS(FLOOR(BNDFIL*FLOAT(HDIM))),"LUMO=",EVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1)
