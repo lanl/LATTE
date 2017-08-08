@@ -27,6 +27,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   USE COULOMBARRAY
   USE TIMER_MOD
   USE MYPRECISION
+  USE MIXER_MOD
 
   IMPLICIT NONE
 
@@ -34,13 +35,14 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   INTEGER :: ALLOKQ, ALLOKM, ALLOK
   INTEGER :: START_CLOCK, STOP_CLOCK, CLOCK_RATE, CLOCK_MAX, ITERACC
   REAL(4) :: TIMEACC
+  REAL(LATTEPREC) :: MAXDQ
   REAL(LATTEPREC), ALLOCATABLE :: QDIFF(:), SPINDIFF(:)
 
   !
   ! If FULLQCONV = 1, then we're going to iterate until all charges are within
   ! QTOL.
   !
-  ! If FULLQCONV = 0, then we're going to run only a user specified number 
+  ! If FULLQCONV = 0, then we're going to run only a user specified number
   ! of iterations (= QITER)
   !
   ! If SWITCH = 0, then we don't have any partial charges defined yet so
@@ -75,7 +77,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         TX = STOP_TIMER(DMBUILD_TIMER)
-        
+
         !
         ! Now we have our bond-order/density matrices,
         ! we can get the charges and spins
@@ -91,41 +93,45 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
               CALL KDEORTHOMYRHO
            ENDIF
         ENDIF
-           
+
+        IF(VERBOSE >= 1)WRITE(*,*)"In GETDELTAQ ..."
         CALL GETDELTAQ
 
         IF (SPINON .EQ. 1) CALL GETDELTASPIN
 
      ENDIF
-     
+
      !
      ! Now we're going to run our iterations for self-consistency
      !
-     
+
      ALLOK = 1
      ITER = 0
 
      ALLOCATE(QDIFF(NATS))
      IF (SPINON .EQ. 1) ALLOCATE(SPINDIFF(DELTADIM))
-     
+
      DO WHILE (ALLOK .GT. 0)
-        
+
         ITER = ITER + 1
+        IF(VERBOSE >= 1)WRITE(*,*)"SCF ITER =", ITER
+        CALL FLUSH(6)
+
 
         IF (ELECMETH .EQ. 0) THEN
-           
+
            !
            ! First do the real space part of the electrostatics
            ! This subroutine is based on Sanville's work
            !
 
            CALL COULOMBRSPACE
-           
+
            !
            ! And now the long range bit (this is also a modified version
-           ! of Ed's code). 
+           ! of Ed's code).
            !
-        
+
            CALL COULOMBEWALD
 
 
@@ -139,18 +145,18 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            CALL GASPCOULOMB
 
         ENDIF
-        
+
         !
         ! Now let's modify the diagonal elements of our H matrix according
         ! to the electrostatic potential experienced by each atom
         !
-        
-        CALL ADDQDEP 
+
+        CALL ADDQDEP
 
         ! Got to add the electrostatic potential to
         ! the Slater-Koster H before adding H_2 to form
         ! H_up and H_down
-        
+
         !
         ! Calculate the spin-dependent H matrix again
         !
@@ -159,7 +165,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
 
         ! We've made changes to the H matrix so we have to re-orthogonalize
-           
+
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
               CALL ORTHOMYH
@@ -167,11 +173,11 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
               CALL KORTHOMYH
            ENDIF
         ENDIF
-              
+
         !
-        ! New Hamiltonian: get the bond order 
+        ! New Hamiltonian: get the bond order
         !
-        
+
         ! Compute the density matrix
 
         TX = START_TIMER(DMBUILD_TIMER)
@@ -186,7 +192,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         ! We have a density matrix computed in from the orthogonalized
         ! H matrix - we have to revert back
-        
+
         !
         ! Save our old charges/spins so we can mix them later
         !
@@ -200,33 +206,40 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         OLDDELTAQS = DELTAQ
-        
+
         !
         ! Get a new set of charges for our system
         !
-        
+
         CALL GETDELTAQ
 
         !
         ! Let's check for convergence
         !
-        
+
         ALLOKQ = 0
 
         QDIFF = ABS(DELTAQ - OLDDELTAQS)
 
-        IF (MAXVAL(QDIFF) .GT. ELEC_QTOL) ALLOKQ = 1
+        MAXDQ = MAXVAL(QDIFF)
+        IF (MAXDQ .GT. ELEC_QTOL) ALLOKQ = 1
 
         ! Mix new and old partial charges
-        
+
         IF (MDITER .LE. 10) THEN
-           DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
+          IF (MIXER == 1) THEN
+            CALL QMIXPRG     !Alternative mixing scheme
+          ELSE
+            DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
+          ENDIF
         ELSE
            DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
         ENDIF
-        
+
+        IF(VERBOSE >= 1)WRITE(*,*)"SCF error (MAXDQ) =",MAXDQ
+
 !        PRINT*, MAXVAL(DELTAQ)
- 
+
         ALLOKM = 0
 
         IF (SPINON .EQ. 1) THEN
@@ -236,14 +249,14 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
            SPINDIFF = ABS(DELTASPIN - OLDDELTASPIN)
 
-           IF (MAXVAL(SPINDIFF) .GT. SPINTOL)  ALLOKM = 1           
-           
+           IF (MAXVAL(SPINDIFF) .GT. SPINTOL)  ALLOKM = 1
+
            ! Mix new and old spin densities
-           
+
            DELTASPIN = SPINMIX*DELTASPIN + (ONE - SPINMIX)*OLDDELTASPIN
-              
+
         ENDIF
-        
+
         ALLOK = ALLOKQ + ALLOKM
 
         IF (ITER .EQ. MAXSCF) THEN
@@ -255,7 +268,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            ALLOK = 0
 
         ENDIF
-        
+
 
      ENDDO
 
@@ -266,17 +279,20 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
 !     WRITE(6,99) "# HDIM, TIME PER RHO BUILD = ", HDIM, TIMEACC/REAL(ITERACC)
 !99   FORMAT(A29, I5, 1X, G18.6)
-     
+
+IF(VERBOSE >= 1)WRITE(*,*)"ALGO4..."
+CALL FLUSH(6)
+
   ELSEIF (FULLQCONV .EQ. 0 .AND. MDON .EQ. 1 .AND. MDITER .GT. 10) THEN
-     
-     ! Now we're doing MD 
+
+     ! Now we're doing MD
 
      DO II = 1, QITER
 
         IF (ELECMETH .EQ. 0) THEN
 
            CALL COULOMBRSPACE
-        
+
            CALL COULOMBEWALD
 
         ELSE
@@ -294,7 +310,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         !
 
         IF (SPINON .EQ. 1) CALL BLDSPINH
-        
+
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
               CALL ORTHOMYH
@@ -305,12 +321,12 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
 
         !
-        ! New Hamiltonian: get the bond order 
+        ! New Hamiltonian: get the bond order
         !
-        
+
         ! Compute the density matrix
 
-        
+
         IF (KON .EQ. 0) THEN
            CALL GETRHO(MDITER)
         ELSE
@@ -330,20 +346,20 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
               CALL KDEORTHOMYRHO
            ENDIF
         ENDIF
-   
+
         CALL GETDELTAQ
 
         !
         ! Mix to get new charges
         !
- 
+
         DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
 
 !        PRINT*, DELTAQ(1)
 
         IF (SPINON .EQ. 1) THEN
-           
-           OLDDELTASPIN = DELTASPIN           
+
+           OLDDELTASPIN = DELTASPIN
            CALL GETDELTASPIN
            DELTASPIN = SPINMIX*DELTASPIN + (ONE - SPINMIX)*OLDDELTASPIN
 
@@ -355,9 +371,9 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
      ! that charge distribution
 
      IF (ELECMETH .EQ. 0) THEN
-     
+
         CALL COULOMBRSPACE
-        
+
         CALL COULOMBEWALD
 
      ELSE
@@ -380,9 +396,9 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
      ENDIF
 
-        
+
      !
-     ! New Hamiltonian: get the bond order/density matrices 
+     ! New Hamiltonian: get the bond order/density matrices
      !
 
      ! Compute the density matrix
@@ -404,5 +420,5 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   ENDIF
 
   RETURN
-  
+
 END SUBROUTINE QCONSISTENCY
