@@ -34,7 +34,7 @@ SUBROUTINE READCONTROLS
 
   CHARACTER(LEN=20) :: HD
 
-  OPEN(UNIT=13, STATUS="OLD", FILE=trim(PARAMPATH)//"control.in")
+  OPEN(UNIT=13, STATUS="OLD", FILE=trim(PARAMPATH)//"/control.in")
 
   !
   ! CONTROL determines how the density matrix is going to be 
