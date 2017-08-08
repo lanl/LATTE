@@ -49,18 +49,19 @@ SUBROUTINE SETUPTBMD
   !
 
   IF(.NOT.INITIALIZED)THEN
-    INQUIRE( FILE="latte.in", exist=EXISTS )
-    IF (EXISTS) THEN
-      CALL PARSE_MD("latte.in")
-    ELSE
-      CALL READMDCONTROLLER
-    ENDIF
+     INQUIRE( FILE="latte.in", exist=EXISTS )
+     IF (EXISTS) THEN
+        CALL PARSE_MD("latte.in")
+     ELSE
+        CALL READMDCONTROLLER
+     ENDIF
 
-  !
-  ! Allocate stuff for building the neighbor lists, then build them
-  !
+     !
+     ! Allocate stuff for building the neighbor lists, then build them
+     !
+     CALL ALLOCATENEBARRAYS
 
-  CALL ALLOCATENEBARRAYS
+     CALL FLUSH(6)
 
   ENDIF
 
@@ -72,22 +73,22 @@ SUBROUTINE SETUPTBMD
   !
 
   IF(.NOT.INITIALIZED)THEN
-    IF (CONTROL .EQ. 1) THEN
-       CALL ALLOCATEDIAG
-    ELSEIF (CONTROL .EQ. 2 .OR. CONTROL .EQ. 4 .OR. CONTROL .EQ. 5) THEN
-       CALL ALLOCATEPURE
-    ELSEIF (CONTROL .EQ. 3) THEN
-       CALL FERMIALLOCATE
-    ENDIF
+     IF (CONTROL .EQ. 1) THEN
+        CALL ALLOCATEDIAG
+     ELSEIF (CONTROL .EQ. 2 .OR. CONTROL .EQ. 4 .OR. CONTROL .EQ. 5) THEN
+        CALL ALLOCATEPURE
+     ELSEIF (CONTROL .EQ. 3) THEN
+        CALL FERMIALLOCATE
+     ENDIF
   ENDIF
 
-!
+  !
+  IF(VERBOSE >= 1)WRITE(*,*)"Getting MD forces ..."
   IF (RESTART .EQ. 0) CALL GETMDF(0,1)
 
   CUMDT = ZERO
 
   TOTSCF = 0
-
 
   RETURN
 
