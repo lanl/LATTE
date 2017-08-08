@@ -228,7 +228,11 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         IF (MDITER .LE. 10) THEN
           IF (MIXER == 1) THEN
+#ifdef PROGRESSON            
             CALL QMIXPRG     !Alternative mixing scheme
+#else
+            STOP'Please compile latte with PROGRESS/BML libraries before setting MIXER = 1'
+#endif
           ELSE
             DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
           ENDIF
