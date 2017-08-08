@@ -266,16 +266,6 @@ CONTAINS
 
     !END OF INITIALIZATION
 
-    ! #ifdef PROGRESSON
-    ! SY%NATS = NATS
-    ! IF(.NOT. ALLOCATED(SY%COORDINATE))ALLOCATE(SY%COORDINATE(3,NATS))
-    ! SY%COORDINATE = CR
-    ! SY%SYMBOL = ATELE
-    ! SY%lattice_vector = BOX
-    ! call write_trajectory(sy,LIBCALLS,1,0.01d0,"traj","pdb")
-    ! call write_system(sy,"sy","pdb")
-    ! #endif
-
     IF (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. DOSFITON .EQ. 0 &
          .AND. PPFITON .EQ. 0 .AND. ALLFITON .EQ. 0) THEN
 
