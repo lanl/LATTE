@@ -636,7 +636,7 @@ CONTAINS
        INITIALIZED = .TRUE.
 
 #ifdef PROGRESSON
-       IF(WRTFREQ > 0)THEN
+       IF(MOD(LIBCALLS,WRTFREQ) = 0)THEN
           IF(VERBOSE >= 1)WRITE(*,*)"Writing trajectory into trajectory.pdb ..."
           SY%NATS = NATS
           IF(.NOT. ALLOCATED(SY%COORDINATE))ALLOCATE(SY%COORDINATE(3,NATS))
