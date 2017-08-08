@@ -41,7 +41,7 @@ contains
     use FERMICOMMON
 
     implicit none
-    integer, parameter :: nkey_char = 6, nkey_int = 49, nkey_re = 21, nkey_log = 1
+    integer, parameter :: nkey_char = 6, nkey_int = 51, nkey_re = 21, nkey_log = 1
     character(len=*) :: filename
 
     !Library of keywords with the respective defaults.
@@ -58,7 +58,7 @@ contains
          'MDON=','PBCON=','RESTART=','CHARGE=','XBO=','XBODISON=','XBODISORDER=','NGPU=',& !33
          'KON=','COMPFORCE=','DOSFIT=','INTS2FIT=','NFITSTEP=','QFIT=',& !39
          'PPFITON=','ALLFITON=','PPSTEP=','BISTEP=','PP2FIT=','BINT2FIT=','PPNMOL=',& !46
-         'PPNGEOM=','PARREP=','VERBOSE=']
+         'PPNGEOM=','PARREP=','VERBOSE=','MIXER=','RESTARTLIB=']
     integer :: valvector_int(nkey_int) = (/ &
          1,0,6,1,1,1, &
          1,0,0,1,0,250, &
@@ -67,7 +67,7 @@ contains
          1,1,0,0,1,1,5,2, &
          0,1,0,1,5000,0,&
          0,0,500,500,2,6,10,&
-         200,0,0 /)
+         200,0,0,0,0 /)
 
     character(len=50), parameter :: keyvector_re(nkey_re) = [character(len=50) :: &
          'CGTOL=','KBT=','SPINTOL=','ELEC_ETOL=','ELEC_QTOL=','COULACC=','COULCUT=', 'COULR1=',& !8
@@ -357,6 +357,14 @@ contains
 
     VERBOSE = valvector_int(49)
 
+    ! If Pulay Mixer
+
+    MIXER = valvector_int(50)
+
+    ! Restart option for latte lib.
+
+    MIXER = valvector_int(51)
+
     ! Dielectric constant
 
     RELPERM = valvector_re(21)
@@ -374,7 +382,7 @@ contains
   subroutine parse_md(filename)
 
     implicit none
-    integer, parameter :: nkey_char = 3, nkey_int = 17, nkey_re = 10, nkey_log = 1
+    integer, parameter :: nkey_char = 3, nkey_int = 18, nkey_re = 10, nkey_log = 1
     character(len=*) :: filename
 
     !Library of keywords with the respective defaults.
@@ -386,11 +394,11 @@ contains
     character(len=50), parameter :: keyvector_int(nkey_int) = [character(len=50) :: &
          'MAXITER=', 'UDNEIGH=', 'DUMPFREQ=','RSFREQ=', 'WRTFREQ=', 'TOINITTEMP5=', 'THERMPER=',& !7
          'THERMRUN=', 'NVTON=', 'NPTON=', 'AVEPER=', 'SEED=', 'SHOCKON=',&
-         'SHOCKSTART=','SHOCKDIR=','MDADAPT=','GETHUG=']
+         'SHOCKSTART=','SHOCKDIR=','MDADAPT=','GETHUG=','RSLEVEL=']
     integer :: valvector_int(nkey_int) = (/ &
          5000,1,250,500,25,1,500, &
          50000,0,0,1000,54,0, &
-         100000,1,0,0/)
+         100000,1,0,0,0/)
 
     character(len=50), parameter :: keyvector_re(nkey_re) = [character(len=50) :: &
          'DT=','TEMPERATURE=','FRICTION=','PTARGET=','UPARTICLE=','USHOCK=','C0=', 'E0=',&
@@ -541,6 +549,9 @@ contains
     ! Calculating Hugoniot points?
 
     GETHUG = valvector_int(17)
+
+    RSLEVEL = valvector_int(18)
+
     !   write(*,*)"GETHUG",GETHUG
     E0 = valvector_re(8); V0 = valvector_re(9); P0 = valvector_re(10)
     !   write(*,*)"E0,V0,P0",E0,V0,P0

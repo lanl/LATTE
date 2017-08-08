@@ -5,8 +5,8 @@
 
 include ../makefile.CHOICES
 
-PPFLAGS = -DXSYEV -D$(PRECISION)PREC -DGPU$(GPUOPT) -DDBCSR_$(DBCSR_OPT) -DMPI_$(MPIOPT) 
-PPFLAGS += -DPROGRESS$(PROGRESS) 
+PPFLAGS = -DXSYEV -D$(PRECISION)PREC -DGPU$(GPUOPT) -DDBCSR_$(DBCSR_OPT) -DMPI_$(MPIOPT)
+PPFLAGS += -DPROGRESS$(PROGRESS)
 
 # Flags for linking GPU libraries
 GPU_LINKFLAG = -L../MATRIX -lgfortran -lstdc++
@@ -19,7 +19,7 @@ nonoarray.f90 ppotarray.f90 purearray.f90 relaxcommon.f90 restartarray.f90 \
 sparsearray.f90 spinarray.f90 univarray.f90 virialarray.f90 xboarray.f90 \
 kspacearray.f90 timer_mod.f90 subgraph.f90 matrixio.f90 sparsemath.f90 \
 sparsesp2.f90 subgraphsp2.f90 homolumo.f90 openfiles_mod.f90 kernelparser_mod.f90 \
-latteparser_latte_mod.f90 latte_lib.f90 
+latteparser_latte_mod.f90 prg_pulaymixer_mod.f90 latte_lib.f90
 
 DBCSRMODS = dbcsr_var_mod.f90 init_dbcsr.f90 shutdown_dbcsr.f90
 
@@ -59,44 +59,45 @@ deallocatesubgraph.f90 dosfit.f90 mofit.f90 getrespf.f90 gendiag.f90 \
 mofit_plato.f90 ppfit.f90 pairpot_noneb.f90 allfit.f90 \
 readppottab.f90 pairpottab.f90 hugrescale.f90 avesforhug.f90 getdipole.f90 \
 fittingoutput.f90 tabtest.f90 kgenX.f90 korthomyH.f90 kdeorthomyrho.f90 \
-kfcoulnono.f90 kpulay.f90 getforce.f90 masses2symbols.f90 setuptbmd.f90
+kfcoulnono.f90 kpulay.f90 getforce.f90 masses2symbols.f90 mixer_mod.f90 setuptbmd.f90 \
+wrtrestartlib.f90 readrestartlib.f90 prg_get_flevel.f90
 
 # dependencies
 # DEP_FILE = makefile.dep
 # include $(DEP_FILE)
 
-XMYMODULES = 		$(MYMODULES:.f90=.o) 
-XDBCSRMODS = 		$(DBCSRMODS:.f90=.o) 
-XMYSUBS = 		$(MYSUBS:.f90=.o) 
+XMYMODULES = 		$(MYMODULES:.f90=.o)
+XDBCSRMODS = 		$(DBCSRMODS:.f90=.o)
+XMYSUBS = 		$(MYSUBS:.f90=.o)
 
-				
+
 ifeq ($(DBCSR_OPT), ON)
 
-latte:		$(XMYMODULES) $(XDBCSRMODS) $(XMYSUBS) 
+latte:		$(XMYMODULES) $(XDBCSRMODS) $(XMYSUBS)
 		$(FCL) -o ../LATTE_DBCSR_$(PRECISION) $(LINKFLAG) $(XMYMODULES) $(XDBCSRMODS) $(XMYSUBS) $(DBCSR_LIB) $(LIB) $(DBCSR_MOD)
 
 else
 ifeq ($(GPUOPT), ON)
 
-latte:		$(XMYMODULES) $(XMYSUBS) 
+latte:		$(XMYMODULES) $(XMYSUBS)
 		$(FCL) -o ../LATTEGPU_$(PRECISION) $(GPU_LINKFLAG) $(XMYMODULES) $(XMYSUBS) $(LIB) $(GPU_LIB)
 
 else
 ifeq ($(MPIOPT), ON)
 
-latte: 		$(XMYMODULES) $(XMYSUBS) 
-		$(FCL) -o ../LATTE_MPI_$(PRECISION) $(LINKFLAG) $(XMYMODULES)  $(XMYSUBS) $(LIB) 
+latte: 		$(XMYMODULES) $(XMYSUBS)
+		$(FCL) -o ../LATTE_MPI_$(PRECISION) $(LINKFLAG) $(XMYMODULES)  $(XMYSUBS) $(LIB)
 
 else
-latte:		$(XMYMODULES) $(XMYSUBS) 
-		$(FCL) -o ../LATTE_$(PRECISION) $(LINKFLAG) $(XMYMODULES) $(XMYSUBS) $(LIB) 
+latte:		$(XMYMODULES) $(XMYSUBS)
+		$(FCL) -o ../LATTE_$(PRECISION) $(LINKFLAG) $(XMYMODULES) $(XMYSUBS) $(LIB)
 
 endif
 endif
 endif
 
 
-ifeq ($(MAKELIB), ON) 
+ifeq ($(MAKELIB), ON)
 		$(AR) ../liblatte.a latte_lib.o $(XMYMODULES) $(XMYSUBS)
 		$(RANLIB) ../liblatte.a
 		$(FC) $(FFLAGS) -c latte_c_bind.f90
@@ -106,10 +107,10 @@ endif
 
 ifeq ($(DBCSR_OPT), ON)
 
-$(XMYMODULES): 	        $(MYMODULES) 
+$(XMYMODULES): 	        $(MYMODULES)
 			$(FC) $(FFLAGS) $(PPFLAGS) -c $(MYMODULES) $(DBCSR_MOD)
 
-$(XDBCSRMODS): 	        $(DBCSRMODS) 
+$(XDBCSRMODS): 	        $(DBCSRMODS)
 			$(FC) $(FFLAGS) $(PPFLAGS) -c $(DBCSRMODS) $(DBCSR_MOD)
 
 else
@@ -122,6 +123,5 @@ endif
 $(XMYSUBS): 		$(MYSUBS)
 			$(FC) $(FFLAGS) $(PPFLAGS) -c $(MYSUBS)
 
-clean: 
+clean:
 			rm *.o *.mod *.a
-
