@@ -132,6 +132,7 @@ CONTAINS
 
     OPEN(UNIT=6, FILE="log.latte", FORM="formatted")
 
+    !INITIALIZATION
     IF(.NOT. INITIALIZED)THEN
 
        WRITE(6,*)"The log file for latte_lib"
@@ -163,30 +164,38 @@ CONTAINS
           BOX(3,2) = YZ
           BOX(3,3) = xhi(3) - xlo(3)
 
-          WRITE(*,*)"Lattice vectors"
-          WRITE(*,*)"a=",BOX(1,1),BOX(1,2),BOX(1,3)
-          WRITE(*,*)"b=",BOX(2,1),BOX(2,2),BOX(2,3)
-          WRITE(*,*)"c=",BOX(3,1),BOX(3,2),BOX(3,3)
+          IF(VERBOSE >= 1)THEN
+            WRITE(*,*)"Lattice vectors:"
+            WRITE(*,*)"a=",BOX(1,1),BOX(1,2),BOX(1,3)
+            WRITE(*,*)"b=",BOX(2,1),BOX(2,2),BOX(2,3)
+            WRITE(*,*)"c=",BOX(3,1),BOX(3,2),BOX(3,3)
+            WRITE(*,*)""
+          ENDIF
 
           NATS = SIZE(CR_IN,DIM=2)
 
           IF(.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
           CR = CR_IN
 
-          IF(.NOT.INITIALIZED)then
-            ALLOCATE(ATELE(NATS))
-            CALL MASSES2SYMBOLS(TYPES,NTYPES,MASSES_IN,NATS,ATELE)
+          IF(.NOT.INITIALIZED)THEN
+             IF(VERBOSE >= 1)WRITE(*,*)"Converting masses to symbols ..."
+             ALLOCATE(ATELE(NATS))
+             CALL MASSES2SYMBOLS(TYPES,NTYPES,MASSES_IN,NATS,ATELE)
           ENDIF
 
+          !Forces, charges and element pointers are allocated in readcr
           CALL READCR
 
+          CALL FLUSH(6)
+
        ELSE
+          IF(VERBOSE >= 1)WRITE(*,*)"Restarting calculation from file ..."
           CALL READRESTART
        ENDIF
 
+       IF (VERBOSE >= 1) WRITE(*,*)"Reading ppots from file (if PPOTON >= 1) ..."
        IF (PPOTON .EQ. 1) CALL READPPOT
        IF (PPOTON .EQ. 2) CALL READPPOTTAB
-
 
        IF (DEBUGON .EQ. 1) THEN
           CALL PLOTUNIV
@@ -197,9 +206,12 @@ CONTAINS
 
        CALL GETMATINDLIST
 
+       IF (VERBOSE >= 1) WRITE(*,*)"Getting rho0 ..."
        CALL RHOZERO
 
        CALL GETBNDFIL()
+
+       CALL FLUSH(6)
 
 #ifdef GPUON
 
@@ -219,17 +231,32 @@ CONTAINS
 
        BOX = 0.0d0
        BOX(1,1) = xhi(1) - xlo(1)
+       BOX(2,1) = XY
        BOX(2,2) = xhi(2) - xlo(2)
+       BOX(3,1) = XZ
+       BOX(3,2) = YZ
        BOX(3,3) = xhi(3) - xlo(3)
+
+       IF(VERBOSE >= 1)THEN
+         WRITE(*,*)"Lattice vectors:"
+         WRITE(*,*)"a=",BOX(1,1),BOX(1,2),BOX(1,3)
+         WRITE(*,*)"b=",BOX(2,1),BOX(2,2),BOX(2,3)
+         WRITE(*,*)"c=",BOX(3,1),BOX(3,2),BOX(3,3)
+         WRITE(*,*)""
+       ENDIF
 
        NATS = SIZE(CR_IN,DIM=2)
 
        IF(.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
        CR = CR_IN
 
+       CALL FLUSH(6)
+
     ENDIF
 
-    !END OF INITIALIZATION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    IF(VERBOSE >= 1)WRITE(*,*)"End of INITIALIZATION";
+
+    !END OF INITIALIZATION
 
     ! #ifdef PROGRESSON
     ! SY%NATS = NATS
@@ -323,25 +350,23 @@ CONTAINS
        ! We have to build our NKTOT complex H matrices and compute the
        ! self consistent density matrix
 
-
-
        ! Tr[rho dH/dR], Pulay force, and Tr[rho H] need to de-orthogonalized rho
 
        IF (KON .EQ. 1) CALL KGETDOS
 
        ! OPEN(UNIT=31, STATUS="UNKNOWN", FILE="myrho.dat")
 
-       !         DO I = 1, HDIM
-       !           DO J = 1,HDIM
+       ! DO I = 1, HDIM
+       !   DO J = 1,HDIM
 
-       !              IF (ABS(BO(J,I)) .GT. 1.0D-5) WRITE(31,99) I, J
+       !     IF (ABS(BO(J,I)) .GT. 1.0D-5) WRITE(31,99) I, J
 
-       !                  ENDDO
-       !                  ENDDO
+       !   ENDDO
+       ! ENDDO
 
        !99 FORMAT(2I9)
+       !CLose(31)
 
-       !     CLose(31)
        IF (DEBUGON .EQ. 1 .AND. SPINON .EQ. 0 .AND. KON .EQ. 0) THEN
 
           PRINT*, "Caution - you're writing to file the density matrix!"
@@ -433,7 +458,7 @@ CONTAINS
        CALL WRTRESTART(0)
 
        IF (CONTROL .EQ. 1) THEN
-          !        CALL DEALLOCATEDIAG
+          !  CALL DEALLOCATEDIAG
        ELSEIF (CONTROL .EQ. 2 .OR. CONTROL .EQ. 4 .OR. CONTROL .EQ. 5) THEN
           CALL DEALLOCATEPURE
        ELSEIF (CONTROL .EQ. 3) THEN
@@ -494,33 +519,43 @@ CONTAINS
 
     ELSEIF (MDON .EQ. 1 .AND. RELAXME .EQ. 0 .AND. MAXITER_IN < 0 ) THEN
 
+       IF(VERBOSE >= 1)WRITE(*,*)"Insie MDON= 1 and RELAXME= 0 ..."
+
        DT = DT_IN ! Get the integration step from the hosting code.
 
        !Control for implicit geometry optimization.
        !This will need to be replaced by a proper flag.
        IF (DT_IN == 0) THEN
-         IF (VERBOSE == 1) WRITE(*,*)"NOTE: DT = 0 => FULLQCONV = 1"
-         FULLQCONV = 1
-         MDMIX = QMIX
+          IF (VERBOSE >= 1) WRITE(*,*)"NOTE: DT = 0 => FULLQCONV = 1"
+          IF (VERBOSE >= 1) WRITE(*,*)"NOTE: DT = 0 => MDMIX = QMIX"
+          FULLQCONV = 1
+          MDMIX = QMIX
+          CALL FLUSH(6)
        ENDIF
 
        IF(LIBCALLS == 0)THEN
 
+          IF (VERBOSE >= 1)WRITE(*,*)"Allocating nonorthogonal arrays ..."
           IF (BASISTYPE .EQ. "NONORTHO") CALL ALLOCATENONO
 
+          IF (VERBOSE >= 1)WRITE(*,*)"Allocating XLBO arrays ..."
           IF (XBOON .EQ. 1) CALL ALLOCATEXBO
 
+          IF (VERBOSE >= 1)WRITE(*,*)"Allocating COULOMB arrays ..."
           IF (ELECTRO .EQ. 1) THEN
              CALL ALLOCATECOULOMB
              CALL INITCOULOMB
           ENDIF
 
           ! Start the timers
-
+          IF (VERBOSE >= 1)WRITE(*,*)"Starting timers ..."
           CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
           CALL DTIME(TARRAY, RESULT)
 
+          IF (VERBOSE >= 1)WRITE(*,*)"Setting up TBMD ..."
           CALL SETUPTBMD
+
+          CALL FLUSH(6)
 
        ENDIF
 
@@ -568,10 +603,14 @@ CONTAINS
 
        ENDIF
 
+       IF(RESTARTLIB == 1 .AND. .NOT.INITIALIZED)THEN
+          CALL READRESTARTLIB(LIBCALLS)
+       ENDIF
+
        VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
 
-       WRITE(6,*)"Energy Components (TRRHOH, EREP, ENTE, ECOUL)",TRRHOH, EREP, ENTE, ECOUL
-       WRITE(6,*)"Epot", VENERG
+       WRITE(*,*)"Energy Components (TRRHOH, EREP, ENTE, ECOUL)",TRRHOH, EREP, ENTE, ECOUL
+       WRITE(*,*)"Epot", VENERG
 
        FTOT_OUT = FTOT
 
@@ -587,6 +626,15 @@ CONTAINS
        VIRIALINOUT = -VIRIAL
 
        INITIALIZED = .TRUE.
+
+       IF(VERBOSE >= 1 .AND. CONTROL == 1)THEN
+          WRITE(*,*)"HOMO=",EVALS(FLOOR(BNDFIL*FLOAT(HDIM))),"LUMO=",EVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1)
+          WRITE(*,*)"EGAP=",EVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1)-EVALS(FLOOR(BNDFIL*FLOAT(HDIM)))
+       ENDIF
+
+       IF (MOD(LIBCALLS, RSFREQ) .EQ. 0)THEN
+          CALL WRTRESTARTLIB(LIBCALLS)
+       ENDIF
 
        CALL FLUSH(6) !To force writing to file at every call
 
@@ -614,11 +662,9 @@ CONTAINS
 
        CALL TBMD
 
-
 #ifdef MPI_ON
        IF (PARREP .EQ. 1) CALL MPI_BARRIER (MPI_COMM_WORLD, IERR )
 #endif
-
 
        ! Stop the timers
 
