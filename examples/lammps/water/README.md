@@ -14,3 +14,5 @@ Run lammps doing:
 latte.fullscf.in: To perform QMD with full SCF at each time step.
 
 latte.0SCF.in: To perform XLBOMD with only one diagonalization per time step.
+
+latte.Pulay.in: Includes the use of the Pulay mixing scheme (Only when compiled with PROGRESS/BML libraries)
