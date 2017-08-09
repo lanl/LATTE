@@ -227,22 +227,20 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ! Mix new and old partial charges
 
         IF (MDITER .LE. 10) THEN
-          IF (MIXER == 1) THEN
 #ifdef PROGRESSON            
-            CALL QMIXPRG     !Alternative mixing scheme
-#else
-            STOP'Please compile latte with PROGRESS/BML libraries before setting MIXER = 1'
-#endif
+          IF(MX%MIXERON)THEN 
+            CALL QMIXPRG     !Alternative mixing scheme from PROGRESS
           ELSE
             DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
-          ENDIF
+          ENDIF  
+#else
+            DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
+#endif
         ELSE
            DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
         ENDIF
 
         IF(VERBOSE >= 1)WRITE(*,*)"SCF error (MAXDQ) =",MAXDQ
-
-!        PRINT*, MAXVAL(DELTAQ)
 
         ALLOKM = 0
 
