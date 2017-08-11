@@ -65,14 +65,21 @@ LIB = -llapack -lblas
 #LIB = -framework Accelerate
 #LIB = -L/usr/projects/hpcsoft/toss2/common/acml/5.3.1/gfortran64/lib -lacml
 
+# Uncomment for coverage
+#CVR = OFF
+ifeq ($(CVR), ON)
+	FFLAGS += -fprofile-arcs -ftest-coverage
+	LINKFLAG += -fprofile-arcs -ftest-coverage
+endif
+
 ifeq ($(PROGRESS), ON)
 	LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml
-        FFLAGS += -I$(BML_PATH)/../include -I$(PROGRESS_PATH)/../include
+	FFLAGS += -I$(BML_PATH)/../include -I$(PROGRESS_PATH)/../include
 endif
 
 ifeq ($(GRAPH), ON) 
 	LIB += -L$(METIS_PATH)/lib -lmetis
-        FFLAGS += -I$(METIS_PATH)/include
+	FFLAGS += -I$(METIS_PATH)/include
 endif
 
 #DBCSR_LIB = -L/home/cawkwell/cp2k/lib/cawkwell/popt -lcp2k_dbcsr_lib
