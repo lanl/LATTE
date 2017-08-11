@@ -35,7 +35,6 @@ SUBROUTINE READTB
   INTEGER :: I, J, K
   CHARACTER(LEN=20) :: HD
   REAL(LATTEPREC) :: TAILPARAMS(6)
-  LOGICAL :: LATTEINEXISTS
 
   write(*,*)trim(PARAMPATH)//"/electrons.dat"
   
@@ -103,10 +102,10 @@ SUBROUTINE READTB
   ! If we're doing k-space integration, let's read in the k point mesh
   IF (KON .EQ. 1) THEN
 
-    INQUIRE( FILE="latte.in", exist=LATTEINEXISTS )
-    IF (LATTEINEXISTS) THEN
+    IF (EXISTS) THEN
       CALL PARSE_KMESH("latte.in")
     ELSE
+
       OPEN(UNIT=11, STATUS="OLD", FILE=trim(PARAMPATH)//"/kmesh.in")
       READ(11,*) NKX, NKY, NKZ
       READ(11,*) KSHIFT(1), KSHIFT(2), KSHIFT(3)

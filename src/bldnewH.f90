@@ -29,6 +29,10 @@ SUBROUTINE BLDNEWHS
   USE UNIVARRAY
   USE MYPRECISION
 
+#ifdef PROGRESSON
+  USE GENXPROGRESS
+#endif
+
   IMPLICIT NONE
 
   INTEGER :: I, J, NEWJ, K, L, II, JJ, KK, MM, MP, NN, SUBI
@@ -590,7 +594,17 @@ SUBROUTINE BLDNEWHS
   IF (BASISTYPE .EQ. "NONORTHO") THEN
 
      H0 = H
+     
+#ifdef PROGRESSON
+     IF(EXISTS)THEN
+       CALL GENXBML
+     ELSE
+       CALL GENX     
+     ENDIF
+#else
      CALL GENX
+#endif
+
      
      IF (DEBUGON .EQ. 1) THEN
         

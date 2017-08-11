@@ -42,14 +42,13 @@ SUBROUTINE SETUPTBMD
   REAL(LATTEPREC) :: THETIME, NEWESPIN, NEWECOUL
   REAL(LATTEPREC) :: RN, MYVOL
   INTEGER :: FLAGAND
-  LOGICAL :: EXISTS
 
   !
   ! Read MDcontroller to determine what kind of MD simulation to do
   !
 
   IF(.NOT.INITIALIZED)THEN
-     INQUIRE( FILE="latte.in", exist=EXISTS )
+     
      IF (EXISTS) THEN
         CALL PARSE_MD("latte.in")
      ELSE
