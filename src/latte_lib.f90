@@ -140,6 +140,9 @@ CONTAINS
        WRITE(6,*)"The log file for latte_lib"
        WRITE(6,*)""
 
+       INQUIRE( FILE="animate/.", exist=EXISTS)
+       IF (.NOT. EXISTS) CALL SYSTEM("mkdir animate")
+
        NUMSCF = 0
        CHEMPOT = ZERO
 
@@ -649,7 +652,7 @@ CONTAINS
        ENDIF
 
        CALL FLUSH(6) !To force writing to file at every call
-
+       
        RETURN
 
     ELSEIF (MDON .EQ. 1 .AND. RELAXME .EQ. 0 .AND. MAXITER_IN >= 0) THEN
