@@ -1,0 +1,8 @@
+#!/bin/bash
+# 
+set +e
+make clean
+set -e
+make; ./tests/run_test.sh
+cd src ; ../tests/run_gcov > coverage.dat
+../tests/get_cov; cd -
