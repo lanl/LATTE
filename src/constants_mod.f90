@@ -82,6 +82,9 @@ MODULE CONSTANTS_MOD
   LOGICAL :: INITIALIZED = .false.
   INTEGER :: LIBCALLS = 0
 
+  !For the new input file parser
+  LOGICAL :: EXISTS
+
   !! For truncated SP2 and entropy calculation
   INTEGER :: SCFSTEP = 0
   INTEGER :: OCCSTEPS

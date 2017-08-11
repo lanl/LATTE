@@ -30,6 +30,10 @@ SUBROUTINE BLDNEWHS_SP
   USE UNIVARRAY
   USE MYPRECISION
 
+#ifdef PROGRESSON
+  USE GENXPROGRESS
+#endif
+
   IMPLICIT NONE
 
   INTEGER :: I, J, NEWJ, K, KK, SUBI, NNZ
@@ -597,7 +601,15 @@ SUBROUTINE BLDNEWHS_SP
 
      H0 = H
 
-     CALL GENX
+#ifdef PROGRESSON
+    if(EXISTS)then
+      CALL GENXBML
+    else
+      CALL GENX
+    endif
+#else
+    CALL GENX
+#endif
 
      IF (DEBUGON .EQ. 1) THEN
         
