@@ -50,7 +50,7 @@ CONTAINS
     ELSEIF(MX%MIXERTYPE == "Pulay")THEN
        CALL PRG_QMIXER(DELTAQ,OLDDELTAQS,DQIN,DQOUT,SCFERROR,PITER,MX%MIXCOEFF,MX%MPULAY,MX%VERBOSE)
     ELSE  
-       STOP"Mixing scheme not implemented. Check MixerType keyword in the input file"
+       STOP "Mixing scheme not implemented. Check MixerType keyword in the input file"
     ENDIF
 
   END SUBROUTINE QMIXPRG
