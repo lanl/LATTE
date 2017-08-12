@@ -227,17 +227,27 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ! Mix new and old partial charges
 
         IF (MDITER .LE. 10) THEN
-#ifdef PROGRESSON            
-          IF(MX%MIXERON)THEN 
-            CALL QMIXPRG     !Alternative mixing scheme from PROGRESS
-          ELSE
-            DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
-          ENDIF  
+#ifdef PROGRESSON
+           IF(MX%MIXERON)THEN
+              CALL QMIXPRG     !Alternative mixing scheme from PROGRESS
+           ELSE
+              DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
+           ENDIF
 #else
-            DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
+           DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
 #endif
         ELSE
+#ifdef PROGRESSON
+           IF(MX%MIXERON)THEN
+              CALL QMIXPRG     !Alternative mixing scheme from PROGRESS
+           ELSE
+             DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
+           ENDIF
+#else
            DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
+#endif
+
+
         ENDIF
 
         IF(VERBOSE >= 1)WRITE(*,*)"SCF error (MAXDQ) =",MAXDQ
@@ -279,10 +289,10 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
      DEALLOCATE(QDIFF)
      IF (SPINON .EQ. 1) DEALLOCATE(SPINDIFF)
 
-!     WRITE(6,99) "# HDIM, TIME PER RHO BUILD = ", HDIM, TIMEACC/REAL(ITERACC)
-!99   FORMAT(A29, I5, 1X, G18.6)
+     !     WRITE(6,99) "# HDIM, TIME PER RHO BUILD = ", HDIM, TIMEACC/REAL(ITERACC)
+     !99   FORMAT(A29, I5, 1X, G18.6)
 
-CALL FLUSH(6)
+     CALL FLUSH(6)
 
   ELSEIF (FULLQCONV .EQ. 0 .AND. MDON .EQ. 1 .AND. MDITER .GT. 10) THEN
 
@@ -356,7 +366,7 @@ CALL FLUSH(6)
 
         DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
 
-!        PRINT*, DELTAQ(1)
+        !        PRINT*, DELTAQ(1)
 
         IF (SPINON .EQ. 1) THEN
 
