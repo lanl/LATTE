@@ -112,7 +112,6 @@ SUBROUTINE PAIRPOTTAB
                 (B*B*B - B)*PPSPL(KHI,PPSEL))*(DX*DX/SIX)
 
            EREP = EREP + TMPE
-           write(*,*)"EREP=",EREP
 
            GRAD = (PPVAL(KHI,PPSEL) - PPVAL(KLO,PPSEL))/DX + &
                 ((ONE - THREE*A*A)*PPSPL(KLO,PPSEL) + &
@@ -140,7 +139,7 @@ SUBROUTINE PAIRPOTTAB
   ENDDO
 
   EREP = EREP/TWO
-  write(*,*)"EREP =",EREP
+
   VIRPAIR = VIRPAIR/TWO
 
   RETURN

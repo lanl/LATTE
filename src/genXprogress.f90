@@ -54,10 +54,10 @@ CONTAINS
     !> Parsing Z sparse propagation and build.
     IF(IGENX == 0)then
        CALL PRG_PARSE_ZSP(ZSP,"latte.in")
-       IF(ZSP%BML_TYPE == BML_MATRIX_DENSE .and. SPARSEON == 1) STOP'If CONTROL{ SPARSEON= 1 } then ZSP{ BMLType= Ellpack }'
+       IF(ZSP%BML_TYPE == BML_MATRIX_DENSE .and. SPARSEON == 1) STOP 'If CONTROL{ SPARSEON= 1 } then ZSP{ BMLType= Ellpack }'
        IF(ZSP%BML_TYPE .EQ. BML_MATRIX_ELLPACK)then
-          IF(ZSP%ZSP .eqv. .false.)STOP'If ZSP{ ZSP= F } then ZSP{ BMLType= Dense }'
-          IF(SPARSEON == 0) STOP'If CONTROL{ SPARSEON= 0 } then ZSP{ BMLType= Dense }'
+          IF(ZSP%ZSP .eqv. .false.)STOP 'If ZSP{ ZSP= F } then ZSP{ BMLType= Dense }'
+          IF(SPARSEON == 0) STOP 'If CONTROL{ SPARSEON= 0 } then ZSP{ BMLType= Dense }'
         ENDIF
     ENDIF
 
