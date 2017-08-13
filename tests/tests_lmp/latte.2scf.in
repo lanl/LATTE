@@ -1,9 +1,3 @@
-LATTE INPUT FILE
-================
-#This input file resumes the content of MDcontroller and TBparam/control.in
-#The parser will only read it if it is present inside the running folder. 
-#In case this file is not present Latte will read the two files as original.
-#The order of the kewords is not important in this file. 
 
 #General controls
 CONTROL{
@@ -21,7 +15,7 @@ CONTROL{
   COULACC= 1.0e-6 COULCUT= -500.0 COULR1= 500.0
   MAXSCF= 250
   BREAKTOL= 1.0E-12 MINSP2ITER= 22 SP2CONV= REL
-  FULLQCONV= 0 QITER= 0
+  FULLQCONV= 0 QITER= 2
   QMIX= 0.25 SPINMIX= 0.25 MDMIX= 0.25
   ORDERNMOL= 0
   SPARSEON= 0 THRESHOLDON= 1 NUMTHRESH= 1.0e-6 FILLINSTOP= 100 BLKSZ= 4
@@ -50,7 +44,7 @@ CONTROL{
 
 #Controls for QMD 
 MDCONTROL{
-  MAXITER= 20
+  MAXITER= -1
   UDNEIGH= 1
   DT= 0.25
   TEMPERATURE= 1.0e-30 RNDIST= GAUSSIAN SEEDINIT= UNIFORM
@@ -69,4 +63,5 @@ MDCONTROL{
   MDADAPT= 0
   GETHUG= 0 E0= -795.725  V0= 896.984864 P0= 0.083149
 }
+
 
