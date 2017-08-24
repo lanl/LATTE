@@ -606,13 +606,19 @@ CONTAINS
        IF(RESTARTLIB == 1 .AND. .NOT.INITIALIZED)THEN
           CALL READRESTARTLIB(LIBCALLS)
        ENDIF
-
-       VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
-
+      
        WRITE(*,*)"Energy Components (TRRHOH, EREP, ENTE, ECOUL)",TRRHOH, EREP, ENTE, ECOUL
-       WRITE(*,*)"Epot", VENERG
+      
+       IF(MAXVAL(FTOT_OUT) .NE. 0.0d0)THEN
+         IF(VERBOSE >= 2)WRITE(*,*)"Adding force components and energies from applicacion code ..." 
+         WRITE(*,*)"APPCODE,LATTE",VENERG,TRRHOH + EREP - ENTE - ECOUL + ESPIN
+         VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
+         FTOT_OUT = FTOT_OUT +  FTOT
+       ELSE
+         VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
+         FTOT_OUT = FTOT
+       ENDIF  
 
-       FTOT_OUT = FTOT
 
        ! Get the seccond virial coefficient to pass it to the application program
        VIRIAL = VIRBOND + VIRPAIR + VIRCOUL
@@ -651,7 +657,7 @@ CONTAINS
        ENDIF
 
        CALL FLUSH(6) !To force writing to file at every call
-       
+
        RETURN
 
     ELSEIF (MDON .EQ. 1 .AND. RELAXME .EQ. 0 .AND. MAXITER_IN >= 0) THEN
