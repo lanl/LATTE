@@ -574,7 +574,7 @@ contains
          'DUMMY']
 
     character(len=50), parameter :: keyvector_int(nkey_int) = [character(len=50) :: &
-         'KNX=','KNY=','KNZ=']
+         'NKX=','NKY=','NKZ=']
     integer :: valvector_int(nkey_int) = (/ &
          1,1,1/)
 
