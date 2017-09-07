@@ -9,25 +9,22 @@ endif(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_Fortran_FLAGS)
 # Cmake modules/macros are in a subdirectory to keep this file cleaner
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/Modules)
 
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CXX_FLAGS)
-  #release comes with -O3 by default
-  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
-endif(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CXX_FLAGS)
+include(GNUInstallDirs)
 
 set(PRECISION DOUBLE CACHE STRING "The float precision")
+set_property(CACHE PRECISION PROPERTY STRINGS DOUBLE SINGLE)
 string(TOUPPER ${PRECISION} PRECISION)
 
 if((NOT ${PRECISION} STREQUAL SINGLE) AND (NOT ${PRECISION} STREQUAL DOUBLE))
   message(FATAL_ERROR "PRECISION needs to be either SINGLE or DOUBLE")
 endif()
 
-set(OPENMP FALSE CACHE BOOL "Use OpenMP")
-
+option(OPENMP "Use OpenMP" OFF)
 if(OPENMP)
   find_package(OpenMP REQUIRED)
 endif()
 
-set(DO_MPI FALSE CACHE BOOL "Use MPI")
+option(DO_MPI "Use MPI" OFF)
 if(DO_MPI)
   find_package(MPI REQUIRED)
   if (NOT MPI_Fortran_FOUND)
@@ -61,8 +58,6 @@ option(GPUOPT "Whether to use the GPU" OFF)
 if(GPUOPT)
   find_package(CUDA REQUIRED)
 endif()
-
-string(TOLOWER latte_${PRECISION} EXECUTABLE_NAME)
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
@@ -131,59 +126,43 @@ if(NOT DBCSR_OPT)
   set(DBCSR_SOURCES)
 endif()
 
-add_library(latte ${MYMODULES_SOURCES} ${MYSUBS_SOURCES})
-target_compile_options(latte PRIVATE -cpp)
-
-  #if(SOLVERS_HEADER_FOUND)
-  #  include_directories(${SOLVERS_INCLUDE})
-  #endif()
-  #
-  #if(SOLVERS_LIBS)
-  #  target_link_libraries(latte ${SOLVERS_LIBS})
-  #endif()
-  #
-  #if(MPI_Fortran_INCLUDE_PATH)
-  #  target_link_libraries(latte ${MPI_Fortran_INCLUDE_PATH})
-  #endif()
-  #
-  #if(MPI_Fortran_LIBRARIES)
-  #  target_link_libraries(latte ${MPI_Fortran_LIBRARIES})
-  #endif()
-  #
-target_compile_definitions(latte
-  PRIVATE
-    XSYEV
-    ${PRECISION}PREC
-    GPU${GPUOPT}
-    DBCSR_${DBCSR_OPT}
-    MPI_${DO_MPI}
-    $<$<BOOL:${DO_MPI}>:DO_MPI_ON>
+add_library(latte ${MYMODULES_SOURCES} ${MYSUBS_SOURCES}
+  ${CMAKE_SOURCE_DIR}/../src/latte_lib.f90
+  ${CMAKE_SOURCE_DIR}/../src/latte_c_bind.f90
 )
-  #
-  #target_link_libraries(latte
-  #  ${LAPACK_LIBRARIES}
-  #  ${BLAS_LIBRARIES}
-  #  ${CUDA_cublas_LIBRARY}
-  #  ${CUDA_cusparse_LIBRARY}
-  #  ${CUDA_CUDART_LIBRARY})
-  #
-  #set_target_properties(latte
-  #  PROPERTIES
-  #  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
-  #  OUTPUT_NAME ${EXECUTABLE_NAME})
-  #
-  #if(OPENMP_FOUND)
-  #  set_target_properties(latte
-  #    PROPERTIES
-  #    COMPILE_FLAGS ${OpenMP_Fortran_FLAGS}
-  #    LINK_FLAGS ${OpenMP_Fortran_FLAGS})
-  #endif()
-  #
-  #if(MPI_Fortran_FOUND)
-  #  set_target_properties(latte
-  #    PROPERTIES
-  #    COMPILE_FLAGS ${MPI_Fortran_COMPILE_FLAGS})
-  #endif()
-  #
-  #install(TARGETS latte
-  #  RUNTIME DESTINATION bin)
+target_compile_options(latte PRIVATE -cpp ${OpenMP_Fortran_FLAGS})
+install(TARGETS latte LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+target_link_libraries(latte
+  ${LAPACK_LIBRARIES}
+  ${BLAS_LIBRARIES}
+  ${CUDA_cublas_LIBRARY}
+  ${CUDA_cusparse_LIBRARY}
+  ${CUDA_CUDART_LIBRARY}
+  ${MPI_Fortran_LIBRARIES}
+)
+set_target_properties(latte PROPERTIES LINK_FLAGS ${OpenMP_Fortran_FLAGS})
+target_include_directories(latte PRIVATE ${MPI_Fortran_INCLUDE_PATH})
+
+#only "ON" and "OFF" support
+foreach(_def GPUOPT DBCSR_OPT DO_MPI)
+  if(${${_def}})
+    set(${_def} ON)
+  else()
+    set(${_def} OFF)
+  endif()
+endforeach()
+
+target_compile_definitions(latte PRIVATE XSYEV ${PRECISION}PREC GPU${GPUOPT} DBCSR_${DBCSR_OPT} MPI_${DO_MPI})
+
+if(DO_MPI)
+  set(LATTE LATTE_MPI_${PRECISION})
+else()
+  set(LATTE LATTE_${PRECISION})
+endif()
+add_executable(${LATTE} ${CMAKE_SOURCE_DIR}/../src/latte.f90)
+target_compile_options(${LATTE} PRIVATE -cpp ${OpenMP_Fortran_FLAGS})
+set_target_properties(${LATTE} PROPERTIES LINK_FLAGS ${OpenMP_Fortran_FLAGS})
+target_link_libraries(${LATTE} latte)
+target_include_directories(${LATTE} PRIVATE ${MPI_Fortran_INCLUDE_PATH})
+target_compile_definitions(${LATTE} PRIVATE XSYEV ${PRECISION}PREC GPU${GPUOPT} DBCSR_${DBCSR_OPT} MPI_${DO_MPI})
+install(TARGETS ${LATTE} DESTINATION ${CMAKE_INSTALL_BINDIR})
