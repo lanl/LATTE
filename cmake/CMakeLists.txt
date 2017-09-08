@@ -7,7 +7,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_Fortran_FLAGS)
 endif(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_Fortran_FLAGS)
 
 # Cmake modules/macros are in a subdirectory to keep this file cleaner
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/Modules)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Modules)
 
 include(GNUInstallDirs)
 
@@ -55,7 +55,7 @@ endif()
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-  configure_file(${CMAKE_SOURCE_DIR}/../src/Doxyfile.in Doxyfile)
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../src/Doxyfile.in Doxyfile)
   add_custom_target(doc
     COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile)
 endif()
@@ -112,7 +112,7 @@ wrtrestartlib.f90 readrestartlib.f90)
 foreach(_m MYMODULES MYSUBS DBCSR)
   set(${_m}_SOURCES)
   foreach(_file ${${_m}})
-    list(APPEND ${_m}_SOURCES ${CMAKE_SOURCE_DIR}/../src/${_file})
+    list(APPEND ${_m}_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../src/${_file})
   endforeach()
 endforeach()
 
@@ -121,8 +121,8 @@ if(NOT DBCSR_OPT)
 endif()
 
 add_library(latte ${MYMODULES_SOURCES} ${MYSUBS_SOURCES}
-  ${CMAKE_SOURCE_DIR}/../src/latte_lib.f90
-  ${CMAKE_SOURCE_DIR}/../src/latte_c_bind.f90
+  ${CMAKE_CURRENT_SOURCE_DIR}/../src/latte_lib.f90
+  ${CMAKE_CURRENT_SOURCE_DIR}/../src/latte_c_bind.f90
 )
 target_compile_options(latte PRIVATE -cpp ${OpenMP_Fortran_FLAGS})
 install(TARGETS latte LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -134,7 +134,9 @@ target_link_libraries(latte
   ${CUDA_CUDART_LIBRARY}
   ${MPI_Fortran_LIBRARIES}
 )
-set_target_properties(latte PROPERTIES LINK_FLAGS ${OpenMP_Fortran_FLAGS})
+if(OPENMP)
+  set_target_properties(latte PROPERTIES LINK_FLAGS ${OpenMP_Fortran_FLAGS})
+endif()
 target_include_directories(latte PRIVATE ${MPI_Fortran_INCLUDE_PATH})
 
 #only "ON" and "OFF" support
@@ -153,9 +155,11 @@ if(DO_MPI)
 else()
   set(LATTE LATTE_${PRECISION})
 endif()
-add_executable(${LATTE} ${CMAKE_SOURCE_DIR}/../src/latte.f90)
+add_executable(${LATTE} ${CMAKE_CURRENT_SOURCE_DIR}/../src/latte.f90)
 target_compile_options(${LATTE} PRIVATE -cpp ${OpenMP_Fortran_FLAGS})
-set_target_properties(${LATTE} PROPERTIES LINK_FLAGS ${OpenMP_Fortran_FLAGS})
+if(OPENMP)
+  set_target_properties(${LATTE} PROPERTIES LINK_FLAGS ${OpenMP_Fortran_FLAGS})
+endif()
 target_link_libraries(${LATTE} latte)
 target_include_directories(${LATTE} PRIVATE ${MPI_Fortran_INCLUDE_PATH})
 target_compile_definitions(${LATTE} PRIVATE XSYEV ${PRECISION}PREC GPU${GPUOPT} DBCSR_${DBCSR_OPT} MPI_${DO_MPI})
