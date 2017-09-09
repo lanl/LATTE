@@ -126,7 +126,7 @@ add_library(latte ${MYMODULES_SOURCES} ${MYSUBS_SOURCES}
 )
 target_compile_options(latte PRIVATE -cpp ${OpenMP_Fortran_FLAGS})
 install(TARGETS latte LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-target_link_libraries(latte
+target_link_libraries(latte PRIVATE
   ${LAPACK_LIBRARIES}
   ${BLAS_LIBRARIES}
   ${CUDA_cublas_LIBRARY}
@@ -135,7 +135,7 @@ target_link_libraries(latte
   ${MPI_Fortran_LIBRARIES}
 )
 if(OPENMP)
-  set_target_properties(latte PROPERTIES LINK_FLAGS ${OpenMP_Fortran_FLAGS})
+  target_link_libraries(latte PUBLIC "${OpenMP_Fortran_FLAGS}")
 endif()
 target_include_directories(latte PRIVATE ${MPI_Fortran_INCLUDE_PATH})
 
@@ -157,9 +157,6 @@ else()
 endif()
 add_executable(${LATTE} ${CMAKE_CURRENT_SOURCE_DIR}/../src/latte.f90)
 target_compile_options(${LATTE} PRIVATE -cpp ${OpenMP_Fortran_FLAGS})
-if(OPENMP)
-  set_target_properties(${LATTE} PROPERTIES LINK_FLAGS ${OpenMP_Fortran_FLAGS})
-endif()
 target_link_libraries(${LATTE} latte)
 target_include_directories(${LATTE} PRIVATE ${MPI_Fortran_INCLUDE_PATH})
 target_compile_definitions(${LATTE} PRIVATE XSYEV ${PRECISION}PREC GPU${GPUOPT} DBCSR_${DBCSR_OPT} MPI_${DO_MPI})
