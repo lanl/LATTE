@@ -46,6 +46,12 @@ if(NOT BLAS_WORKS OR NOT LAPACK_WORKS)
   message(FATAL_ERROR "Can not compile against BLAS/LAPACK. Please see error log.")
 endif()
 
+option(PROGRESS "Use progress library" OFF)
+if(PROGRESS)
+  find_package(BML REQUIRED)
+  find_package(PROGRESS REQUIRED)
+endif()  
+
 option(DBCSR_OPT "Whether to use DBCSR" OFF)
 
 option(GPUOPT "Whether to use the GPU" OFF)
@@ -129,6 +135,8 @@ install(TARGETS latte LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTIN
 target_link_libraries(latte PRIVATE
   ${LAPACK_LIBRARIES}
   ${BLAS_LIBRARIES}
+  ${PROGRESS_LIBRARIES}
+  ${BML_LIBRARIES}
   ${CUDA_cublas_LIBRARY}
   ${CUDA_cusparse_LIBRARY}
   ${CUDA_CUDART_LIBRARY}
@@ -137,10 +145,10 @@ target_link_libraries(latte PRIVATE
 if(OPENMP)
   target_link_libraries(latte PUBLIC "${OpenMP_Fortran_FLAGS}")
 endif()
-target_include_directories(latte PRIVATE ${MPI_Fortran_INCLUDE_PATH})
+target_include_directories(latte PRIVATE ${MPI_Fortran_INCLUDE_PATH} ${PROGRESS_INCLUDE_DIRS} ${BML_INCLUDE_DIRS})
 
 #only "ON" and "OFF" support
-foreach(_def GPUOPT DBCSR_OPT DO_MPI)
+foreach(_def GPUOPT DBCSR_OPT DO_MPI PROGRESS)
   if(${${_def}})
     set(${_def} ON)
   else()
@@ -148,7 +156,7 @@ foreach(_def GPUOPT DBCSR_OPT DO_MPI)
   endif()
 endforeach()
 
-target_compile_definitions(latte PRIVATE XSYEV ${PRECISION}PREC GPU${GPUOPT} DBCSR_${DBCSR_OPT} MPI_${DO_MPI})
+target_compile_definitions(latte PRIVATE XSYEV ${PRECISION}PREC GPU${GPUOPT} DBCSR_${DBCSR_OPT} MPI_${DO_MPI} PROGRESS${PROGRESS})
 
 if(DO_MPI)
   set(LATTE LATTE_MPI_${PRECISION})
@@ -159,5 +167,5 @@ add_executable(${LATTE} ${CMAKE_CURRENT_SOURCE_DIR}/../src/latte.f90)
 target_compile_options(${LATTE} PRIVATE -cpp ${OpenMP_Fortran_FLAGS})
 target_link_libraries(${LATTE} latte)
 target_include_directories(${LATTE} PRIVATE ${MPI_Fortran_INCLUDE_PATH})
-target_compile_definitions(${LATTE} PRIVATE XSYEV ${PRECISION}PREC GPU${GPUOPT} DBCSR_${DBCSR_OPT} MPI_${DO_MPI})
+target_compile_definitions(${LATTE} PRIVATE XSYEV ${PRECISION}PREC GPU${GPUOPT} DBCSR_${DBCSR_OPT} MPI_${DO_MPI} PROGRESS${PROGRESS})
 install(TARGETS ${LATTE} DESTINATION ${CMAKE_INSTALL_BINDIR})
