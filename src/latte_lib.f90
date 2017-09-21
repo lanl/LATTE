@@ -125,19 +125,15 @@ CONTAINS
     CALL MPI_COMM_SIZE( MPI_COMM_WORLD, NUMPROCS, IERR )
 #endif
 
-    IF(.NOT. INITIALIZED)THEN
-       LIBCALLS = 0 ; MAXITER = -10
-    ELSE
-       LIBCALLS = LIBCALLS + 1
-    ENDIF
-
-    OPEN(UNIT=6, FILE="log.latte", FORM="formatted")
-
     !INITIALIZATION
     IF(.NOT. INITIALIZED)THEN
 
-       WRITE(6,*)"The log file for latte_lib"
-       WRITE(6,*)""
+       LIBCALLS = 0 ; MAXITER = -10
+
+       OPEN(UNIT=6, FILE="log.latte", FORM="formatted")
+
+       WRITE(*,*)"The log file for latte_lib"
+       WRITE(*,*)""
 
        INQUIRE( FILE="animate/.", exist=EXISTS)
        IF (.NOT. EXISTS) CALL SYSTEM("mkdir animate")
@@ -239,6 +235,8 @@ CONTAINS
 
     ELSE
 
+       LIBCALLS = LIBCALLS + 1
+
        BOX = 0.0d0
        BOX(1,1) = xhi(1) - xlo(1)
        BOX(2,1) = XY
@@ -299,7 +297,7 @@ CONTAINS
        IF (KON .EQ. 0) THEN
 
           IF (SPONLY .EQ. 0) THEN
-             CALL BLDNEWHS_SP
+             CALL BLDNEWHS_SP             
           ELSE
              CALL BLDNEWHS
           ENDIF
@@ -517,6 +515,10 @@ CONTAINS
 
        CALL DEALLOCATENEBARRAYS
 
+       CALL DEALLOCATEALL
+
+       STOP
+
     ELSEIF (MDON .EQ. 1 .AND. RELAXME .EQ. 0 .AND. MAXITER_IN < 0 ) THEN
 
        IF(VERBOSE >= 1)WRITE(*,*)"Insie MDON= 1 and RELAXME= 0 ..."
@@ -606,18 +608,18 @@ CONTAINS
        IF(RESTARTLIB == 1 .AND. .NOT.INITIALIZED)THEN
           CALL READRESTARTLIB(LIBCALLS)
        ENDIF
-      
+
        WRITE(*,*)"Energy Components (TRRHOH, EREP, ENTE, ECOUL)",TRRHOH, EREP, ENTE, ECOUL
-      
+
        IF(MAXVAL(FTOT_OUT) .NE. 0.0d0)THEN
-         IF(VERBOSE >= 2)WRITE(*,*)"Adding force components and energies from applicacion code ..." 
+         IF(VERBOSE >= 2)WRITE(*,*)"Adding force components and energies from applicacion code ..."
          WRITE(*,*)"APPCODE,LATTE",VENERG,TRRHOH + EREP - ENTE - ECOUL + ESPIN
          VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
          FTOT_OUT = FTOT_OUT +  FTOT
        ELSE
          VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
          FTOT_OUT = FTOT
-       ENDIF  
+       ENDIF
 
 
        ! Get the seccond virial coefficient to pass it to the application program
