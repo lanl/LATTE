@@ -34,5 +34,5 @@ fix 6 all print 1 "Temp = ${myT}"
 
 run_style verlet
 
-run		100
+run		21
 
