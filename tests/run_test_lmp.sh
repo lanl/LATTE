@@ -26,7 +26,7 @@ for name in 0scf 2scf fullscf ; do
   echo ""
 
   grep Energy out | sed -e s/"PAR"/$STRR/g  >  input_tmp.in
-  python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.0000001
+  python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.000001
 
 done
 
