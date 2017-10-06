@@ -245,9 +245,9 @@ SUBROUTINE NEBLISTS(AMIALLO)
 
         ! Dangerous condition caught below (MJC)
         
-        IF (S(1) .EQ. ONE) S(1) = ZERO
-        IF (S(2) .EQ. ONE) S(2) = ZERO
-        IF (S(3) .EQ. ONE) S(3) = ZERO
+        IF (S(1) .GE. ONE) S(1) = ZERO
+        IF (S(2) .GE. ONE) S(2) = ZERO
+        IF (S(3) .GE. ONE) S(3) = ZERO
         
         BOXID(1) = INT(S(1)*NCELL(1))
         BOXID(2) = INT(S(2)*NCELL(2))
