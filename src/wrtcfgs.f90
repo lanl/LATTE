@@ -278,7 +278,7 @@ SUBROUTINE WRTCFGS(ITER)
 
                      CALL DGEMV('T', 3, 3, ONE, BOXINV, 3, CR(1,J), 1, ZERO, S, 1)
                     WRITE(23,17) S(1), S(2), S(3), V(1,J), V(2,J), V(3,J), &
-                         F(1,J), F(2,J), F(3,J), &
+                         FTOT(1,J), FTOT(2,J), FTOT(3,J), &
                          MAGF(J), T(J), DELTAQ(J)
 
                  ENDIF
