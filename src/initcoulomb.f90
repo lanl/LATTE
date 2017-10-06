@@ -111,6 +111,7 @@ SUBROUTINE INITCOULOMB
      
      P = -LOG(COULACC)
      SQRTP = SQRT(P)
+
      IF (COULCUT .GT. ZERO) THEN
         
         CALPHA = SQRTP/COULCUT
@@ -118,7 +119,8 @@ SUBROUTINE INITCOULOMB
         kcutoff = TWO*CALPHA*SQRTP
         kcutoff2 = kcutoff*kcutoff
         CALPHA2 = CALPHA*CALPHA  
-        
+        FOURCALPHA2 = FOUR*CALPHA2
+
      ELSE
         
         !
@@ -127,9 +129,9 @@ SUBROUTINE INITCOULOMB
         !
  
 !        TIMERATIO = 50.0
-        TIMERATIO = 10.0D0
+        TIMERATIO = 1.0D0
         
-        CALPHA = SQRTPI*((TIMERATIO * NATS / (COULVOL*COULVOL))**(ONE/SIX))
+        CALPHA = SQRTPI*((TIMERATIO * REAL(NATS) / (COULVOL*COULVOL))**(ONE/SIX))
         COULCUT = SQRTP/CALPHA
 
 !        PRINT*, "COULCUT =", COULCUT
@@ -149,21 +151,18 @@ SUBROUTINE INITCOULOMB
         ! Taking this bit from Coulomb Ewald so we don't have to 
         ! recompute every time:
         
-        LMAX = INT(KCUTOFF / SQRT(RECIPVECS(1,1)*RECIPVECS(1,1) + &
-             RECIPVECS(1,2)*RECIPVECS(1,2) + RECIPVECS(1,3)*RECIPVECS(1,3)))
-        
-        MMAX = INT(KCUTOFF / SQRT(RECIPVECS(2,1)*RECIPVECS(2,1) + &
-             RECIPVECS(2,2)*RECIPVECS(2,2) + RECIPVECS(2,3)*RECIPVECS(2,3)))
-        
-        NMAX = INT(KCUTOFF / SQRT(RECIPVECS(3,1)*RECIPVECS(3,1) + &
-             RECIPVECS(3,2)*RECIPVECS(3,2) + RECIPVECS(3,3)*RECIPVECS(3,3)))
-        
-        
-        
-!     PRINT*, "# Automatic real space cut-off = ", COULCUT
-
      ENDIF
 
+     LMAX = INT(KCUTOFF / SQRT(RECIPVECS(1,1)*RECIPVECS(1,1) + &
+          RECIPVECS(1,2)*RECIPVECS(1,2) + RECIPVECS(1,3)*RECIPVECS(1,3)))
+     
+     MMAX = INT(KCUTOFF / SQRT(RECIPVECS(2,1)*RECIPVECS(2,1) + &
+          RECIPVECS(2,2)*RECIPVECS(2,2) + RECIPVECS(2,3)*RECIPVECS(2,3)))
+     
+     NMAX = INT(KCUTOFF / SQRT(RECIPVECS(3,1)*RECIPVECS(3,1) + &
+          RECIPVECS(3,2)*RECIPVECS(3,2) + RECIPVECS(3,3)*RECIPVECS(3,3)))
+        
+        
   ENDIF
   
 END SUBROUTINE INITCOULOMB
