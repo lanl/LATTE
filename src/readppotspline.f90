@@ -19,20 +19,59 @@
 ! Public License for more details.                                         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-MODULE PPOTARRAY
+SUBROUTINE READPPOTSPLINE
 
-  USE MYPRECISION 
+  USE CONSTANTS_MOD
+  USE PPOTARRAY
 
   IMPLICIT NONE
 
-  SAVE
+  INTEGER :: I, J, K, MAXENTRY, NUMENTRY, N
+  REAL(LATTEPREC) :: JUNK, P, QN, SIG, UN
+  REAL(LATTEPREC), ALLOCATABLE :: U(:)
+  CHARACTER(LEN=20) :: HD, HD1, HD2
 
-  INTEGER :: NOPPS
-  INTEGER, ALLOCATABLE :: PPTABLENGTH(:), PPNK(:)
-  REAL(LATTEPREC), ALLOCATABLE :: POTCOEF(:,:)
-  CHARACTER(LEN=2), ALLOCATABLE :: PPELE1(:), PPELE2(:)
-  REAL(LATTEPREC), ALLOCATABLE :: PPR(:,:), PPVAL(:,:), PPSPL(:,:)
-  ! These ones are for the spline pps
-  REAL(LATTEPREC), ALLOCATABLE :: PPRK(:,:), PPAK(:,:)
+  OPEN(UNIT=14, STATUS="OLD", FILE=trim(PARAMPATH)//"/ppots.spline")
 
-END MODULE PPOTARRAY
+  READ(14,*) NOPPS
+  
+  ! Figure out array dimensions for allocation
+
+  MAXENTRY = 0
+  DO I = 1, NOPPS
+     READ(14,*) HD1, HD2
+     READ(14,*) NUMENTRY
+
+     IF (NUMENTRY .GT. MAXENTRY) MAXENTRY = NUMENTRY
+
+     DO J = 1, NUMENTRY
+        READ(14,*) JUNK, JUNK
+     ENDDO
+  ENDDO
+
+  REWIND(14)
+
+!  print*, MAXENTRY
+  ! Now we can allocate
+  
+  ALLOCATE(PPELE1(NOPPS), PPELE2(NOPPS), PPRK(MAXENTRY,NOPPS), &
+       PPAK(MAXENTRY,NOPPS), PPNK(NOPPS))
+
+  PPRK = ZERO
+  PPAK = ZERO
+  
+  READ(14,*) NOPPS
+  DO I = 1, NOPPS
+     READ(14,*) PPELE1(I), PPELE2(I)
+     READ(14,*) PPNK(I)
+     DO J = 1, PPNK(I)
+        READ(14,*) PPRK(J,I), PPAK(J,I)
+     ENDDO
+  ENDDO
+
+!  print *, ppak(1,1)
+  CLOSE(14)
+
+  RETURN
+  
+END SUBROUTINE READPPOTSPLINE

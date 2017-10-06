@@ -79,9 +79,10 @@ PROGRAM LATTE
   ELSE
      CALL READRESTART
   ENDIF
-
+  
   IF (PPOTON .EQ. 1) CALL READPPOT
   IF (PPOTON .EQ. 2) CALL READPPOTTAB
+  IF (PPOTON .EQ. 3) CALL READPPOTSPLINE
 
   IF (DEBUGON .EQ. 1) THEN
       CALL PLOTUNIV
@@ -184,7 +185,6 @@ PROGRAM LATTE
         CALL SP2FERMIINIT
 
      ENDIF
-     
 
      IF (ELECTRO .EQ. 0) CALL QNEUTRAL(0,1) ! Local charge neutrality
 
@@ -224,6 +224,10 @@ PROGRAM LATTE
         CALL PAIRPOTTAB
      ENDIF
 
+     IF (PPOTON .EQ. 3) THEN
+        CALL PAIRPOTSPLINE
+     ENDIF
+
      CALL TOTENG
 
      ECOUL = ZERO
@@ -241,7 +245,7 @@ PROGRAM LATTE
         CALL ENTROPY
      
      ENDIF
-     
+
      CALL WRTRESTART(0)
      
      IF (CONTROL .EQ. 1) THEN
@@ -261,17 +265,6 @@ PROGRAM LATTE
      CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
 
      CALL GETPRESSURE
-
-     DO I = 1, NATS
-        WRITE(6,*) "Force ", FTOT(1,I), FTOT(2,I), FTOT(3,I)
-     ENDDO
-
-!     WRITE(6,*) "Force ", FPP(1,1), FPP(2,1), FPP(3,1)
-!     PRINT*, "PCHECK ", (1.0/3.0)*(VIRBOND(1)+VIRBOND(2) + VIRBOND(3)), &
-!          (1.0/3.0)*(VIRCOUL(1)+VIRCOUL(2) + VIRCOUL(3)), &
-!          (1.0/3.0)*(VIRPAIR(1)+VIRPAIR(2) + VIRPAIR(3)), &
-!          (1.0/3.0)*(VIRPUL(1)+VIRPUL(2) + VIRPUL(3)), &
-!          (1.0/3.0)*(VIRSCOUL(1)+VIRSCOUL(2) + VIRSCOUL(3))
      
 #ifdef DBCSR_ON
 
@@ -280,8 +273,8 @@ PROGRAM LATTE
 #endif
 
      IF (MYID .EQ. 0) THEN
+        CALL FITTINGOUTPUT(0) ! This has to come first (MJC)
         CALL SUMMARY
-        CALL FITTINGOUTPUT(0)
 
 !     IF (SPINON .EQ. 0) CALL NORMS
 
