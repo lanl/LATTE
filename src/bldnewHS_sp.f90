@@ -134,7 +134,7 @@ SUBROUTINE BLDNEWHS_SP
 
         J = NEBTB(1, NEWJ, I)
 
-        IF (J .GE. I) THEN #bug fix by MJC
+        IF (J .GE. I) THEN !bug fix by MJC
            
            PBCI = NEBTB(2, NEWJ, I)
            PBCJ = NEBTB(3, NEWJ, I)
