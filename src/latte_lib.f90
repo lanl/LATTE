@@ -202,6 +202,7 @@ CONTAINS
        IF (VERBOSE >= 1) WRITE(*,*)"Reading ppots from file (if PPOTON >= 1) ..."
        IF (PPOTON .EQ. 1) CALL READPPOT
        IF (PPOTON .EQ. 2) CALL READPPOTTAB
+       IF (PPOTON .EQ. 3) CALL READPPOTSPLINE
 
        IF (DEBUGON .EQ. 1) THEN
           CALL PLOTUNIV
@@ -412,6 +413,11 @@ CONTAINS
           FTOT = FTOT + FPP
        ENDIF
 
+       IF (PPOTON .EQ. 3) THEN
+          CALL PAIRPOTSPLINE
+          FTOT = FTOT + FPP
+       ENDIF
+
        IF (ELECTRO .EQ. 1) FTOT = FTOT + FCOUL
 
        IF (BASISTYPE .EQ. "NONORTHO") THEN
@@ -487,8 +493,8 @@ CONTAINS
 #endif
 
           IF (MYID .EQ. 0) THEN
-             CALL SUMMARY
              CALL FITTINGOUTPUT(0)
+             CALL SUMMARY
 
              !     IF (SPINON .EQ. 0) CALL NORMS
 
@@ -580,7 +586,11 @@ CONTAINS
           CALL PAIRPOT
        ELSEIF (PPOTON .EQ. 2) THEN
           CALL PAIRPOTTAB
+       ELSEIF (PPOTON .EQ. 3) THEN
+          CALL PAIRPOTSPLINE
        ENDIF
+
+       
 
        IF (QITER .NE. 0) THEN
           ECOUL = ZERO
