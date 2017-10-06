@@ -69,7 +69,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
         ALLOCATE(NEBPP( 4, MAXDIMPP, NATS ))
      ENDIF
 
-     IF (ELECTRO .NE. 1) THEN
+     IF (ELECTRO .EQ. 1) THEN
         DEALLOCATE(NEBCOUL)
         ALLOCATE(NEBCOUL( 4, MAXDIMCOUL, NATS))
      ENDIF
@@ -104,6 +104,8 @@ SUBROUTINE NEBLISTS(AMIALLO)
            IF (PPOTON .EQ. 2 .AND. PPR(PPTABLENGTH(K), K) .GT. PPMAX) &
                 PPMAX = PPR(PPTABLENGTH(K), K)
 
+           IF (PPOTON .EQ. 3 .AND. PPRK(1,K) .GT. PPMAX) PPMAX = PPRK(1,K)
+
         ENDDO
            
      ENDIF
@@ -130,7 +132,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
 
      ! Now let's estimate the size of the arrays we need for to 
      ! store the neighbor lists, plus some
-
+     
      IF (PBCON .EQ. 1) THEN
 
         XRANGE = INT(MAXCUT/BOX(1,1)) + 1
@@ -240,7 +242,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
      ! Put the atoms into the sub-cells
 
      DO I = 1, NATS
-        
+
         CALL DGEMV('T', 3, 3, ONE, BOXINV, 3, CR(1,I), 1, ZERO, S, 1)
 
         ! Dangerous condition caught below (MJC)
