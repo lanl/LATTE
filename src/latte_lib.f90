@@ -298,7 +298,7 @@ CONTAINS
        IF (KON .EQ. 0) THEN
 
           IF (SPONLY .EQ. 0) THEN
-             CALL BLDNEWHS_SP             
+             CALL BLDNEWHS_SP
           ELSE
              CALL BLDNEWHS
           ENDIF
@@ -565,6 +565,15 @@ CONTAINS
 
           CALL FLUSH(6)
 
+       ELSE
+
+         ! Reinitiating Coulombic contribution if Kpoints are used
+         IF (ELECTRO .EQ. 1) THEN
+           IF (NKX+NKY+NKZ > 0) THEN
+             CALL INITCOULOMB
+           ENDIF
+         ENDIF
+
        ENDIF
 
        IF (MOD(LIBCALLS, UDNEIGH) .EQ. 0) CALL NEBLISTS(1)
@@ -590,7 +599,6 @@ CONTAINS
           CALL PAIRPOTSPLINE
        ENDIF
 
-       
 
        IF (QITER .NE. 0) THEN
           ECOUL = ZERO

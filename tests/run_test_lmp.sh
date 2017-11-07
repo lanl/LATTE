@@ -2,6 +2,8 @@
 
 # Script to test the LAMMPS-LATTE interface program.
 
+cp latte.in latte.in.tmp
+
 set -e                                          # This will exit the script if there is any error
 MY_PATH=`pwd`                                   # Capturing the local path of the folder where we are running.
 
@@ -53,5 +55,7 @@ for name in opt ; do
   python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.0000001
 
 done
+
+cp latte.in.tmp latte.in
 
 echo -e "\nEnd of run and test"

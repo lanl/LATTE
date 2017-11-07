@@ -9,6 +9,8 @@ RUN="./LATTE_DOUBLE"  # LATTE program executable
 
 echo -e "\nTesting LATTE with new (latte.in) input files \n"
 
+mv latte.in latte.in.tmp
+
 for name in 0scf 2scf fullscf sp2 ; do
 
   INLATTEFILE="latte."$name".in"
@@ -80,5 +82,7 @@ echo -e "\nTesting LATTE with original input files \n"
    python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.0000001
 
  done
+
+mv latte.in.tmp latte.in
 
 echo -e "\nEnd of run and test"
