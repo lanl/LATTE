@@ -569,7 +569,7 @@ CONTAINS
 
          ! Reinitiating Coulombic contribution if Kpoints are used
          IF (ELECTRO .EQ. 1) THEN
-           IF (NKX+NKY+NKZ > 0) THEN
+           IF (ELECMETH == 0) THEN
              CALL INITCOULOMB
            ENDIF
          ENDIF
