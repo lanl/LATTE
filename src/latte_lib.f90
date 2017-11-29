@@ -135,8 +135,8 @@ CONTAINS
        WRITE(*,*)"The log file for latte_lib"
        WRITE(*,*)""
 
-       INQUIRE( FILE="animate/.", exist=EXISTS)
-       IF (.NOT. EXISTS) CALL SYSTEM("mkdir animate")
+       INQUIRE( FILE="animate/.", exist=LATTEINEXISTS)
+       IF (.NOT. LATTEINEXISTS) CALL SYSTEM("mkdir animate")
 
        NUMSCF = 0
        CHEMPOT = ZERO
@@ -145,9 +145,9 @@ CONTAINS
        TX = INIT_TIMER()
        TX = START_TIMER(LATTE_TIMER)
 
-       INQUIRE( FILE="latte.in", exist=EXISTS )
+       INQUIRE( FILE="latte.in", exist=LATTEINEXISTS )
 
-       IF (EXISTS) THEN
+       IF (LATTEINEXISTS) THEN
           IF(.NOT. INITIALIZED) CALL PARSE_CONTROL("latte.in")
 
 #ifdef PROGRESSON
