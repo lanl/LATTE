@@ -102,7 +102,7 @@ SUBROUTINE READTB
   ! If we're doing k-space integration, let's read in the k point mesh
   IF (KON .EQ. 1) THEN
 
-    IF (EXISTS) THEN
+    IF (LATTEINEXISTS) THEN
       CALL PARSE_KMESH("latte.in")
     ELSE
 
