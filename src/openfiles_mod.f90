@@ -1,5 +1,4 @@
-!> Module to handle input output files for the PROGRESS lib. 
-!! \ingroup PROGRESS
+!> Module to handle input output files.
 !! 
 module openfiles_mod
 
