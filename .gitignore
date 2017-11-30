@@ -9,4 +9,10 @@
 *.xyz
 *mylastLATTEcalc
 *out
+*.lmp
+in.*
+*.tmp
+log.*
+log.*
+*.pdb
 
