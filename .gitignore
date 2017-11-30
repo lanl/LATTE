@@ -1,0 +1,12 @@
+*.o
+*.mod
+*.a
+*.out
+*.in
+*.dat
+*LATTE_*
+*.cfg
+*.xyz
+*mylastLATTEcalc
+*out
+
