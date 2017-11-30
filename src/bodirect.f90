@@ -45,7 +45,7 @@ SUBROUTINE BOEVECS
 
   OCCTARGET = BNDFIL*REAL(HDIM)
 
-!  PRINT*, TOTNE, OCCTARGET
+  !  PRINT*, TOTNE, OCCTARGET
 
   ITER = 0
 
@@ -60,51 +60,51 @@ SUBROUTINE BOEVECS
 
   IF (KBT .GT. 0.000001) THEN  ! This bit is for a finite electronic temperature
 
-   IF(VERBOSE >= 2)WRITE(*,*)"Total charge =",sum(DELTAQ)
+     IF(VERBOSE >= 2)WRITE(*,*)"Total charge =",SUM(DELTAQ)
 
 #ifdef PROGRESSON
 
-   CALL PRG_GET_FLEVEL(EVALS,KBT,BNDFIL,BREAKTOL,CHEMPOT)
+     CALL PRG_GET_FLEVEL(EVALS,KBT,BNDFIL,BREAKTOL,CHEMPOT)
 
 #else
 
-      DO WHILE (ABS(OCCERROR) .GT. BREAKTOL .AND. ITER .LT. 100)
+     DO WHILE (ABS(OCCERROR) .GT. BREAKTOL .AND. ITER .LT. 100)
 
-         ITER = ITER + 1
-         OCC = ZERO
-         DFDIRAC = ZERO
+        ITER = ITER + 1
+        OCC = ZERO
+        DFDIRAC = ZERO
 
-         DO I = 1, HDIM
+        DO I = 1, HDIM
 
-            FDIRACARG = (EVALS(I) - CHEMPOT)/KBT
+           FDIRACARG = (EVALS(I) - CHEMPOT)/KBT
 
-            FDIRACARG = MAX(FDIRACARG, -EXPTOL)
-            FDIRACARG = MIN(FDIRACARG, EXPTOL)
+           FDIRACARG = MAX(FDIRACARG, -EXPTOL)
+           FDIRACARG = MIN(FDIRACARG, EXPTOL)
 
-            EXPARG = EXP(FDIRACARG)
-            FDIRAC = ONE/(ONE + EXPARG)
-            OCC = OCC + FDIRAC
-            DFDIRAC = DFDIRAC + EXPARG*FDIRAC*FDIRAC
+           EXPARG = EXP(FDIRACARG)
+           FDIRAC = ONE/(ONE + EXPARG)
+           OCC = OCC + FDIRAC
+           DFDIRAC = DFDIRAC + EXPARG*FDIRAC*FDIRAC
 
-         ENDDO
+        ENDDO
 
-         DFDIRAC = DFDIRAC/KBT
+        DFDIRAC = DFDIRAC/KBT
 
-         OCCERROR = OCCTARGET - OCC
+        OCCERROR = OCCTARGET - OCC
 
-         IF (ABS(DFDIRAC) .LT. NUMLIMIT) DFDIRAC = SIGN(NUMLIMIT, DFDIRAC)
+        IF (ABS(DFDIRAC) .LT. NUMLIMIT) DFDIRAC = SIGN(NUMLIMIT, DFDIRAC)
 
-         SHIFTCP = OCCERROR/DFDIRAC
+        SHIFTCP = OCCERROR/DFDIRAC
 
-         IF (ABS(SHIFTCP) .GT. MAXSHIFT) SHIFTCP = SIGN(MAXSHIFT, SHIFTCP)
+        IF (ABS(SHIFTCP) .GT. MAXSHIFT) SHIFTCP = SIGN(MAXSHIFT, SHIFTCP)
 
-         CHEMPOT = CHEMPOT + SHIFTCP
+        CHEMPOT = CHEMPOT + SHIFTCP
 
- !        PRINT*, CHEMPOT, OCCERROR
+        !        PRINT*, CHEMPOT, OCCERROR
 
-         IF(VERBOSE >= 2)WRITE(*,*)"Occupation error =",OCCERROR," Chemical potential =",CHEMPOT
+        IF(VERBOSE >= 2)WRITE(*,*)"Occupation error = ",OCCERROR," Chemical potential = ",CHEMPOT
 
-      ENDDO
+     ENDDO
 
      IF (ITER .EQ. 100) THEN
         WRITE(6,*) "Newton-Raphson scheme to find the Chemical potential does not converge"
@@ -202,8 +202,8 @@ SUBROUTINE BOEVECS
         FULLQCONV = 1
         MDMIX = 0.1
      ELSE
-       QITER = 1
-       MDMIX = 0.25
+        QITER = 1
+        MDMIX = 0.25
      ENDIF
 
   ENDIF

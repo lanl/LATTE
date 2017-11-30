@@ -49,7 +49,6 @@ PROGRAM LATTE
   REAL :: TARRAY(2), RESULT, SYSTDIAG, SYSTPURE
   CHARACTER(LEN=50) :: FLNM
 
-
 #ifdef MPI_ON
   INTEGER :: IERR, STATUS(MPI_STATUS_SIZE), NUMPROCS
 
@@ -66,10 +65,10 @@ PROGRAM LATTE
   TX = START_TIMER(LATTE_TIMER)
 
   INQUIRE( FILE="latte.in", exist=LATTEINEXISTS )
-  IF (LATTEINEXISTS) THEN  
-    IF(.NOT. INITIALIZED) CALL PARSE_CONTROL("latte.in")
+  IF (LATTEINEXISTS) THEN
+     IF(.NOT. INITIALIZED) CALL PARSE_CONTROL("latte.in")
   ELSE
-    CALL READCONTROLS 
+     CALL READCONTROLS
   ENDIF
 
   CALL READTB
@@ -79,14 +78,14 @@ PROGRAM LATTE
   ELSE
      CALL READRESTART
   ENDIF
-  
+
   IF (PPOTON .EQ. 1) CALL READPPOT
   IF (PPOTON .EQ. 2) CALL READPPOTTAB
   IF (PPOTON .EQ. 3) CALL READPPOTSPLINE
 
   IF (DEBUGON .EQ. 1) THEN
-      CALL PLOTUNIV
-      IF (PPOTON .EQ. 1) CALL PLOTPPOT
+     CALL PLOTUNIV
+     IF (PPOTON .EQ. 1) CALL PLOTPPOT
   ENDIF
 
   CALL GETHDIM
@@ -114,7 +113,7 @@ PROGRAM LATTE
 
   IF (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. DOSFITON .EQ. 0 &
        .AND. PPFITON .EQ. 0 .AND. ALLFITON .EQ. 0) THEN
-    
+
      !
      ! Start the timers
      !
@@ -127,7 +126,7 @@ PROGRAM LATTE
      CALL ALLOCATENEBARRAYS
 
      IF (ELECTRO .EQ. 1) THEN
-     
+
         CALL ALLOCATECOULOMB
 
         CALL INITCOULOMB
@@ -145,11 +144,11 @@ PROGRAM LATTE
         IF (SPONLY .EQ. 0) THEN
            CALL BLDNEWHS_SP
         ELSE
-           CALL BLDNEWHS   
+           CALL BLDNEWHS
         ENDIF
 
-     ELSE	
-        
+     ELSE
+
         CALL KBLDNEWH
 
      ENDIF
@@ -158,9 +157,9 @@ PROGRAM LATTE
      ! If we're starting from a restart file, we need to modify H such
      ! that it agrees with the density matrix elements read from file
      !
-     
+
      IF (RESTART .EQ. 1) CALL IFRESTART
- 
+
 
      !
      ! See whether we need spin-dependence too
@@ -178,7 +177,7 @@ PROGRAM LATTE
      ELSEIF (CONTROL .EQ. 3) THEN
         CALL FERMIALLOCATE
      ENDIF
-     
+
      IF (CONTROL .EQ. 5) THEN
 
         CALL GERSHGORIN
@@ -190,7 +189,7 @@ PROGRAM LATTE
 
      IF (ELECTRO .EQ. 1) CALL QCONSISTENCY(0,1) ! Self-consistent charges
 
-     ! We have to build our NKTOT complex H matrices and compute the 
+     ! We have to build our NKTOT complex H matrices and compute the
      ! self consistent density matrix
 
      ! Tr[rho dH/dR], Pulay force, and Tr[rho H] need to de-orthogonalized rho
@@ -200,23 +199,23 @@ PROGRAM LATTE
      IF (DEBUGON .EQ. 1 .AND. SPINON .EQ. 0 .AND. KON .EQ. 0) THEN
 
         PRINT*, "Caution - you're writing to file the density matrix!"
-        
+
         OPEN(UNIT=31, STATUS="UNKNOWN", FILE="myrho.dat")
 
         DO I = 1, HDIM
            WRITE(31,10) (BO(I,J), J = 1, HDIM)
         ENDDO
-        
+
         CLOSE(31)
-     
+
 10      FORMAT(100G18.8)
 
      ENDIF
 
      IF (COMPFORCE .EQ. 1) CALL GETFORCE
-     
+
      EREP = ZERO
-     IF (PPOTON .EQ. 1) THEN 
+     IF (PPOTON .EQ. 1) THEN
         CALL PAIRPOT
      ENDIF
 
@@ -236,20 +235,20 @@ PROGRAM LATTE
      ESPIN = ZERO
      IF (SPINON .EQ. 1) CALL GETSPINE
 
-     IF (CONTROL .NE. 1 .AND. CONTROL .NE. 2 .AND. KBT .GT. 0.000001 ) THEN 
-        
- 	! We get the entropy automatically when using diagonalization. 
-        ! This is only required when employing the recursive expansion 
+     IF (CONTROL .NE. 1 .AND. CONTROL .NE. 2 .AND. KBT .GT. 0.000001 ) THEN
+
+ 	! We get the entropy automatically when using diagonalization.
+        ! This is only required when employing the recursive expansion
         ! of the Fermi-operator at finite electronic temperature
 
         CALL ENTROPY
-     
+
      ENDIF
 
      CALL WRTRESTART(0)
-     
+
      IF (CONTROL .EQ. 1) THEN
-!        CALL DEALLOCATEDIAG
+        !        CALL DEALLOCATEDIAG
      ELSEIF (CONTROL .EQ. 2 .OR. CONTROL .EQ. 4 .OR. CONTROL .EQ. 5) THEN
         CALL DEALLOCATEPURE
      ELSEIF (CONTROL .EQ. 3) THEN
@@ -261,32 +260,39 @@ PROGRAM LATTE
      !
 
      TX = STOP_TIMER(LATTE_TIMER)
-     CALL DTIME(TARRAY, RESULT)        
+     CALL DTIME(TARRAY, RESULT)
      CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
 
      CALL GETPRESSURE
-     
+
+     !     WRITE(6,*) "Force ", FPP(1,1), FPP(2,1), FPP(3,1)
+     !     PRINT*, "PCHECK ", (1.0/3.0)*(VIRBOND(1)+VIRBOND(2) + VIRBOND(3)), &
+     !          (1.0/3.0)*(VIRCOUL(1)+VIRCOUL(2) + VIRCOUL(3)), &
+     !          (1.0/3.0)*(VIRPAIR(1)+VIRPAIR(2) + VIRPAIR(3)), &
+     !          (1.0/3.0)*(VIRPUL(1)+VIRPUL(2) + VIRPUL(3)), &
+     !          (1.0/3.0)*(VIRSCOUL(1)+VIRSCOUL(2) + VIRSCOUL(3))
+
 #ifdef DBCSR_ON
 
      IF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 1 .AND.  MYNODE .EQ. 0) THEN
 
 #endif
 
-     IF (MYID .EQ. 0) THEN
-        CALL FITTINGOUTPUT(0) ! This has to come first (MJC)
-        CALL SUMMARY
+        IF (MYID .EQ. 0) THEN
+           CALL FITTINGOUTPUT(0) ! This has to come first (MJC)
+           CALL SUMMARY
 
-!     IF (SPINON .EQ. 0) CALL NORMS
+           !     IF (SPINON .EQ. 0) CALL NORMS
 
-     PRINT*, "# System time  = ", TARRAY(1)
-     PRINT*, "# Wall time = ", FLOAT(STOP_CLOCK - START_CLOCK)/FLOAT(CLOCK_RATE)
-     PRINT*, "# Wall time per SCF =", &
-          FLOAT(STOP_CLOCK - START_CLOCK)/(FLOAT(CLOCK_RATE)*FLOAT(NUMSCF))
-!     PRINT*, HDIM, FLOAT(STOP_CLOCK - START_CLOCK)/FLOAT(CLOCK_RATE)
-     TX = TIMER_RESULTS()
+           PRINT*, "# System time  = ", TARRAY(1)
+           PRINT*, "# Wall time = ", FLOAT(STOP_CLOCK - START_CLOCK)/FLOAT(CLOCK_RATE)
+           PRINT*, "# Wall time per SCF =", &
+                FLOAT(STOP_CLOCK - START_CLOCK)/(FLOAT(CLOCK_RATE)*FLOAT(NUMSCF))
+           !     PRINT*, HDIM, FLOAT(STOP_CLOCK - START_CLOCK)/FLOAT(CLOCK_RATE)
+           TX = TIMER_RESULTS()
            PRINT*, "# NUMSCF = ", NUMSCF
 
-      ENDIF
+        ENDIF
 #ifdef DBCSR_ON
 
      ENDIF
@@ -294,7 +300,7 @@ PROGRAM LATTE
 #endif
 
 
-!     CALL ASSESSOCC
+     !     CALL ASSESSOCC
 
      IF (ELECTRO .EQ. 1) CALL DEALLOCATECOULOMB
 
@@ -315,25 +321,26 @@ PROGRAM LATTE
 
      ! Start the timers
 
-     CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)     
+     CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
      CALL DTIME(TARRAY, RESULT)
-     
+
      !
      ! Call TBMD
      !
 
      CALL TBMD
 
+
 #ifdef MPI_ON
      IF (PARREP .EQ. 1) CALL MPI_BARRIER (MPI_COMM_WORLD, IERR )
-#endif 
+#endif
 
 
      ! Stop the timers
-     
+
      CALL DTIME(TARRAY, RESULT)
      CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
-     
+
      CALL SUMMARY
 
      IF (PBCON .EQ. 0) CLOSE(23)
@@ -341,14 +348,14 @@ PROGRAM LATTE
      IF (BASISTYPE .EQ. "NONORTHO") CALL DEALLOCATENONO
 
      IF (XBOON .EQ. 1) CALL DEALLOCATEXBO
-     
+
      IF (ELECTRO .EQ. 1) CALL DEALLOCATECOULOMB
 
-!     SYSTPURE = TARRAY(1)
-!     WRITE(6,'("# System time for MD run = ", F12.2, " s")') SYSTPURE
+     !     SYSTPURE = TARRAY(1)
+     !     WRITE(6,'("# System time for MD run = ", F12.2, " s")') SYSTPURE
      WRITE(6,'("# Wall time for MD run = ", F12.2, " s")') &
           FLOAT(STOP_CLOCK - START_CLOCK)/FLOAT(CLOCK_RATE)
-     
+
   ELSEIF (MDON .EQ. 0 .AND. RELAXME .EQ. 1) THEN
 
      CALL MSRELAX
@@ -361,8 +368,8 @@ PROGRAM LATTE
 
      CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
 
-     WRITE(6,'("# Wall time = ", F12.2, " s")') &                   
-          FLOAT(STOP_CLOCK - START_CLOCK)/FLOAT(CLOCK_RATE)                    
+     WRITE(6,'("# Wall time = ", F12.2, " s")') &
+          FLOAT(STOP_CLOCK - START_CLOCK)/FLOAT(CLOCK_RATE)
 
   ELSEIF  (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. DOSFITON .EQ. 2) THEN
 
@@ -381,11 +388,11 @@ PROGRAM LATTE
 
      CALL ALLFIT
 
-  ELSE 
+  ELSE
 
      WRITE(6,*) "You can't have RELAXME = 1 and MDON = 1"
      STOP
-     
+
   ENDIF
 
 #ifdef GPUON
@@ -404,12 +411,14 @@ PROGRAM LATTE
   IF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 1) CALL SHUTDOWN_DBCSR
 
 #endif
-  
+
   ! Done with timers
+  TX = STOP_TIMER(LATTE_TIMER)
+  TX = TIMER_RESULTS()
   TX = SHUTDOWN_TIMER()
 
 #ifdef MPI_ON
   CALL MPI_FINALIZE( IERR )
 #endif
-  
+
 END PROGRAM LATTE

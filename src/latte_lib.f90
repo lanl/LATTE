@@ -364,7 +364,7 @@ CONTAINS
        ! ENDDO
 
        !99 FORMAT(2I9)
-       !CLose(31)
+       !CLOSE(31)
 
        IF (DEBUGON .EQ. 1 .AND. SPINON .EQ. 0 .AND. KON .EQ. 0) THEN
 
@@ -567,12 +567,12 @@ CONTAINS
 
        ELSE
 
-         ! Reinitiating Coulombic contribution if Kpoints are used
-         IF (ELECTRO .EQ. 1) THEN
-           IF (ELECMETH == 0) THEN
-             CALL INITCOULOMB
-           ENDIF
-         ENDIF
+          ! Reinitiating Coulombic contribution if Kpoints are used
+          IF (ELECTRO .EQ. 1) THEN
+             IF (ELECMETH == 0) THEN
+                CALL INITCOULOMB
+             ENDIF
+          ENDIF
 
        ENDIF
 
@@ -630,13 +630,13 @@ CONTAINS
        WRITE(*,*)"Energy Components (TRRHOH, EREP, ENTE, ECOUL)",TRRHOH, EREP, ENTE, ECOUL
 
        IF(MAXVAL(FTOT_OUT) .NE. 0.0d0)THEN
-         IF(VERBOSE >= 2)WRITE(*,*)"Adding force components and energies from applicacion code ..."
-         WRITE(*,*)"APPCODE,LATTE",VENERG,TRRHOH + EREP - ENTE - ECOUL + ESPIN
-         VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
-         FTOT_OUT = FTOT_OUT +  FTOT
+          IF(VERBOSE >= 2)WRITE(*,*)"Adding force components and energies from applicacion code ..."
+          WRITE(*,*)"APPCODE,LATTE",VENERG,TRRHOH + EREP - ENTE - ECOUL + ESPIN
+          VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
+          FTOT_OUT = FTOT_OUT +  FTOT
        ELSE
-         VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
-         FTOT_OUT = FTOT
+          VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
+          FTOT_OUT = FTOT
        ENDIF
 
 

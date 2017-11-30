@@ -172,8 +172,6 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   IF (ELECTRO .EQ. 1 .AND. QITER .EQ. 0) THEN
 
      OLDDELTAQS = DELTAQ ! save the propagated charges
-
-     IF(VERBOSE >= 1)WRITE(*,*)"Getting DELTAQs ..."
      CALL GETDELTAQ ! Get updated set of partial charges
 
      ECOUL = ZERO
