@@ -60,7 +60,17 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
+
+#ifdef PROGRESSON
+              IF (LATTEINEXISTS) THEN  !orthogonalize from progress lib if latte.in exists
+                CALL ORTHOMYHPRG
+              ELSE
+                CALL ORTHOMYH
+              ENDIF
+#else
               CALL ORTHOMYH
+#endif
+
            ELSEIF (KON .EQ. 1) THEN
               CALL KORTHOMYH
            ENDIF
@@ -88,7 +98,15 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
+#ifdef PROGRESSON
+            IF (LATTEINEXISTS) THEN  !deorthogonalize from progress lib if latte.in exists
+              CALL DEORTHOMYRHOPRG
+            ELSE
               CALL DEORTHOMYRHO
+            ENDIF
+#else
+           CALL DEORTHOMYRHO
+#endif
            ELSEIF (KON .EQ. 1) THEN
               CALL KDEORTHOMYRHO
            ENDIF
@@ -199,7 +217,15 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         IF (BASISTYPE.EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
+#ifdef PROGRESSON
+            IF (LATTEINEXISTS) THEN  !deorthogonalize from progress lib if latte.in exists
+              CALL DEORTHOMYRHOPRG
+            ELSE
               CALL DEORTHOMYRHO
+            ENDIF
+#else
+            CALL DEORTHOMYRHO
+#endif
            ELSEIF (KON .EQ. 1) THEN
               CALL KDEORTHOMYRHO
            ENDIF
@@ -236,7 +262,9 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 #else
            DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
 #endif
+
         ELSE
+
 #ifdef PROGRESSON
            IF(MX%MIXERON)THEN
               CALL QMIXPRG     !Alternative mixing scheme from PROGRESS
@@ -324,7 +352,17 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
+
+#ifdef PROGRESSON
+            IF (LATTEINEXISTS) THEN  !orthogonalize from progress lib if latte.in exists
+              CALL ORTHOMYHPRG
+            ELSE
               CALL ORTHOMYH
+            ENDIF
+#else
+            CALL ORTHOMYH
+#endif
+
            ELSEIF (KON .EQ. 1) THEN
               CALL KORTHOMYH
            ENDIF
@@ -352,7 +390,15 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
-              CALL DEORTHOMYRHO
+#ifdef PROGRESSON
+           IF (LATTEINEXISTS) THEN  !deorthogonalize from progress lib if latte.in exists
+             CALL DEORTHOMYRHOPRG
+           ELSE
+             CALL DEORTHOMYRHO
+           ENDIF
+#else
+           CALL DEORTHOMYRHO
+#endif
            ELSEIF (KON .EQ. 1) THEN
               CALL KDEORTHOMYRHO
            ENDIF
@@ -366,7 +412,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
 
-        !        PRINT*, DELTAQ(1)
+!        PRINT*, DELTAQ(1)
 
         IF (SPINON .EQ. 1) THEN
 
@@ -401,7 +447,18 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
      IF (BASISTYPE .EQ. "NONORTHO") THEN
         IF (KON .EQ. 0) THEN
-           CALL ORTHOMYH
+
+#ifdef PROGRESSON
+          IF (LATTEINEXISTS) THEN  !orthogonalize from progress lib if latte.in exists
+            CALL ORTHOMYHPRG
+          ELSE
+            CALL ORTHOMYH
+          ENDIF
+#else
+          CALL ORTHOMYH
+#endif
+
+
         ELSEIF (KON .EQ. 1) THEN
            CALL KORTHOMYH
         ENDIF
@@ -422,7 +479,15 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
      IF (BASISTYPE .EQ. "NONORTHO") THEN
         IF (KON .EQ. 0) THEN
-           CALL DEORTHOMYRHO
+#ifdef PROGRESSON
+        IF (LATTEINEXISTS) THEN  !deorthogonalize from progress lib if latte.in exists
+          CALL DEORTHOMYRHOPRG
+        ELSE
+          CALL DEORTHOMYRHO
+        ENDIF
+#else
+        CALL DEORTHOMYRHO
+#endif
         ELSEIF (KON .EQ. 1) THEN
            CALL KDEORTHOMYRHO
         ENDIF
