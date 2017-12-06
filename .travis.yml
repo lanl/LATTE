@@ -16,6 +16,12 @@ before_install:
   - cd; git clone https://github.com/lanl/qmd-progress.git
   - cd; git clone https://github.com/lanl/bml.git
 
+  # Install BML, PROGRESS and LAMMPS
+  - cd bml; CC=gcc FC=gfortran CMAKE_BUILD_TYPE=Release BLAS_VENDOR=GNU BML_OPENMP=yes BML_TESTING=no ./build.sh configure
+  - cd build; make; make install; cd
+  - cd qmd-progress; CC=gcc FC=gfortran PROGRESS_MPI=no PROGRESS_TESTING=yes BLAS_VENDOR=GNU PKG_CONFIG_PATH=~/bml/install/lib/pkgconfig PROGRESS_OPENMP=yes ./build.sh configure
+  - cd build; make; make install; cd 
+  
 before_script:
   - cd ~/build/lanl/LATTE/
 
