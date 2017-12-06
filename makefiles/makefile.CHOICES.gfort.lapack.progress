@@ -51,7 +51,7 @@ LIB = -llapack -lblas
  -lmkl_gnu_thread -lmkl_core -ldl -lpthread -lm
 
 ifeq ($(PROGRESS), ON)
-	LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml
+	LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml_fortran -lbml
         FFLAGS += -I$(BML_PATH)/../include -I$(PROGRESS_PATH)/../include
 endif
 
