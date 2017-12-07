@@ -334,7 +334,7 @@ contains
     elseif(SPARSEON == 1)then
       lt%bml_type = bml_matrix_ellpack
     else
-      STOP'SPARSEON > 1 yet not implemented'
+      STOP 'SPARSEON > 1 yet not implemented'
     endif
 
     if(THRESHOLDON == 0)then
@@ -342,7 +342,7 @@ contains
     elseif(THRESHOLDON == 1)then
       lt%threshold = NUMTHRESH
     else
-      STOP'THRESHOLDON > 1 yet not implemented'
+      STOP 'THRESHOLDON > 1 yet not implemented'
     endif
 
 #endif
@@ -363,7 +363,7 @@ contains
     elseif(MSPARSE > 0)then
       lt%mdim = MSPARSE
     else
-      STOP'MSPARSE cannot be negative'
+      STOP 'MSPARSE cannot be negative'
     endif
 
 #endif
