@@ -54,7 +54,15 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
 
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
-              CALL ORTHOMYH
+#ifdef PROGRESSON
+             IF (LATTEINEXISTS) THEN  !orthogonalize from progress lib if latte.in exists
+               CALL ORTHOMYHPRG
+             ELSE
+               CALL ORTHOMYH
+             ENDIF
+#else
+             CALL ORTHOMYH
+#endif
            ELSEIF (KON .EQ. 1) THEN
               CALL KORTHOMYH
            ENDIF
@@ -84,7 +92,15 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
 
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
+#ifdef PROGRESSON
+            IF (LATTEINEXISTS) THEN  !deorthogonalize from progress lib if latte.in exists
+              CALL DEORTHOMYRHOPRG
+            ELSE
               CALL DEORTHOMYRHO
+            ENDIF
+#else
+            CALL DEORTHOMYRHO
+#endif
            ELSEIF (KON .EQ. 1) THEN
               CALL KDEORTHOMYRHO
            ENDIF
@@ -95,18 +111,18 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
         IF (SPINON .EQ. 1) CALL GETDELTASPIN
 
      ENDIF
-     
+
      !
      ! Now we're going to run our iterations for self-consistency
      !
-     
+
      ALLOK = 1
      ITER = 0
 
      IF (SPINON .EQ. 1) ALLOCATE(SPINDIFF(DELTADIM))
-     
+
      DO WHILE (ALLOK .GT. 0)
-        
+
         ITER = ITER + 1
 
         ! Adjust on-site energies such that partial charges -> 0
@@ -114,16 +130,24 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
         CALL SHIFTH(QMIX)
 
         !
-        ! New Hamiltonian: get the bond order 
+        ! New Hamiltonian: get the bond order
         !
-        
+
         ! Compute the density matrix
 
         IF (SPINON .EQ. 1) CALL BLDSPINH
 
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
+#ifdef PROGRESSON
+            IF (LATTEINEXISTS) THEN  !orthogonalize from progress lib if latte.in exists
+              CALL ORTHOMYHPRG
+            ELSE
               CALL ORTHOMYH
+            ENDIF
+#else
+           CALL ORTHOMYH
+#endif
            ELSEIF (KON .EQ. 1) THEN
               CALL KORTHOMYH
            ENDIF
@@ -140,13 +164,21 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
 
         IF (BASISTYPE.EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
+#ifdef PROGRESSON
+            IF (LATTEINEXISTS) THEN  !deorthogonalize from progress lib if latte.in exists
+              CALL DEORTHOMYRHOPRG
+            ELSE
               CALL DEORTHOMYRHO
+            ENDIF
+#else
+            CALL DEORTHOMYRHO
+#endif
            ELSEIF (KON .EQ. 1) THEN
               CALL KDEORTHOMYRHO
            ENDIF
         ENDIF
 
-        
+
         CALL GETDELTAQ
 
         IF (ABS(MAXVAL(DELTAQ)) .LT. ELEC_QTOL) ALLOK = 0
@@ -159,12 +191,12 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
 
            SPINDIFF = ABS(DELTASPIN - OLDDELTASPIN)
 
-           IF (MAXVAL(SPINDIFF) .LT. SPINTOL)  ALLOK = 0           
-           
+           IF (MAXVAL(SPINDIFF) .LT. SPINTOL)  ALLOK = 0
+
            ! Mix new and old spin densities
-           
+
            DELTASPIN = SPINMIX*DELTASPIN + (ONE - SPINMIX)*OLDDELTASPIN
-              
+
         ENDIF
 
 
@@ -177,38 +209,46 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
            ALLOK = 0
 
         ENDIF
-        
+
 
      ENDDO
 
      NUMSCF = ITER
 
      IF (SPINON .EQ. 1) DEALLOCATE(SPINDIFF)
-     
+
   ELSEIF (FULLQCONV .EQ. 0 .AND. MDON .EQ. 1 .AND. MDITER .GT. 10) THEN
-     
-     ! Now we're doing MD 
+
+     ! Now we're doing MD
 
      DO II = 1, QITER
 
         CALL SHIFTH(MDMIX)
 
         IF (SPINON .EQ. 1) CALL BLDSPINH
-        
+
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
-              CALL ORTHOMYH
+#ifdef PROGRESSON
+           IF (LATTEINEXISTS) THEN  !orthogonalize from progress lib if latte.in exists
+             CALL ORTHOMYHPRG
+           ELSE
+             CALL ORTHOMYH
+           ENDIF
+#else
+           CALL ORTHOMYH
+#endif
            ELSEIF (KON .EQ. 1) THEN
               CALL KORTHOMYH
            ENDIF
         ENDIF
 
-        
+
 
         !
-        ! New Hamiltonian: get the bond order 
+        ! New Hamiltonian: get the bond order
         !
-        
+
         ! Compute the density matrix
 
         IF (KON .EQ. 0) THEN
@@ -219,7 +259,15 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
 
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
-              CALL DEORTHOMYRHO
+#ifdef PROGRESSON
+           IF (LATTEINEXISTS) THEN  !deorthogonalize from progress lib if latte.in exists
+             CALL DEORTHOMYRHOPRG
+           ELSE
+             CALL DEORTHOMYRHO
+           ENDIF
+#else
+           CALL DEORTHOMYRHO
+#endif
            ELSEIF (KON .EQ. 1) THEN
               CALL KDEORTHOMYRHO
            ENDIF
@@ -230,17 +278,17 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
         CALL GETDELTAQ
 
         IF (SPINON .EQ. 1) THEN
-           
-           OLDDELTASPIN = DELTASPIN           
+
+           OLDDELTASPIN = DELTASPIN
            CALL GETDELTASPIN
            DELTASPIN = SPINMIX*DELTASPIN + (ONE - SPINMIX)*OLDDELTASPIN
 
         ENDIF
-        
+
      ENDDO
 
   ENDIF
 
   RETURN
-  
+
 END SUBROUTINE QNEUTRAL

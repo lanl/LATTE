@@ -49,7 +49,7 @@ SUBROUTINE WRTCFGS(ITER)
   REAL(LATTEPREC), ALLOCATABLE :: T(:), MAGF(:), ATSPIN(:)
   REAL(LATTEPREC) :: V2, MYMASS, MASSMYELEMENTS(4)
   REAL(LATTEPREC) :: WORK(3), BOXINV(3,3), S(3)
-!  REAL(LATTEPREC), PARAMETER :: CONV = 1.66053D6/(3.0D0*1.38062D0)
+  !  REAL(LATTEPREC), PARAMETER :: CONV = 1.66053D6/(3.0D0*1.38062D0)
   CHARACTER(LEN=50) :: FLNM
   CHARACTER(LEN=2) :: MYELEMENTS(92)
 
@@ -63,9 +63,9 @@ SUBROUTINE WRTCFGS(ITER)
   IF (MDON .EQ. 1) THEN
 
      IF (.NOT. ALLOCATED(V)) THEN
-       ALLOCATE(V(3,NATS)); V = 0.0d0
+        ALLOCATE(V(3,NATS)); V = 0.0d0
      ENDIF
-     
+
      DO I = 1, NATS
 
         V2 = V(1,I)*V(1,I) + V(2,I)*V(2,I) + V(3,I)*V(3,I)
@@ -236,7 +236,7 @@ SUBROUTINE WRTCFGS(ITER)
      WRITE(23,11) "H0(3,2) = ", BOX(3,2), " A"
      WRITE(23,11) "H0(3,3) = ", BOX(3,3), " A"
 
-! Box inverse
+     ! Box inverse
 
      BOXINV = BOX
 
@@ -276,7 +276,7 @@ SUBROUTINE WRTCFGS(ITER)
 
                  IF (ATELE(J) .EQ. MYELEMENTS(I)) THEN
 
-                     CALL DGEMV('T', 3, 3, ONE, BOXINV, 3, CR(1,J), 1, ZERO, S, 1)
+                    CALL DGEMV('T', 3, 3, ONE, BOXINV, 3, CR(1,J), 1, ZERO, S, 1)
                     WRITE(23,17) S(1), S(2), S(3), V(1,J), V(2,J), V(3,J), &
                          FTOT(1,J), FTOT(2,J), FTOT(3,J), &
                          MAGF(J), T(J), DELTAQ(J)
@@ -438,7 +438,7 @@ SUBROUTINE WRTCFGS(ITER)
 
      ENDIF
 
-!     DEALLOCATE(T, MAGF)
+     !     DEALLOCATE(T, MAGF)
 
      CLOSE(23)
 
@@ -476,22 +476,22 @@ SUBROUTINE WRTCFGS(ITER)
 
      IF (ITER .EQ. -999) CLOSE(23)
 
-!     IF (ITER .LT. 0) THEN
+     !     IF (ITER .LT. 0) THEN
 
-!        WRITE(FLNM,'("animate/myXYZfile.PANIC.xyz")')
-!        IF (ITER .EQ. -999) WRITE(FLNM,'("lastsystem.xyz")')
+     !        WRITE(FLNM,'("animate/myXYZfile.PANIC.xyz")')
+     !        IF (ITER .EQ. -999) WRITE(FLNM,'("lastsystem.xyz")')
 
-!        OPEN(UNIT=24, STATUS="UNKNOWN", FILE=FLNM)
+     !        OPEN(UNIT=24, STATUS="UNKNOWN", FILE=FLNM)
 
-!        WRITE(24,20) NATS
-!        WRITE(24,'("LATTE MD: dt = ", F8.3, " Time step = ", I9)') DT, ITER
-!        DO I = 1, NATS
-!           WRITE(24,21) ATELE(I), CR(1,I), CR(2,I), CR(3,I)
-!        ENDDO
+     !        WRITE(24,20) NATS
+     !        WRITE(24,'("LATTE MD: dt = ", F8.3, " Time step = ", I9)') DT, ITER
+     !        DO I = 1, NATS
+     !           WRITE(24,21) ATELE(I), CR(1,I), CR(2,I), CR(3,I)
+     !        ENDDO
 
-!        CLOSE (24)
+     !        CLOSE (24)
 
-!     ENDIF
+     !     ENDIF
 
   END IF
 

@@ -602,7 +602,7 @@ SUBROUTINE BLDNEWHS_SP
      H0 = H
 
 #ifdef PROGRESSON
-    if(EXISTS)then
+    if(LATTEINEXISTS)then
       CALL GENXBML
     else
       CALL GENX

@@ -40,7 +40,7 @@ SUBROUTINE READCONTROLS
   ! CONTROL determines how the density matrix is going to be 
   ! calculated: 1 = diagonalization, 2 = SP2 purification,
   ! 3 = recursive expansion of the Fermi operator, 4 = SP2T,
-  ! 5 = SP2 Fermi
+  ! 5 = SP2 Fermi (truncated SP2)
   !
 
   READ(13,*) HD, CONTROL 

@@ -46,7 +46,7 @@ SUBROUTINE TBMD
   !
   ! Read MDcontroller to determine what kind of MD simulation to do
   !
-  IF (EXISTS) THEN
+  IF (LATTEINEXISTS) THEN
     CALL PARSE_MD("latte.in")
   ELSE
     CALL READMDCONTROLLER
