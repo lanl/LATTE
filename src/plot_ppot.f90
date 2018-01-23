@@ -65,9 +65,13 @@ SUBROUTINE PLOTPPOT
 
         MAGR = 0.7D0 + 4.3D0*REAL(II-1)/THOUSAND
 
+!        MAGR = MAGR - POTCOEF(6,PPSEL)
+
         MAGR2 = MAGR*MAGR
 
         IF (MAGR .LT. R1) THEN
+
+           MAGR = MAGR - POTCOEF(6,PPSEL)
            
 !           CALL DUNIVSCALE(MAGR, POTCOEF(:,PPSEL), DC, PHI, DPHI)
 
@@ -82,8 +86,10 @@ SUBROUTINE PLOTPPOT
            
            DPHI = -DC*PHI*DPOLYNOM           
            
-           EXPTMP = POTCOEF(6,PPSEL)*EXP(POTCOEF(7,PPSEL) * &
-                (MAGR - POTCOEF(8,PPSEL)))
+!           EXPTMP = POTCOEF(6,PPSEL)*EXP(POTCOEF(7,PPSEL) * &
+!                (MAGR - POTCOEF(8,PPSEL)))
+
+           EXPTMP = ZERO
 
            MYPAIRPOTS(II, PPSEL) = PHI + EXPTMP
 
