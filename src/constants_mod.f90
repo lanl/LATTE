@@ -80,7 +80,7 @@ MODULE CONSTANTS_MOD
 
   ! For the latte lib
   CHARACTER(LEN = 20) :: JOB
-  LOGICAL :: INITIALIZED = .false.
+  LOGICAL :: LIBINIT = .false.
   INTEGER :: LIBCALLS = 0
 
   !For the new input file parser

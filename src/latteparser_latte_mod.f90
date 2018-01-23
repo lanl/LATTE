@@ -161,7 +161,7 @@ contains
          1.0e-7,1000.0,0.2,1000.0,0.01,1.0/)
 
     character(len=50), parameter :: keyvector_log(nkey_log) = [character(len=100) :: &
-         'INITIALIZED=']
+         'LIBINIT=']
     logical :: valvector_log(nkey_log) = (/&
          .false./)
 

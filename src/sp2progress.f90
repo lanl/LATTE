@@ -45,7 +45,7 @@ MODULE SP2PROGRESS
   PUBLIC :: SP2PRG
 
 #ifdef PROGRESSON
-  LOGICAL, PUBLIC                           :: INITIALIZEDSP2 = .FALSE.!COUTER TO KEEP TRACK OF THE TIMES ZMAT IS COMPUTED.
+  LOGICAL, PUBLIC                           :: SP2INIT = .FALSE.!COUTER TO KEEP TRACK OF THE TIMES ZMAT IS COMPUTED.
   TYPE(BML_MATRIX_T)                        :: ORTHOH_BML, ORTHOX_BML
   TYPE(SP2DATA_TYPE), PUBLIC                :: SP2D
 #endif
@@ -62,9 +62,9 @@ CONTAINS
 
     !> Parsing sp2 input paramenters. this will read the variables in the input file.
     !  sp2 is the "SP2DATA_TYPE".
-    IF(.NOT.INITIALIZEDSP2)THEN
+    IF(.NOT.SP2INIT)THEN
        CALL PRG_PARSE_SP2(SP2D,"latte.in")
-       INITIALIZEDSP2 = .TRUE.
+       SP2INIT = .TRUE.
     ENDIF
 
     IF(SP2D%MDIM < 0)SP2D%MDIM = HDIM

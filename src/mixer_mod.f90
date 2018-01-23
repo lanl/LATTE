@@ -36,7 +36,7 @@ MODULE MIXER_MOD
 
   !For mixing scheme
   INTEGER, PUBLIC                      ::  PITER = 1
-  LOGICAL, PUBLIC                      ::  MIXINITIALIZED = .FALSE.
+  LOGICAL, PUBLIC                      ::  MIXINIT = .FALSE.
   REAL(LATTEPREC), ALLOCATABLE, PUBLIC  ::  DQIN(:,:), DQOUT(:,:)
   REAL(LATTEPREC), PUBLIC              ::  SCFERROR
   TYPE(MX_TYPE), PUBLIC                ::  MX
