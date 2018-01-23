@@ -80,9 +80,12 @@ echo -e "\nTesting LATTE with original input files \n"
 
    grep Energy out | sed -e s/"PAR"/$STRR/g  >  input_tmp.in
    python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.0000001
-
+ 
  done
 
 mv latte.in.tmp latte.in
+rm out 
+
+
 
 echo -e "\nEnd of run and test"

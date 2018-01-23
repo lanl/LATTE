@@ -24,6 +24,10 @@ module latteparser_latte_mod
   use openfiles_mod
   use kernelparser_mod
 
+#ifdef PROGRESSON
+  use bml
+#endif
+
   implicit none
 
   private
@@ -31,6 +35,84 @@ module latteparser_latte_mod
   integer, parameter :: dp = latteprec
 
   public :: parse_control, parse_md, parse_kmesh
+
+#ifdef PROGRESSON
+!> General latte input variables type.
+!!
+type, public :: latte_type
+
+  !> Name of the current job.
+  character(20) :: jobname
+
+  !> Verbosity level.
+  integer :: verbose
+
+  !> Threshold values for matrix elements.
+  real(dp) :: threshold
+
+  !> Max nonzero elements per row for every row see \cite Mniszewski2015 .
+  integer :: mdim
+
+  !> Matrix format (Dense or Ellpack).
+  character(20) :: bml_type
+
+  !> Distribution mode (sequential, distributed, or graph_distributed).
+  character(20) :: bml_dmode
+
+  !> Coulomb Accuracy.
+  real(dp) :: coul_acc
+
+  !> Pulay mixing coefficient.
+  real(dp) :: pulaycoeff
+
+  !> Linear mixing coefficient.
+  real(dp) :: mixcoeff
+
+  !> Coulomb Accuracy.
+  integer :: mpulay
+
+  !> Maximum SCF iterations.
+  integer :: maxscf
+
+  !> SCF tolerance.
+  real(dp) :: scftol
+
+  !> Z Matrix calculation type.
+  character(20) :: ZMat
+
+  !> Solver method
+  character(20) :: method
+
+  !> Estimated ration between real & k space time efficiency.
+  real(dp) :: timeratio
+
+  !> Total number of steps for MD simulation.
+  integer :: mdsteps
+
+  !> Total number of steps for MD simulation.
+  real(dp) :: timestep
+
+  !> Total number of steps for MD simulation.
+  character(100) :: parampath
+
+  !> File containing coordinates.
+  character(100) :: coordsfile
+
+  !> File containing coordinates.
+  integer :: nlisteach
+
+  !> Restart calculation.
+  logical :: restart
+
+  !> Restart calculation.
+  real(dp) :: efermi
+
+
+end type latte_type
+
+type(latte_type), public :: lt
+
+#endif
 
 contains
 
@@ -244,6 +326,27 @@ contains
     !
 
     SPARSEON = valvector_int(17); THRESHOLDON = valvector_int(18); NUMTHRESH = valvector_re(13)
+
+#ifdef PROGRESSON
+
+    if(SPARSEON == 0)then
+      lt%bml_type = bml_matrix_dense
+    elseif(SPARSEON == 1)then
+      lt%bml_type = bml_matrix_ellpack
+    else
+      STOP 'SPARSEON > 1 yet not implemented'
+    endif
+
+    if(THRESHOLDON == 0)then
+      lt%threshold = 0.0_dp
+    elseif(THRESHOLDON == 1)then
+      lt%threshold = NUMTHRESH
+    else
+      STOP 'THRESHOLDON > 1 yet not implemented'
+    endif
+
+#endif
+
     FILLINSTOP = valvector_int(19); BLKSZ = valvector_int(20)
 
     !
@@ -252,6 +355,18 @@ contains
     !
 
     MSPARSE = valvector_int(21)
+
+#ifdef PROGRESSON
+
+    if(MSPARSE == 0)then
+      lt%mdim = -1  !Defaults to N
+    elseif(MSPARSE > 0)then
+      lt%mdim = MSPARSE
+    else
+      STOP 'MSPARSE cannot be negative'
+    endif
+
+#endif
 
     !
     ! LCNON: 0 = during charge neutral MD simulations we'll run LCNITER SCF
