@@ -73,7 +73,7 @@ ifeq ($(CVR), ON)
 endif
 
 ifeq ($(PROGRESS), ON)
-	LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml
+	LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml_fortran -lbml
 	FFLAGS += -I$(BML_PATH)/../include -I$(PROGRESS_PATH)/../include
 endif
 

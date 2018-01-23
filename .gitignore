@@ -1,0 +1,17 @@
+*.o
+*.mod
+*.a
+*.out
+*.in
+*.dat
+*LATTE_*
+*.cfg
+*.xyz
+*mylastLATTEcalc
+*out
+*.lmp
+in.*
+*.tmp
+log.*
+log.*
+*.pdb

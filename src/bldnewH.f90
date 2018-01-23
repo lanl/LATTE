@@ -45,7 +45,7 @@ SUBROUTINE BLDNEWHS
   REAL(LATTEPREC) :: RIJ(3), MAGR2, MAGR, MAGRP, RCUTTB
   REAL(LATTEPREC) :: MAXRCUT, MAXRCUT2
   REAL(LATTEPREC) :: ANGFACTOR, AMMBRA, WIGLBRAMBRA
-!  REAL(LATTEPREC), ALLOCATABLE :: SAVEHDIAG(:)
+  !  REAL(LATTEPREC), ALLOCATABLE :: SAVEHDIAG(:)
   REAL(LATTEPREC), EXTERNAL :: UNIVSCALE, WIGNERD, SLMMP, TLMMP, AM, BM
 
 
@@ -53,130 +53,130 @@ SUBROUTINE BLDNEWHS
 
   IF (BASISTYPE .EQ. "NONORTHO") THEN
 
-     SMAT = ZERO     
+     SMAT = ZERO
      DO I = 1, HDIM
         SMAT(I,I) = ONE
      ENDDO
-     
+
   ENDIF
-  
+
   INDEX = 0
-  
+
   ! Build diagonal elements
   DO I = 1, NATS
-     
+
      K = ELEMPOINTER(I)
-     
-     SELECT CASE(BASIS(K)) 
-        
+
+     SELECT CASE(BASIS(K))
+
      CASE("s")
-        
-        INDEX = INDEX + 1           
+
+        INDEX = INDEX + 1
         H(INDEX, INDEX) = HES(K)
-        
+
      CASE("p")
-        
+
         DO SUBI = 1, 3
            INDEX = INDEX + 1
            H(INDEX,INDEX) = HEP(K)
         ENDDO
-        
+
      CASE("d")
-           
-        DO SUBI = 1, 5              
+
+        DO SUBI = 1, 5
            INDEX = INDEX + 1
            H(INDEX,INDEX) = HED(K)
         ENDDO
-        
+
      CASE("f")
-        
+
         DO SUBI = 1, 7
            INDEX = INDEX + 1
            H(INDEX,INDEX) = HEF(K)
         ENDDO
-        
+
      CASE("sp")
-        
+
         DO SUBI = 1, 4
-           
+
            INDEX = INDEX + 1
            IF (SUBI .EQ. 1) THEN
               H(INDEX,INDEX) = HES(K)
            ELSE
               H(INDEX,INDEX) = HEP(K)
            ENDIF
-           
+
         ENDDO
-        
+
      CASE("sd")
-        
+
         DO SUBI = 1, 6
-           
+
            INDEX = INDEX + 1
            IF (SUBI .EQ. 1) THEN
               H(INDEX,INDEX) = HES(K)
            ELSE
               H(INDEX,INDEX) = HED(K)
            ENDIF
-           
+
         ENDDO
-        
+
      CASE("sf")
-        
+
         DO SUBI = 1, 8
-           
+
            INDEX = INDEX + 1
            IF (SUBI .EQ. 1) THEN
               H(INDEX,INDEX) = HES(K)
            ELSE
               H(INDEX,INDEX) = HEF(K)
            ENDIF
-           
+
         ENDDO
-        
+
      CASE("pd")
-        
+
         DO SUBI = 1, 8
-           
+
            INDEX = INDEX + 1
            IF (SUBI .LE. 3) THEN
               H(INDEX,INDEX) = HEP(K)
            ELSE
               H(INDEX,INDEX) = HED(K)
            ENDIF
-           
+
         ENDDO
-        
+
      CASE("pf")
-        
+
         DO SUBI = 1, 10
-           
+
            INDEX = INDEX + 1
            IF (SUBI .LE. 3) THEN
               H(INDEX,INDEX) = HEP(K)
            ELSE
               H(INDEX,INDEX) = HEF(K)
            ENDIF
-           
+
         ENDDO
-        
+
      CASE("df")
-        
+
         DO SUBI = 1, 12
-           
+
            INDEX = INDEX + 1
            IF (SUBI .LE. 5) THEN
               H(INDEX,INDEX) = HED(K)
            ELSE
               H(INDEX,INDEX) = HEF(K)
            ENDIF
-           
+
         ENDDO
-        
+
      CASE("spd")
-        
+
         DO SUBI = 1, 9
-           
+
            INDEX = INDEX + 1
            IF (SUBI .EQ. 1) THEN
               H(INDEX,INDEX) = HES(K)
@@ -185,13 +185,13 @@ SUBROUTINE BLDNEWHS
            ELSE
               H(INDEX,INDEX) = HED(K)
            ENDIF
-           
+
         ENDDO
-        
+
      CASE("spf")
-        
+
         DO SUBI = 1, 11
-           
+
            INDEX = INDEX + 1
            IF (SUBI .EQ. 1) THEN
               H(INDEX,INDEX) = HES(K)
@@ -200,13 +200,13 @@ SUBROUTINE BLDNEWHS
            ELSE
               H(INDEX,INDEX) = HEF(K)
            ENDIF
-           
+
         ENDDO
-        
+
      CASE("sdf")
-        
+
         DO SUBI = 1, 13
-           
+
            INDEX = INDEX + 1
            IF (SUBI .EQ. 1) THEN
               H(INDEX,INDEX) = HES(K)
@@ -215,14 +215,14 @@ SUBROUTINE BLDNEWHS
            ELSE
               H(INDEX,INDEX) = HEF(K)
            ENDIF
-           
+
         ENDDO
-        
-        
+
+
      CASE("pdf")
-        
+
         DO SUBI = 1, 15
-           
+
            INDEX = INDEX + 1
            IF (SUBI .LE. 3) THEN
               H(INDEX,INDEX) = HEP(K)
@@ -231,15 +231,15 @@ SUBROUTINE BLDNEWHS
            ELSE
               H(INDEX,INDEX) = HEF(K)
            ENDIF
-           
+
         ENDDO
-        
-     CASE("spdf") 
-        
+
+     CASE("spdf")
+
         DO SUBI = 1, 16
-           
-           INDEX = INDEX + 1              
-           IF (SUBI .EQ. 1) THEN                       
+
+           INDEX = INDEX + 1
+           IF (SUBI .EQ. 1) THEN
               H(INDEX, INDEX) = HES(K)
            ELSEIF (SUBI .GT. 1 .AND. SUBI .LE. 4) THEN
               H(INDEX, INDEX) = HEP(K)
@@ -248,21 +248,21 @@ SUBROUTINE BLDNEWHS
            ELSE
               H(INDEX, INDEX) = HEF(K)
            ENDIF
-           
+
         ENDDO
-        
+
      END SELECT
-              
+
   ENDDO
-     
-!$OMP PARALLEL DO DEFAULT (NONE) &
-!$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &    
-!$OMP SHARED(CR, BOX, H, SMAT, NOINT, ATELE, ELE1, ELE2) &           
-!$OMP SHARED(BOND, OVERL, MATINDLIST, BASISTYPE) &
-!$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &
-!$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP, PHI, ALPHA, BETA, COSBETA) &
-!$OMP PRIVATE(LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET) &        
-!$OMP PRIVATE(RCUTTB, IBRA, IKET, AMMBRA, WIGLBRAMBRA, ANGFACTOR, MP)   
+
+  !$OMP PARALLEL DO DEFAULT (NONE) &
+  !$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &
+  !$OMP SHARED(CR, BOX, H, SMAT, NOINT, ATELE, ELE1, ELE2) &
+  !$OMP SHARED(BOND, OVERL, MATINDLIST, BASISTYPE) &
+  !$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &
+  !$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP, PHI, ALPHA, BETA, COSBETA) &
+  !$OMP PRIVATE(LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET) &
+  !$OMP PRIVATE(RCUTTB, IBRA, IKET, AMMBRA, WIGLBRAMBRA, ANGFACTOR, MP)
 
   ! open loop over atoms I in system
   DO I = 1, NATS
@@ -270,7 +270,7 @@ SUBROUTINE BLDNEWHS
      ! Build the lists of orbitals on each atom
 
      SELECT CASE(BASIS(ELEMPOINTER(I)))
-               
+
      CASE("s")
         BASISI(1) = 0
         BASISI(2) = -1
@@ -283,51 +283,51 @@ SUBROUTINE BLDNEWHS
      CASE("f")
         BASISI(1) = 3
         BASISI(2) = -1
-     CASE("sp") 
+     CASE("sp")
         BASISI(1) = 0
         BASISI(2) = 1
         BASISI(3) = -1
-     CASE("sd") 
+     CASE("sd")
         BASISI(1) = 0
         BASISI(2) = 2
         BASISI(3) = -1
-     CASE("sf") 
+     CASE("sf")
         BASISI(1) = 0
         BASISI(2) = 3
         BASISI(3) = -1
-     CASE("pd") 
+     CASE("pd")
         BASISI(1) = 1
         BASISI(2) = 2
         BASISI(3) = -1
-     CASE("pf") 
+     CASE("pf")
         BASISI(1) = 1
         BASISI(2) = 3
         BASISI(3) = -1
-     CASE("df") 
+     CASE("df")
         BASISI(1) = 2
         BASISI(2) = 3
         BASISI(3) = -1
-     CASE("spd") 
+     CASE("spd")
         BASISI(1) = 0
         BASISI(2) = 1
         BASISI(3) = 2
         BASISI(4) = -1
-     CASE("spf") 
+     CASE("spf")
         BASISI(1) = 0
         BASISI(2) = 1
         BASISI(3) = 3
         BASISI(4) = -1
-     CASE("sdf") 
+     CASE("sdf")
         BASISI(1) = 0
         BASISI(2) = 2
         BASISI(3) = 3
         BASISI(4) = -1
-     CASE("pdf") 
+     CASE("pdf")
         BASISI(1) = 1
         BASISI(2) = 2
         BASISI(3) = 3
         BASISI(4) = -1
-     CASE("spdf") 
+     CASE("spdf")
         BASISI(1) = 0
         BASISI(2) = 1
         BASISI(3) = 2
@@ -347,13 +347,13 @@ SUBROUTINE BLDNEWHS
            PBCI = NEBTB(2, NEWJ, I)
            PBCJ = NEBTB(3, NEWJ, I)
            PBCK = NEBTB(4, NEWJ, I)
-           
+
            RIJ(1) = CR(1,J) + REAL(PBCI)*BOX(1,1) + REAL(PBCJ)*BOX(2,1) + &
                 REAL(PBCK)*BOX(3,1) - CR(1,I)
-           
+
            RIJ(2) = CR(2,J) + REAL(PBCI)*BOX(1,2) + REAL(PBCJ)*BOX(2,2) + &
                 REAL(PBCK)*BOX(3,2) - CR(2,I)
-           
+
            RIJ(3) = CR(3,J) + REAL(PBCI)*BOX(1,3) + REAL(PBCJ)*BOX(2,3) + &
                 REAL(PBCK)*BOX(3,3) - CR(3,I)
 
@@ -361,26 +361,26 @@ SUBROUTINE BLDNEWHS
 
            RCUTTB = ZERO
            DO K = 1, NOINT
-              
+
               IF ( (ATELE(I) .EQ. ELE1(K) .AND. &
                    ATELE(J) .EQ. ELE2(K)) .OR. &
                    (ATELE(J) .EQ. ELE1(K) .AND. &
                    ATELE(I) .EQ. ELE2(K) )) THEN
-                 
+
                  IF (BOND(8,K) .GT. RCUTTB ) RCUTTB = BOND(8,K)
-                 
+
                  IF (BASISTYPE .EQ. "NONORTHO") THEN
                     IF (OVERL(8,K) .GT. RCUTTB ) RCUTTB = OVERL(8,K)
                  ENDIF
-                 
+
               ENDIF
-              
+
            ENDDO
-           
+
            IF (MAGR2 .LT. RCUTTB*RCUTTB) THEN
-              
+
               MAGR = SQRT(MAGR2)
-                            
+
               SELECT CASE(BASIS(ELEMPOINTER(J)))
               CASE("s")
                  BASISJ(1) = 0
@@ -394,65 +394,65 @@ SUBROUTINE BLDNEWHS
               CASE("f")
                  BASISJ(1) = 3
                  BASISJ(2) = -1
-              CASE("sp") 
+              CASE("sp")
                  BASISJ(1) = 0
                  BASISJ(2) = 1
                  BASISJ(3) = -1
-              CASE("sd") 
+              CASE("sd")
                  BASISJ(1) = 0
                  BASISJ(2) = 2
                  BASISJ(3) = -1
-              CASE("sf") 
+              CASE("sf")
                  BASISJ(1) = 0
                  BASISJ(2) = 3
                  BASISJ(3) = -1
-              CASE("pd") 
+              CASE("pd")
                  BASISJ(1) = 1
                  BASISJ(2) = 2
                  BASISJ(3) = -1
-              CASE("pf") 
+              CASE("pf")
                  BASISJ(1) = 1
                  BASISJ(2) = 3
                  BASISJ(3) = -1
-              CASE("df") 
+              CASE("df")
                  BASISJ(1) = 2
                  BASISJ(2) = 3
                  BASISJ(3) = -1
-              CASE("spd") 
+              CASE("spd")
                  BASISJ(1) = 0
                  BASISJ(2) = 1
                  BASISJ(3) = 2
                  BASISJ(4) = -1
-              CASE("spf") 
+              CASE("spf")
                  BASISJ(1) = 0
                  BASISJ(2) = 1
                  BASISJ(3) = 3
                  BASISJ(4) = -1
-              CASE("sdf") 
+              CASE("sdf")
                  BASISJ(1) = 0
                  BASISJ(2) = 2
                  BASISJ(3) = 3
                  BASISJ(4) = -1
-              CASE("pdf") 
+              CASE("pdf")
                  BASISJ(1) = 1
                  BASISJ(2) = 2
                  BASISJ(3) = 3
                  BASISJ(4) = -1
-              CASE("spdf") 
+              CASE("spdf")
                  BASISJ(1) = 0
                  BASISJ(2) = 1
                  BASISJ(3) = 2
                  BASISJ(4) = 3
                  BASISJ(5) = -1
               END SELECT
-              
+
               INDJ = MATINDLIST(J)
-              
+
               MAGRP = SQRT(RIJ(1) * RIJ(1) + RIJ(2) * RIJ(2))
-              
+
               ! transform to system in which z-axis is aligned with RIJ,
               IF (ABS(RIJ(1)) .GT. 1.0E-12) THEN
-                 
+
                  IF (RIJ(1) .GT. ZERO .AND. RIJ(2) .GE. ZERO) THEN
                     PHI = ZERO
                  ELSEIF (RIJ(1) .GT. ZERO .AND. RIJ(2) .LT. ZERO) THEN
@@ -461,130 +461,130 @@ SUBROUTINE BLDNEWHS
                     PHI = PI
                  ENDIF
                  ALPHA = ATAN(RIJ(2) / RIJ(1)) + PHI
-                 
+
               ELSEIF (ABS(RIJ(2)) .GT. 1.0E-12) THEN
-                 
+
                  IF (RIJ(2) .GT. 1.0E-12) THEN
                     ALPHA = PI / TWO
                  ELSE
                     ALPHA = THREE * PI / TWO
                  ENDIF
-                 
+
               ELSE
-                 ! pathological case: beta=0 and alpha undefined, but 
+                 ! pathological case: beta=0 and alpha undefined, but
                  ! this doesn't matter for matrix elements
-                 
+
                  ALPHA = ZERO
-                 
+
               ENDIF
-              
+
               COSBETA = RIJ(3)/MAGR
               BETA = ACOS(RIJ(3) / MAGR)
-              
+
               ! Build matrix elements using eqns (1)-(9) in PRB 72 165107
-              
+
               ! The loops over LBRA and LKET need to take into account
               ! the orbitals assigned to each atom, e.g., sd rather than
               ! spd...
-              
+
               IBRA = INDI + 1
-              
+
               LBRAINC = 1
               DO WHILE (BASISI(LBRAINC) .NE. -1)
-                 
+
                  LBRA = BASISI(LBRAINC)
                  LBRAINC = LBRAINC + 1
-                 
+
                  DO MBRA = -LBRA, LBRA
-                    
-                    ! We can calculate these two outside the 
+
+                    ! We can calculate these two outside the
                     ! MKET loop...
 
                     AMMBRA = AM(MBRA, ALPHA)
                     WIGLBRAMBRA = WIGNERD(LBRA, ABS(MBRA), 0, COSBETA)
 
                     IKET = INDJ + 1
-                    
+
                     LKETINC = 1
                     DO WHILE (BASISJ(LKETINC) .NE. -1)
-                       
+
                        LKET = BASISJ(LKETINC)
                        LKETINC = LKETINC + 1
-                       
+
                        DO MKET = -LKET, LKET
-                          
+
                           ! This is the sigma bonds (mp = 0)
-                          
+
                           ! Hamiltonian build
-                          
+
                           ! Pre-compute the angular part so we can use it
                           ! again later if we're building the S matrix too
-                          
+
                           ANGFACTOR = TWO * AMMBRA * &
                                AM(MKET, ALPHA) * &
-                               WIGLBRAMBRA  * & 
+                               WIGLBRAMBRA  * &
                                WIGNERD(LKET, ABS(MKET), 0, COSBETA)
-                          
-                          H(IBRA, IKET) = H(IBRA, IKET) + ANGFACTOR * & 
-!                          H(IKET, IBRA) = H(IKET, IBRA) + ANGFACTOR * & 
+
+                          H(IBRA, IKET) = H(IBRA, IKET) + ANGFACTOR * &
+                               !                          H(IKET, IBRA) = H(IKET, IBRA) + ANGFACTOR * &
                                UNIVSCALE(I, J, LBRA, LKET, 0, MAGR, "H")
-                          
+
                           ! Overlap matrix build
-                          
+
                           IF (BASISTYPE .EQ. "NONORTHO") THEN
-                             
+
                              SMAT(IBRA, IKET) = SMAT(IBRA, IKET) + ANGFACTOR * &
                                   UNIVSCALE(I, J, LBRA, LKET, 0, MAGR, "S")
-                             
+
                           ENDIF
-                          
+
                           ! everything else
-                          
+
                           DO MP = 1, MIN(LBRA, LKET)
-                             
+
                              ANGFACTOR = SLMMP(LBRA, MBRA, MP, ALPHA, COSBETA) * &
                                   SLMMP(LKET, MKET, MP, ALPHA, COSBETA) + &
                                   TLMMP(LBRA, MBRA, MP, ALPHA, COSBETA) * &
                                   TLMMP(LKET, MKET, MP, ALPHA, COSBETA)
-                             
+
                              H(IBRA, IKET) = H(IBRA, IKET) + ANGFACTOR * &
-                             !H(IKET, IBRA) = H(IKET, IBRA) + ANGFACTOR * & 
-                                  UNIVSCALE(I, J, LBRA, LKET, MP, MAGR, "H") 
-                             
+                                !H(IKET, IBRA) = H(IKET, IBRA) + ANGFACTOR * &
+                                  UNIVSCALE(I, J, LBRA, LKET, MP, MAGR, "H")
+
                              IF (BASISTYPE .EQ. "NONORTHO") THEN
-                                
+
                                 SMAT(IBRA, IKET) = SMAT(IBRA, IKET) + &
                                      ANGFACTOR * &
                                      UNIVSCALE(I, J, LBRA, LKET, MP, MAGR, "S")
-                                
+
                              ENDIF
-                             
+
                           ENDDO
-                          
+
                           H(IKET, IBRA) = H(IBRA, IKET)
                           !H(IBRA, IKET) = H(IKET, IBRA)
                           IF (BASISTYPE .EQ. "NONORTHO") &
                                SMAT(IKET, IBRA) = SMAT(IBRA, IKET)
-                          
+
                           IKET = IKET + 1
-                          
+
                        ENDDO
-                       
+
                     ENDDO
-                    
+
                     IBRA = IBRA + 1
-                    
+
                  ENDDO
               ENDDO
            ENDIF
         ENDIF
      ENDDO
-     
-!     INDI = INDI + NORBI
+
+     !     INDI = INDI + NORBI
 
   ENDDO
 
-!$OMP END PARALLEL DO
+  !$OMP END PARALLEL DO
 
   DO I = 1, HDIM
      HDIAG(I) = H(I,I)
@@ -594,39 +594,39 @@ SUBROUTINE BLDNEWHS
   IF (BASISTYPE .EQ. "NONORTHO") THEN
 
      H0 = H
-     
+
 #ifdef PROGRESSON
-     IF(EXISTS)THEN
-       CALL GENXBML
+     IF(LATTEINEXISTS)THEN
+        CALL GENXBML
      ELSE
-       CALL GENX     
+        CALL GENX
      ENDIF
 #else
      CALL GENX
 #endif
 
-     
+
      IF (DEBUGON .EQ. 1) THEN
-        
+
         OPEN(UNIT=30, STATUS="UNKNOWN", FILE="myS.dat")
         OPEN(UNIT=31, STATUS="UNKNOWN", FILE="myH0.dat")
-        
+
         PRINT*, "Caution - the Slater-Koster H and overlap matrices are being written to file"
-        
+
         DO I = 1, HDIM
            WRITE(30,10) (SMAT(I,J), J = 1, HDIM)
            WRITE(31,10) (H0(I,J), J = 1, HDIM)
         ENDDO
-        
+
         CLOSE(30)
         CLOSE(31)
 
-10      FORMAT(100F12.6) 
+10      FORMAT(100F12.6)
 
      ENDIF
 
   ENDIF
 
   RETURN
-  
+
 END SUBROUTINE BLDNEWHS

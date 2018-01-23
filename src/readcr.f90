@@ -93,6 +93,8 @@ SUBROUTINE READCR
   ENDIF
 
   ! Set up pointer to the data in TBparam/electrons.dat
+  ELEMPOINTER = 0
+
   DO I = 1, NATS
      DO J = 1, NOELEM
         IF (ATELE(I) .EQ. ELE(J)) ELEMPOINTER(I) = J
@@ -103,8 +105,9 @@ SUBROUTINE READCR
   ! density later
 
   SUMMASS = ZERO
+
   DO I = 1, NATS
-     SUMMASS = SUMMASS + MASS(ELEMPOINTER(I))
+    SUMMASS = SUMMASS + MASS(ELEMPOINTER(I))
   ENDDO
 
   ! Let's check whether we have only sp elements. If so, we can

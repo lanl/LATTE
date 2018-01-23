@@ -23,11 +23,16 @@ SUBROUTINE GETRHO(MDITER)
 
   USE CONSTANTS_MOD
 
+#ifdef PROGRESSON
+    USE SP2PROGRESS
+#endif
+
+
   IMPLICIT NONE
 
   INTEGER :: MDITER
 
-  ! This subroutine selects and calls the subroutines used to 
+  ! This subroutine selects and calls the subroutines used to
   ! compute the density matrix based on the value of CONTROL
 
   ! CONTROL = 1 : DIAGONALIZATION
@@ -36,7 +41,7 @@ SUBROUTINE GETRHO(MDITER)
   ! CONTROL = 4, 5 : EXPERIMENTAL FINITE T SP2
 
   IF (CONTROL .EQ. 1) THEN
-     
+
      CALL DIAGMYH()
 
      IF (SPINON .EQ. 0) THEN
@@ -45,63 +50,79 @@ SUBROUTINE GETRHO(MDITER)
         CALL SPINRHOEVECS
      ENDIF
 
-     
+
   ELSEIF (CONTROL .EQ. 2) THEN
-     
+
      IF  (SPARSEON .EQ. 0) THEN
-        
+
         CALL GERSHGORIN
-        
+
         CALL SP2PURE
 
-!        IF (MDITER .LE. 10) THEN
-!           CALL SP2GAP_SETUP
-!        ELSE
-!           CALL SP2GAP
-!        ENDIF
-       
+        !        IF (MDITER .LE. 10) THEN
+        !           CALL SP2GAP_SETUP
+        !        ELSE
+        !           CALL SP2GAP
+        !        ENDIF
+
      ELSEIF (SPARSEON .EQ. 1) THEN
-        
+
         !! CALL SP2PURE_SPARSE
 
-        IF (MDITER .LE. 10) THEN
-          CALL SP2PURE_SPARSE_PARALLEL(MDITER)
+#ifdef PROGRESSON
+
+        IF (LATTEINEXISTS) THEN  !SP2 from progress lib if latte.in exists
+           CALL SP2PRG
         ELSE
-          CALL SP2PURE_SPARSE_PARALLEL_SIMPLE(MDITER)
+           IF (MDITER .LE. 10) THEN
+              CALL SP2PURE_SPARSE_PARALLEL(MDITER)
+           ELSE
+              CALL SP2PURE_SPARSE_PARALLEL_SIMPLE(MDITER)
+           ENDIF
         ENDIF
- 
+
+#else
+
+        IF (MDITER .LE. 10) THEN
+           CALL SP2PURE_SPARSE_PARALLEL(MDITER)
+        ELSE
+           CALL SP2PURE_SPARSE_PARALLEL_SIMPLE(MDITER)
+        ENDIF
+
+#endif
+
      ELSEIF (SPARSEON .EQ. 2) THEN
 
         IF (MDITER .LE. 10) THEN
-          CALL SP2PURE_SPARSE_PARALLEL(MDITER)
+           CALL SP2PURE_SPARSE_PARALLEL(MDITER)
         ELSE
-          CALL SP2PURE_SUBGRAPH_PARALLEL(MDITER)
+           CALL SP2PURE_SUBGRAPH_PARALLEL(MDITER)
         ENDIF
 
      ENDIF
 
 
-!     ELSEIF (SPARSEON .EQ. 1) THEN
-        
-!        CALL SP2PURE_SPARSE
-!        CALL SP2PURE_SPARSE_PARALLEL(MDITER)
-!     ELSEIF (SPARSEON .EQ. 2) THEN
-!        CALL SP2PURE_SPARSE_PARALLEL(MDITER)
-!     ENDIF
-     
+     !     ELSEIF (SPARSEON .EQ. 1) THEN
+
+     !        CALL SP2PURE_SPARSE
+     !        CALL SP2PURE_SPARSE_PARALLEL(MDITER)
+     !     ELSEIF (SPARSEON .EQ. 2) THEN
+     !        CALL SP2PURE_SPARSE_PARALLEL(MDITER)
+     !     ENDIF
+
   ELSEIF (CONTROL .EQ. 3) THEN
-     
+
      CALL FERMIEXPANS
-     
+
   ELSEIF (CONTROL .EQ. 4) THEN
-     
+
      CALL GERSHGORIN
      CALL SP2T
-     
+
   ELSEIF (CONTROL .EQ. 5) THEN
-     
+
      CALL SP2FERMI
-     
+
   ENDIF
 
   RETURN
