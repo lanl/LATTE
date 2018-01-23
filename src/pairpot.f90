@@ -41,21 +41,6 @@ SUBROUTINE PAIRPOT
   REAL(LATTEPREC) :: PHI, DPHI(3), EXPTMP, R6, FTMP(3)
   REAL(LATTEPREC) :: POLYNOM, DPOLYNOM
 
-  ! 
-  ! In this subroutine we add contributions in a strange way to ensure
-  ! numerical accuracy when switching between single and double precision.
-  ! If we don't do this, we get errors associated with adding very small
-  ! numbers to very large ones, and energies can be off by 0.01% or more.
-  !
-
-  !
-  ! There are 4 different parts to the pair potential:
-  !
-  ! 1) Short range repulsion fitting to give bond lengths etc
-  ! 2) The joining function from JOINR1 TO JOINRCUT
-  ! 3) The vdW-type pair potential from JOINCUT to PPR1
-  ! 4) The final cut off tail from PPR1 TO PPRCUT
-  !
 
   UNIVPHI = ZERO
   CUTPHI = ZERO
@@ -109,13 +94,15 @@ SUBROUTINE PAIRPOT
            
            IF (MAGR2 .LE. RCUT2) THEN
               
-              MAGR = SQRT(MAGR2)
+              MAGR = SQRT(MAGR2) 
               
               ! Direction cosines
               
               DC = RIJ/MAGR
               
               IF (MAGR .LT. R1) THEN
+
+                 MAGR = MAGR - POTCOEF(6,PPSEL)
                  
 !                 CALL DUNIVSCALE(MAGR, POTCOEF(:,PPSEL), DC, PHI, DPHI)
 
@@ -131,10 +118,12 @@ SUBROUTINE PAIRPOT
                  DPHI = -DC*PHI*DPOLYNOM
 
 ! Hack!
-                 EXPTMP = POTCOEF(6,PPSEL)*&
-                      EXP( POTCOEF(7,PPSEL) * (MAGR - POTCOEF(8,PPSEL)) )
+!                 EXPTMP = POTCOEF(6,PPSEL)*&
+!                      EXP( POTCOEF(7,PPSEL) * (MAGR - POTCOEF(8,PPSEL)) )
 !                 R6 = MAGR2*MAGR2*MAGR2
-                 
+
+                 EXPTMP = ZERO
+
 !                 UNIVPHI = UNIVPHI + PHI + EXPTMP - POTCOEF(8,PPSEL)/R6
 
                  UNIVPHI = UNIVPHI + PHI + EXPTMP

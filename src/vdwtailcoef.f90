@@ -40,6 +40,12 @@ SUBROUTINE VDWTAILCOEF
 
   ! PHI = A0*EXP(A1*X + A2*X^2 + A3*X^3 + A4*X^4) + A5*EXP(A6*X) - C/X^6
 
+  ! Now lets' try this:
+
+  ! Phi A0*EXP(A1*(X - A5) + A2*(X - A5)^2 + A3*(X-A5)^3 + A4*(X-A5)^4)
+
+  
+
   !
   ! The cut-offs and joining functions look like this:
   !
@@ -51,7 +57,7 @@ SUBROUTINE VDWTAILCOEF
   
      ! Join first : need values for pair potential at R1
 
-     R1 = POTCOEF(9,PPID)
+     R1 = POTCOEF(9,PPID) - POTCOEF(6,PPID)
      RCUT = POTCOEF(10,PPID)
      R1SQ = R1*R1
 !     R6 = R1SQ * R1SQ * R1SQ
@@ -63,8 +69,10 @@ SUBROUTINE VDWTAILCOEF
      
      SCL_R1 = POTCOEF(1,PPID)*EXP(POLY)     
 
-     EXPTMP = POTCOEF(6,PPID)*EXP(POTCOEF(7,PPID)*(R1 - POTCOEF(8,PPID)))
-
+!     EXPTMP = POTCOEF(6,PPID)*EXP(POTCOEF(7,PPID)*(R1 - POTCOEF(8,PPID)))
+     
+     EXPTMP = ZERO
+     
      POTCOEF(11,PPID) = SCL_R1 + EXPTMP ! - POTCOEF(8,PPID)/R6
      
      DPOLY = POTCOEF(2,PPID) + TWO*POTCOEF(3,PPID)*R1 + &
@@ -85,6 +93,7 @@ SUBROUTINE VDWTAILCOEF
 
      ! At the end of the join function:
 
+     R1 = POTCOEF(9,PPID)
      DELTA = RCUT - R1
      DELTA2 = DELTA*DELTA
      DELTA3 = DELTA2*DELTA
