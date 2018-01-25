@@ -29,7 +29,7 @@ SUBROUTINE RHOZERO
   USE MYPRECISION
 
   IMPLICIT NONE
- 
+
   INTEGER :: I, K, SUBI, INDEX
   REAL(LATTEPREC) :: STOT, PTOT, NUMPERORB
   REAL(LATTEPREC) :: SUP, SDOWN, PUP, PDOWN, DUP, DDOWN, FUP, FDOWN
@@ -43,11 +43,11 @@ SUBROUTINE RHOZERO
     ! No spins
 
      ALLOCATE(BOZERO(HDIM))
-     
+
      BOZERO = ZERO
-     
+
      INDEX = 0
-     
+
      DO I = 1, NATS
 
         SELECT CASE(BASIS(ELEMPOINTER(I)))
@@ -58,7 +58,7 @@ SUBROUTINE RHOZERO
            INDEX = INDEX + 1
 
         CASE("p")
-           
+
            ! Distribute the electrons evenly between the orbitals
 
            NUMPERORB = ATOCC(ELEMPOINTER(I))/THREE
@@ -70,16 +70,16 @@ SUBROUTINE RHOZERO
 
 
         CASE("d")
-           
+
            NUMPERORB = ATOCC(ELEMPOINTER(I))/FIVE
            BOZERO(INDEX + 1) = NUMPERORB
            BOZERO(INDEX + 2) = NUMPERORB
            BOZERO(INDEX + 3) = NUMPERORB
            BOZERO(INDEX + 4) = NUMPERORB
            BOZERO(INDEX + 5) = NUMPERORB
-           
+
            INDEX = INDEX + 5
-  
+
         CASE("f")
 
            NUMPERORB = ATOCC(ELEMPOINTER(I))/SEVEN
@@ -92,7 +92,7 @@ SUBROUTINE RHOZERO
            BOZERO(INDEX + 7) = NUMPERORB
 
            INDEX = INDEX + 7
-           
+
         CASE("sp")
 
            ! First fill s, then p
@@ -102,7 +102,7 @@ SUBROUTINE RHOZERO
               BOZERO(INDEX + 1) = ATOCC(ELEMPOINTER(I))
 
               INDEX = INDEX + 1
-              
+
               BOZERO(INDEX + 1) = ZERO
               BOZERO(INDEX + 2) = ZERO
               BOZERO(INDEX + 3) = ZERO
@@ -110,19 +110,19 @@ SUBROUTINE RHOZERO
               INDEX = INDEX + 3
 
            ELSE
-              
+
               BOZERO(INDEX + 1) = TWO
 
               INDEX = INDEX + 1
-              
+
               NUMPERORB = (ATOCC(ELEMPOINTER(I)) - TWO)/THREE
-              
+
               BOZERO(INDEX + 1) = NUMPERORB
               BOZERO(INDEX + 2) = NUMPERORB
               BOZERO(INDEX + 3) = NUMPERORB
-              
+
               INDEX = INDEX + 3
-              
+
            ENDIF
 
         CASE("sd")
@@ -132,7 +132,7 @@ SUBROUTINE RHOZERO
            INDEX = INDEX + 1
 
            NUMPERORB = (ATOCC(ELEMPOINTER(I)) - TWO)/FIVE
-           
+
            BOZERO(INDEX + 1) = NUMPERORB
            BOZERO(INDEX + 2) = NUMPERORB
            BOZERO(INDEX + 3) = NUMPERORB
@@ -144,13 +144,13 @@ SUBROUTINE RHOZERO
         CASE("sf")
 
            ! Caution - f electron system!
-           
+
            BOZERO(INDEX + 1) = TWO
 
            INDEX = INDEX + 1
 
            NUMPERORB = (ATOCC(ELEMPOINTER(I)) - TWO)/SEVEN
-           
+
            BOZERO(INDEX + 1) = NUMPERORB
            BOZERO(INDEX + 2) = NUMPERORB
            BOZERO(INDEX + 3) = NUMPERORB
@@ -174,11 +174,11 @@ SUBROUTINE RHOZERO
            INDEX = INDEX + 3
 
            BOZERO(INDEX + 1) = TWO
-           BOZERO(INDEX + 2) = TWO 
+           BOZERO(INDEX + 2) = TWO
            BOZERO(INDEX + 3) = TWO
-           BOZERO(INDEX + 4) = TWO 
+           BOZERO(INDEX + 4) = TWO
            BOZERO(INDEX + 5) = TWO
-           
+
            INDEX = INDEX + 5
 
         CASE("pf")
@@ -194,18 +194,18 @@ SUBROUTINE RHOZERO
            INDEX = INDEX + 3
 
            BOZERO(INDEX + 1) = TWO
-           BOZERO(INDEX + 2) = TWO 
+           BOZERO(INDEX + 2) = TWO
            BOZERO(INDEX + 3) = TWO
-           BOZERO(INDEX + 4) = TWO 
+           BOZERO(INDEX + 4) = TWO
            BOZERO(INDEX + 5) = TWO
-           BOZERO(INDEX + 6) = TWO 
+           BOZERO(INDEX + 6) = TWO
            BOZERO(INDEX + 7) = TWO
-           
+
            INDEX = INDEX + 7
 
 
         CASE("df")
-           
+
            ! For the light actinides we have 1 in the d, and the rest in the f
            ! (except Th, where we have 2d's and zero f's)
 
@@ -228,7 +228,7 @@ SUBROUTINE RHOZERO
               BOZERO(INDEX + 5) = ZERO
               BOZERO(INDEX + 6) = ZERO
               BOZERO(INDEX + 7) = ZERO
-              
+
               INDEX = INDEX + 7
 
            ELSE
@@ -244,7 +244,7 @@ SUBROUTINE RHOZERO
               INDEX = INDEX + 5
 
               NUMPERORB = (ATOCC(ELEMPOINTER(I)) - ONE)/SEVEN
-              
+
               BOZERO(INDEX + 1) = NUMPERORB
               BOZERO(INDEX + 2) = NUMPERORB
               BOZERO(INDEX + 3) = NUMPERORB
@@ -252,7 +252,7 @@ SUBROUTINE RHOZERO
               BOZERO(INDEX + 5) = NUMPERORB
               BOZERO(INDEX + 6) = NUMPERORB
               BOZERO(INDEX + 7) = NUMPERORB
-              
+
               INDEX = INDEX + 7
 
            ENDIF
@@ -309,7 +309,7 @@ SUBROUTINE RHOZERO
               BOZERO(INDEX + 1) = TWO
 
               INDEX = INDEX + 1
-              
+
               NUMPERORB = (ATOCC(ELEMPOINTER(I)) - TWELVE)/THREE
 
               BOZERO(INDEX + 1) = NUMPERORB
@@ -384,7 +384,7 @@ SUBROUTINE RHOZERO
               BOZERO(INDEX + 1) = TWO
 
               INDEX = INDEX + 1
-              
+
               NUMPERORB = (ATOCC(ELEMPOINTER(I)) - SIXTEEN)/THREE
 
               BOZERO(INDEX + 1) = NUMPERORB
@@ -404,7 +404,7 @@ SUBROUTINE RHOZERO
               INDEX = INDEX + 7
 
            ENDIF
-            
+
         CASE("sdf")
 
            ! Let's build this for the light actinides
@@ -465,19 +465,18 @@ SUBROUTINE RHOZERO
               BOZERO(INDEX + 5) = NUMPERORB
               BOZERO(INDEX + 6) = NUMPERORB
               BOZERO(INDEX + 7) = NUMPERORB
-              
+
               INDEX = INDEX + 7
 
            ELSE
 
-              PRINT*, "Check the number of electrons you're using"
-              PRINT*, "with the sdf basis"
-              STOP
+              CALL ERRORS("rhozero","Check the number of electrons &
+              & you're using with the sdf basis")
 
            ENDIF
-                     
+
         CASE("pdf")
-           
+
            ! I suppose we fill the f, then the d, and finally the p
 
            IF (ATOCC(ELEMPOINTER(I)) .LE. FOURTEEN) THEN
@@ -491,7 +490,7 @@ SUBROUTINE RHOZERO
               BOZERO(INDEX + 5) = NUMPERORB
               BOZERO(INDEX + 6) = NUMPERORB
               BOZERO(INDEX + 7) = NUMPERORB
-              
+
               INDEX = INDEX + 7
 
               BOZERO(INDEX + 1) = ZERO
@@ -505,20 +504,20 @@ SUBROUTINE RHOZERO
               BOZERO(INDEX + 1) = ZERO
               BOZERO(INDEX + 2) = ZERO
               BOZERO(INDEX + 3) = ZERO
-              
+
               INDEX = INDEX + 3
 
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. FOURTEEN .AND. &
               ATOCC(ELEMPOINTER(I)) .LE. TWENTYFOUR) THEN
 
-              BOZERO(INDEX + 1) = TWO 
+              BOZERO(INDEX + 1) = TWO
               BOZERO(INDEX + 2) = TWO
               BOZERO(INDEX + 3) = TWO
               BOZERO(INDEX + 4) = TWO
               BOZERO(INDEX + 5) = TWO
               BOZERO(INDEX + 6) = TWO
               BOZERO(INDEX + 7) = TWO
-              
+
               INDEX = INDEX + 7
 
               NUMPERORB = (ATOCC(ELEMPOINTER(I)) - FOURTEEN)/FIVE
@@ -539,14 +538,14 @@ SUBROUTINE RHOZERO
 
            ELSE
 
-              BOZERO(INDEX + 1) = TWO 
+              BOZERO(INDEX + 1) = TWO
               BOZERO(INDEX + 2) = TWO
               BOZERO(INDEX + 3) = TWO
               BOZERO(INDEX + 4) = TWO
               BOZERO(INDEX + 5) = TWO
               BOZERO(INDEX + 6) = TWO
               BOZERO(INDEX + 7) = TWO
-              
+
               INDEX = INDEX + 7
 
               BOZERO(INDEX + 1) = TWO
@@ -567,8 +566,8 @@ SUBROUTINE RHOZERO
 
            ENDIF
 
-        CASE("spdf") 
-           
+        CASE("spdf")
+
            ! s, then f, then d, then p...
 
            IF (ATOCC(ELEMPOINTER(I)) .LE. TWO) THEN
@@ -584,7 +583,7 @@ SUBROUTINE RHOZERO
               BOZERO(INDEX + 5) = ZERO
               BOZERO(INDEX + 6) = ZERO
               BOZERO(INDEX + 7) = ZERO
-              
+
               INDEX = INDEX + 7
 
               BOZERO(INDEX + 1) = ZERO
@@ -592,7 +591,7 @@ SUBROUTINE RHOZERO
               BOZERO(INDEX + 3) = ZERO
               BOZERO(INDEX + 4) = ZERO
               BOZERO(INDEX + 5) = ZERO
-              
+
               INDEX = INDEX + 5
 
               BOZERO(INDEX + 1) = ZERO
@@ -615,7 +614,7 @@ SUBROUTINE RHOZERO
               BOZERO(INDEX + 5) = NUMPERORB
               BOZERO(INDEX + 6) = NUMPERORB
               BOZERO(INDEX + 7) = NUMPERORB
-              
+
               INDEX = INDEX + 7
 
               BOZERO(INDEX + 1) = ZERO
@@ -629,7 +628,7 @@ SUBROUTINE RHOZERO
               BOZERO(INDEX + 1) = ZERO
               BOZERO(INDEX + 2) = ZERO
               BOZERO(INDEX + 3) = ZERO
-              
+
               INDEX = INDEX + 3
 
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. SIXTEEN .AND. &
@@ -639,14 +638,14 @@ SUBROUTINE RHOZERO
 
               INDEX = INDEX + 1
 
-              BOZERO(INDEX + 1) = TWO 
+              BOZERO(INDEX + 1) = TWO
               BOZERO(INDEX + 2) = TWO
               BOZERO(INDEX + 3) = TWO
               BOZERO(INDEX + 4) = TWO
               BOZERO(INDEX + 5) = TWO
               BOZERO(INDEX + 6) = TWO
               BOZERO(INDEX + 7) = TWO
-              
+
               INDEX = INDEX + 7
 
               NUMPERORB = (ATOCC(ELEMPOINTER(I)) - SIXTEEN)/FIVE
@@ -662,23 +661,23 @@ SUBROUTINE RHOZERO
               BOZERO(INDEX + 1) = ZERO
               BOZERO(INDEX + 2) = ZERO
               BOZERO(INDEX + 3) = ZERO
-              
+
               INDEX = INDEX + 3
 
            ELSE
 
               BOZERO(INDEX + 1) = TWO
-              
+
               INDEX = INDEX + 1
 
-              BOZERO(INDEX + 1) = TWO 
+              BOZERO(INDEX + 1) = TWO
               BOZERO(INDEX + 2) = TWO
               BOZERO(INDEX + 3) = TWO
               BOZERO(INDEX + 4) = TWO
               BOZERO(INDEX + 5) = TWO
               BOZERO(INDEX + 6) = TWO
               BOZERO(INDEX + 7) = TWO
-              
+
               INDEX = INDEX + 7
 
               BOZERO(INDEX + 1) = TWO
@@ -700,49 +699,49 @@ SUBROUTINE RHOZERO
            ENDIF
 
         END SELECT
-              
+
      ENDDO
 
 
      IF (KON .EQ. 0) THEN ! Real-space
 
         IF (RESTART .EQ. 0) THEN
-           
+
            !
            ! Initialize the diagonal elements of BO to those for free atoms
            !
-           
+
            DO I = 1, HDIM
               BO(I,I) = BOZERO(I)
            ENDDO
-           
+
         ELSEIF (RESTART .EQ. 1) THEN
-           
+
            DO I = 1, HDIM
               BO(I,I) = TMPBODIAG(I)
            ENDDO
-           
+
            DEALLOCATE(TMPBODIAG)
-           
+
         ENDIF
-        
+
      ELSE ! k-space
 
         IF (RESTART .EQ. 0) THEN
-           
+
            !
            ! Initialize the diagonal elements of BO to those for free atoms
            !
-           
+
            DO K = 1, NKTOT
               DO I = 1, HDIM
                  KBO(I,I,K) = CMPLX(BOZERO(I))
               ENDDO
            ENDDO
 
-           
+
         ELSEIF (RESTART .EQ. 1) THEN
-           
+
            DO K = 1, NKTOT
               DO I = 1, HDIM
                  KBO(I,I,K) = CMPLX(TMPBODIAG(I))
@@ -750,12 +749,12 @@ SUBROUTINE RHOZERO
            ENDDO
 
            DEALLOCATE(TMPBODIAG)
-           
+
         ENDIF
 
      ENDIF
 
-       
+
   ELSEIF (SPINON .EQ. 1) THEN
 
      ! With spins
@@ -766,13 +765,13 @@ SUBROUTINE RHOZERO
      RHODOWNZERO = ZERO
 
      INDEX = 0
-     
+
      DO I = 1, NATS
 
         SELECT CASE(BASIS(ELEMPOINTER(I)))
 
         CASE("s")
-           
+
            IF (ATOCC(ELEMPOINTER(I)) .LE. SPINMAXS) THEN
 
               RHOUPZERO(INDEX+1) = ATOCC(ELEMPOINTER(I))
@@ -788,7 +787,7 @@ SUBROUTINE RHOZERO
               INDEX = INDEX + 1
 
            ENDIF
-           
+
         CASE("p")
 
            IF (ATOCC(ELEMPOINTER(I)) .LE. SPINMAXP) THEN
@@ -806,15 +805,15 @@ SUBROUTINE RHOZERO
            RHOUPZERO(INDEX + 1) = PUP
            RHOUPZERO(INDEX + 2) = PUP
            RHOUPZERO(INDEX + 3) = PUP
-           
+
            RHODOWNZERO(INDEX + 1) = PDOWN
            RHODOWNZERO(INDEX + 2) = PDOWN
            RHODOWNZERO(INDEX + 3) = PDOWN
-           
+
            INDEX = INDEX + 3
-              
+
         CASE("d")
-           
+
            IF (ATOCC(ELEMPOINTER(I)) .LE. SPINMAXD) THEN
 
               DUP = ATOCC(ELEMPOINTER(I))/SPINMAXD
@@ -826,26 +825,26 @@ SUBROUTINE RHOZERO
               DDOWN = (ATOCC(ELEMPOINTER(I)) - SPINMAXD)/SPINMAXD
 
            ENDIF
-           
+
            RHOUPZERO(INDEX + 1) = DUP
            RHOUPZERO(INDEX + 2) = DUP
            RHOUPZERO(INDEX + 3) = DUP
            RHOUPZERO(INDEX + 4) = DUP
            RHOUPZERO(INDEX + 5) = DUP
-           
-           
+
+
            RHODOWNZERO(INDEX + 1) = DDOWN
            RHODOWNZERO(INDEX + 2) = DDOWN
            RHODOWNZERO(INDEX + 3) = DDOWN
            RHODOWNZERO(INDEX + 4) = DDOWN
            RHODOWNZERO(INDEX + 5) = DDOWN
-           
+
            INDEX = INDEX + 5
-           
+
         CASE("f")
-           
+
            IF (ATOCC(ELEMPOINTER(I)) .LE. SPINMAXF) THEN
-              
+
               FUP = ATOCC(ELEMPOINTER(I))/SPINMAXF
               FDOWN = ZERO
 
@@ -856,7 +855,7 @@ SUBROUTINE RHOZERO
 
            ENDIF
 
-           
+
            RHOUPZERO(INDEX + 1) = FUP
            RHOUPZERO(INDEX + 2) = FUP
            RHOUPZERO(INDEX + 3) = FUP
@@ -864,7 +863,7 @@ SUBROUTINE RHOZERO
            RHOUPZERO(INDEX + 5) = FUP
            RHOUPZERO(INDEX + 6) = FUP
            RHOUPZERO(INDEX + 7) = FUP
-           
+
            RHODOWNZERO(INDEX + 1) = FDOWN
            RHODOWNZERO(INDEX + 2) = FDOWN
            RHODOWNZERO(INDEX + 3) = FDOWN
@@ -872,16 +871,16 @@ SUBROUTINE RHOZERO
            RHODOWNZERO(INDEX + 5) = FDOWN
            RHODOWNZERO(INDEX + 6) = FDOWN
            RHODOWNZERO(INDEX + 7) = FDOWN
-           
+
            INDEX = INDEX + 7
-           
+
         CASE("sp")
 
            IF (ATOCC(ELEMPOINTER(I)) .LE. SPINMAXS) THEN
 
               SUP = ATOCC(ELEMPOINTER(I))
               SDOWN = ZERO
-              PUP = ZERO 
+              PUP = ZERO
               PDOWN = ZERO
 
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. SPINMAXS .AND. &
@@ -894,14 +893,14 @@ SUBROUTINE RHOZERO
 
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXS .AND. &
                 ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXS + SPINMAXP) THEN
-              
+
 
               SUP = ONE
               SDOWN = ONE
               PUP = (ATOCC(ELEMPOINTER(I)) - TWO*SPINMAXS)/SPINMAXP
               PDOWN = ZERO
 
-           ELSE 
+           ELSE
 
               SUP = ONE
               SDOWN = ONE
@@ -920,7 +919,7 @@ SUBROUTINE RHOZERO
            RHODOWNZERO(INDEX + 2) = PDOWN
            RHODOWNZERO(INDEX + 3) = PDOWN
            RHODOWNZERO(INDEX + 4) = PDOWN
-           
+
            INDEX = INDEX + 4
 
         CASE("sd")
@@ -929,7 +928,7 @@ SUBROUTINE RHOZERO
 
               SUP = ATOCC(ELEMPOINTER(I))
               SDOWN = ZERO
-              DUP = ZERO 
+              DUP = ZERO
               DDOWN = ZERO
 
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. SPINMAXS .AND. &
@@ -942,14 +941,14 @@ SUBROUTINE RHOZERO
 
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXS .AND. &
                 ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXS + SPINMAXD) THEN
-              
+
 
               SUP = ONE
               SDOWN = ONE
               DUP = (ATOCC(ELEMPOINTER(I)) - TWO*SPINMAXS)/SPINMAXD
               DDOWN = ZERO
 
-           ELSE 
+           ELSE
 
               SUP = ONE
               SDOWN = ONE
@@ -975,14 +974,14 @@ SUBROUTINE RHOZERO
            RHODOWNZERO(INDEX + 6) = DDOWN
 
            INDEX = INDEX + 6
-           
+
         CASE("sf")
 
            IF (ATOCC(ELEMPOINTER(I)) .LE. SPINMAXS) THEN
 
               SUP = ATOCC(ELEMPOINTER(I))
               SDOWN = ZERO
-              FUP = ZERO 
+              FUP = ZERO
               FDOWN = ZERO
 
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. SPINMAXS .AND. &
@@ -995,14 +994,14 @@ SUBROUTINE RHOZERO
 
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXS .AND. &
                 ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXS + SPINMAXF) THEN
-              
+
 
               SUP = ONE
               SDOWN = ONE
               FUP = (ATOCC(ELEMPOINTER(I)) - TWO*SPINMAXS)/SPINMAXF
               FDOWN = ZERO
 
-           ELSE 
+           ELSE
 
               SUP = ONE
               SDOWN = ONE
@@ -1031,7 +1030,7 @@ SUBROUTINE RHOZERO
            RHODOWNZERO(INDEX + 8) = FDOWN
 
            INDEX = INDEX + 8
-            
+
         CASE("pd")
 
            ! We'll fill the d, then the p
@@ -1040,7 +1039,7 @@ SUBROUTINE RHOZERO
 
               DUP = ATOCC(ELEMPOINTER(I))/SPINMAXD
               DDOWN = ZERO
-              PUP = ZERO 
+              PUP = ZERO
               PDOWN = ZERO
 
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. SPINMAXD .AND. &
@@ -1053,14 +1052,14 @@ SUBROUTINE RHOZERO
 
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXD .AND. &
                 ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXD + SPINMAXP) THEN
-              
+
 
               DUP = ONE
               DDOWN = ONE
               PUP = (ATOCC(ELEMPOINTER(I)) - TWO*SPINMAXD)/SPINMAXP
               PDOWN = ZERO
 
-           ELSE 
+           ELSE
 
               DUP = ONE
               DDOWN = ONE
@@ -1098,7 +1097,7 @@ SUBROUTINE RHOZERO
 
               FUP = ATOCC(ELEMPOINTER(I))/SPINMAXF
               FDOWN = ZERO
-              PUP = ZERO 
+              PUP = ZERO
               PDOWN = ZERO
 
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. SPINMAXF .AND. &
@@ -1111,14 +1110,14 @@ SUBROUTINE RHOZERO
 
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXF .AND. &
                 ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXF + SPINMAXP) THEN
-              
+
 
               FUP = ONE
               FDOWN = ONE
               PUP = (ATOCC(ELEMPOINTER(I)) - TWO*SPINMAXF)/SPINMAXP
               PDOWN = ZERO
 
-           ELSE 
+           ELSE
 
               FUP = ONE
               FDOWN = ONE
@@ -1154,15 +1153,14 @@ SUBROUTINE RHOZERO
 
 
         CASE("df")
-           
+
            ! Let's imagine these are the light actinides
-           
+
            ! Thorium
-           
+
            IF (ATOCC(ELEMPOINTER(I)) .GT. FOUR) THEN
-              PRINT*, "The df basis is limited to 4 electrons (U) "
-              PRINT*, "at the moment. Modify the source to go beyond U"
-              STOP
+              CALL ERRORS("rhozero","The df basis is limited to 4 electrons (U)&
+              & at the moment. Modify the source to go beyond U")
            ENDIF
 
            IF (ATOCC(ELEMPOINTER(I)) .LE. TWO) THEN
@@ -1217,7 +1215,7 @@ SUBROUTINE RHOZERO
 
               SUP = ATOCC(ELEMPOINTER(I))
               SDOWN = ZERO
-              DUP = ZERO 
+              DUP = ZERO
               DDOWN = ZERO
               PUP = ZERO
               PDOWN = ZERO
@@ -1234,7 +1232,7 @@ SUBROUTINE RHOZERO
 
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXS .AND. &
                 ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXS + SPINMAXD) THEN
-              
+
 
               SUP = ONE
               SDOWN = ONE
@@ -1253,7 +1251,7 @@ SUBROUTINE RHOZERO
                    (TWO*SPINMAXS + SPINMAXD))/SPINMAXD
               PUP = ZERO
               PDOWN = ZERO
-              
+
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXS + TWO*SPINMAXD &
                 .AND. ATOCC(ELEMPOINTER(I)) .LE. &
                 TWO*SPINMAXS + TWO*SPINMAXD + SPINMAXP ) THEN
@@ -1299,8 +1297,8 @@ SUBROUTINE RHOZERO
            RHODOWNZERO(INDEX + 9) = DDOWN
 
            INDEX = INDEX + 9
-           
-         
+
+
         CASE("spf")
 
            ! s, then f, then p
@@ -1309,7 +1307,7 @@ SUBROUTINE RHOZERO
 
               SUP = ATOCC(ELEMPOINTER(I))
               SDOWN = ZERO
-              FUP = ZERO 
+              FUP = ZERO
               FDOWN = ZERO
               PUP = ZERO
               PDOWN = ZERO
@@ -1326,7 +1324,7 @@ SUBROUTINE RHOZERO
 
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXS .AND. &
                 ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXS + SPINMAXF) THEN
-              
+
 
               SUP = ONE
               SDOWN = ONE
@@ -1345,7 +1343,7 @@ SUBROUTINE RHOZERO
                    (TWO*SPINMAXS + SPINMAXF))/SPINMAXF
               PUP = ZERO
               PDOWN = ZERO
-              
+
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXS + TWO*SPINMAXF &
                 .AND. ATOCC(ELEMPOINTER(I)) .LE. &
                 TWO*SPINMAXS + TWO*SPINMAXF + SPINMAXP ) THEN
@@ -1406,7 +1404,7 @@ SUBROUTINE RHOZERO
 
               SUP = ATOCC(ELEMPOINTER(I))
               SDOWN = ZERO
-              FUP = ZERO 
+              FUP = ZERO
               FDOWN = ZERO
               DUP = ZERO
               DDOWN = ZERO
@@ -1435,7 +1433,7 @@ SUBROUTINE RHOZERO
 
               ! Having one electron in the 6d isn't working...
               ! Let's go with 4 in the 5 f instead
-              
+
 !              SUP = ONE
 !              SDOWN = ONE
 !              FUP = (ATOCC(ELEMPOINTER(I)) - ONE)/SPINMAXF
@@ -1449,7 +1447,7 @@ SUBROUTINE RHOZERO
               FDOWN = ZERO
               DUP = ZERO
               DDOWN = ZERO
-              
+
            ENDIF
 
            RHOUPZERO(INDEX + 1) = SUP
@@ -1479,18 +1477,18 @@ SUBROUTINE RHOZERO
            RHODOWNZERO(INDEX + 11) = FDOWN
            RHODOWNZERO(INDEX + 12) = FDOWN
            RHODOWNZERO(INDEX + 13) = FDOWN
-     
+
            INDEX = INDEX + 13
-                     
+
         CASE("pdf")
-           
+
            ! f, then d, then p
-           
+
            IF (ATOCC(ELEMPOINTER(I)) .LT. SPINMAXF) THEN
 
               FUP = ATOCC(ELEMPOINTER(I))/SPINMAXF
               FDOWN = ZERO
-              DUP = ZERO 
+              DUP = ZERO
               DDOWN = ZERO
               PUP = ZERO
               PDOWN = ZERO
@@ -1517,7 +1515,7 @@ SUBROUTINE RHOZERO
 
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXF + SPINMAXD .AND. &
                 ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXF + TWO*SPINMAXD) THEN
-              
+
               FUP = ONE
               FDOWN = ONE
               DUP = ONE
@@ -1530,7 +1528,7 @@ SUBROUTINE RHOZERO
                 TWO*SPINMAXF + TWO*SPINMAXD .AND. &
                 ATOCC(ELEMPOINTER(I)) .LE. &
                 TWO*SPINMAXF + TWO*SPINMAXD + SPINMAXP) THEN
-              
+
               FUP = ONE
               FDOWN = ONE
               DUP = ONE
@@ -1548,7 +1546,7 @@ SUBROUTINE RHOZERO
               PUP = ONE
               PDOWN = (ATOCC(ELEMPOINTER(I)) - &
                    (TWO*SPINMAXF + TWO*SPINMAXD + SPINMAXP))/SPINMAXP
-              
+
            ENDIF
 
            RHOUPZERO(INDEX + 1) = PUP
@@ -1584,9 +1582,9 @@ SUBROUTINE RHOZERO
            RHODOWNZERO(INDEX + 15) = FDOWN
 
            INDEX = INDEX + 15
-           
-        CASE("spdf") 
-           
+
+        CASE("spdf")
+
            ! s, f, d, then p
 
            IF (ATOCC(ELEMPOINTER(I)) .LE. SPINMAXS) THEN
@@ -1595,7 +1593,7 @@ SUBROUTINE RHOZERO
               SDOWN = ZERO
               FUP = ZERO
               FDOWN = ZERO
-              DUP = ZERO 
+              DUP = ZERO
               DDOWN = ZERO
               PUP = ZERO
               PDOWN = ZERO
@@ -1627,7 +1625,7 @@ SUBROUTINE RHOZERO
 
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXS + SPINMAXF .AND. &
                 ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXS + TWO*SPINMAXF) THEN
-              
+
               SUP = ONE
               SDOWN = ONE
               FUP = ONE
@@ -1642,7 +1640,7 @@ SUBROUTINE RHOZERO
                 TWO*SPINMAXS + TWO*SPINMAXF .AND. &
                 ATOCC(ELEMPOINTER(I)) .LE. &
                 TWO*SPINMAXS + TWO*SPINMAXF + SPINMAXD) THEN
-              
+
               SUP = ONE
               SDOWN = ONE
               FUP = ONE
@@ -1657,7 +1655,7 @@ SUBROUTINE RHOZERO
                 TWO*SPINMAXS + TWO*SPINMAXF + SPINMAXD.AND. &
                 ATOCC(ELEMPOINTER(I)) .LE.  &
                 TWO*SPINMAXS + TWO*SPINMAXF + TWO*SPINMAXD) THEN
-              
+
               SUP = ONE
               SDOWN = ONE
               FUP = ONE
@@ -1672,7 +1670,7 @@ SUBROUTINE RHOZERO
                 TWO*SPINMAXS + TWO*SPINMAXF + TWO*SPINMAXD .AND. &
                 ATOCC(ELEMPOINTER(I)) .LE.  &
                 TWO*SPINMAXS + TWO*SPINMAXF + TWO*SPINMAXD + SPINMAXP) THEN
-              
+
               SUP = ONE
               SDOWN = ONE
               FUP = ONE
@@ -1738,25 +1736,25 @@ SUBROUTINE RHOZERO
      ENDDO
 
      IF (RESTART .EQ. 0) THEN
-        
+
         !
         ! Let's initialize our self-consistent spin densities as those for
         ! free atoms
-        !            
-        
+        !
+
         DO I = 1, HDIM
-           
+
            RHOUP(I,I) = RHOUPZERO(I)
            RHODOWN(I,I) = RHODOWNZERO(I)
-           
+
         ENDDO
 
      ELSEIF (RESTART .EQ. 1) THEN
 
         DO I = 1, HDIM
-           
+
            RHOUP(I,I) = TMPRHOUP(I)
-           RHODOWN(I,I) = TMPRHODOWN(I) 
+           RHODOWN(I,I) = TMPRHODOWN(I)
 
         ENDDO
 
@@ -1770,7 +1768,7 @@ SUBROUTINE RHOZERO
 !     CALL GETSPINE
 !     print*, "c"
 !     ESPIN_ZERO = ESPIN
-     
+
   ENDIF
 
   RETURN

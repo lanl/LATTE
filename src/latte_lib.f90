@@ -81,6 +81,7 @@ CONTAINS
   !! \param VEL Velocities passed to latte.
   !! \param DT integration step passed to latte.
   !! \param VIRIALINOUT Components of the second virial coefficient
+  !! \param EXISTERROR Returns an error flag (.true.) to the hosting code.
   !!
   !! \brief This routine will be used load call latte_lib from a C/C++ program:
   !!
@@ -97,7 +98,7 @@ CONTAINS
   !! \brief Note: All units are LATTE units by default. See https://github.com/losalamos/LATTE/blob/master/Manual/LATTE_manual.pdf
   !!
   SUBROUTINE LATTE(NTYPES,TYPES,CR_IN,MASSES_IN,XLO,XHI,XY,XZ,YZ,FTOT_OUT, &
-       MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIALINOUT)
+       MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIALINOUT, EXISTERROR)
 
     IMPLICIT NONE
 
@@ -112,6 +113,7 @@ CONTAINS
     REAL(LATTEPREC), INTENT(OUT) :: FTOT_OUT(:,:), VENERG
     REAL(LATTEPREC), INTENT(OUT) :: VIRIALINOUT(6)
     INTEGER, INTENT(IN) ::  NTYPES, TYPES(:), MAXITER_IN
+    LOGICAL, INTENT(INOUT) :: EXISTERROR
 
 #ifdef PROGRESSON
     TYPE(SYSTEM_TYPE) :: SY
@@ -124,6 +126,8 @@ CONTAINS
     CALL MPI_COMM_RANK( MPI_COMM_WORLD, MYID, IERR )
     CALL MPI_COMM_SIZE( MPI_COMM_WORLD, NUMPROCS, IERR )
 #endif
+
+    LIBRUN = .true.
 
     !INITIALIZATION
     IF(.NOT. LIBINIT)THEN
@@ -523,7 +527,7 @@ CONTAINS
 
        CALL DEALLOCATEALL
 
-       STOP
+       RETURN
 
     ELSEIF (MDON .EQ. 1 .AND. RELAXME .EQ. 0 .AND. MAXITER_IN < 0 ) THEN
 
@@ -790,8 +794,7 @@ CONTAINS
 
     ELSE
 
-       WRITE(6,*) "You can't have RELAXME = 1 and MDON = 1"
-       STOP
+       CALL ERRORS("latte_lib","You can't have RELAXME = 1 and MDON = 1")
 
     ENDIF
 

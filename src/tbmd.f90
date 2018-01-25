@@ -137,13 +137,11 @@ SUBROUTINE TBMD
   ENDIF
 
   IF (GETHUG .EQ. 1 .AND. NVTON .NE. 0) THEN
-     PRINT*, "Don't have GETHUG = 1 and NVTON .NE. 0"
-     STOP
+     CALL ERRORS("tbmd","Please don't have GETHUG = 1 and NVTON .NE. 0")
   ENDIF
 
   IF (GETHUG .EQ. 1 .AND. NPTON .NE. 0) THEN
-     PRINT*, "Don't have GETHUG = 1 and NPTON .NE. 0"
-     STOP
+     CALL ERRORS("tbmd","Please don't have GETHUG = 1 and NPTON .NE. 0")
   ENDIF
 
   IF (NVTON .EQ. 1 .OR. NPTON .EQ. 1) THEN
@@ -381,8 +379,7 @@ SUBROUTINE TBMD
         IF (GETHUG .EQ. 1) CALL AVESFORHUG(PRESSURE, TOTE, TEMPERATURE, SYSVOL)
 
         IF (ABS(TOTE) .GT. 10000000000.0) THEN
-           WRITE(6,*) "# The calculation has diverged - check SCF parameters"
-           STOP
+           CALL ERRORS("tbmd","The calculation has diverged - check SCF parameters")
         ENDIF
 
 !        write(70,*) ITER, CR(1,1)

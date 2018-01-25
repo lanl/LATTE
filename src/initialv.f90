@@ -40,23 +40,23 @@ SUBROUTINE INITIALV
   IF ( RNDIST .EQ. "UNIFORM" ) THEN
 
      DO I = 1, NATS
-        
+
         MYMASS = MASS(ELEMPOINTER(I))
-        
+
         VELFACTOR = SQRT(ONE/MYMASS)
-        
+
         CALL RANDOM_NUMBER(RN)
-                
+
         V(1,I) = (TWO*RN(1) - ONE) * VELFACTOR
         V(2,I) = (TWO*RN(2) - ONE) * VELFACTOR
         V(3,I) = (TWO*RN(3) - ONE) * VELFACTOR
-        
+
         MOMENTUM(1) = MOMENTUM(1) + V(1,I)*MYMASS
         MOMENTUM(2) = MOMENTUM(2) + V(2,I)*MYMASS
         MOMENTUM(3) = MOMENTUM(3) + V(3,I)*MYMASS
-        
+
      ENDDO
-        
+
   ELSEIF ( RNDIST .EQ. "GAUSSIAN" ) THEN
 
      SETTH = 0
@@ -67,11 +67,11 @@ SUBROUTINE INITIALV
 
         MYMASS = MASS(ELEMPOINTER(I))
         STDDEV = SQRT(BOLTZ*TTARGET/(MYMASS*MVV2KE))
-        
+
         V(1,I) = GAUSSRN(ZERO, STDDEV)
         V(2,I) = GAUSSRN(ZERO, STDDEV)
         V(3,I) = GAUSSRN(ZERO, STDDEV)
-        
+
         MOMENTUM(1) = MOMENTUM(1) + V(1,I)*MYMASS
         MOMENTUM(2) = MOMENTUM(2) + V(2,I)*MYMASS
         MOMENTUM(3) = MOMENTUM(3) + V(3,I)*MYMASS
@@ -80,28 +80,27 @@ SUBROUTINE INITIALV
 
   ELSE
 
-     WRITE(6,*) "Choose either UNIFORM or GAUSSIAN for the", &
-          " random number distribution"
-     STOP
-     
+     CALL ERRORS("initialv","Choose either UNIFORM or GAUSSIAN for the &
+     & random number distribution")
+
   ENDIF
 
   MOMENTUM = MOMENTUM/SUMMASS
-  
+
   DO I = 1, NATS
-     
+
      V(1,I) = V(1,I) - MOMENTUM(1)
      V(2,I) = V(2,I) - MOMENTUM(2)
      V(3,I) = V(3,I) - MOMENTUM(3)
-     
+
   ENDDO
-  
+
   CALL GETKE
-  
+
   RESCALE = SQRT(TTARGET/TEMPERATURE)
-  
+
   V = RESCALE * V
-  
+
   RETURN
 
 END SUBROUTINE INITIALV

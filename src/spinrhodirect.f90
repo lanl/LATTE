@@ -45,7 +45,7 @@ SUBROUTINE SPINRHOEVECS
 
   RHOUP = ZERO
   RHODOWN = ZERO
-  
+
   ITER = 0
 
   OCCERROR = 100000000.0
@@ -55,40 +55,40 @@ SUBROUTINE SPINRHOEVECS
   !
 
   IF (KBT .GT. 0.000001) THEN
-     
-     DO WHILE ( ABS(OCCERROR) .GT. BREAKTOL .AND. ITER .LT. 100 ) 
-        
+
+     DO WHILE ( ABS(OCCERROR) .GT. BREAKTOL .AND. ITER .LT. 100 )
+
         ITER = ITER + 1
-        
+
         OCCUP = ZERO
         OCCDOWN = ZERO
         DFDIRAC = ZERO
-        
+
         DO I = 1, HDIM
-        
+
            FDIRACARG = (UPEVALS(I) - CHEMPOT)/KBT
-           
+
            FDIRACARG = MAX(FDIRACARG, -EXPTOL)
            FDIRACARG = MIN(FDIRACARG, EXPTOL)
-           
+
            EXPARG = EXP(FDIRACARG)
            FDIRAC = ONE/(ONE + EXPARG)
            OCCUP = OCCUP + FDIRAC
            DFDIRAC = DFDIRAC + EXPARG*FDIRAC*FDIRAC
-           
+
            FDIRACARG = (DOWNEVALS(I) - CHEMPOT)/KBT
 
            FDIRACARG = MAX(FDIRACARG, -EXPTOL)
            FDIRACARG = MIN(FDIRACARG, EXPTOL)
 
-           
+
            EXPARG = EXP(FDIRACARG)
            FDIRAC = ONE/(ONE + EXPARG)
            OCCDOWN = OCCDOWN + FDIRAC
            DFDIRAC = DFDIRAC + EXPARG*FDIRAC*FDIRAC
-           
+
         ENDDO
-        
+
         DFDIRAC = DFDIRAC/KBT
 
         OCCERROR = TOTNE - OCCUP - OCCDOWN
@@ -96,21 +96,21 @@ SUBROUTINE SPINRHOEVECS
         IF (ABS(DFDIRAC) .LT. NUMLIMIT) DFDIRAC = SIGN(NUMLIMIT, DFDIRAC)
 
         SHIFTCP = OCCERROR/DFDIRAC
-           
+
         IF (ABS(SHIFTCP) .GT. MAXSHIFT) SHIFTCP = SIGN(MAXSHIFT, SHIFTCP)
-        
+
         CHEMPOT = CHEMPOT + SHIFTCP
-       
+
      ENDDO
-     
+
      IF (ITER .GT. 100) THEN
-        WRITE(6,*) "Newton-Raphson scheme to find the chemical potential has not converged"
-        STOP
+        CALL ERRORS("spinrhodirect","Newton-Raphson scheme to find the &
+        & chemical potential has not converged")
      ENDIF
-     
-     
+
+
      ! Now we have the chemical potential we can build the density matrices
-     
+
      ! Entropy and HOMO-LUMO: only computed when we need them during MD
 
      S = ZERO
@@ -121,90 +121,90 @@ SUBROUTINE SPINRHOEVECS
         ! We will compute the HOMO-LUMO gap and the entropy in here too
 
         ! Starting guesses
-        
+
         HOMO = MIN(UPEVALS(1), DOWNEVALS(1))
         LUMO = MAX(UPEVALS(HDIM), DOWNEVALS(HDIM))
 
         DO I = 1, HDIM
-           
+
            ! Entropy
 
            FDIRACARG = (UPEVALS(I) - CHEMPOT)/KBT
 
            FDIRACARG = MAX(FDIRACARG, -EXPTOL)
            FDIRACARG = MIN(FDIRACARG, EXPTOL)
-          
+
            FDIRAC = ONE/(ONE + EXP(FDIRACARG))
-           
+
            OCCLOGOCC_ELECTRONS = FDIRAC * LOG(FDIRAC)
            OCCLOGOCC_HOLES = (ONE - FDIRAC) * LOG(ONE - FDIRAC)
-           
+
            S = S + OCCLOGOCC_ELECTRONS + OCCLOGOCC_HOLES
-           
+
            FDIRACARG = (DOWNEVALS(I) - CHEMPOT)/KBT
-           
+
            FDIRACARG = MAX(FDIRACARG, -EXPTOL)
            FDIRACARG = MIN(FDIRACARG, EXPTOL)
-           
+
            FDIRAC = ONE/(ONE + EXP(FDIRACARG))
-              
+
            OCCLOGOCC_ELECTRONS = FDIRAC * LOG(FDIRAC)
            OCCLOGOCC_HOLES = (ONE - FDIRAC) * LOG(ONE - FDIRAC)
-           
+
            S = S + OCCLOGOCC_ELECTRONS + OCCLOGOCC_HOLES
-           
+
            ! Homo-Lumo
 
            IF (UPEVALS(I) .LT. CHEMPOT .AND. &
                 UPEVALS(I) .GT. HOMO) HOMO = UPEVALS(I)
            IF (DOWNEVALS(I) .LT. CHEMPOT .AND. &
                 DOWNEVALS(I) .GT. HOMO) HOMO = DOWNEVALS(I)
-           
+
            ! LUMO = smallest eigenvalue > chemical potential
-           
+
            IF (UPEVALS(I) .GT. CHEMPOT .AND. &
                 UPEVALS(I) .LT. LUMO) LUMO = UPEVALS(I)
            IF (DOWNEVALS(I) .GT. CHEMPOT .AND. &
                 DOWNEVALS(I) .LT. LUMO) LUMO = DOWNEVALS(I)
-           
-           
+
+
         ENDDO
 
         EGAP = LUMO - HOMO
-        
+
      ENDIF
 
      ENTE = -KBT*S
-     
+
      ! Building density matrices
 
      DO I = 1, HDIM
-              
+
         FDIRACARG = (UPEVALS(I) - CHEMPOT)/KBT
-           
+
         FDIRACARG = MAX(FDIRACARG, -EXPTOL)
         FDIRACARG = MIN(FDIRACARG, EXPTOL)
-        
+
         FDIRAC = ONE/(ONE + EXP(FDIRACARG))
-           
+
         CALL DGER(HDIM, HDIM, FDIRAC, UPEVECS(:,I), 1, UPEVECS(:,I), 1, RHOUP, HDIM)
-           
+
         FDIRACARG = (DOWNEVALS(I) - CHEMPOT)/KBT
 
         FDIRACARG = MAX(FDIRACARG, -EXPTOL)
         FDIRACARG = MIN(FDIRACARG, EXPTOL)
-           
+
         FDIRAC = ONE/(ONE + EXP(FDIRACARG))
-        
+
         CALL DGER(HDIM, HDIM, FDIRAC, DOWNEVECS(:,I), 1, DOWNEVECS(:,I), 1, RHODOWN, HDIM)
-           
+
      ENDDO
 
   ELSE  ! For zero electronic temperature
 
      ! Occupy the lowest eigenvalues
 
-     ! See whether we occupy spin up or down first 
+     ! See whether we occupy spin up or down first
 
      IF (UPEVALS(1) .LT. DOWNEVALS(1)) THEN
         UPNE = 1
@@ -216,12 +216,12 @@ SUBROUTINE SPINRHOEVECS
         CHEMPOT = DOWNEVALS(1)
      ENDIF
 
-     ! Go through the eigenvalues and occupy if                                 
-     ! 1) its energy >= the previous occupied eigenvalue                        
-     ! 2) its energy <= the energy of the unoccupied eigenvalue from the other  
-     ! spin channel                                                             
+     ! Go through the eigenvalues and occupy if
+     ! 1) its energy >= the previous occupied eigenvalue
+     ! 2) its energy <= the energy of the unoccupied eigenvalue from the other
+     ! spin channel
 
-     ! Stop when the total number of electrons reaches the target               
+     ! Stop when the total number of electrons reaches the target
      ! Works with O and O2.
 
      BREAKLOOP = 0
@@ -242,20 +242,20 @@ SUBROUTINE SPINRHOEVECS
            DOWNNE = DOWNNE + 1
            CHEMPOT = DOWNEVALS(DOWNNE)
         ENDIF
-        
+
         IF ( UPNE + DOWNNE .EQ. TOTNE ) BREAKLOOP = 1
 
 !        print*, UPNE, DOWNNE
 
      ENDDO
 
-     ! Here HOMO = CHEMPOT, so the energy of the 
+     ! Here HOMO = CHEMPOT, so the energy of the
      ! LUMO = min(upevals(upne + 1), downevals(downne + 1)
 
      LUMO = MIN(UPEVALS(UPNE + 1), DOWNEVALS(DOWNNE + 1))
 
      EGAP = LUMO - CHEMPOT
-     
+
      DO I = 1, UPNE
 
         CALL DGER(HDIM, HDIM, ONE, UPEVECS(:,I), 1, UPEVECS(:,I), 1, RHOUP, HDIM)
@@ -263,13 +263,13 @@ SUBROUTINE SPINRHOEVECS
      ENDDO
 
      DO I = 1, DOWNNE
-        
+
         CALL DGER(HDIM, HDIM, ONE, DOWNEVECS(:,I), 1, DOWNEVECS(:,I), 1, RHODOWN, HDIM)
 
      ENDDO
 
   ENDIF
-  
+
   RETURN
-  
+
 END SUBROUTINE SPINRHOEVECS

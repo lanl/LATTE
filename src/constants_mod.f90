@@ -82,6 +82,8 @@ MODULE CONSTANTS_MOD
   CHARACTER(LEN = 20) :: JOB
   LOGICAL :: LIBINIT = .false.
   INTEGER :: LIBCALLS = 0
+  LOGICAL :: EXISTERROR = .false.
+  LOGICAL :: LIBRUN = .false.
 
   !For the new input file parser
   LOGICAL :: LATTEINEXISTS

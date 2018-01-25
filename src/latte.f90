@@ -390,8 +390,7 @@ PROGRAM LATTE
 
   ELSE
 
-     WRITE(6,*) "You can't have RELAXME = 1 and MDON = 1"
-     STOP
+     CALL ERRORS("latte","You can't have RELAXME = 1 and MDON = 1")
 
   ENDIF
 

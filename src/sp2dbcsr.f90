@@ -23,7 +23,7 @@ SUBROUTINE SP2DBCSR
 
   !
   ! This subroutine implements Niklasson's SP2 density matrix purification
-  ! algorithm. 
+  ! algorithm.
   !
 
   USE CONSTANTS_MOD
@@ -44,8 +44,8 @@ SUBROUTINE SP2DBCSR
   REAL(LATTEPREC) :: IDEMPERR, TRXOLD
   REAL(LATTEPREC) :: IDEMPERR1, IDEMPERR2
   REAL(LATTEPREC), PARAMETER :: IDEMTOL = 1.0D-14
-	 
- 
+
+
   IDEMPERR = ZERO
   IDEMPERR1 = ZERO
   IDEMPERR2 = ZERO
@@ -59,11 +59,11 @@ SUBROUTINE SP2DBCSR
   ! Using intrinsics is probably better than coding this ourselves
 
      IF (BASISTYPE .EQ. "ORTHO") THEN
-        BO = -H/MAXMINUSMIN	 
+        BO = -H/MAXMINUSMIN
      ELSE
         BO = -ORTHOH/MAXMINUSMIN
      ENDIF
- 
+
      GERSHFACT =  MAXEVAL/MAXMINUSMIN
 
      TRX = ZERO
@@ -74,69 +74,68 @@ SUBROUTINE SP2DBCSR
 	TRX = TRX + BO(I,I)
 
      ENDDO
-     
+
      ITER = 0
-     
+
      BREAKLOOP = 0
 
      DO WHILE ( BREAKLOOP .EQ. 0 .AND. ITER .LT. 100 )
-        
+
         ITER = ITER + 1
-        
+
         X2 = BO
-        
+
         CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, MINUSONE, &
              BO, HDIM, BO, HDIM, ONE, X2, HDIM)
 
-        
+
         TRX2 = ZERO
-        
+
         DO I = 1, HDIM
            TRX2 = TRX2 + X2(I,I)
         ENDDO
-        
+
 
 	LIMDIFF = ABS(TRX - TRX2 - OCC) - ABS(TRX + TRX2 - OCC)
 
-        IF ( LIMDIFF .GE. IDEMTOL ) THEN    
+        IF ( LIMDIFF .GE. IDEMTOL ) THEN
 
 
            BO = BO + X2
-           
+
            TRX = TRX + TRX2
-           
-        ELSEIF ( LIMDIFF .LT. -IDEMTOL ) THEN 
-           
+
+        ELSEIF ( LIMDIFF .LT. -IDEMTOL ) THEN
+
            BO = BO - X2
-           
+
            TRX = TRX - TRX2
-           
+
         ENDIF
-        
+
 	IDEMPERR2 = IDEMPERR1
 	IDEMPERR1 = IDEMPERR
         IDEMPERR = ABS(TRX2)
-        
+
 !        PRINT*, ITER, IDEMPERR, ABS(TRX - OCC)
 !	WRITE(*,10) ITER, IDEMPERR, IDEMPERR2 - IDEMPERR
-	10 FORMAT(I4, 2G30.18)        
+	10 FORMAT(I4, 2G30.18)
  	IF (SP2CONV .EQ. "REL" .AND. ITER .GE. MINSP2ITER &
            .AND. (IDEMPERR2 .LE. IDEMPERR .OR. &
 	   IDEMPERR .LT. IDEMTOL)) BREAKLOOP = 1
 
 !	IF (ITER .EQ. 30) BREAKLOOP=1
         IF (SP2CONV .EQ. "ABS" .AND. ABS(LIMDIFF) .LT. IDEMTOL) BREAKLOOP = 1
-        
+
      ENDDO
-     
+
      IF (ITER .EQ. 100) THEN
-        WRITE(6,*) "SP2 purification is not converging: STOP!"
         CALL PANIC
-        STOP
+        CALL ERRORS("sp2dbcsr","SP2 purification is not converging: STOP!")
      ENDIF
-     
+
      BO = TWO*BO
-     
+
 
   RETURN
 

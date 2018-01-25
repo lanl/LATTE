@@ -39,6 +39,8 @@
 !! \param VENERG This is the potential Energy that is given back from latte to the hosting code.
 !! \param VEL Velocities passed to latte.
 !! \param DT integration step passed to latte.
+!! \param VIRIALINOUT Components of the second virial coefficient
+!! \param EXISTERROR Returns an error flag (.true.) to the hosting code.
 !!
 !! \brief This routine will be used load call latte_lib from a C/C++ program:
 !!
@@ -59,7 +61,7 @@ SUBROUTINE LATTE_C_BIND (FLAGS,NATS,COORDS,TYPES,NTYPES,MASSES,XLO &
      ,XHI,XY,XZ,YZ,FORCES,MAXITER,VENERG, &
      VEL,DT,VIRIALINOUT) BIND (C, NAME="latte")
 
-  USE ISO_C_BINDING, ONLY: C_CHAR, C_NULL_CHAR, C_DOUBLE, C_INT
+  USE ISO_C_BINDING, ONLY: C_CHAR, C_NULL_CHAR, C_DOUBLE, C_INT, C_BOOL
   USE LATTE_LIB
 
   IMPLICIT NONE
@@ -72,10 +74,13 @@ SUBROUTINE LATTE_C_BIND (FLAGS,NATS,COORDS,TYPES,NTYPES,MASSES,XLO &
   REAL(C_DOUBLE), INTENT(INOUT)  ::  FORCES(3, NATS), VEL(3, NATS)
   REAL(C_DOUBLE), INTENT(INOUT)  ::  VIRIALINOUT(6)
   INTEGER                        ::  I
-
+  LOGICAL                        ::  EXISTERROR
+  EXISTERROR = .false.
   CALL LATTE(NTYPES,TYPES,COORDS,MASSES,XLO,XHI,XY,XZ,YZ,FORCES, &
-       MAXITER, VENERG, VEL, DT, VIRIALINOUT)
+       MAXITER, VENERG, VEL, DT, VIRIALINOUT, EXISTERROR)
 
+   write(*,*)"EXISTERROR",EXISTERROR
+   STOP
   RETURN
 
 END SUBROUTINE LATTE_C_BIND

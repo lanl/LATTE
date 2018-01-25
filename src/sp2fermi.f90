@@ -25,7 +25,7 @@ SUBROUTINE SP2FERMI
   ! This is an implementation of Niklasson's SP2 algorithm for the
   ! Fermi operator (i.e., finite temperature SP2)
   !
-  ! GERSHGORIN and SP2FERMIINIT must be run first to initialize 
+  ! GERSHGORIN and SP2FERMIINIT must be run first to initialize
   !
 
   USE CONSTANTS_MOD
@@ -58,7 +58,7 @@ SUBROUTINE SP2FERMI
   ITER = 0
 
   BREAKLOOP = 0
-  
+
   PREVERROR = ZERO
   PREVERROR2 = ZERO
   PREVERROR3 = ZERO
@@ -67,12 +67,12 @@ SUBROUTINE SP2FERMI
 
      OCC = BNDFIL*FLOAT(HDIM)
 
-     DO WHILE (BREAKLOOP .EQ. 0 .AND. ITER .LT. 50) 
+     DO WHILE (BREAKLOOP .EQ. 0 .AND. ITER .LT. 50)
 
         ITER = ITER + 1
 
         BO = -H/MAXMINUSMIN
-        
+
         GERSHFACT = (MAXEVAL - CHEMPOT)/MAXMINUSMIN
 
         DO I = 1, HDIM
@@ -81,7 +81,7 @@ SUBROUTINE SP2FERMI
 
         ENDDO
 
- 
+
         DO II = 1, NORECS
 
            X2 = BO
@@ -109,20 +109,20 @@ SUBROUTINE SP2FERMI
            ENDIF
 
         ENDDO
-        
+
         TRX = ZERO
         TRX2 = ZERO
 
         !
         ! Now we're getting TrX1 where X1 = beta0*(X-X^2)
-        ! 
+        !
 
         DO I = 1, HDIM
 
            TRX = TRX + BO(I,I)
 
            DO J = 1, HDIM
- 
+
               TRX2 = TRX2 + BO(J,I)*BO(J,I)
 
            ENDDO
@@ -136,18 +136,18 @@ SUBROUTINE SP2FERMI
 	!PRINT*, TRX, TRX2
 
         LAMBDA = (OCC - TRX)/(BETA0*TRXOMX)
-          
+
         !
         ! New CHEMPOT
         !
 
         IF (ABS(LAMBDA) .GT. MAXSHIFT) LAMBDA = SIGN(MAXSHIFT, LAMBDA)
-        
+
         CHEMPOT = CHEMPOT + LAMBDA
 
         PREVERROR3 = PREVERROR2
         PREVERROR2 = PREVERROR
-        PREVERROR = OCCERROR  
+        PREVERROR = OCCERROR
         OCCERROR = ABS(OCC - TRX)
 
 #ifdef DOUBLEPREC
@@ -171,8 +171,7 @@ SUBROUTINE SP2FERMI
         ENDDO
 
         IF (ITER .EQ. 100) THEN
-           WRITE(6,*) "SP2FERMI is not converging: STOP!"
-           STOP
+           CALL ERRORS("sp2fermi","SP2FERMI is not converging: STOP!")
         ENDIF
 
      !
@@ -184,8 +183,8 @@ SUBROUTINE SP2FERMI
 
         ! Update occupancy
 
-        ! bo = 2 x ( bo + lambda*(beta0*(bo * (I - bo)))) <- we put this into 
-        ! GEMM-form 
+        ! bo = 2 x ( bo + lambda*(beta0*(bo * (I - bo)))) <- we put this into
+        ! GEMM-form
 
         GEMM_ALPHA = -TWO*LAMBDA*BETA0
         GEMM_BETA = TWO*(ONE + LAMBDA*BETA0)
@@ -199,64 +198,63 @@ SUBROUTINE SP2FERMI
               CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, GEMM_ALPHA, &
                    X2, HDIM, X2, HDIM, GEMM_BETA, BO, HDIM)
 #endif
-        
+
   ELSEIF (SPINON .EQ. 1) THEN
 
-     DO WHILE ( BREAKLOOP .EQ. 0 ) 
+     DO WHILE ( BREAKLOOP .EQ. 0 )
 
         ITER = ITER  + 1
 
         IF (ITER .EQ. 50) THEN
-           WRITE(6,*) "SP2FERMI is not converging: STOP"
-           STOP
+           CALL ERRORS("sp2fermi","SP2FERMI is not converging: STOP")
         ENDIF
 
         DO I = 1, HDIM
            DO J = I, HDIM
-              
+
               IF (I .EQ. J) THEN
-                 
+
                  RHOUP(I,I) = (MAXEVAL - HUP(I,I) - CHEMPOT)/MAXMINUSMIN
-                 
+
                  RHODOWN(I,I) = (MAXEVAL - HDOWN(I,I) - CHEMPOT) / &
                       MAXMINUSMIN
-                 
+
               ELSE
-                 
+
                  RHOUP(J,I) = (ZERO - HUP(J,I))/MAXMINUSMIN
                  RHOUP(I,J) = RHOUP(J,I)
-                 
+
                  RHODOWN(J,I) = (ZERO - HDOWN(J,I))/MAXMINUSMIN
                  RHODOWN(I,J) = RHODOWN(J,I)
-                 
+
               ENDIF
-              
+
            ENDDO
         ENDDO
-        
+
 
         DO II = 1, NORECS
 
            !
            ! X*X
            !
-           
+
 #ifdef DOUBLEPREC
-              
+
               CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
                    RHOUP, HDIM, RHOUP, HDIM, 0.0D0, X2UP, HDIM)
               CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
                    RHODOWN, HDIM, RHODOWN, HDIM, 0.0D0, X2DOWN, HDIM)
-              
+
 #elif defined(SINGLEPREC)
-              
+
               CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
                    RHOUP, HDIM, RHOUP, HDIM, 0.0, X2UP, HDIM)
               CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
                    RHODOWN, HDIM, RHODOWN, HDIM, 0.0, X2DOWN, HDIM)
-              
+
 #endif
-     
+
            RHOUP = RHOUP + SIGNLIST(II)*(RHOUP - X2UP)
            RHODOWN = RHODOWN + SIGNLIST(II)*(RHODOWN - X2DOWN)
 
@@ -267,13 +265,13 @@ SUBROUTINE SP2FERMI
 
         !
         ! Now we're getting TrX1 where X1 = beta0*(X-X^2)
-        ! 
+        !
 
         DO I = 1, HDIM
            DO J = I, HDIM
-              
+
               IF (I .EQ. J) THEN
-                 
+
                  TRX1 = TRX1 + RHOUP(I,I)*(ONE - RHOUP(I,I)) + &
                       RHODOWN(I,I)*(ONE - RHODOWN(I,I))
 
@@ -283,7 +281,7 @@ SUBROUTINE SP2FERMI
                       RHODOWN(J,I)*RHODOWN(J,I))
 
               ENDIF
-                 
+
            ENDDO
 
            TRX = TRX + RHOUP(I,I) + RHODOWN(I,I)
@@ -301,7 +299,7 @@ SUBROUTINE SP2FERMI
         IF (ABS(LAMBDA) .GT. MAXSHIFT) THEN
            LAMBDA = SIGN(MAXSHIFT, LAMBDA)
         ENDIF
-        
+
         CHEMPOT = CHEMPOT + LAMBDA
 
         PREVERROR3 = PREVERROR2
@@ -341,13 +339,11 @@ SUBROUTINE SP2FERMI
 #endif
 
   RETURN
-  
+
 END SUBROUTINE SP2FERMI
 
 
 !  NEWBETA = (TRXPLUS - TRXMINUS)/(TWO*DELTA*TRXOMX)
 
 !  PRINT*, "SP2FERMI: BETA = ", NEWBETA
-!  PRINT*, "SP2FERMI: KBT = ", ONE/NEWBETA  
-
-
+!  PRINT*, "SP2FERMI: KBT = ", ONE/NEWBETA

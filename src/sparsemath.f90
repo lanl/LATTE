@@ -82,7 +82,7 @@ SUBROUTINE SPARSEX2(TTRX, TTRX2, II, JJ, VAL, II2, JJ2, VAL2)
     ! Check if over number of non-zeroes limit
     IF (L > MSPARSE) THEN
       WRITE(6,*) "ERROR: Number of non-zeroes per row =",L,"> MSPARSE, Increase MSPARSE."
-      STOP
+      CALL ERRORS("sparsemath","Number of non-zeroes per row > MSPARSE")
     ENDIF
 
     LL = 0

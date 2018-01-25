@@ -23,7 +23,7 @@ SUBROUTINE ATOMCHARGE(SWITCH)
 
   USE CONSTANTS_MOD
   USE SETUPARRAY
-  USE MYPRECISION 
+  USE MYPRECISION
 
   IMPLICIT NONE
 
@@ -39,7 +39,7 @@ SUBROUTINE ATOMCHARGE(SWITCH)
   ALLOCATE(DELTAQ(NATS), PREVDQ(NATS), CPROP(NATS))
 
   CPROP = 0.25D0
-  
+
   RIGHTFACT = 1.1D0
   WRONGFACT = 0.45D0
 
@@ -48,12 +48,12 @@ SUBROUTINE ATOMCHARGE(SWITCH)
   PREVMYINDEX = 0
   ALLOK = 0
 
-  ! 
+  !
   ! If we're applying full local charge neutrality, we need to run the
-  ! whole caboodle until the DO WHILE loop is satisfied (ie, all atoms 
+  ! whole caboodle until the DO WHILE loop is satisfied (ie, all atoms
   ! possess a number of electrons to within CHTOL
   !
-  ! On the other hand, running one or two iterations of this should be 
+  ! On the other hand, running one or two iterations of this should be
   ! good enough for an MD simulation when using XBO - we just need an
   ! infinitessimal improvement to ensure stability
   !
@@ -67,9 +67,9 @@ SUBROUTINE ATOMCHARGE(SWITCH)
      DO I = 1, NATS
 
         ATCHG = ZERO
-        
+
         DO J = 1, NOELEM
-           
+
            IF (ATELE(I) .EQ. ELE(J)) THEN
               CORRCHG = ATOCC(J)
               IF (BASIS(J) .EQ. "sp") THEN
@@ -78,40 +78,40 @@ SUBROUTINE ATOMCHARGE(SWITCH)
                  MYINDEX = MYINDEX + 1
               ENDIF
            ENDIF
-           
+
         ENDDO
-        
+
         DO J = PREVMYINDEX+1, MYINDEX
            ATCHG = ATCHG + BO(J,J)
         ENDDO
-        
+
         PREVMYINDEX = MYINDEX
-        
+
         DELTAQ(I) = ATCHG - CORRCHG
-        
+
         IF (ABS(DELTAQ(I)) .GT. CHTOL) THEN
            ALLOK = ALLOK + 1
         ENDIF
-        
+
      ENDDO
-     
+
      ITER = 0
      NEWBUILD = 0
 !     SCFS_II = 0
-     
+
      DO WHILE (ALLOK .NE. 0)
-        
+
         ITER = ITER + 1
-        
+
         SCFS_II = SCFS_II + 1
-        
+
         MYINDEX = 0
         PREVMYINDEX = 0
-        
+
         DO I = 1, NATS
-           
+
            IF (ITER .GT. 1) THEN
-              
+
               IF (ABS(DELTAQ(I)) .LT. ABS(PREVDQ(I))) THEN
 
               ! Going in the right direction, so go further
@@ -124,12 +124,12 @@ SUBROUTINE ATOMCHARGE(SWITCH)
 
               ENDIF
            ENDIF
-           
+
            CPROP(I) = MIN(CPROP(I), CPROPMAX)
            CPROP(I) = MAX(CPROP(I), CPROPMIN)
-           
+
            DELTAHII = DELTAQ(I)*CPROP(I)
-           
+
            DO J = 1, NOELEM
               IF (ATELE(I) .EQ. ELE(J)) THEN
                  IF (BASIS(J) .EQ. "sp") THEN
@@ -139,28 +139,26 @@ SUBROUTINE ATOMCHARGE(SWITCH)
                  ENDIF
               ENDIF
            ENDDO
-           
+
            DO J = PREVMYINDEX + 1, MYINDEX
               H(J,J) = H(J,J) + DELTAHII
            ENDDO
-           
-           PREVMYINDEX = MYINDEX
-           
-        ENDDO
-        
-        IF (ITER .EQ. 100 ) THEN
 
-           WRITE(6,*) "LCN not converging: STOP!"
+           PREVMYINDEX = MYINDEX
+
+        ENDDO
+
+        IF (ITER .EQ. 100 ) THEN
 
            DO I = 1, NATS
               WRITE(6,99) I, DELTAQ(I), ATELE(I), CPROP(I)
            ENDDO
 99         FORMAT(I6,1X,F18.9,1X,A2,1X, F12.8)
-           
-           STOP
+
+           CALL ERRORS("atomcharge","LCN not converging: STOP!")
 
         ENDIF
-           
+
         IF (CONTROL .EQ. 1) THEN
 
            CALL DIAGMYH()
@@ -173,12 +171,12 @@ SUBROUTINE ATOMCHARGE(SWITCH)
            IF (SPARSEON .EQ. 0) THEN
               CALL SP2PURE
            ELSEIF (SPARSEON .EQ. 1) THEN
-              
+
               CALL SP2PURE_SPARSE
 
            ENDIF
 
-        ELSEIF (CONTROL .EQ. 3) THEN 
+        ELSEIF (CONTROL .EQ. 3) THEN
 !           IF (SPARSEON .EQ. 0) THEN
               CALL FERMIEXPANS
 !           ELSEIF (SPARSEON .EQ. 1) THEN
@@ -189,20 +187,20 @@ SUBROUTINE ATOMCHARGE(SWITCH)
 !              CALL FERMIEXPANSSPARSE
 !           ENDIF
         ENDIF
-        
+
         ALLOK = 0
-        
+
         MYINDEX = 0
         PREVMYINDEX = 0
-        
+
         PREVDQ = DELTAQ
-        
+
         DO I = 1, NATS
-           
+
            ATCHG = ZERO
-           
+
            DO J = 1, NOELEM
-              
+
               IF (ATELE(I) .EQ. ELE(J)) THEN
                  CORRCHG = ATOCC(J)
                  IF (BASIS(J) .EQ. "sp") THEN
@@ -211,28 +209,28 @@ SUBROUTINE ATOMCHARGE(SWITCH)
                     MYINDEX = MYINDEX + 1
                  ENDIF
               ENDIF
-              
+
            ENDDO
-           
+
            DO J = PREVMYINDEX+1, MYINDEX
               ATCHG = ATCHG + BO(J,J)
            ENDDO
-           
+
            PREVMYINDEX = MYINDEX
-           
+
            DELTAQ(I) = ATCHG - CORRCHG
-           
+
            IF (ABS(DELTAQ(I)) .GT. CHTOL) THEN
               ALLOK = ALLOK + 1
            ENDIF
-           
+
         ENDDO
-        
+
      ENDDO
 
-     ! LCNON = 0: we're doing just some specified number of 
+     ! LCNON = 0: we're doing just some specified number of
      ! iterations (= LCNITER)
-     
+
   ELSEIF (LCNON .EQ. 0 .AND. SWITCH .NE. 0) THEN
 
      DO II = 1, LCNITER
@@ -241,13 +239,13 @@ SUBROUTINE ATOMCHARGE(SWITCH)
         PREVMYINDEX = 0
 
         SCFS_II = SCFS_II + 1
-        
+
         DO I = 1, NATS
-           
+
            ATCHG = ZERO
-           
+
            DO J = 1, NOELEM
-              
+
               IF (ATELE(I) .EQ. ELE(J)) THEN
                  CORRCHG = ATOCC(J)
                  IF (BASIS(J) .EQ. "sp") THEN
@@ -256,13 +254,13 @@ SUBROUTINE ATOMCHARGE(SWITCH)
                     MYINDEX = MYINDEX + 1
                  ENDIF
               ENDIF
-              
+
            ENDDO
-           
+
            DO J = PREVMYINDEX+1, MYINDEX
               ATCHG = ATCHG + BO(J,J)
            ENDDO
-           
+
            !
            ! Note that this factor of 0.25 is an empirical
            ! value that the user is free to adjust. I should probably
@@ -270,13 +268,13 @@ SUBROUTINE ATOMCHARGE(SWITCH)
            !
 
            DELTAHII = QUARTER*(ATCHG - CORRCHG)
-           
+
            DO J = PREVMYINDEX+1, MYINDEX
               H(J,J) = H(J,J) + DELTAHII
            ENDDO
-           
+
            PREVMYINDEX = MYINDEX
-           
+
         ENDDO
 
         IF ( II .LT. LCNITER ) THEN
@@ -285,19 +283,19 @@ SUBROUTINE ATOMCHARGE(SWITCH)
 
               CALL DIAGMYH()
               CALL BOEVECS()
-              
+
            ELSEIF (CONTROL .EQ. 2) THEN
-              
+
               CALL GERSHGORIN
-              
+
               IF (SPARSEON .EQ. 0) THEN
                  CALL SP2PURE
               ELSEIF (SPARSEON .EQ. 1) THEN
-                 
+
                  CALL SP2PURE_SPARSE
               ENDIF
-              
-           ELSEIF (CONTROL .EQ. 3) THEN 
+
+           ELSEIF (CONTROL .EQ. 3) THEN
 !              IF (SPARSEON .EQ. 0) THEN
                  CALL FERMIEXPANS
 !              ELSEIF (SPARSEON .EQ. 1) THEN
@@ -308,13 +306,13 @@ SUBROUTINE ATOMCHARGE(SWITCH)
 !                 CALL FERMIEXPANSSPARSE
 !              ENDIF
            ENDIF
-           
+
         ENDIF
 
      ENDDO
 
-  ENDIF         
-  
+  ENDIF
+
   DEALLOCATE(DELTAQ, PREVDQ, CPROP)
 
   RETURN

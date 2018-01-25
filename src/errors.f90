@@ -19,43 +19,37 @@
 ! Public License for more details.                                         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-!> To implement mixing schemes from the progress library
+!> Soubroutine to handle errors.
+!! \brief This will decide what to do if the program has to stop for some
+!! reason. It will either stop the program or send an error flag up.
+!! \param SUB Subroutine where the program would stop.
+!! \param TAG Error message to be passed.
 !!
-MODULE MIXER_MOD
+SUBROUTINE ERRORS(SUB,TAG)
+  USE CONSTANTS_MOD, ONLY: LIBRUN, EXISTERROR
+  USE TIMER_MOD, ONLY: TIMEDATE_TAG
+  CHARACTER(*), INTENT(IN) :: SUB,TAG
 
-#ifdef PROGRESSON
+  WRITE(*,*)"LIBRUN",LIBRUN
+  IF(LIBRUN)THEN
+    WRITE(*,*) "# *************ERROR**************"
+    WRITE(*,*) "# LATTE stop due to the following error at subroutine ",SUB,":"
+    WRITE(*,*) "# ",TAG
+    CALL TIMEDATE_TAG("The error occurred at: ")
+    WRITE(*,*) "# The error will be reported back to the host code"
+    WRITE(*,*) "# ********************************"
+    EXISTERROR = .true.
+    RETURN
+    STOP
+  ELSE
+    WRITE(*,*) ""
+    WRITE(*,*) "# *************ERROR**************"
+    WRITE(*,*) "# LATTE stopped due to the following error at subroutine ",SUB,":"
+    WRITE(*,*) "# ",TAG
+    CALL TIMEDATE_TAG("The error occurred at: ")
+    WRITE(*,*) "# ********************************"
+    WRITE(*,*) ""
+    STOP
+  ENDIF
 
-  USE MYPRECISION
-  USE COULOMBARRAY
-  USE SETUPARRAY
-  USE PRG_PULAYMIXER_MOD
-
-  PRIVATE
-
-  PUBLIC :: QMIXPRG
-
-  !For mixing scheme
-  INTEGER, PUBLIC                      ::  PITER = 1
-  LOGICAL, PUBLIC                      ::  MIXINIT = .FALSE.
-  REAL(LATTEPREC), ALLOCATABLE, PUBLIC  ::  DQIN(:,:), DQOUT(:,:)
-  REAL(LATTEPREC), PUBLIC              ::  SCFERROR
-  TYPE(MX_TYPE), PUBLIC                ::  MX
-
-CONTAINS
-
-  SUBROUTINE QMIXPRG
-
-    IF(MX%MIXERTYPE == "Linear")THEN
-       CALL PRG_LINEARMIXER(DELTAQ,OLDDELTAQS,SCFERROR,MX%MIXCOEFF,MX%VERBOSE)
-    ELSEIF(MX%MIXERTYPE == "Pulay")THEN
-       CALL PRG_QMIXER(DELTAQ,OLDDELTAQS,DQIN,DQOUT,SCFERROR,PITER,MX%MIXCOEFF,MX%MPULAY,MX%VERBOSE)
-    ELSE
-       CALL ERRORS("mixer_mod:qmixprg","Mixing scheme not implemented. &
-       & Check MixerType keyword in the input file")
-    ENDIF
-
-  END SUBROUTINE QMIXPRG
-
-#endif
-
-END MODULE MIXER_MOD
+END SUBROUTINE ERRORS

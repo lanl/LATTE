@@ -31,7 +31,7 @@ SUBROUTINE KFCOULNONO
   USE VIRIALARRAY
   USE KSPACEARRAY
   USE MYPRECISION
-  
+
   IMPLICIT NONE
 
   INTEGER :: I, J, K, L, M, N, KK, INDI, INDJ
@@ -51,11 +51,10 @@ SUBROUTINE KFCOULNONO
   COMPLEX(LATTEPREC) :: FTMP(3), RHO, CONJGBLOCH
   LOGICAL PATH
 
-  ! These were allocated elsewhere. We'll use them to accumulate the complex forces                                      
+  ! These were allocated elsewhere. We'll use them to accumulate the complex forces
 
   IF (SPINON .EQ. 1) THEN
-     WRITE(6,*) "Non-ortho k-space and spin polarization not yet implemented"
-     STOP
+     CALL ERRORS("kfcoulnono","Non-ortho k-space and spin polarization not yet implemented")
   ENDIF
 
   KF = CMPLX(ZERO)
@@ -90,23 +89,23 @@ SUBROUTINE KFCOULNONO
        PI*(ONE - REAL(NKZ))/(REAL(NKZ))*B3 - PI*KSHIFT
 
 
-!$OMP PARALLEL DO DEFAULT (NONE) &                                              
-!$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &                      
-!$OMP SHARED(CR, BOX, KBO, RHOUP, RHODOWN, SPINON, NOINT, ATELE, ELE1, ELE2) &   
-!$OMP SHARED(BOND, OVERL, MATINDLIST, BASISTYPE) &                              
+!$OMP PARALLEL DO DEFAULT (NONE) &
+!$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &
+!$OMP SHARED(CR, BOX, KBO, RHOUP, RHODOWN, SPINON, NOINT, ATELE, ELE1, ELE2) &
+!$OMP SHARED(BOND, OVERL, MATINDLIST, BASISTYPE) &
 !$OMP SHARED(HUBBARDU, DELTAQ, COULOMBV) &
 !$OMP SHARED(K0, B1, B2, B3, NKX, NKY, NKZ, KF) &
-!$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &    
+!$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &
 !$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP2, MAGRP, PATH, PHI, ALPHA, BETA, COSBETA, FTMP) &
-!$OMP PRIVATE(DC, LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET, RHO) &           
+!$OMP PRIVATE(DC, LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET, RHO) &
 !$OMP PRIVATE(MYDFDA, MYDFDB, MYDFDR, RCUTTB, CONJGBLOCH, KDOTL) &
 !$OMP PRIVATE(KPOINT, KCOUNT) &
-!$OMP REDUCTION(+: VIRBONDK)                                 
+!$OMP REDUCTION(+: VIRBONDK)
 
 
   DO I = 1, NATS
 
-     ! Build list of orbitals on atom I                                           
+     ! Build list of orbitals on atom I
      SELECT CASE(BASIS(ELEMPOINTER(I)))
 
      CASE("s")
@@ -215,7 +214,7 @@ SUBROUTINE KFCOULNONO
 
            MAGR = SQRT(MAGR2)
 
-           ! Build list of orbitals on atom J                                     
+           ! Build list of orbitals on atom J
 
            SELECT CASE(BASIS(ELEMPOINTER(J)))
            CASE("s")
@@ -281,13 +280,13 @@ SUBROUTINE KFCOULNONO
               BASISJ(4) = 3
               BASISJ(5) = -1
            END SELECT
-           
+
            INDJ = MATINDLIST(J)
 
            MAGRP2 = RIJ(1)*RIJ(1) + RIJ(2)*RIJ(2)
            MAGRP = SQRT(MAGRP2)
-           
-           ! transform to system in which z-axis is aligned with RIJ              
+
+           ! transform to system in which z-axis is aligned with RIJ
 
            PATH = .FALSE.
            IF (ABS(RIJ(1)) .GT. 1E-12) THEN
@@ -306,7 +305,7 @@ SUBROUTINE KFCOULNONO
                  ALPHA = THREE * PI / TWO
               ENDIF
            ELSE
-              ! pathological case: pole in alpha at beta=0                        
+              ! pathological case: pole in alpha at beta=0
               PATH = .TRUE.
            ENDIF
 
@@ -315,9 +314,9 @@ SUBROUTINE KFCOULNONO
 
            DC = RIJ/MAGR
 
-           ! build forces using PRB 72 165107 eq. (12) - the sign of the          
-           ! dfda contribution seems to be wrong, but gives the right             
-           ! answer(?)                                                            
+           ! build forces using PRB 72 165107 eq. (12) - the sign of the
+           ! dfda contribution seems to be wrong, but gives the right
+           ! answer(?)
 
            FTMP = ZERO
            K = INDI
@@ -352,7 +351,7 @@ SUBROUTINE KFCOULNONO
 
                        IF (.NOT. PATH) THEN
 
-                          ! Unroll loops and pre-compute                          
+                          ! Unroll loops and pre-compute
 
                           MYDFDA = DFDA(I, J, LBRA, LKET, MBRA, &
                                MKET, MAGR, ALPHA, COSBETA, "S")
@@ -364,19 +363,19 @@ SUBROUTINE KFCOULNONO
                                MKET, MAGR, ALPHA, COSBETA, "S")
 
                           KCOUNT = 0
-                          
+
                           DO KX = 1, NKX
 
                              DO KY = 1, NKY
-                                
+
                                 DO KZ = 1, NKZ
-                                   
+
                                    KPOINT = TWO*PI*(REAL(KX-1)*B1/REAL(NKX) + &
                                         REAL(KY-1)*B2/REAL(NKY) + &
                                         REAL(KZ-1)*B3/REAL(NKZ)) + K0
-                                   
+
                                    KCOUNT = KCOUNT+1
-                                   
+
                                    KDOTL = KPOINT(1)*RIJ(1) + KPOINT(2)*RIJ(2) + &
                                         KPOINT(3)*RIJ(3)
 
@@ -384,65 +383,65 @@ SUBROUTINE KFCOULNONO
 
                                    RHO = KBO(K,L,KCOUNT)*CONJGBLOCH
 
-                                   !                                                       
-                                   ! d/d_alpha                                             
-                                   !                                                       
-                                   
+                                   !
+                                   ! d/d_alpha
+                                   !
+
                                    FTMP(1) = FTMP(1) + RHO * &
                                         (-RIJ(2) / MAGRP2 * MYDFDA)
-                                   
+
                                    FTMP(2) = FTMP(2) + RHO * &
                                         (RIJ(1)/ MAGRP2 * MYDFDA)
-                                   
-                                   !                                                       
-                                   ! d/d_beta                                              
-                                   !                                                       
-                                   
+
+                                   !
+                                   ! d/d_beta
+                                   !
+
                                    FTMP(1) = FTMP(1) + RHO * &
                                         (((((RIJ(3) * RIJ(1)) / &
                                         MAGR2)) / MAGRP) * MYDFDB)
-                                   
+
                                    FTMP(2) = FTMP(2) + RHO * &
                                         (((((RIJ(3) * RIJ(2)) / &
                                         MAGR2)) / MAGRP) * MYDFDB)
-                                   
+
                                    FTMP(3) = FTMP(3) - RHO * &
                                         (((ONE - ((RIJ(3) * RIJ(3)) / &
                                         MAGR2)) / MAGRP) * MYDFDB)
-                                   
-                                   !                                                       
-                                   ! d/dR                                                  
-                                   !                                                       
-                                   
+
+                                   !
+                                   ! d/dR
+                                   !
+
                                    FTMP(1) = FTMP(1) - RHO * DC(1) * &
                                         MYDFDR
-                                   
+
                                    FTMP(2) = FTMP(2) - RHO * DC(2) * &
                                         MYDFDR
-                                   
+
                                    FTMP(3) = FTMP(3) - RHO * DC(3) * &
                                         MYDFDR
-                                   
+
                                 ENDDO
                              ENDDO
                           ENDDO
 
                        ELSE
 
-                          ! pathological configuration in which beta=0            
-                          ! or pi => alpha undefined                              
+                          ! pathological configuration in which beta=0
+                          ! or pi => alpha undefined
 
-                          ! fixed: MJC 12/17/13                                   
+                          ! fixed: MJC 12/17/13
 
                           MYDFDB = DFDB(I, J, LBRA, LKET, &
                                MBRA, MKET, MAGR, ZERO, COSBETA, "S") / MAGR
-                          
+
                           MYDFDB = DFDB(I, J, LBRA, LKET, &
                                MBRA, MKET, MAGR, PI/TWO, COSBETA, "S") / MAGR
-                          
+
                           MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
                                MKET, MAGR, ZERO, COSBETA, "S")
-                          
+
                           KCOUNT = 0
 
                           DO KX = 1, NKX
@@ -461,17 +460,17 @@ SUBROUTINE KFCOULNONO
                                    CONJGBLOCH = EXP(CMPLX(ZERO,-KDOTL))
 
                                    RHO = KBO(K,L,KCOUNT)*CONJGBLOCH
-                          
+
                                    FTMP(1) = FTMP(1) - RHO * COSBETA * MYDFDB
                                    FTMP(2) = FTMP(2) - RHO * COSBETA * MYDFDB
                                    FTMP(3) = FTMP(3) - RHO * COSBETA * MYDFDR
-                                   
+
                                 ENDDO
                              ENDDO
                           ENDDO
 
                        ENDIF
-                       
+
                     ENDDO
                  ENDDO
               ENDDO
@@ -480,24 +479,24 @@ SUBROUTINE KFCOULNONO
            FTMP = FTMP * ( HUBBARDU(ELEMPOINTER(J))*DELTAQ(J) + COULOMBV(J) &
                 +HUBBARDU(ELEMPOINTER(I))*DELTAQ(I) + COULOMBV(I))
 
-           
+
            KF(1,I) = KF(1,I) + FTMP(1)
            KF(2,I) = KF(2,I) + FTMP(2)
            KF(3,I) = KF(3,I) + FTMP(3)
-           
-           ! with the factor of 2...                                               
-           
+
+           ! with the factor of 2...
+
            VIRBONDK(1) = VIRBONDK(1) + RIJ(1)*FTMP(1)
            VIRBONDK(2) = VIRBONDK(2) + RIJ(2)*FTMP(2)
            VIRBONDK(3) = VIRBONDK(3) + RIJ(3)*FTMP(3)
            VIRBONDK(4) = VIRBONDK(4) + RIJ(1)*FTMP(2)
            VIRBONDK(5) = VIRBONDK(5) + RIJ(2)*FTMP(3)
            VIRBONDK(6) = VIRBONDK(6) + RIJ(3)*FTMP(1)
-          
+
 
         ENDIF
      ENDDO
-        
+
   ENDDO
 
 !$OMP END PARALLEL DO

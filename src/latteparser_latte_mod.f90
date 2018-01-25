@@ -191,8 +191,7 @@ contains
     BASISTYPE = valvector_char(2)
 
     if (BASISTYPE .ne. "ORTHO" .and. BASISTYPE .ne. "NONORTHO") then
-       print*, "Error defining basis type (ortho/nonortho)"
-       stop
+       CALL ERRORS("latteparser_latte_mod","Error defining basis type (ortho/nonortho)")
     endif
 
     DEBUGON = valvector_int(2)
@@ -334,7 +333,7 @@ contains
     elseif(SPARSEON == 1)then
       lt%bml_type = bml_matrix_ellpack
     else
-      STOP 'SPARSEON > 1 yet not implemented'
+      CALL ERRORS("latteparser_latte_mod","SPARSEON > 1 yet not implemented")
     endif
 
     if(THRESHOLDON == 0)then
@@ -342,7 +341,7 @@ contains
     elseif(THRESHOLDON == 1)then
       lt%threshold = NUMTHRESH
     else
-      STOP 'THRESHOLDON > 1 yet not implemented'
+      CALL ERRORS("latteparser_latte_mod","THRESHOLDON > 1 yet not implemented")
     endif
 
 #endif
@@ -363,7 +362,7 @@ contains
     elseif(MSPARSE > 0)then
       lt%mdim = MSPARSE
     else
-      STOP 'MSPARSE cannot be negative'
+      CALL ERRORS("latteparser_latte_mod","MSPARSE cannot be negative")
     endif
 
 #endif
@@ -617,9 +616,7 @@ contains
 
 
     if (NVTON .eq. 1 .and. NPTON .eq. 1) then
-       write(6,*) "You can't have NVTON = 1 and NPTON = 1"
-       write(6,*) "STOP!!!"
-       stop
+       CALL ERRORS("latteparser_latte_mod","You can't have NVTON = 1 and NPTON = 1")
     endif
 
     ! PTARGET = Target pressure (in GPa) when running NPT

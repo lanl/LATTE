@@ -107,8 +107,7 @@ SUBROUTINE BOEVECS
      ENDDO
 
      IF (ITER .EQ. 100) THEN
-        WRITE(6,*) "Newton-Raphson scheme to find the Chemical potential does not converge"
-        STOP
+        CALL ERRORS("bodirect","Newton-Raphson scheme to find the Chemical potential does not converge")
      ENDIF
 
      ! Now we have the chemical potential we can build the density matrix
@@ -169,9 +168,8 @@ SUBROUTINE BOEVECS
   ELSE ! This bit is for zero electronic temperature
 
      IF (MOD(INT(TOTNE),2) .NE. 0) THEN
-        PRINT*, "Odd number of electrons - run a spin-polarized calculation "
-        PRINT*, "or use a finite electron temperature"
-        STOP
+        CALL ERRORS("bodirect","Odd number of electrons - run a spin-polarized calculation &
+        & or use a finite electron temperature")
      ENDIF
 
      !

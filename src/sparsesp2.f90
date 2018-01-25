@@ -231,9 +231,8 @@ SUBROUTINE SP2LOOP(MSIZE, ITER, II, JJ, VAL)
 
     ! NOT converging
     IF (ITER .EQ. 100) THEN
-      WRITE(6,*) "Sparse SP2 purification is not converging: STOP!"
       CALL PANIC
-      STOP
+      CALL ERRORS("sparsesp2","Sparse SP2 purification is not converging: STOP!")
     ENDIF
 
   ENDDO
@@ -272,7 +271,7 @@ SUBROUTINE SP2SEQUENCELOOP(MSIZE, ITER, II, JJ, VAL)
   REAL(LATTEPREC) :: TRX, TRNORM, OCC
   REAL(LATTEPREC) :: TRX2, TR2XX2, TRXOLD
   REAL(LATTEPREC) :: LIMDIFF, IDEMPERR, IDEMPERR1, IDEMPERR2
-  REAL(LATTEPREC), INTENT(INOUT) :: VAL(:,:) 
+  REAL(LATTEPREC), INTENT(INOUT) :: VAL(:,:)
   REAL(LATTEPREC), ALLOCATABLE :: CCN(:,:)
   REAL(LATTEPREC), PARAMETER :: IDEMTOL = 1.0E-14
 
@@ -293,9 +292,9 @@ SUBROUTINE SP2SEQUENCELOOP(MSIZE, ITER, II, JJ, VAL)
 
   IX = 0
   X = ZERO
-  Y = ZERO 
+  Y = ZERO
 
-  CCN = ZERO 
+  CCN = ZERO
   JJC = 0
   IIC = 0
 
@@ -344,16 +343,15 @@ SUBROUTINE SP2SEQUENCELOOP(MSIZE, ITER, II, JJ, VAL)
 
     ! NOT converging
     IF (ITER .GE. 100) THEN
-      WRITE(6,*) "Sparse SP2 purification is not converging: STOP!"
       CALL PANIC
-      STOP
+      CALL ERRORS("sparsesp2","Sparse SP2 purification is not converging: STOP!")
     ENDIF
 
   ENDDO
   NR_SP2_ITER = ITER
 
   ! Reset number of non-zeroes per row - MSPARSE
-  
+
 !  PRINT*, MAXM, HDIM, 2*MAXVAL(IIC)
 
   MSIZE = MAXM

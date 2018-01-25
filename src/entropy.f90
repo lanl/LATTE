@@ -43,13 +43,13 @@ SUBROUTINE ENTROPY
   REAL(LATTEPREC) :: CLOSE2ZERO = 1.0D-16
   REAL(LATTEPREC) :: ELECTRON, HOLE, TMPELEC, TMPHOLE
   REAL(LATTEPREC) :: LN2, C4(2), C8(4)
-  CHARACTER(LEN=1), PARAMETER :: JOBZ = "N",  UPLO = "U" 
+  CHARACTER(LEN=1), PARAMETER :: JOBZ = "N",  UPLO = "U"
 
   !
   ! Options:
   !
   ! ENTROPYKIND = 0: S=0 (for testing purposes)
-  ! 
+  !
   ! Sanville's algorithm:
   !
   ! ENTROPYKIND = 1 : S = XlnX + (1-X)ln(1-X) (exact for Fermi-Dirac smearing)
@@ -87,19 +87,19 @@ SUBROUTINE ENTROPY
      LWORK = 3*HDIM - 1
      ALLOCATE(WORK(LWORK))
 #elif defined(XSYEVD)
-     LWORK = 1 + 6*HDIM + 2*HDIM*HDIM  
+     LWORK = 1 + 6*HDIM + 2*HDIM*HDIM
      LIWORK = 3 + 5*HDIM
      ALLOCATE(WORK(LWORK), IWORK(LIWORK))
 #endif
 
      IF (SPINON .EQ. 0) THEN
-        
+
         S_EVEC = HALF*BO
 
 #ifdef XSYEV
         ! Pre-processing to select precision
 
-#ifdef DOUBLEPREC        
+#ifdef DOUBLEPREC
         CALL DSYEV(JOBZ, UPLO, HDIM, S_EVEC, HDIM, S_EVAL, WORK, LWORK,INFO)
 #elif defined(SINGLEPREC)
         CALL SSYEV(JOBZ, UPLO, HDIM, S_EVEC, HDIM, S_EVAL, WORK, LWORK,INFO)
@@ -107,7 +107,7 @@ SUBROUTINE ENTROPY
 
 #elif defined(XSYEVD)
 
-#ifdef DOUBLEPREC        
+#ifdef DOUBLEPREC
         CALL DSYEVD(JOBZ, UPLO, HDIM, S_EVEC, HDIM, S_EVAL, WORK, LWORK, &
 	           IWORK, LIWORK, INFO)
 #elif defined(SINGLEPREC)
@@ -115,41 +115,41 @@ SUBROUTINE ENTROPY
 	            IWORK, LIWORK, INFO)
 #endif
 
-#endif	
-        
+#endif
+
         DO I = 1, HDIM
-           
+
            OCC = S_EVAL(I)
-           
+
            IF (OCC .LE. CLOSE2ZERO .OR. OCC .GE. (ONE - CLOSE2ZERO)) THEN
-              
+
               OCCLOGOCC_ELECTRONS = ZERO
               OCCLOGOCC_HOLES = ZERO
-              
+
            ELSE
-              
+
               OCCLOGOCC_ELECTRONS = OCC * LOG(OCC)
               OCCLOGOCC_HOLES = (ONE - OCC) * LOG(ONE - OCC)
-              
+
            ENDIF
-           
+
            S = S + TWO*(OCCLOGOCC_ELECTRONS + OCCLOGOCC_HOLES)
-           
+
         ENDDO
-        
+
      ELSE
-        
+
         !
         ! Do both density matrices separately - this is correct
-        ! when we're doing spin-polarized calculations    
+        ! when we're doing spin-polarized calculations
         !
-        
+
         S_EVEC = RHOUP
-      
+
 #ifdef XSYEV
         ! Pre-processing to select precision
 
-#ifdef DOUBLEPREC        
+#ifdef DOUBLEPREC
         CALL DSYEV(JOBZ, UPLO, HDIM, S_EVEC, HDIM, S_EVAL, WORK, LWORK,INFO)
 #elif defined(SINGLEPREC)
         CALL SSYEV(JOBZ, UPLO, HDIM, S_EVEC, HDIM, S_EVAL, WORK, LWORK,INFO)
@@ -157,7 +157,7 @@ SUBROUTINE ENTROPY
 
 #elif defined(XSYEVD)
 
-#ifdef DOUBLEPREC        
+#ifdef DOUBLEPREC
         CALL DSYEVD(JOBZ, UPLO, HDIM, S_EVEC, HDIM, S_EVAL, WORK, LWORK, &
 	           IWORK, LIWORK, INFO)
 #elif defined(SINGLEPREC)
@@ -167,33 +167,33 @@ SUBROUTINE ENTROPY
 
 #endif
 
-        
+
         DO I = 1, HDIM
-           
+
            OCC = S_EVAL(I)
-           
+
            IF (OCC .LE. CLOSE2ZERO .OR. OCC .GE. (ONE - CLOSE2ZERO)) THEN
-              
+
               OCCLOGOCC_ELECTRONS = ZERO
               OCCLOGOCC_HOLES = ZERO
-              
+
            ELSE
-              
+
               OCCLOGOCC_ELECTRONS = OCC * LOG(OCC)
               OCCLOGOCC_HOLES = (ONE - OCC) * LOG(ONE - OCC)
-              
+
            ENDIF
-           
+
            S = S + OCCLOGOCC_ELECTRONS + OCCLOGOCC_HOLES
-           
+
         ENDDO
-        
+
         S_EVEC = RHODOWN
 
 #ifdef XSYEV
         ! Pre-processing to select precision
 
-#ifdef DOUBLEPREC        
+#ifdef DOUBLEPREC
         CALL DSYEV(JOBZ, UPLO, HDIM, S_EVEC, HDIM, S_EVAL, WORK, LWORK,INFO)
 #elif defined(SINGLEPREC)
         CALL SSYEV(JOBZ, UPLO, HDIM, S_EVEC, HDIM, S_EVAL, WORK, LWORK,INFO)
@@ -201,7 +201,7 @@ SUBROUTINE ENTROPY
 
 #elif defined(XSYEVD)
 
-#ifdef DOUBLEPREC        
+#ifdef DOUBLEPREC
         CALL DSYEVD(JOBZ, UPLO, HDIM, S_EVEC, HDIM, S_EVAL, WORK, LWORK, &
 	           IWORK, LIWORK, INFO)
 #elif defined(SINGLEPREC)
@@ -209,29 +209,29 @@ SUBROUTINE ENTROPY
 	            IWORK, LIWORK, INFO)
 #endif
 
-#endif	
+#endif
 
-        
+
         DO I = 1, HDIM
-           
+
            OCC = S_EVAL(I)
-           
+
            IF (OCC .LE. CLOSE2ZERO .OR. OCC .GE. (ONE - CLOSE2ZERO)) THEN
-              
+
               OCCLOGOCC_ELECTRONS = ZERO
               OCCLOGOCC_HOLES = ZERO
-              
+
            ELSE
-              
+
               OCCLOGOCC_ELECTRONS = OCC * LOG(OCC)
               OCCLOGOCC_HOLES = (ONE - OCC) * LOG(ONE - OCC)
-              
+
            ENDIF
-           
+
            S = S + OCCLOGOCC_ELECTRONS + OCCLOGOCC_HOLES
-           
+
         ENDDO
-        
+
      ENDIF
 
      DEALLOCATE(S_EVEC, S_EVAL)
@@ -241,55 +241,54 @@ SUBROUTINE ENTROPY
 #elif defined(XSYEVD)
      DEALLOCATE(WORK, IWORK)
 #endif
-    
+
   ELSEIF (ENTROPYKIND .EQ. 2) THEN
 
      IF (CONTROL .NE. 5) THEN
-        WRITE(6,*) "Only use ENTROPYKIND = 2 if you're using CONTROL = 5"
-        STOP
+        CALL ERRORS("entropy","Only use ENTROPYKIND = 2 if you're using CONTROL = 5")
      ENDIF
 
      LWORK = 3*HDIM - 1
 
      ALLOCATE(S_EVEC(HDIM, HDIM), S_EVAL(HDIM), WORK(LWORK))
-     
+
      NPOWER = TWO**NORECS
 
      IF (SPINON .EQ. 0) THEN
-        
+
         S_EVEC = HALF*BO
 
 #ifdef DOUBLEPREC
         CALL DSYEV(JOBZ, UPLO, HDIM, S_EVEC, HDIM, S_EVAL, WORK, LWORK,INFO)
-#elif defined(SINGLEPREC)        
+#elif defined(SINGLEPREC)
         CALL SSYEV(JOBZ, UPLO, HDIM, S_EVEC, HDIM, S_EVAL, WORK, LWORK,INFO)
 #endif
-     
+
         DO I = 1, HDIM
-           
+
            OCC = S_EVAL(I)
-           
+
            IF (OCC .LE. CLOSE2ZERO) THEN
               ELECTRON = ZERO
            ENDIF
-           
-           IF (ONE - OCC .LE. CLOSE2ZERO) THEN 
+
+           IF (ONE - OCC .LE. CLOSE2ZERO) THEN
               HOLE = ZERO
            ENDIF
-           
+
            IF (OCC .GT. CLOSE2ZERO .AND. &
                 ONE - OCC .GT. CLOSE2ZERO) THEN
-              
+
               TMPELEC = OCC**(ONE/NPOWER)
               TMPHOLE = (ONE - OCC)**(ONE/NPOWER)
-              
+
               ELECTRON = OCC*(TMPELEC - ONE)/(TMPELEC + ONE)
               HOLE = (ONE - OCC)*(TMPHOLE - ONE)/(TMPHOLE + ONE)
-              
+
            ENDIF
-           
+
            S = S + FOUR*NPOWER*(ELECTRON + HOLE)
-           
+
         ENDDO
 
      ELSE
@@ -305,32 +304,32 @@ SUBROUTINE ENTROPY
 #elif defined(SINGLEPREC)
         CALL SSYEV(JOBZ, UPLO, HDIM, S_EVEC, HDIM, S_EVAL, WORK, LWORK,INFO)
 #endif
-        
+
         DO I = 1, HDIM
-           
+
            OCC = S_EVAL(I)
-           
+
            IF (OCC .LE. CLOSE2ZERO) THEN
               ELECTRON = ZERO
            ENDIF
-           
-           IF (ONE - OCC .LE. CLOSE2ZERO) THEN 
+
+           IF (ONE - OCC .LE. CLOSE2ZERO) THEN
               HOLE = ZERO
            ENDIF
-           
+
            IF (OCC .GT. CLOSE2ZERO .AND. &
                 ONE - OCC .GT. CLOSE2ZERO) THEN
-              
+
               TMPELEC = OCC**(ONE/NPOWER)
               TMPHOLE = (ONE - OCC)**(ONE/NPOWER)
-              
+
               ELECTRON = OCC*(TMPELEC - ONE)/(TMPELEC + ONE)
               HOLE = (ONE - OCC)*(TMPHOLE - ONE)/(TMPHOLE + ONE)
-              
+
            ENDIF
-           
+
            S = S + TWO*NPOWER*(ELECTRON + HOLE)
-           
+
         ENDDO
 
         S_EVEC = RHODOWN
@@ -340,38 +339,38 @@ SUBROUTINE ENTROPY
 #elif defined(SINGLEPREC)
         CALL SSYEV(JOBZ, UPLO, HDIM, S_EVEC, HDIM, S_EVAL, WORK, LWORK,INFO)
 #endif
-        
+
         DO I = 1, HDIM
-           
+
            OCC = S_EVAL(I)
-           
+
            IF (OCC .LE. CLOSE2ZERO) THEN
               ELECTRON = ZERO
            ENDIF
-           
-           IF (ONE - OCC .LE. CLOSE2ZERO) THEN 
+
+           IF (ONE - OCC .LE. CLOSE2ZERO) THEN
               HOLE = ZERO
            ENDIF
-           
+
            IF (OCC .GT. CLOSE2ZERO .AND. &
                 ONE - OCC .GT. CLOSE2ZERO) THEN
-              
+
               TMPELEC = OCC**(ONE/NPOWER)
               TMPHOLE = (ONE - OCC)**(ONE/NPOWER)
-              
+
               ELECTRON = OCC*(TMPELEC - ONE)/(TMPELEC + ONE)
               HOLE = (ONE - OCC)*(TMPHOLE - ONE)/(TMPHOLE + ONE)
-              
+
            ENDIF
-           
+
            S = S + TWO*NPOWER*(ELECTRON + HOLE)
-           
+
         ENDDO
 
      ENDIF
 
      DEALLOCATE(S_EVEC, S_EVAL, WORK)
-      
+
   ELSEIF (ENTROPYKIND .EQ. 3) THEN
 
      !
@@ -379,7 +378,7 @@ SUBROUTINE ENTROPY
      !
 
      LN2 = LOG(TWO)
-     
+
      C4(1) = EIGHT*LN2 - TWO
      C4(2) = SIXTEEN*LN2 - EIGHT
 
@@ -394,26 +393,26 @@ SUBROUTINE ENTROPY
 #ifdef DOUBLEPREC
       CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 0.25D0, &
       BO, HDIM, BO, HDIM, 0.0D0, MAT2, HDIM)
-#elif defined(SINGLEPREC)                
+#elif defined(SINGLEPREC)
       CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 0.25, &
       BO, HDIM, BO, HDIM, 0.0, MAT2, HDIM)
 #endif
 
         DO I = 1, HDIM
            DO J = I, HDIM
-              
+
               IF (I .EQ. J) THEN
-                 
+
                  S = S + (MAT2(I,I) - HALF*BO(I,I)) * &
                       (C4(1) + C4(2)*(MAT2(I,I) - HALF*BO(I,I)))
-                 
-              ELSE 
-                 
+
+              ELSE
+
                  S = S + TWO*C4(2) * (MAT2(J,I) - HALF*BO(J,I)) * &
                       (MAT2(J,I) - HALF*BO(J,I))
-                 
+
               ENDIF
-              
+
            ENDDO
         ENDDO
 
@@ -428,26 +427,26 @@ SUBROUTINE ENTROPY
 #ifdef DOUBLEPREC
         CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
                 RHOUP, HDIM, RHOUP, HDIM, 0.0D0, MAT2, HDIM)
-#elif defined(SINGLEPREC)                
+#elif defined(SINGLEPREC)
                 CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
                 RHOUP, HDIM, RHOUP, HDIM, 0.0, MAT2, HDIM)
 #endif
 
         DO I = 1, HDIM
            DO J = I, HDIM
-              
+
               IF (I .EQ. J) THEN
-                 
+
                  S = S + (MAT2(I,I) - RHOUP(I,I)) * &
                       (C4(1) + C4(2)*(MAT2(I,I) - RHOUP(I,I)))
-                 
-              ELSE 
-                 
+
+              ELSE
+
                  S = S + TWO*C4(2) * (MAT2(J,I) - RHOUP(J,I)) * &
                       (MAT2(J,I) - RHOUP(J,I))
-                 
+
               ENDIF
-              
+
            ENDDO
         ENDDO
 
@@ -465,21 +464,21 @@ SUBROUTINE ENTROPY
 
         DO I = 1, HDIM
            DO J = I, HDIM
-              
+
               IF (I .EQ. J) THEN
-                 
+
                  S = S + (MAT2(I,I) - RHODOWN(I,I)) * &
                       (C4(1) + C4(2)*(MAT2(I,I) - RHODOWN(I,I)))
-                 
-              ELSE 
-                 
+
+              ELSE
+
                  S = S + TWO*C4(2) * (MAT2(J,I) - RHODOWN(J,I)) * &
                       (MAT2(J,I) - RHODOWN(J,I))
-                 
+
               ENDIF
-              
+
            ENDDO
-        ENDDO        
+        ENDDO
 
      ENDIF
 
@@ -514,7 +513,7 @@ SUBROUTINE ENTROPY
            CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 0.25, &
                 BO, HDIM, BO, HDIM, 0.0, MAT2, HDIM)
 #endif
-        
+
         Y = MAT2 - HALF*BO
 
         !
@@ -531,19 +530,19 @@ SUBROUTINE ENTROPY
 
         DO I = 1, HDIM
            DO J = I, HDIM
-              
+
               IF (I .EQ. J) THEN
-                 
+
                  S = S + C8(1)*Y(I,I) + MAT2(I,I) * &
                       (C8(2) + C8(3)*Y(I,I) + C8(4)*MAT2(I,I))
-                 
-              ELSE 
-                 
+
+              ELSE
+
                  S = S + C8(3)*MAT2(J,I)*Y(J,I) + &
                       C8(4)*MAT2(J,I)*MAT2(J,I)
-                 
+
               ENDIF
-              
+
            ENDDO
         ENDDO
 
@@ -564,7 +563,7 @@ SUBROUTINE ENTROPY
            CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
                 RHOUP, HDIM, RHOUP, HDIM, 0.0, MAT2, HDIM)
 #endif
-        
+
         Y = MAT2 - RHOUP
 
         ! MAT2 = Y*Y
@@ -572,29 +571,29 @@ SUBROUTINE ENTROPY
 #ifdef DOUBLEPREC
            CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
                 Y, HDIM, Y, HDIM, 0.0D0, MAT2, HDIM)
-#elif defined(SINGLEPREC)                
+#elif defined(SINGLEPREC)
            CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
                 Y, HDIM, Y, HDIM, 0.0, MAT2, HDIM)
 #endif
 
         DO I = 1, HDIM
            DO J = I, HDIM
-              
+
               IF (I .EQ. J) THEN
-                 
+
                  S = S + C8(1)*Y(I,I) + MAT2(I,I) * &
                       (C8(2) + C8(3)*Y(I,I) + C8(4)*MAT2(I,I))
-                 
-              ELSE 
-                 
+
+              ELSE
+
                  S = S + C8(3)*MAT2(J,I)*Y(J,I) + &
                       C8(4)*MAT2(J,I)*MAT2(J,I)
-                 
+
               ENDIF
-              
+
            ENDDO
         ENDDO
-        
+
         !
         ! Now for spin-down
         !
@@ -604,11 +603,11 @@ SUBROUTINE ENTROPY
 #ifdef DOUBLEPREC
            CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
                 RHODOWN, HDIM, RHODOWN, HDIM, 0.0D0, MAT2, HDIM)
-#elif defined(SINGLEPREC)                
+#elif defined(SINGLEPREC)
            CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
                 RHODOWN, HDIM, RHODOWN, HDIM, 0.0, MAT2, HDIM)
 #endif
-        
+
         Y = MAT2 - RHODOWN
 
         ! MAT2 = Y*Y
@@ -623,21 +622,21 @@ SUBROUTINE ENTROPY
 
         DO I = 1, HDIM
            DO J = I, HDIM
-              
+
               IF (I .EQ. J) THEN
-                 
+
                  S = S + C8(1)*Y(I,I) + MAT2(I,I) * &
                       (C8(2) + C8(3)*Y(I,I) + C8(4)*MAT2(I,I))
-                 
-              ELSE 
-                 
+
+              ELSE
+
                  S = S + C8(3)*MAT2(J,I)*Y(J,I) + &
                       C8(4)*MAT2(J,I)*MAT2(J,I)
-                 
+
               ENDIF
-              
+
            ENDDO
-        ENDDO        
+        ENDDO
 
      ENDIF
 
@@ -648,6 +647,5 @@ SUBROUTINE ENTROPY
   ENTE = MINUSONE*KBT*S
 
   RETURN
-  
-END SUBROUTINE ENTROPY
 
+END SUBROUTINE ENTROPY
