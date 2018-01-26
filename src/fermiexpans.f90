@@ -60,7 +60,7 @@ SUBROUTINE FERMIEXPANS
      IF (ITER .EQ. 100) THEN
         CALL PANIC
         CALL ERRORS("fermiexpans","Fermi expansion is not converging: STOP!")
-     ENDIF     
+     ENDIF
 
      IF (SPINON .EQ. 0) THEN
 
@@ -91,13 +91,13 @@ SUBROUTINE FERMIEXPANS
 
         IF (CGORLIB .EQ. 0) THEN
 
-	! Call GESV-based solver
+           ! Call GESV-based solver
 
            CALL SOLVEMATLAPACK
 
         ELSE
 
-	! Call the conjugate gradient solver on the CPU
+           ! Call the conjugate gradient solver on the CPU
 
            CALL SOLVEMATCG
 
@@ -107,13 +107,13 @@ SUBROUTINE FERMIEXPANS
 
 #elif defined(GPUON)
 
-      !
-      ! This calls Sanville's CUDA routines on the GPU
-      ! Now modified by MJC to send down FERMIM too
-      !
+     !
+     ! This calls Sanville's CUDA routines on the GPU
+     ! Now modified by MJC to send down FERMIM too
+     !
 
-      CALL SOLVE_MATRIX_CG(BO, RHOUP, RHODOWN, HDIM, CGTOL2, &
-	                     SPINON, LATTEPREC, FERMIM)
+     CALL SOLVE_MATRIX_CG(BO, RHOUP, RHODOWN, HDIM, CGTOL2, &
+          SPINON, LATTEPREC, FERMIM)
 
 #endif
 
@@ -149,7 +149,7 @@ SUBROUTINE FERMIEXPANS
         PREVERROR2 = PREVERROR
         PREVERROR = OCCERROR
         OCCERROR = ABS(OCC - TRX)
-!        PRINT*, ITER, OCCERROR
+        !        PRINT*, ITER, OCCERROR
 
      ELSE
 
@@ -183,7 +183,7 @@ SUBROUTINE FERMIEXPANS
 
      ENDIF
 
-!     PRINT*, ITER, OCCERROR
+     !     PRINT*, ITER, OCCERROR
 
      IF (ABS(SHIFTCP) .GT. MAXSHIFT) THEN
         SHIFTCP = SIGN(MAXSHIFT, SHIFTCP)
@@ -193,21 +193,21 @@ SUBROUTINE FERMIEXPANS
 
 #ifdef DOUBLEPREC
 
-        IF (ITER .GE. 3 .AND. OCCERROR .LT. BREAKTOL) THEN
-           BREAKLOOP = 1
-        ENDIF
+     IF (ITER .GE. 3 .AND. OCCERROR .LT. BREAKTOL) THEN
+        BREAKLOOP = 1
+     ENDIF
 
 #elif defined(SINGLEPREC)
 
-        IF ( ITER .GE. 3 .AND. ((OCCERROR .LT. BREAKTOL) .AND. &
-             (OCCERROR .EQ. PREVERROR .OR. &
-             OCCERROR .EQ. PREVERROR2 .OR. &
-             OCCERROR .EQ. PREVERROR3)) .OR. &
-             ITER .EQ. 25) THEN
+     IF ( ITER .GE. 3 .AND. ((OCCERROR .LT. BREAKTOL) .AND. &
+          (OCCERROR .EQ. PREVERROR .OR. &
+          OCCERROR .EQ. PREVERROR2 .OR. &
+          OCCERROR .EQ. PREVERROR3)) .OR. &
+          ITER .EQ. 25) THEN
 
-           BREAKLOOP = 1
+        BREAKLOOP = 1
 
-        ENDIF
+     ENDIF
 
 #endif
 

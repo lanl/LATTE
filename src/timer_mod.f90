@@ -34,8 +34,8 @@ MODULE TIMER_MOD
 
 CONTAINS
 
-! Initialize timers
-!
+  ! Initialize timers
+  !
   FUNCTION INIT_TIMER()
 
     INTEGER :: I, INIT_TIMER
@@ -45,7 +45,7 @@ CONTAINS
     ALLOCATE(TSTART(NUM_TIMERS), TTOTAL(NUM_TIMERS), TCOUNT(NUM_TIMERS))
     ALLOCATE(TNAME(NUM_TIMERS))
     IF(.NOT.ALLOCATED(TAVG))THEN
-      ALLOCATE(TAVG(NUM_TIMERS),TSUM(NUM_TIMERS),TPERCENT(NUM_TIMERS))
+       ALLOCATE(TAVG(NUM_TIMERS),TSUM(NUM_TIMERS),TPERCENT(NUM_TIMERS))
     ENDIF
 
     ! Timer handles, names, and counters
@@ -70,8 +70,8 @@ CONTAINS
 
   END FUNCTION INIT_TIMER
 
-! Done with timers
-!
+  ! Done with timers
+  !
   FUNCTION SHUTDOWN_TIMER()
 
     INTEGER :: SHUTDOWN_TIMER
@@ -83,8 +83,8 @@ CONTAINS
 
   END FUNCTION SHUTDOWN_TIMER
 
-! Start Timing
-!
+  ! Start Timing
+  !
   FUNCTION START_TIMER(ITIMER)
 
     INTEGER :: ITIMER, START_TIMER
@@ -96,8 +96,8 @@ CONTAINS
 
   END FUNCTION START_TIMER
 
-! Stop timing
-!
+  ! Stop timing
+  !
   FUNCTION STOP_TIMER(ITIMER)
 
     INTEGER :: ITIMER, TDELTA, STOP_TIMER
@@ -111,8 +111,8 @@ CONTAINS
 
   END FUNCTION STOP_TIMER
 
-! Print performance results
-!
+  ! Print performance results
+  !
   FUNCTION TIMER_RESULTS()
 
     INTEGER :: I, TIMER_RESULTS
@@ -123,15 +123,15 @@ CONTAINS
 
     DO I = 1, NUM_TIMERS
 
-      IF (TCOUNT(I) .GT. 0) THEN
+       IF (TCOUNT(I) .GT. 0) THEN
 
-        TAVG(I) = (FLOAT(TTOTAL(I))/FLOAT(TCLOCK_RATE))/FLOAT(TCOUNT(I))
-        TSUM(I) = FLOAT(TTOTAL(I))/FLOAT(TCLOCK_RATE)
-        TPERCENT(I) = (TSUM(I) / TSUM(1)) * 100.0
+          TAVG(I) = (FLOAT(TTOTAL(I))/FLOAT(TCLOCK_RATE))/FLOAT(TCOUNT(I))
+          TSUM(I) = FLOAT(TTOTAL(I))/FLOAT(TCLOCK_RATE)
+          TPERCENT(I) = (TSUM(I) / TSUM(1)) * 100.0
 
-        WRITE(6,10) TNAME(I), TCOUNT(I), TAVG(I), TSUM(I), TPERCENT(I)
-        10 FORMAT(A25, I4, 3G16.6)
-      ENDIF
+          WRITE(6,10) TNAME(I), TCOUNT(I), TAVG(I), TSUM(I), TPERCENT(I)
+10        FORMAT(A25, I4, 3G16.6)
+       ENDIF
 
     ENDDO
 
@@ -139,8 +139,8 @@ CONTAINS
 
   END FUNCTION TIMER_RESULTS
 
-! Print a tag time and date
-!
+  ! Print a tag time and date
+  !
   SUBROUTINE TIMEDATE_TAG(TAG)
     CHARACTER(LEN=*) :: TAG
     INTEGER :: VALUES(8)
@@ -148,8 +148,8 @@ CONTAINS
     CALL DATE_AND_TIME(VALUES=VALUES)
 
     WRITE(*,'(A2,1X,A,1X,I2,A1,I2,2X,A2,1X,I2,A1,I2,A1,I4)') " #",TRIM(TAG),&
-    & VALUES(5),":",VALUES(6),&
-    & "on",VALUES(2),"/",VALUES(3),"/",VALUES(1)
+         & VALUES(5),":",VALUES(6),&
+         & "on",VALUES(2),"/",VALUES(3),"/",VALUES(1)
 
   END SUBROUTINE TIMEDATE_TAG
 

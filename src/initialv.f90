@@ -81,7 +81,7 @@ SUBROUTINE INITIALV
   ELSE
 
      CALL ERRORS("initialv","Choose either UNIFORM or GAUSSIAN for the &
-     & random number distribution")
+          & random number distribution")
 
   ENDIF
 

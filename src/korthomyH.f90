@@ -20,13 +20,13 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    
 
 SUBROUTINE KORTHOMYH
-  
+
   USE CONSTANTS_MOD
   USE SETUPARRAY
   USE NONOARRAY
   USE KSPACEARRAY
   USE MYPRECISION
-  
+
   IMPLICIT NONE
 
   INTEGER I, J, II
@@ -38,7 +38,7 @@ SUBROUTINE KORTHOMYH
   !
   ! ORTHOH = X^dag H X
   !
-  
+
   DO II = 1, NKTOT
 
      CALL ZGEMM('C', 'N', HDIM, HDIM, HDIM, ALPHA, KXMAT(:,:,II), &
@@ -48,7 +48,7 @@ SUBROUTINE KORTHOMYH
 
   ENDDO
 
-  
+
 
   RETURN
 

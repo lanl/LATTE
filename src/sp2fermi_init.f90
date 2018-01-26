@@ -46,7 +46,7 @@ SUBROUTINE SP2FERMIINIT
   REAL(LATTEPREC), ALLOCATABLE :: X1X0UP(:,:), X1X0DOWN(:,:)
   REAL(LATTEPREC), ALLOCATABLE :: X1UP(:,:), X1DOWN(:,:)
   REAL(LATTEPREC) :: PREVERROR, PREVERROR2, PREVERROR3
-!  REAL(LATTEPREC) :: DELTA = 0.01D0, TRXPLUS, TRXMINUS, NEWBETA, NEWCHEMPOT
+  !  REAL(LATTEPREC) :: DELTA = 0.01D0, TRXPLUS, TRXMINUS, NEWBETA, NEWCHEMPOT
 
   !
   ! We'll have spin and non-spin dependent versions separate
@@ -103,11 +103,11 @@ SUBROUTINE SP2FERMIINIT
            !
 
 #ifdef DOUBLEPREC
-              CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                   BO, HDIM, BO, HDIM, 0.0D0, X2, HDIM)
+           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+                BO, HDIM, BO, HDIM, 0.0D0, X2, HDIM)
 #elif defined(SINGLEPREC)
-              CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                   BO, HDIM, BO, HDIM, 0.0, X2, HDIM)
+           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+                BO, HDIM, BO, HDIM, 0.0, X2, HDIM)
 #endif
 
            TRX = ZERO
@@ -134,19 +134,19 @@ SUBROUTINE SP2FERMIINIT
            !
 
 #ifdef DOUBLEPREC
-              CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                   BO, HDIM, X1, HDIM, 0.0D0, X0X1, HDIM)
+           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+                BO, HDIM, X1, HDIM, 0.0D0, X0X1, HDIM)
 #elif defined(SINGLEPREC)
-              CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                   BO, HDIM, X1, HDIM, 0.0, X0X1, HDIM)
+           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+                BO, HDIM, X1, HDIM, 0.0, X0X1, HDIM)
 #endif
 
 #ifdef DOUBLEPREC
-              CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                   X1, HDIM, BO, HDIM, 0.0D0, X1X0, HDIM)
+           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+                X1, HDIM, BO, HDIM, 0.0D0, X1X0, HDIM)
 #elif defined(SINGLEPREC)
-              CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                   X1, HDIM, BO, HDIM, 0.0, X1X0, HDIM)
+           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+                X1, HDIM, BO, HDIM, 0.0, X1X0, HDIM)
 #endif
 
            !
@@ -213,21 +213,21 @@ SUBROUTINE SP2FERMIINIT
 
 #ifdef DOUBLEPREC
 
-           IF (OCCERROR .LT. BREAKTOL) THEN
+        IF (OCCERROR .LT. BREAKTOL) THEN
 
-              BREAKLOOP = 1
+           BREAKLOOP = 1
 
-           ENDIF
+        ENDIF
 
 #elif defined(SINGLEPREC)
 
-           IF (OCCERROR .EQ. PREVERROR .OR. &
-                OCCERROR .EQ. PREVERROR2 .OR. &
-                OCCERROR .EQ. PREVERROR3 .OR. ITER .EQ. 25 ) THEN
+        IF (OCCERROR .EQ. PREVERROR .OR. &
+             OCCERROR .EQ. PREVERROR2 .OR. &
+             OCCERROR .EQ. PREVERROR3 .OR. ITER .EQ. 25 ) THEN
 
-              BREAKLOOP = 1
+           BREAKLOOP = 1
 
-           ENDIF
+        ENDIF
 
 #endif
 
@@ -290,15 +290,15 @@ SUBROUTINE SP2FERMIINIT
            !
 
 #ifdef DOUBLEPREC
-              CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                   RHOUP, HDIM, RHOUP, HDIM, 0.0D0, X2UP, HDIM)
-              CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                   RHODOWN, HDIM, RHODOWN, HDIM, 0.0D0, X2DOWN, HDIM)
+           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+                RHOUP, HDIM, RHOUP, HDIM, 0.0D0, X2UP, HDIM)
+           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+                RHODOWN, HDIM, RHODOWN, HDIM, 0.0D0, X2DOWN, HDIM)
 #elif defined(SINGLEPREC)
-              CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                   RHOUP, HDIM, RHOUP, HDIM, 0.0, X2UP, HDIM)
-              CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                   RHODOWN, HDIM, RHODOWN, HDIM, 0.0, X2DOWN, HDIM)
+           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+                RHOUP, HDIM, RHOUP, HDIM, 0.0, X2UP, HDIM)
+           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+                RHODOWN, HDIM, RHODOWN, HDIM, 0.0, X2DOWN, HDIM)
 #endif
 
            TRX = ZERO
@@ -322,27 +322,27 @@ SUBROUTINE SP2FERMIINIT
 
 #ifdef DOUBLEPREC
 
-              CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                   RHOUP, HDIM, X1UP, HDIM, 0.0D0, X0X1UP, HDIM)
-              CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                   RHODOWN, HDIM, X1DOWN, HDIM, 0.0D0, X0X1DOWN, HDIM)
+           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+                RHOUP, HDIM, X1UP, HDIM, 0.0D0, X0X1UP, HDIM)
+           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+                RHODOWN, HDIM, X1DOWN, HDIM, 0.0D0, X0X1DOWN, HDIM)
 
-              CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                   X1UP, HDIM, RHOUP, HDIM, 0.0D0, X1X0UP, HDIM)
-              CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                   X1DOWN, HDIM, RHODOWN, HDIM, 0.0D0, X1X0DOWN, HDIM)
+           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+                X1UP, HDIM, RHOUP, HDIM, 0.0D0, X1X0UP, HDIM)
+           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+                X1DOWN, HDIM, RHODOWN, HDIM, 0.0D0, X1X0DOWN, HDIM)
 
 #elif defined(SINGLEPREC)
 
-              CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                   RHOUP, HDIM, X1UP, HDIM, 0.0, X0X1UP, HDIM)
-              CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                   RHODOWN, HDIM, X1DOWN, HDIM, 0.0, X0X1DOWN, HDIM)
+           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+                RHOUP, HDIM, X1UP, HDIM, 0.0, X0X1UP, HDIM)
+           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+                RHODOWN, HDIM, X1DOWN, HDIM, 0.0, X0X1DOWN, HDIM)
 
-              CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                   X1UP, HDIM, RHOUP, HDIM, 0.0, X1X0UP, HDIM)
-              CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                   X1DOWN, HDIM, RHODOWN, HDIM, 0.0, X1X0DOWN, HDIM)
+           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+                X1UP, HDIM, RHOUP, HDIM, 0.0, X1X0UP, HDIM)
+           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+                X1DOWN, HDIM, RHODOWN, HDIM, 0.0, X1X0DOWN, HDIM)
 
 #endif
 
@@ -414,21 +414,21 @@ SUBROUTINE SP2FERMIINIT
 
 #ifdef DOUBLEPREC
 
-           IF (OCCERROR .LT. BREAKTOL) THEN
+        IF (OCCERROR .LT. BREAKTOL) THEN
 
-              BREAKLOOP = 1
+           BREAKLOOP = 1
 
-           ENDIF
+        ENDIF
 
 #elif defined(SINGLEPREC)
 
-           IF (OCCERROR .EQ. PREVERROR .OR. &
-                OCCERROR .EQ. PREVERROR2 .OR. &
-                OCCERROR .EQ. PREVERROR3 .OR. ITER .EQ. 25 ) THEN
+        IF (OCCERROR .EQ. PREVERROR .OR. &
+             OCCERROR .EQ. PREVERROR2 .OR. &
+             OCCERROR .EQ. PREVERROR3 .OR. ITER .EQ. 25 ) THEN
 
-              BREAKLOOP = 1
+           BREAKLOOP = 1
 
-           ENDIF
+        ENDIF
 
 #endif
 
@@ -452,9 +452,9 @@ SUBROUTINE SP2FERMIINIT
 END SUBROUTINE SP2FERMIINIT
 
 
-  !
-  ! Now find the correct beta for calculating the corresponding entropy
-  !
+!
+! Now find the correct beta for calculating the corresponding entropy
+!
 
 !  ALLOCATE(X(HDIM, HDIM))
 
@@ -499,9 +499,9 @@ END SUBROUTINE SP2FERMIINIT
 
 !  DO II = 1, NORECS
 
-     !
-     ! BO^2
-     !
+!
+! BO^2
+!
 
 !     IF (LATTEPREC .EQ. KIND(0.0D0)) THEN
 !        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
@@ -511,10 +511,10 @@ END SUBROUTINE SP2FERMIINIT
 !             X, HDIM, X, HDIM, 0.0, X2, HDIM)
 !     ENDIF
 
-     !
-     ! We purify using the sequence of operations defined
-     ! in SP2FERMIINIT
-     !
+!
+! We purify using the sequence of operations defined
+! in SP2FERMIINIT
+!
 
 !     X = X + SIGNLIST(II)*(X - X2)
 
@@ -546,9 +546,9 @@ END SUBROUTINE SP2FERMIINIT
 
 !  DO II = 1, NORECS
 
-     !
-     ! BO^2
-     !
+!
+! BO^2
+!
 
 !     IF (LATTEPREC .EQ. KIND(0.0D0)) THEN
 !        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
@@ -558,10 +558,10 @@ END SUBROUTINE SP2FERMIINIT
 !             X, HDIM, X, HDIM, 0.0, X2, HDIM)
 !     ENDIF
 
-     !
-     ! We purify using the sequence of operations defined
-     ! in SP2FERMIINIT
-     !
+!
+! We purify using the sequence of operations defined
+! in SP2FERMIINIT
+!
 
 !     X = X + SIGNLIST(II)*(X - X2)
 

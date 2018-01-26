@@ -38,7 +38,7 @@ SUBROUTINE SP2FERMI
 
 #ifdef GPUON
 
-  call sp2fermi_gpu(bndfil, hdim, spinon, bo, rhoup, rhodown, maxeval, &
+  CALL sp2fermi_gpu(bndfil, hdim, spinon, bo, rhoup, rhodown, maxeval, &
        h, hup, hdown, maxminusmin, chempot, norecs, signlist, beta0, &
        breaktol, latteprec)
 
@@ -152,51 +152,51 @@ SUBROUTINE SP2FERMI
 
 #ifdef DOUBLEPREC
 
-           IF (OCCERROR .LT. BREAKTOL) THEN
-              BREAKLOOP = 1
-           ENDIF
+        IF (OCCERROR .LT. BREAKTOL) THEN
+           BREAKLOOP = 1
+        ENDIF
 
 #elif defined(SINGLEPREC)
 
-           IF (OCCERROR .EQ. PREVERROR .OR. &
-                OCCERROR .EQ. PREVERROR2 .OR. &
-                OCCERROR .EQ. PREVERROR3 .OR. ITER .EQ. 10 ) THEN
+        IF (OCCERROR .EQ. PREVERROR .OR. &
+             OCCERROR .EQ. PREVERROR2 .OR. &
+             OCCERROR .EQ. PREVERROR3 .OR. ITER .EQ. 10 ) THEN
 
-              BREAKLOOP = 1
+           BREAKLOOP = 1
 
-           ENDIF
+        ENDIF
 
 #endif
 
-        ENDDO
+     ENDDO
 
-        IF (ITER .EQ. 100) THEN
-           CALL ERRORS("sp2fermi","SP2FERMI is not converging: STOP!")
-        ENDIF
+     IF (ITER .EQ. 100) THEN
+        CALL ERRORS("sp2fermi","SP2FERMI is not converging: STOP!")
+     ENDIF
 
      !
      ! If you forget the following you'll spend about a day
      ! trying to find the bug in every other subroutine...
      !
 
-!     BO = TWO*BO
+     !     BO = TWO*BO
 
-        ! Update occupancy
+     ! Update occupancy
 
-        ! bo = 2 x ( bo + lambda*(beta0*(bo * (I - bo)))) <- we put this into
-        ! GEMM-form
+     ! bo = 2 x ( bo + lambda*(beta0*(bo * (I - bo)))) <- we put this into
+     ! GEMM-form
 
-        GEMM_ALPHA = -TWO*LAMBDA*BETA0
-        GEMM_BETA = TWO*(ONE + LAMBDA*BETA0)
+     GEMM_ALPHA = -TWO*LAMBDA*BETA0
+     GEMM_BETA = TWO*(ONE + LAMBDA*BETA0)
 
-        X2 = BO
+     X2 = BO
 
 #ifdef DOUBLEPREC
-              CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, GEMM_ALPHA, &
-                   X2, HDIM, X2, HDIM, GEMM_BETA, BO, HDIM)
+     CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, GEMM_ALPHA, &
+          X2, HDIM, X2, HDIM, GEMM_BETA, BO, HDIM)
 #elif defined(SINGLEPREC)
-              CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, GEMM_ALPHA, &
-                   X2, HDIM, X2, HDIM, GEMM_BETA, BO, HDIM)
+     CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, GEMM_ALPHA, &
+          X2, HDIM, X2, HDIM, GEMM_BETA, BO, HDIM)
 #endif
 
   ELSEIF (SPINON .EQ. 1) THEN
@@ -241,17 +241,17 @@ SUBROUTINE SP2FERMI
 
 #ifdef DOUBLEPREC
 
-              CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                   RHOUP, HDIM, RHOUP, HDIM, 0.0D0, X2UP, HDIM)
-              CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                   RHODOWN, HDIM, RHODOWN, HDIM, 0.0D0, X2DOWN, HDIM)
+           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+                RHOUP, HDIM, RHOUP, HDIM, 0.0D0, X2UP, HDIM)
+           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+                RHODOWN, HDIM, RHODOWN, HDIM, 0.0D0, X2DOWN, HDIM)
 
 #elif defined(SINGLEPREC)
 
-              CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                   RHOUP, HDIM, RHOUP, HDIM, 0.0, X2UP, HDIM)
-              CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                   RHODOWN, HDIM, RHODOWN, HDIM, 0.0, X2DOWN, HDIM)
+           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+                RHOUP, HDIM, RHOUP, HDIM, 0.0, X2UP, HDIM)
+           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+                RHODOWN, HDIM, RHODOWN, HDIM, 0.0, X2DOWN, HDIM)
 
 #endif
 
@@ -311,24 +311,24 @@ SUBROUTINE SP2FERMI
         ! Convergence tests for double and single precision runs
         !
 
-!        PRINT*, ITER, OCCERROR, PREVERROR, PREVERROR2, PREVERROR3
+        !        PRINT*, ITER, OCCERROR, PREVERROR, PREVERROR2, PREVERROR3
 
 #ifdef DOUBLEPREC
 
-           IF (OCCERROR .LT. BREAKTOL) THEN
-              BREAKLOOP = 1
-           ENDIF
+        IF (OCCERROR .LT. BREAKTOL) THEN
+           BREAKLOOP = 1
+        ENDIF
 
 #elif defined(SINGLEPREC)
 
-           IF ( (ITER .GE. 2) .AND. (OCCERROR .EQ. PREVERROR .OR. &
-                OCCERROR .EQ. PREVERROR2 .OR. &
-                OCCERROR .EQ. PREVERROR3 .OR. &
-                ITER .EQ. 10) ) THEN
+        IF ( (ITER .GE. 2) .AND. (OCCERROR .EQ. PREVERROR .OR. &
+             OCCERROR .EQ. PREVERROR2 .OR. &
+             OCCERROR .EQ. PREVERROR3 .OR. &
+             ITER .EQ. 10) ) THEN
 
-              BREAKLOOP = 1
+           BREAKLOOP = 1
 
-           ENDIF
+        ENDIF
 
 #endif
 

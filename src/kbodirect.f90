@@ -58,7 +58,7 @@ SUBROUTINE KBOEVECS
 
   OCCTARGET = BNDFIL*REAL(HDIM*NKTOT)
 
-!  PRINT*, TOTNE, OCCTARGET
+  !  PRINT*, TOTNE, OCCTARGET
 
   ITER = 0
 
@@ -80,12 +80,12 @@ SUBROUTINE KBOEVECS
         DFDIRAC = ZERO
 
 
-! Loop over all k-points too
+        ! Loop over all k-points too
 
-!$OMP PARALLEL DO DEFAULT(NONE) &
-!$OMP SHARED(NKTOT, HDIM, KEVALS, CHEMPOT, KBT) &
-!$OMP PRIVATE(K, I, FDIRACARG, EXPARG, FDIRAC) &
-!$OMP REDUCTION(+: OCC, DFDIRAC)
+        !$OMP PARALLEL DO DEFAULT(NONE) &
+        !$OMP SHARED(NKTOT, HDIM, KEVALS, CHEMPOT, KBT) &
+        !$OMP PRIVATE(K, I, FDIRACARG, EXPARG, FDIRAC) &
+        !$OMP REDUCTION(+: OCC, DFDIRAC)
 
         DO K = 1, NKTOT
            DO I = 1, HDIM
@@ -103,7 +103,7 @@ SUBROUTINE KBOEVECS
            ENDDO
         ENDDO
 
-!$OMP END PARALLEL DO
+        !$OMP END PARALLEL DO
 
         DFDIRAC = DFDIRAC/REAL(NKTOT)
 
@@ -119,7 +119,7 @@ SUBROUTINE KBOEVECS
 
         CHEMPOT = CHEMPOT + SHIFTCP
 
-    ENDDO
+     ENDDO
 
      IF (ITER .EQ. 100) THEN
         CALL ERRORS("kbodirect","Newton-Raphson scheme to find the Chemical potential does not converge")
@@ -132,10 +132,10 @@ SUBROUTINE KBOEVECS
      IF (MDON .EQ. 0 .OR. &
           (MDON .EQ. 1 .AND. MOD(ENTROPYITER, WRTFREQ) .EQ. 0 )) THEN
 
-!$OMP PARALLEL DO DEFAULT(NONE) &
-!$OMP SHARED(NKTOT, HDIM, KEVALS, CHEMPOT, KBT) &
-!$OMP PRIVATE(K, I, FDIRACARG, FDIRAC, OCCLOGOCC_HOLES, OCCLOGOCC_ELECTRONS) &
-!$OMP REDUCTION(+: S)
+        !$OMP PARALLEL DO DEFAULT(NONE) &
+        !$OMP SHARED(NKTOT, HDIM, KEVALS, CHEMPOT, KBT) &
+        !$OMP PRIVATE(K, I, FDIRACARG, FDIRAC, OCCLOGOCC_HOLES, OCCLOGOCC_ELECTRONS) &
+        !$OMP REDUCTION(+: S)
 
         DO K = 1, NKTOT
            DO I = 1, HDIM
@@ -155,7 +155,7 @@ SUBROUTINE KBOEVECS
            ENDDO
         ENDDO
 
-!$OMP END PARALLEL DO
+        !$OMP END PARALLEL DO
 
         S = S/REAL(NKTOT)
 
@@ -163,11 +163,11 @@ SUBROUTINE KBOEVECS
 
         ! If we have an even number of electrons
 
-!        IF (MOD(INT(TOTNE),2) .EQ. 0) THEN
-!           EGAP = EVALS(INT(OCCTARGET) + 1) - EVALS(INT(OCCTARGET))
-!        ELSE
-!           EGAP = ZERO
-!        ENDIF
+        !        IF (MOD(INT(TOTNE),2) .EQ. 0) THEN
+        !           EGAP = EVALS(INT(OCCTARGET) + 1) - EVALS(INT(OCCTARGET))
+        !        ELSE
+        !           EGAP = ZERO
+        !        ENDIF
 
      ENDIF
 
@@ -211,7 +211,7 @@ SUBROUTINE KBOEVECS
         ENDIF
      ENDDO
 
-!     CALL MPI_Barrier(MPI_COMM_WORLD, IERR)
+     !     CALL MPI_Barrier(MPI_COMM_WORLD, IERR)
 
      ! Collect KBO on rank 0 then broadcast
 
@@ -265,7 +265,7 @@ SUBROUTINE KBOEVECS
 
      IF (MOD(INT(TOTNE),2) .NE. 0) THEN
         CALL ERRORS("kbodirect","Odd number of electrons - run a &
-        & spin-polarized calculation or use a finite electron temperature")
+             & spin-polarized calculation or use a finite electron temperature")
      ENDIF
 
      !
@@ -300,9 +300,9 @@ SUBROUTINE KBOEVECS
         DO I = 1, HDIM
 
            IF (KEVALS(I,K) .LE. CHEMPOT .AND. COUNT .LT. LOOPTARGET) THEN
-  	   COUNT = COUNT + 1
-               CALL ZGERC(HDIM, HDIM, ZONE, KEVECS(:,I,K), 1, &
-                    KEVECS(:,I,K), 1, KBO(:,:,K), HDIM)
+              COUNT = COUNT + 1
+              CALL ZGERC(HDIM, HDIM, ZONE, KEVECS(:,I,K), 1, &
+                   KEVECS(:,I,K), 1, KBO(:,:,K), HDIM)
 
 	   ENDIF
 
@@ -327,7 +327,7 @@ SUBROUTINE KBOEVECS
         ENDIF
      ENDDO
 
-!     CALL MPI_Barrier(MPI_COMM_WORLD, IERR)
+     !     CALL MPI_Barrier(MPI_COMM_WORLD, IERR)
 
      ! Collect KBO on rank 0 then broadcast
 
@@ -380,7 +380,7 @@ SUBROUTINE KBOEVECS
 
   ENDIF
 
-!  PRINT*, COUNT, OCCTARGET
+  !  PRINT*, COUNT, OCCTARGET
 
   KBO = KBO*CMPLX(TWO)
 
@@ -399,7 +399,7 @@ SUBROUTINE KBOEVECS
 
   ENDIF
 
-12   FORMAT(100F8.3)
+12 FORMAT(100F8.3)
 
 #ifdef MPI_ON
   DEALLOCATE(TMPKBO)

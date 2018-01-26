@@ -27,18 +27,18 @@ SUBROUTINE SP2PURE_SPARSE
   !
 
 #ifdef DBCSR_ON
-!**************************************************************
-!use these dbcsr mod files
+  !**************************************************************
+  !use these dbcsr mod files
   USE DBCSR_VAR_MOD
   USE dbcsr_types
   USE dbcsr_methods
   USE dbcsr_error_handling
   USE array_types,                     ONLY: array_data,&
-                                             array_i1d_obj,&
-                                             array_new,&
-                                             array_nullify,&
-                                             array_release,&
-                                             array_size
+       array_i1d_obj,&
+       array_new,&
+       array_nullify,&
+       array_release,&
+       array_size
   USE dbcsr_io
   USE dbcsr_operations
   USE dbcsr_ptr_util
@@ -49,12 +49,12 @@ SUBROUTINE SP2PURE_SPARSE
 
   USE dbcsr_block_access
   USE dbcsr_iterator_operations,       ONLY: dbcsr_iterator_blocks_left,&
-                                               dbcsr_iterator_next_block,&
-                                               dbcsr_iterator_start,&
-                                               dbcsr_iterator_stop
+       dbcsr_iterator_next_block,&
+       dbcsr_iterator_start,&
+       dbcsr_iterator_stop
 
   USE dbcsr_dist_operations,          ! ONLY: create_bl_distribution,&                                                               !        dbcsr_get_stored_coordinates
-!*****************************************************************
+  !*****************************************************************
 #endif
 
   USE CONSTANTS_MOD
@@ -105,7 +105,7 @@ SUBROUTINE SP2PURE_SPARSE
 
   IF (SPINON .EQ. 1) THEN
      CALL ERRORS("sp2pure_sparse","Sparse SP2 with DBSCR for &
-     & spin-polarized systems hasn't been implemented just yet")
+          & spin-polarized systems hasn't been implemented just yet")
   ENDIF
 
 
@@ -180,14 +180,14 @@ SUBROUTINE SP2PURE_SPARSE
      DO i=1, dbcsr_nblkrows_total(matrix_a)
 
 	FROB = ZERO
-        do a = 1, BLKSZ
-           do b = 1, BLKSZ
+        DO a = 1, BLKSZ
+           DO b = 1, BLKSZ
 
               BLOCK_2D(b,a)=BO_PADDED(BLKSZ*(i-1)+b,BLKSZ*(j-1)+a)
               FROB = FROB + BLOCK_2D(b,a)*BLOCK_2D(b,a)
 
-           enddo
-        enddo
+           ENDDO
+        ENDDO
 
         tr = .FALSE.
 
@@ -208,20 +208,20 @@ SUBROUTINE SP2PURE_SPARSE
   ENDDO
 
 
- !refinallizes matrix a
+  !refinallizes matrix a
 
   CALL dbcsr_finalize(matrix_a, error=error)
   CALL dbcsr_finalize(matrix_b, error=error)
 
   ! Now throw away all the BLKSZ*BLKSZ blocks that have nothing in them
 
-! OCC = dbcsr_get_occupation(matrix_a)
-! PRINT*, "OCC 1 = ", OCC
+  ! OCC = dbcsr_get_occupation(matrix_a)
+  ! PRINT*, "OCC 1 = ", OCC
 
-! CALL dbcsr_filter(matrix_a, eps=1.0d-12, error=error)
+  ! CALL dbcsr_filter(matrix_a, eps=1.0d-12, error=error)
 
-! OCC = dbcsr_get_occupation(matrix_a)
-! PRINT*, "OCC 2 = ", OCC
+  ! OCC = dbcsr_get_occupation(matrix_a)
+  ! PRINT*, "OCC 2 = ", OCC
 
   ITERZ = 0
 
@@ -274,8 +274,8 @@ SUBROUTINE SP2PURE_SPARSE
 
      ! Filtering, if desired
 
-!     IF (THRESHOLDON .EQ. 1) CALL dbcsr_filter(matrix_a, &
-!          eps=NUMTHRESH, error=error)
+     !     IF (THRESHOLDON .EQ. 1) CALL dbcsr_filter(matrix_a, &
+     !          eps=NUMTHRESH, error=error)
 
      IDEMPERR2 = IDEMPERR1
      IDEMPERR1 = IDEMPERR
@@ -302,7 +302,7 @@ SUBROUTINE SP2PURE_SPARSE
   !shares data with all procs
   CALL dbcsr_replicate_all(matrix_a, error)
 
-!  BO = ZERO
+  !  BO = ZERO
 
 
   DO j=1, dbcsr_nblkcols_total(matrix_a)
@@ -316,15 +316,15 @@ SUBROUTINE SP2PURE_SPARSE
 
         CALL dbcsr_get_block(matrix_a, i, j, BLOCK_2D, tr, found)
 
-	do a = 1, BLKSZ
-           do b = 1, BLKSZ
+	DO a = 1, BLKSZ
+           DO b = 1, BLKSZ
 
-              if(found) THEN
+              IF(found) THEN
                  BO_PADDED(BLKSZ*(i-1)+b,BLKSZ*(j-1)+a) = TWO*BLOCK_2D(b,a)
               ENDIF
 
-           enddo
-	enddo
+           ENDDO
+	ENDDO
 
 
      ENDDO
@@ -475,7 +475,7 @@ SUBROUTINE SP2PURE_SPARSE
 
      IF (ITERZ .EQ. FILLINSTOP) NNZX2 = INT(1.1*NNZX2)
 
-!     print*, ITERZ, NNZX2, PREVNNZX2, FLOAT(NNZX2)/FLOAT((HDIM*HDIM))
+     !     print*, ITERZ, NNZX2, PREVNNZX2, FLOAT(NNZX2)/FLOAT((HDIM*HDIM))
 
      IF (ITERZ .EQ. 1) THEN
 
@@ -645,8 +645,8 @@ SUBROUTINE SP2PURE_SPARSE
 
            IF (ITERZ .LE. FILLINSTOP .AND. RX(HDIM + 1) .NE. NNZX2 ) THEN
 
-                 DEALLOCATE( VX, CX )
-                 ALLOCATE( VX(NNZX2), CX(NNZX2) )
+              DEALLOCATE( VX, CX )
+              ALLOCATE( VX(NNZX2), CX(NNZX2) )
 
            ENDIF
 
@@ -662,8 +662,8 @@ SUBROUTINE SP2PURE_SPARSE
      IDEMPERR1 = IDEMPERR
      IDEMPERR = ABS(TRX - TRXOLD)
 
-!     PRINT*, IDEMPERR, ABS(TRX2 - OCC) - ABS(TR2XX2 - OCC)
-!     PRINT*, ITERZ, IDEMPERR0 - IDEMPERR2, ABS(TRX - OCC)
+     !     PRINT*, IDEMPERR, ABS(TRX2 - OCC) - ABS(TR2XX2 - OCC)
+     !     PRINT*, ITERZ, IDEMPERR0 - IDEMPERR2, ABS(TRX - OCC)
      !PRINT*, ITERZ, ABS(TRX - OCC)
 
      IF (SP2CONV .EQ. "REL" .AND.  ITERZ .GE. MINSP2ITER &

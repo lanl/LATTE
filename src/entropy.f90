@@ -109,10 +109,10 @@ SUBROUTINE ENTROPY
 
 #ifdef DOUBLEPREC
         CALL DSYEVD(JOBZ, UPLO, HDIM, S_EVEC, HDIM, S_EVAL, WORK, LWORK, &
-	           IWORK, LIWORK, INFO)
+             IWORK, LIWORK, INFO)
 #elif defined(SINGLEPREC)
         CALL SSYEVD(JOBZ, UPLO, HDIM, S_EVEC, HDIM, S_EVAL, WORK, LWORK, &
-	            IWORK, LIWORK, INFO)
+             IWORK, LIWORK, INFO)
 #endif
 
 #endif
@@ -159,10 +159,10 @@ SUBROUTINE ENTROPY
 
 #ifdef DOUBLEPREC
         CALL DSYEVD(JOBZ, UPLO, HDIM, S_EVEC, HDIM, S_EVAL, WORK, LWORK, &
-	           IWORK, LIWORK, INFO)
+             IWORK, LIWORK, INFO)
 #elif defined(SINGLEPREC)
         CALL SSYEVD(JOBZ, UPLO, HDIM, S_EVEC, HDIM, S_EVAL, WORK, LWORK, &
-	            IWORK, LIWORK, INFO)
+             IWORK, LIWORK, INFO)
 #endif
 
 #endif
@@ -203,10 +203,10 @@ SUBROUTINE ENTROPY
 
 #ifdef DOUBLEPREC
         CALL DSYEVD(JOBZ, UPLO, HDIM, S_EVEC, HDIM, S_EVAL, WORK, LWORK, &
-	           IWORK, LIWORK, INFO)
+             IWORK, LIWORK, INFO)
 #elif defined(SINGLEPREC)
         CALL SSYEVD(JOBZ, UPLO, HDIM, S_EVEC, HDIM, S_EVAL, WORK, LWORK, &
-	            IWORK, LIWORK, INFO)
+             IWORK, LIWORK, INFO)
 #endif
 
 #endif
@@ -391,11 +391,11 @@ SUBROUTINE ENTROPY
         !
 
 #ifdef DOUBLEPREC
-      CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 0.25D0, &
-      BO, HDIM, BO, HDIM, 0.0D0, MAT2, HDIM)
+        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 0.25D0, &
+             BO, HDIM, BO, HDIM, 0.0D0, MAT2, HDIM)
 #elif defined(SINGLEPREC)
-      CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 0.25, &
-      BO, HDIM, BO, HDIM, 0.0, MAT2, HDIM)
+        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 0.25, &
+             BO, HDIM, BO, HDIM, 0.0, MAT2, HDIM)
 #endif
 
         DO I = 1, HDIM
@@ -426,10 +426,10 @@ SUBROUTINE ENTROPY
 
 #ifdef DOUBLEPREC
         CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                RHOUP, HDIM, RHOUP, HDIM, 0.0D0, MAT2, HDIM)
+             RHOUP, HDIM, RHOUP, HDIM, 0.0D0, MAT2, HDIM)
 #elif defined(SINGLEPREC)
-                CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                RHOUP, HDIM, RHOUP, HDIM, 0.0, MAT2, HDIM)
+        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+             RHOUP, HDIM, RHOUP, HDIM, 0.0, MAT2, HDIM)
 #endif
 
         DO I = 1, HDIM
@@ -455,11 +455,11 @@ SUBROUTINE ENTROPY
         !
 
 #ifdef DOUBLEPREC
-           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                RHODOWN, HDIM, RHODOWN, HDIM, 0.0D0, MAT2, HDIM)
+        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+             RHODOWN, HDIM, RHODOWN, HDIM, 0.0D0, MAT2, HDIM)
 #elif defined(SINGLEPREC)
-           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                RHODOWN, HDIM, RHODOWN, HDIM, 0.0, MAT2, HDIM)
+        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+             RHODOWN, HDIM, RHODOWN, HDIM, 0.0, MAT2, HDIM)
 #endif
 
         DO I = 1, HDIM
@@ -507,11 +507,11 @@ SUBROUTINE ENTROPY
         !
 
 #ifdef DOUBLEPREC
-           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 0.25D0, &
-                BO, HDIM, BO, HDIM, 0.0D0, MAT2, HDIM)
+        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 0.25D0, &
+             BO, HDIM, BO, HDIM, 0.0D0, MAT2, HDIM)
 #elif defined(SINGLEPREC)
-           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 0.25, &
-                BO, HDIM, BO, HDIM, 0.0, MAT2, HDIM)
+        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 0.25, &
+             BO, HDIM, BO, HDIM, 0.0, MAT2, HDIM)
 #endif
 
         Y = MAT2 - HALF*BO
@@ -521,11 +521,11 @@ SUBROUTINE ENTROPY
         !
 
 #ifdef DOUBLEPREC
-           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                Y, HDIM, Y, HDIM, 0.0D0, MAT2, HDIM)
+        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+             Y, HDIM, Y, HDIM, 0.0D0, MAT2, HDIM)
 #elif defined(SINGLEPREC)
-           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                Y, HDIM, Y, HDIM, 0.0, MAT2, HDIM)
+        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+             Y, HDIM, Y, HDIM, 0.0, MAT2, HDIM)
 #endif
 
         DO I = 1, HDIM
@@ -557,11 +557,11 @@ SUBROUTINE ENTROPY
         ! MAT2 = X*X
 
 #ifdef DOUBLEPREC
-           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                RHOUP, HDIM, RHOUP, HDIM, 0.0D0, MAT2, HDIM)
+        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+             RHOUP, HDIM, RHOUP, HDIM, 0.0D0, MAT2, HDIM)
 #elif defined(SINGLEPREC)
-           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                RHOUP, HDIM, RHOUP, HDIM, 0.0, MAT2, HDIM)
+        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+             RHOUP, HDIM, RHOUP, HDIM, 0.0, MAT2, HDIM)
 #endif
 
         Y = MAT2 - RHOUP
@@ -569,11 +569,11 @@ SUBROUTINE ENTROPY
         ! MAT2 = Y*Y
 
 #ifdef DOUBLEPREC
-           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                Y, HDIM, Y, HDIM, 0.0D0, MAT2, HDIM)
+        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+             Y, HDIM, Y, HDIM, 0.0D0, MAT2, HDIM)
 #elif defined(SINGLEPREC)
-           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                Y, HDIM, Y, HDIM, 0.0, MAT2, HDIM)
+        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+             Y, HDIM, Y, HDIM, 0.0, MAT2, HDIM)
 #endif
 
         DO I = 1, HDIM
@@ -601,11 +601,11 @@ SUBROUTINE ENTROPY
         ! MAT2 = X*X
 
 #ifdef DOUBLEPREC
-           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                RHODOWN, HDIM, RHODOWN, HDIM, 0.0D0, MAT2, HDIM)
+        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+             RHODOWN, HDIM, RHODOWN, HDIM, 0.0D0, MAT2, HDIM)
 #elif defined(SINGLEPREC)
-           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                RHODOWN, HDIM, RHODOWN, HDIM, 0.0, MAT2, HDIM)
+        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+             RHODOWN, HDIM, RHODOWN, HDIM, 0.0, MAT2, HDIM)
 #endif
 
         Y = MAT2 - RHODOWN
@@ -613,11 +613,11 @@ SUBROUTINE ENTROPY
         ! MAT2 = Y*Y
 
 #ifdef DOUBLEPREC
-           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                Y, HDIM, Y, HDIM, 0.0D0, MAT2, HDIM)
+        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+             Y, HDIM, Y, HDIM, 0.0D0, MAT2, HDIM)
 #elif defined(SINGLEPREC)
-           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                Y, HDIM, Y, HDIM, 0.0, MAT2, HDIM)
+        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+             Y, HDIM, Y, HDIM, 0.0, MAT2, HDIM)
 #endif
 
         DO I = 1, HDIM

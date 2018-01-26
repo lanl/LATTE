@@ -36,14 +36,14 @@ SUBROUTINE SOLVEMATCG
 
   IF (SPINON .EQ. 0) THEN
 
-  ! Let's try storing X2 in P0...
+     ! Let's try storing X2 in P0...
 
 #ifdef DOUBLEPREC
-        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-             BO, HDIM, BO, HDIM, 0.0D0, P0, HDIM)
+     CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+          BO, HDIM, BO, HDIM, 0.0D0, P0, HDIM)
 #elif defined(SINGLEPREC)
-        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-             BO, HDIM, BO, HDIM, 0.0, P0, HDIM)
+     CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+          BO, HDIM, BO, HDIM, 0.0, P0, HDIM)
 #endif
 
      A = TWO*(P0 - BO)
@@ -53,11 +53,11 @@ SUBROUTINE SOLVEMATCG
      ENDDO
 
 #ifdef DOUBLEPREC
-        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-             A, HDIM, BO, HDIM, 0.0D0, R0, HDIM)
+     CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+          A, HDIM, BO, HDIM, 0.0D0, R0, HDIM)
 #elif defined(SINGLEPREC)
-        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-             A, HDIM, BO, HDIM, 0.0, R0, HDIM)
+     CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+          A, HDIM, BO, HDIM, 0.0, R0, HDIM)
 #endif
 
      R0 = R0 - P0
@@ -78,19 +78,19 @@ SUBROUTINE SOLVEMATCG
 
 
 #ifdef DOUBLEPREC
-           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                A, HDIM, P0, HDIM, 0.0D0, TMPMAT, HDIM)
+        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+             A, HDIM, P0, HDIM, 0.0D0, TMPMAT, HDIM)
 #elif defined(SINGLEPREC)
-           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                A, HDIM, P0, HDIM, 0.0, TMPMAT, HDIM)
+        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+             A, HDIM, P0, HDIM, 0.0, TMPMAT, HDIM)
 #endif
 
         ERROR2 = ZERO
 
-!$OMP PARALLEL DO DEFAULT(NONE) &
-!$OMP SHARED (TMPMAT, R0, P0, BO, HDIM) &
-!$OMP PRIVATE(I, J, R0VEC, P0VEC, R1VEC, XALPHA, XBETA) &
-!$OMP REDUCTION(+ : ERROR2)
+        !$OMP PARALLEL DO DEFAULT(NONE) &
+        !$OMP SHARED (TMPMAT, R0, P0, BO, HDIM) &
+        !$OMP PRIVATE(I, J, R0VEC, P0VEC, R1VEC, XALPHA, XBETA) &
+        !$OMP REDUCTION(+ : ERROR2)
 
         DO I = 1, HDIM
 
@@ -133,14 +133,14 @@ SUBROUTINE SOLVEMATCG
 
         ENDDO
 
-!$OMP END PARALLEL DO
-!$OMP BARRIER
+        !$OMP END PARALLEL DO
+        !$OMP BARRIER
 
         IF (ERROR2 .LT. CGTOL2) THEN
            BREAKLOOP = 1
         ENDIF
 
-!        PRINT*, ITER, ERROR2
+        !        PRINT*, ITER, ERROR2
 
      ENDDO
 
@@ -149,11 +149,11 @@ SUBROUTINE SOLVEMATCG
      ! This is the spin-polarized version
 
 #ifdef DOUBLEPREC
-        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-             RHOUP, HDIM, RHOUP, HDIM, 0.0D0, P0, HDIM)
+     CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+          RHOUP, HDIM, RHOUP, HDIM, 0.0D0, P0, HDIM)
 #elif defined(SINGLEPREC)
-        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-             RHOUP, HDIM, RHOUP, HDIM, 0.0, P0, HDIM)
+     CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+          RHOUP, HDIM, RHOUP, HDIM, 0.0, P0, HDIM)
 #endif
 
      A = TWO*(P0 - RHOUP)
@@ -163,11 +163,11 @@ SUBROUTINE SOLVEMATCG
      ENDDO
 
 #ifdef DOUBLEPREC
-        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-             A, HDIM, RHOUP, HDIM, 0.0D0, TMPMAT, HDIM)
+     CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+          A, HDIM, RHOUP, HDIM, 0.0D0, TMPMAT, HDIM)
 #elif defined(SINGLEPREC)
-        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-             A, HDIM, RHOUP, HDIM, 0.0, TMPMAT, HDIM)
+     CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+          A, HDIM, RHOUP, HDIM, 0.0, TMPMAT, HDIM)
 #endif
 
      R0 = TMPMAT - P0
@@ -190,19 +190,19 @@ SUBROUTINE SOLVEMATCG
         !     PRINT*, ITER, ERROR2
 
 #ifdef DOUBLEPREC
-           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                A, HDIM, P0, HDIM, 0.0D0, TMPMAT, HDIM)
+        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+             A, HDIM, P0, HDIM, 0.0D0, TMPMAT, HDIM)
 #elif defined(SINGLEPREC)
-           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                A, HDIM, P0, HDIM, 0.0, TMPMAT, HDIM)
+        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+             A, HDIM, P0, HDIM, 0.0, TMPMAT, HDIM)
 #endif
 
         ERROR2 = ZERO
 
-!$OMP PARALLEL DO DEFAULT(NONE) &
-!$OMP SHARED (TMPMAT, R0, P0, RHOUP, HDIM) &
-!$OMP PRIVATE(I, J, R0VEC, P0VEC, R1VEC, XALPHA, XBETA) &
-!$OMP REDUCTION(+ : ERROR2)
+        !$OMP PARALLEL DO DEFAULT(NONE) &
+        !$OMP SHARED (TMPMAT, R0, P0, RHOUP, HDIM) &
+        !$OMP PRIVATE(I, J, R0VEC, P0VEC, R1VEC, XALPHA, XBETA) &
+        !$OMP REDUCTION(+ : ERROR2)
 
         DO I = 1, HDIM
 
@@ -245,10 +245,10 @@ SUBROUTINE SOLVEMATCG
 
         ENDDO
 
-!$OMP END PARALLEL DO
-!$OMP BARRIER
+        !$OMP END PARALLEL DO
+        !$OMP BARRIER
 
-!        PRINT*, "UP ", ITER, ERROR2
+        !        PRINT*, "UP ", ITER, ERROR2
 
         IF (ITER .GT. 3 .AND. ERROR2 .LT. CGTOL2) THEN
            BREAKLOOP = 1
@@ -257,11 +257,11 @@ SUBROUTINE SOLVEMATCG
      ENDDO
 
 #ifdef DOUBLEPREC
-        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-             RHODOWN, HDIM, RHODOWN, HDIM, 0.0D0, P0, HDIM)
+     CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+          RHODOWN, HDIM, RHODOWN, HDIM, 0.0D0, P0, HDIM)
 #elif defined(SINGLEPREC)
-        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-             RHODOWN, HDIM, RHODOWN, HDIM, 0.0, P0, HDIM)
+     CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+          RHODOWN, HDIM, RHODOWN, HDIM, 0.0, P0, HDIM)
 #endif
 
      A = TWO*(P0 - RHODOWN)
@@ -271,11 +271,11 @@ SUBROUTINE SOLVEMATCG
      ENDDO
 
 #ifdef DOUBLEPREC
-        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-             A, HDIM, RHODOWN, HDIM, 0.0D0, TMPMAT, HDIM)
+     CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+          A, HDIM, RHODOWN, HDIM, 0.0D0, TMPMAT, HDIM)
 #elif defined(SINGLEPREC)
-        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-             A, HDIM, RHODOWN, HDIM, 0.0, TMPMAT, HDIM)
+     CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+          A, HDIM, RHODOWN, HDIM, 0.0, TMPMAT, HDIM)
 #endif
 
      R0 = TMPMAT - P0
@@ -297,19 +297,19 @@ SUBROUTINE SOLVEMATCG
         !     PRINT*, ITER, ERROR2
 
 #ifdef DOUBLEPREC
-           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                A, HDIM, P0, HDIM, 0.0D0, TMPMAT, HDIM)
+        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+             A, HDIM, P0, HDIM, 0.0D0, TMPMAT, HDIM)
 #elif defined(SINGLEPREC)
-           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                A, HDIM, P0, HDIM, 0.0, TMPMAT, HDIM)
+        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+             A, HDIM, P0, HDIM, 0.0, TMPMAT, HDIM)
 #endif
 
         ERROR2 = ZERO
 
-!$OMP PARALLEL DO DEFAULT(NONE) &
-!$OMP SHARED (TMPMAT, R0, P0, RHODOWN, HDIM) &
-!$OMP PRIVATE(I, J, R0VEC, P0VEC, R1VEC, XALPHA, XBETA) &
-!$OMP REDUCTION(+ : ERROR2)
+        !$OMP PARALLEL DO DEFAULT(NONE) &
+        !$OMP SHARED (TMPMAT, R0, P0, RHODOWN, HDIM) &
+        !$OMP PRIVATE(I, J, R0VEC, P0VEC, R1VEC, XALPHA, XBETA) &
+        !$OMP REDUCTION(+ : ERROR2)
 
         DO I = 1, HDIM
 
@@ -352,10 +352,10 @@ SUBROUTINE SOLVEMATCG
 
         ENDDO
 
-!$OMP END PARALLEL DO
-!$OMP BARRIER
+        !$OMP END PARALLEL DO
+        !$OMP BARRIER
 
-!        PRINT*, "DOWN ", ITER, ERROR2
+        !        PRINT*, "DOWN ", ITER, ERROR2
 
         IF (ITER .GT. 3 .AND. ERROR2 .LT. CGTOL2) THEN
            BREAKLOOP = 1

@@ -68,7 +68,7 @@ SUBROUTINE GENX
      CALL ERRORS("genX","Eigenvalues of overlap matrix <= 0")
   ENDIF
 
-!  PRINT*,  MINVAL(NONO_EVALS), MAXVAL(NONO_EVALS)
+  !  PRINT*,  MINVAL(NONO_EVALS), MAXVAL(NONO_EVALS)
 
   DO I = 1, HDIM
 
@@ -82,10 +82,10 @@ SUBROUTINE GENX
 
 #ifdef DOUBLEPREC
   CALL DGEMM('N', 'T', HDIM, HDIM, HDIM, ONE, &
-             NONOTMP, HDIM, UMAT, HDIM, ZERO, XMAT, HDIM)
+       NONOTMP, HDIM, UMAT, HDIM, ZERO, XMAT, HDIM)
 #elif defined(SINGLEPREC)
   CALL SGEMM('N', 'T', HDIM, HDIM, HDIM, ONE, &
-             NONOTMP, HDIM, UMAT, HDIM, ZERO, XMAT, HDIM)
+       NONOTMP, HDIM, UMAT, HDIM, ZERO, XMAT, HDIM)
 #endif
 
   IF (DEBUGON .EQ. 1) THEN
@@ -106,24 +106,24 @@ SUBROUTINE GENX
 
      ! Let's also check the inverse
 
-!     CALL DGEMM( 'N', 'N', HDIM, HDIM, HDIM, ONE, &
-!             XMAT, HDIM, XMAT, HDIM, ZERO, XSQ, HDIM)
-!     CALL DGEMM( 'N', 'N', HDIM, HDIM, HDIM, ONE, &
-!             XSQ, HDIM, IDENTITY, HDIM, ZERO, NONOTMP, HDIM)
+     !     CALL DGEMM( 'N', 'N', HDIM, HDIM, HDIM, ONE, &
+     !             XMAT, HDIM, XMAT, HDIM, ZERO, XSQ, HDIM)
+     !     CALL DGEMM( 'N', 'N', HDIM, HDIM, HDIM, ONE, &
+     !             XSQ, HDIM, IDENTITY, HDIM, ZERO, NONOTMP, HDIM)
 
 #ifdef DOUBLEPREC
 
      CALL DGEMM( 'T', 'N', HDIM, HDIM, HDIM, ONE, &
-             XMAT, HDIM, SMAT, HDIM, ZERO, NONOTMP, HDIM)
+          XMAT, HDIM, SMAT, HDIM, ZERO, NONOTMP, HDIM)
      CALL DGEMM( 'N', 'N', HDIM, HDIM, HDIM, ONE, &
-             NONOTMP, HDIM, XMAT, HDIM, ZERO, IDENTITY, HDIM)
+          NONOTMP, HDIM, XMAT, HDIM, ZERO, IDENTITY, HDIM)
 
 #elif defined(SINGLEPREC)
 
      CALL SGEMM( 'T', 'N', HDIM, HDIM, HDIM, ONE, &
-             XMAT, HDIM, SMAT, HDIM, ZERO, NONOTMP, HDIM)
+          XMAT, HDIM, SMAT, HDIM, ZERO, NONOTMP, HDIM)
      CALL SGEMM( 'N', 'N', HDIM, HDIM, HDIM, ONE, &
-             NONOTMP, HDIM, XMAT, HDIM, ZERO, IDENTITY, HDIM)
+          NONOTMP, HDIM, XMAT, HDIM, ZERO, IDENTITY, HDIM)
 
 #endif
 

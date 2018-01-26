@@ -28,43 +28,27 @@
 SUBROUTINE ERRORS(SUB,TAG)
   USE CONSTANTS_MOD, ONLY: LIBRUN, EXISTERROR
   USE TIMER_MOD, ONLY: TIMEDATE_TAG
-  USE MYPRECISION, ONLY: LATTEPREC
-  USE LATTE_LIB, ONLY: LATTE
   CHARACTER(*), INTENT(IN) :: SUB,TAG
-
-  REAL(LATTEPREC) :: CR_IN(1,1),VEL_IN(1,1), MASSES_IN(1),XLO(3),XHI(3)
-  REAL(LATTEPREC) :: DT_IN, XY, XZ, YZ
-  REAL(LATTEPREC) :: FTOT_OUT(1,1), VENERG
-  REAL(LATTEPREC) :: VIRIALINOUT(6)
-  INTEGER         ::  NTYPES, TYPES(1), MAXITER_IN
 
   WRITE(*,*)"LIBRUN",LIBRUN
   IF(LIBRUN)THEN
-    WRITE(*,*) "# *************ERROR**************"
-    WRITE(*,*) "# LATTE stop due to the following error at subroutine ",SUB,":"
-    WRITE(*,*) "# ",TAG
-    CALL TIMEDATE_TAG("The error occurred at: ")
-    WRITE(*,*) "# The error will be reported back to the host code"
-    WRITE(*,*) "# ********************************"
-    EXISTERROR = .true.
-
-    !Call the main routine back
-    NTYPE = 0; TYPES = 0; CR_IN = 0; MASSES_IN = 0; XLO = 0
-    XHI = 0; XY = 0; XZ = 0; YZ = 0; FTOT_OUT = 0; MAXITER_IN = 0
-    VENERG = 0; VEL_IN = 0 ; DT_IN = 0; VIRIALINOUT = 0
-    CALL LATTE(NTYPES,TYPES,CR_IN,MASSES_IN,XLO,XHI,XY,XZ,YZ,FTOT_OUT, &
-         MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIALINOUT, EXISTERROR)
-
-    STOP
+     WRITE(*,*) "# *************ERROR**************"
+     WRITE(*,*) "# LATTE stop due to the following error at subroutine ",SUB,":"
+     WRITE(*,*) "# ",TAG
+     CALL TIMEDATE_TAG("The error occurred at: ")
+     WRITE(*,*) "# This error will be reported back to the hosting code"
+     WRITE(*,*) "# ********************************"
+     EXISTERROR = .TRUE.
+     STOP
   ELSE
-    WRITE(*,*) ""
-    WRITE(*,*) "# *************ERROR**************"
-    WRITE(*,*) "# LATTE stopped due to the following error at subroutine ",SUB,":"
-    WRITE(*,*) "# ",TAG
-    CALL TIMEDATE_TAG("The error occurred at: ")
-    WRITE(*,*) "# ********************************"
-    WRITE(*,*) ""
-    STOP
+     WRITE(*,*) ""
+     WRITE(*,*) "# *************ERROR**************"
+     WRITE(*,*) "# LATTE stopped due to the following error at subroutine ",SUB,":"
+     WRITE(*,*) "# ",TAG
+     CALL TIMEDATE_TAG("The error occurred at: ")
+     WRITE(*,*) "# ********************************"
+     WRITE(*,*) ""
+     STOP
   ENDIF
 
 END SUBROUTINE ERRORS

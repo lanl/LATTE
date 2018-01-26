@@ -36,14 +36,14 @@ SUBROUTINE READTB
   CHARACTER(LEN=20) :: HD
   REAL(LATTEPREC) :: TAILPARAMS(6)
 
-  write(*,*)trim(PARAMPATH)//"/electrons.dat"
-  
-  OPEN(UNIT=22,STATUS="OLD", FILE=trim(PARAMPATH)//"/electrons.dat")
+  WRITE(*,*)TRIM(PARAMPATH)//"/electrons.dat"
+
+  OPEN(UNIT=22,STATUS="OLD", FILE=TRIM(PARAMPATH)//"/electrons.dat")
 
   READ(22,*) HD, NOELEM
 
   IF(.NOT.ALLOCATED(WSS))THEN
-    ALLOCATE(WSS(NOELEM),WPP(NOELEM),WDD(NOELEM),WFF(NOELEM))
+     ALLOCATE(WSS(NOELEM),WPP(NOELEM),WDD(NOELEM),WFF(NOELEM))
   ENDIF
 
   ALLOCATE(ELE(NOELEM), BASIS(NOELEM), ATOCC(NOELEM), HES(NOELEM), &
@@ -54,15 +54,15 @@ SUBROUTINE READTB
 
   DO I = 1, NOELEM
      READ(22,*) ELE(I), BASIS(I), ATOCC(I), HES(I), HEP(I), HED(I), HEF(I), &
-       MASS(I), HUBBARDU(I), WSS(I), WPP(I), WDD(I), WFF(I)
+          MASS(I), HUBBARDU(I), WSS(I), WPP(I), WDD(I), WFF(I)
   ENDDO
 
   CLOSE(22)
 
   IF (BASISTYPE .EQ. "ORTHO") THEN
-     OPEN(UNIT=11,STATUS="OLD", FILE=trim(PARAMPATH)//"/bondints.ortho")
+     OPEN(UNIT=11,STATUS="OLD", FILE=TRIM(PARAMPATH)//"/bondints.ortho")
   ELSE
-     OPEN(UNIT=11,STATUS="OLD", FILE=trim(PARAMPATH)//"/bondints.nonortho")
+     OPEN(UNIT=11,STATUS="OLD", FILE=TRIM(PARAMPATH)//"/bondints.nonortho")
   ENDIF
 
   READ(11,*) HD, NOINT
@@ -102,16 +102,16 @@ SUBROUTINE READTB
   ! If we're doing k-space integration, let's read in the k point mesh
   IF (KON .EQ. 1) THEN
 
-    IF (LATTEINEXISTS) THEN
-      CALL PARSE_KMESH("latte.in")
-    ELSE
-      OPEN(UNIT=11, STATUS="OLD", FILE=trim(PARAMPATH)//"/kmesh.in")
-      READ(11,*) NKX, NKY, NKZ
-      READ(11,*) KSHIFT(1), KSHIFT(2), KSHIFT(3)
-      CLOSE (11)
-    ENDIF
+     IF (LATTEINEXISTS) THEN
+        CALL PARSE_KMESH("latte.in")
+     ELSE
+        OPEN(UNIT=11, STATUS="OLD", FILE=TRIM(PARAMPATH)//"/kmesh.in")
+        READ(11,*) NKX, NKY, NKZ
+        READ(11,*) KSHIFT(1), KSHIFT(2), KSHIFT(3)
+        CLOSE (11)
+     ENDIF
 
-    NKTOT = NKX*NKY*NKZ
+     NKTOT = NKX*NKY*NKZ
 
   ENDIF
 

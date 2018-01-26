@@ -20,7 +20,7 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SUBROUTINE ALLOCATENEBARRAYS
-  
+
   USE CONSTANTS_MOD
   USE SETUPARRAY
   USE NEBLISTARRAY

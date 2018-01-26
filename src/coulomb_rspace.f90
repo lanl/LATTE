@@ -45,20 +45,20 @@ SUBROUTINE COULOMBRSPACE
   REAL(LATTEPREC), PARAMETER :: C7 = -1.13520398, C8 = 1.48851587
   REAL(LATTEPREC), PARAMETER :: C9 = -0.82215223, C10 = 0.17087277 
   REAL(LATTEPREC) :: Z, T, NUMREP_ERFC
-!  REAL(LATTEPREC), EXTERNAL :: NUMREP_ERFC
+  !  REAL(LATTEPREC), EXTERNAL :: NUMREP_ERFC
 
   FCOUL = ZERO
   COULOMBV = ZERO
 
   VIRCOUL = ZERO
 
-!$OMP PARALLEL DO DEFAULT(NONE) &
-!$OMP SHARED(NATS, BOX, CR, COULCUT2, TOTNEBCOUL, NEBCOUL, HUBBARDU, ELEMPOINTER, DELTAQ, COULOMBV ) &
-!$OMP SHARED(CALPHA, CALPHA2, SQRTPI, FCOUL, KECONST, TFACT) &
-!$OMP PRIVATE(I, J, NEWJ, PBCI, PBCJ, PBCK, RIJ, MAGR2, MAGR,TI,TI2,TI3,TI4,TI6,SSA, SSB, SSC, SSD, SSE, SA, SB, SC, SD, SE, SF ) &
-!$OMP PRIVATE(TI2MTJ2, TJ2MTI2, EXPTI, EXPTJ, TJ, TJ2, TJ3, TJ4, TJ6, FORCE, CA, DC, Z, T, NUMREP_ERFC)&
-!$OMP REDUCTION(+:VIRCOUL)  
-
+  !$OMP PARALLEL DO DEFAULT(NONE) &
+  !$OMP SHARED(NATS, BOX, CR, COULCUT2, TOTNEBCOUL, NEBCOUL, HUBBARDU, ELEMPOINTER, DELTAQ, COULOMBV ) &
+  !$OMP SHARED(CALPHA, CALPHA2, SQRTPI, FCOUL, KECONST, TFACT) &
+  !$OMP PRIVATE(I, J, NEWJ, PBCI, PBCJ, PBCK, RIJ, MAGR2, MAGR,TI,TI2,TI3,TI4,TI6,SSA ) &
+  !$OMP PRIVATE(SSB, SSC, SSD, SSE, SA, SB, SC, SD, SE, SF ) &
+  !$OMP PRIVATE(TI2MTJ2, TJ2MTI2, EXPTI, EXPTJ, TJ, TJ2, TJ3, TJ4, TJ6, FORCE, CA, DC, Z, T, NUMREP_ERFC) &
+  !$OMP REDUCTION(+:VIRCOUL)  
   DO I = 1, NATS
 
      TI = TFACT*HUBBARDU(ELEMPOINTER(I))
@@ -80,16 +80,16 @@ SUBROUTINE COULOMBRSPACE
         PBCI = NEBCOUL(2, NEWJ, I)
         PBCJ = NEBCOUL(3, NEWJ, I)
         PBCK = NEBCOUL(4, NEWJ, I)
-        
+
         RIJ(1) = CR(1,J) + REAL(PBCI)*BOX(1,1) + REAL(PBCJ)*BOX(2,1) + &
              REAL(PBCK)*BOX(3,1) - CR(1,I)
-        
+
         RIJ(2) = CR(2,J) + REAL(PBCI)*BOX(1,2) + REAL(PBCJ)*BOX(2,2) + &
              REAL(PBCK)*BOX(3,2) - CR(2,I)
-        
+
         RIJ(3) = CR(3,J) + REAL(PBCI)*BOX(1,3) + REAL(PBCJ)*BOX(2,3) + &
              REAL(PBCK)*BOX(3,3) - CR(3,I)
-        
+
         MAGR2 = RIJ(1)*RIJ(1) + RIJ(2)*RIJ(2) + RIJ(3)*RIJ(3)
 
         IF (MAGR2 .LE. COULCUT2) THEN
@@ -105,14 +105,14 @@ SUBROUTINE COULOMBRSPACE
            DC = RIJ/MAGR
 
            ! Using Numerical Recipes ERFC
- 
+
            Z = ABS(CALPHA*MAGR)
 
            T = ONE/(ONE + HALF*Z)
 
            NUMREP_ERFC = T * EXP(-Z*Z + C1 + T*(C2 + T*(C3 + T*(C4 + T*(C5 + &
                 T*(C6 + T*(C7 + T*(C8 + T*(C9 + T*C10)))))))))
-  
+
            IF ( CALPHA*MAGR .LT. ZERO ) NUMREP_ERFC = TWO - NUMREP_ERFC
 
            CA = NUMREP_ERFC/MAGR
@@ -124,28 +124,28 @@ SUBROUTINE COULOMBRSPACE
            FORCE = -KECONST*DELTAQ(I)*DELTAQ(J)*CA/MAGR
 
            EXPTI = EXP( -TI*MAGR )
-           
+
            IF (ELEMPOINTER(I) .EQ. ELEMPOINTER(J)) THEN
 
               COULOMBV(I) = COULOMBV(I) - DELTAQ(J)*EXPTI* &
                    (SSB*MAGR2 + SSC*MAGR + SSD + SSE/MAGR)
-              
+
               FORCE = FORCE + (KECONST*DELTAQ(I)*DELTAQ(J)*EXPTI) * &
                    ((SSE/MAGR2 - TWO*SSB*MAGR - SSC) + &
                    SSA*(SSB*MAGR2 + SSC*MAGR + SSD + SSE/MAGR))
-              
+
            ELSE
-              
+
               TJ2 = TJ*TJ
               TJ3 = TJ2*TJ
               TJ4 = TJ2*TJ2
               TJ6 = TJ4*TJ2
-              
+
               EXPTJ = EXP( -TJ*MAGR )
-              
+
               TI2MTJ2 = TI2 - TJ2
               TJ2MTI2 = -TI2MTJ2
-              
+
               SA = TI
               SB = TJ4*TI/(TWO * TI2MTJ2 * TI2MTJ2)
               SC = (TJ6 - THREE*TJ4*TI2)/(TI2MTJ2 * TI2MTJ2 * TI2MTJ2)
@@ -153,7 +153,7 @@ SUBROUTINE COULOMBRSPACE
               SD = TJ
               SE = TI4*TJ/(TWO * TJ2MTI2 * TJ2MTI2)
               SF = (TI6 - THREE*TI4*TJ2)/(TJ2MTI2 * TJ2MTI2 * TJ2MTI2)
-              
+
               COULOMBV(I) = COULOMBV(I) - (DELTAQ(J) * &
                    (EXPTI*(SB - (SC/MAGR)) + EXPTJ*(SE - (SF/MAGR))))
 
@@ -162,11 +162,11 @@ SUBROUTINE COULOMBRSPACE
                    (EXPTJ * (SD*(SE - (SF/MAGR)) - (SF/MAGR2))))
 
            ENDIF
-                   
+
            FCOUL(1,I) = FCOUL(1,I) + DC(1)*FORCE
            FCOUL(2,I) = FCOUL(2,I) + DC(2)*FORCE
            FCOUL(3,I) = FCOUL(3,I) + DC(3)*FORCE
-           
+
            VIRCOUL(1) = VIRCOUL(1) + RIJ(1)*DC(1)*FORCE
            VIRCOUL(2) = VIRCOUL(2) + RIJ(2)*DC(2)*FORCE
            VIRCOUL(3) = VIRCOUL(3) + RIJ(3)*DC(3)*FORCE
@@ -179,9 +179,8 @@ SUBROUTINE COULOMBRSPACE
      ENDDO
 
   ENDDO
+  !$OMP END PARALLEL DO
 
-!$OMP END PARALLEL DO
-  
 
   COULOMBV = KECONST * COULOMBV
   VIRCOUL = HALF * VIRCOUL
@@ -198,7 +197,7 @@ END SUBROUTINE COULOMBRSPACE
 
 !  USE MYPRECISION
 
- ! IMPLICIT NONE
+! IMPLICIT NONE
 
 !  REAL(LATTEPREC) :: NUMREP_ERFC, X
 !  REAL(LATTEPREC) :: T, Z
@@ -214,11 +213,11 @@ END SUBROUTINE COULOMBRSPACE
 
 !  NUMREP_ERFC = T * EXP(-Z*Z + C1 + T*(C2 + T*(C3 + T*(C4 + T*(C5 + &
 !       T*(C6 + T*(C7 + T*(C8 + T*(C9 + T*C10)))))))))
-  
+
 !  IF ( X .LT. ZERO ) NUMREP_ERFC = TWO - NUMREP_ERFC
 
 !  RETURN
-  
+
 !END FUNCTION NUMREP_ERFC
 
 

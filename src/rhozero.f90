@@ -40,7 +40,7 @@ SUBROUTINE RHOZERO
 
   IF (SPINON .EQ. 0) THEN
 
-    ! No spins
+     ! No spins
 
      ALLOCATE(BOZERO(HDIM))
 
@@ -444,7 +444,7 @@ SUBROUTINE RHOZERO
 
               INDEX = INDEX + 1
 
-!              NUMPERORB = ONE/FIVE
+              !              NUMPERORB = ONE/FIVE
               NUMPERORB = ZERO
 
               BOZERO(INDEX + 1) = NUMPERORB
@@ -455,7 +455,7 @@ SUBROUTINE RHOZERO
 
               INDEX = INDEX + 5
 
-!              NUMPERORB = (ATOCC(ELEMPOINTER(I)) - THREE)/SEVEN
+              !              NUMPERORB = (ATOCC(ELEMPOINTER(I)) - THREE)/SEVEN
               NUMPERORB = (ATOCC(ELEMPOINTER(I)) - TWO)/SEVEN
 
               BOZERO(INDEX + 1) = NUMPERORB
@@ -471,7 +471,7 @@ SUBROUTINE RHOZERO
            ELSE
 
               CALL ERRORS("rhozero","Check the number of electrons &
-              & you're using with the sdf basis")
+                   & you're using with the sdf basis")
 
            ENDIF
 
@@ -508,7 +508,7 @@ SUBROUTINE RHOZERO
               INDEX = INDEX + 3
 
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. FOURTEEN .AND. &
-              ATOCC(ELEMPOINTER(I)) .LE. TWENTYFOUR) THEN
+                ATOCC(ELEMPOINTER(I)) .LE. TWENTYFOUR) THEN
 
               BOZERO(INDEX + 1) = TWO
               BOZERO(INDEX + 2) = TWO
@@ -601,7 +601,7 @@ SUBROUTINE RHOZERO
               INDEX = INDEX + 3
 
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO .AND. &
-               ATOCC(ELEMPOINTER(I)) .LE. SIXTEEN) THEN
+                ATOCC(ELEMPOINTER(I)) .LE. SIXTEEN) THEN
 
               BOZERO(INDEX + 1) = TWO
 
@@ -632,7 +632,7 @@ SUBROUTINE RHOZERO
               INDEX = INDEX + 3
 
            ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. SIXTEEN .AND. &
-              ATOCC(ELEMPOINTER(I)) .LE. TWENTYSIX) THEN
+                ATOCC(ELEMPOINTER(I)) .LE. TWENTYSIX) THEN
 
               BOZERO(INDEX + 1) = TWO
 
@@ -1160,7 +1160,7 @@ SUBROUTINE RHOZERO
 
            IF (ATOCC(ELEMPOINTER(I)) .GT. FOUR) THEN
               CALL ERRORS("rhozero","The df basis is limited to 4 electrons (U)&
-              & at the moment. Modify the source to go beyond U")
+                   & at the moment. Modify the source to go beyond U")
            ENDIF
 
            IF (ATOCC(ELEMPOINTER(I)) .LE. TWO) THEN
@@ -1434,12 +1434,12 @@ SUBROUTINE RHOZERO
               ! Having one electron in the 6d isn't working...
               ! Let's go with 4 in the 5 f instead
 
-!              SUP = ONE
-!              SDOWN = ONE
-!              FUP = (ATOCC(ELEMPOINTER(I)) - ONE)/SPINMAXF
-!              FDOWN = ZERO
-!              DUP = ONE/SPINMAXD
-!              DDOWN = ZERO
+              !              SUP = ONE
+              !              SDOWN = ONE
+              !              FUP = (ATOCC(ELEMPOINTER(I)) - ONE)/SPINMAXF
+              !              FDOWN = ZERO
+              !              DUP = ONE/SPINMAXD
+              !              DDOWN = ZERO
 
               SUP = ONE
               SDOWN = ONE
@@ -1762,12 +1762,12 @@ SUBROUTINE RHOZERO
 
      ENDIF
 
-!     print*,"a"
-!     CALL GETDELTASPIN
-!     print*, "b"
-!     CALL GETSPINE
-!     print*, "c"
-!     ESPIN_ZERO = ESPIN
+     !     print*,"a"
+     !     CALL GETDELTASPIN
+     !     print*, "b"
+     !     CALL GETSPINE
+     !     print*, "c"
+     !     ESPIN_ZERO = ESPIN
 
   ENDIF
 

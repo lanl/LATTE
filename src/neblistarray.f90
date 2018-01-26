@@ -20,9 +20,9 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 MODULE NEBLISTARRAY
-  
+
   USE MYPRECISION
-  
+
   IMPLICIT NONE
   SAVE
 

@@ -34,7 +34,7 @@ SUBROUTINE READCONTROLS
 
   CHARACTER(LEN=20) :: HD
 
-  OPEN(UNIT=13, STATUS="OLD", FILE=trim(PARAMPATH)//"/control.in")
+  OPEN(UNIT=13, STATUS="OLD", FILE=TRIM(PARAMPATH)//"/control.in")
 
   !
   ! CONTROL determines how the density matrix is going to be
@@ -184,14 +184,14 @@ SUBROUTINE READCONTROLS
   ! for further fill-in
   !
 
-   READ(13,*) HD, SPARSEON, HD, THRESHOLDON,  HD, NUMTHRESH, HD, FILLINSTOP, HD, BLKSZ
+  READ(13,*) HD, SPARSEON, HD, THRESHOLDON,  HD, NUMTHRESH, HD, FILLINSTOP, HD, BLKSZ
 
   !
   ! MSPARSE: value for M when SPARSEON = 1, used by sp2 sparse algorithm
   !          0 = value for M is not known, defaults to N
   !
 
-   READ(13,*) HD, MSPARSE
+  READ(13,*) HD, MSPARSE
 
   !
   ! LCNON: 0 = during charge neutral MD simulations we'll run LCNITER SCF
@@ -299,25 +299,25 @@ SUBROUTINE READCONTROLS
   ! Summarize the calculation we're doing here
   !
 
-!  OPEN(UNIT=99, STATUS="UNKNOWN", FILE="my_last_LATTE_calc")
+  !  OPEN(UNIT=99, STATUS="UNKNOWN", FILE="my_last_LATTE_calc")
 
-!  IF (CONTROL .EQ. 1) THEN
-!     WRITE(99,*) "Diagonization used to calculate bond order"
-!  ELSEIF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 0) THEN
-!     WRITE(99,*) "Dense matrix SP2 used to calculate bond order"
-!  ELSEIF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 1) THEN
-!     WRITE(99,*) "Quasi-sparse matrix SP2 used to calculated bond order"
-!  ELSEIF (CONTROL .EQ. 3) THEN
-!     WRITE(99,*) "Recursive expansion of the Fermi operator"
-!     IF (CGORLIB .EQ. 0) THEN
-!        WRITE(99,*) "Dense matrix: using LAPACK routine to solve AX=B"
-!     ENDIF
-!     IF (CGORLIB .EQ. 1 .AND. SPARSEON .EQ. 0) THEN
-!        WRITE(99,*) "Dense matrix conjugate gradient scheme to solve AX=B"
-!     ELSEIF (CGORLIB .EQ. 1 .AND. SPARSEON .EQ. 1) THEN
-!        WRITE(99,*) "Sparse matrix conjugate gradient scheme to solve AX=B"
-!     ENDIF
-!  ENDIF
+  !  IF (CONTROL .EQ. 1) THEN
+  !     WRITE(99,*) "Diagonization used to calculate bond order"
+  !  ELSEIF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 0) THEN
+  !     WRITE(99,*) "Dense matrix SP2 used to calculate bond order"
+  !  ELSEIF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 1) THEN
+  !     WRITE(99,*) "Quasi-sparse matrix SP2 used to calculated bond order"
+  !  ELSEIF (CONTROL .EQ. 3) THEN
+  !     WRITE(99,*) "Recursive expansion of the Fermi operator"
+  !     IF (CGORLIB .EQ. 0) THEN
+  !        WRITE(99,*) "Dense matrix: using LAPACK routine to solve AX=B"
+  !     ENDIF
+  !     IF (CGORLIB .EQ. 1 .AND. SPARSEON .EQ. 0) THEN
+  !        WRITE(99,*) "Dense matrix conjugate gradient scheme to solve AX=B"
+  !     ELSEIF (CGORLIB .EQ. 1 .AND. SPARSEON .EQ. 1) THEN
+  !        WRITE(99,*) "Sparse matrix conjugate gradient scheme to solve AX=B"
+  !     ENDIF
+  !  ENDIF
 
 
   RETURN

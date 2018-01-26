@@ -61,9 +61,9 @@ SUBROUTINE SP2GAP_SETUP
 
   IF (SPINON .EQ. 0) THEN
 
-  ! Using intrinsics is probably better than coding this ourselves
+     ! Using intrinsics is probably better than coding this ourselves
 
-  ! Build the starting guess
+     ! Build the starting guess
 
      IF (BASISTYPE .EQ. "ORTHO") THEN
         BO = -H/MAXMINUSMIN
@@ -153,8 +153,8 @@ SUBROUTINE SP2GAP_SETUP
         IDEMPERR = ABS(TRX - TRXOLD)
 
  	IF (SP2CONV .EQ. "REL" .AND. ITER .GE. MINSP2ITER &
-           .AND. (IDEMPERR2 .LE. IDEMPERR .OR. &
-	   IDEMPERR .LT. IDEMTOL)) BREAKLOOP = 1
+             .AND. (IDEMPERR2 .LE. IDEMPERR .OR. &
+             IDEMPERR .LT. IDEMTOL)) BREAKLOOP = 1
 
         IF (SP2CONV .EQ. "ABS" .AND. &
              ABS(TRX - TRXOLD) .LT. IDEMTOL) BREAKLOOP = 1

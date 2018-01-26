@@ -25,7 +25,7 @@ SUBROUTINE INITSHOCKCOMP
 
   ENDIF
 
-!  PRINT*, "Up = ", UPARTICLE, "Us = ", USHOCK
+  !  PRINT*, "Up = ", UPARTICLE, "Us = ", USHOCK
   !
   ! The duration of the shock, i.e., the time taken for the 
   ! shock front to traverse the simulation cell is t_dur = l_0/Us
@@ -39,10 +39,10 @@ SUBROUTINE INITSHOCKCOMP
 
   SHOCKSTOP = SHOCKSTART + &
        INT(BOX(SHOCKDIR,SHOCKDIR)/(USHOCK * DT))
-!  SHOCKSTOP = SHOCKSTART + &
-!       INT((BOX(2,SHOCKDIR) - BOX(1,SHOCKDIR))/(USHOCK * DT))
+  !  SHOCKSTOP = SHOCKSTART + &
+  !       INT((BOX(2,SHOCKDIR) - BOX(1,SHOCKDIR))/(USHOCK * DT))
 
-!  PRINT*, "start, stop = ", SHOCKSTART, SHOCKSTOP
+  !  PRINT*, "start, stop = ", SHOCKSTART, SHOCKSTOP
 
 END SUBROUTINE INITSHOCKCOMP
   

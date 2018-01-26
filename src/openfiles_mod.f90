@@ -1,71 +1,71 @@
 !> Module to handle input output files.
 !! 
-module openfiles_mod
+MODULE openfiles_mod
 
-  implicit none
+  IMPLICIT NONE
 
-  private
+  PRIVATE
 
-  public :: get_file_unit, open_file, open_file_to_read
+  PUBLIC :: get_file_unit, open_file, open_file_to_read
 
-contains
+CONTAINS
 
   !> Returns a unit number that is not in use.
   !! \param io_max Maximum units to search.
   !! \param get_file_unit Unit return to use for the file.
   !!
-  integer function get_file_unit(io_max)
-    implicit none
-    integer :: io_max, io, m, iostat
-    logical :: opened
-    
-    m = io_max ; if (m < 1) m = 97
-    do io = m,1,-1
-      inquire (unit=io, opened=opened, iostat=iostat)
-      if(iostat.ne.0) cycle
-      if(.not.opened) exit
-    end do
+  INTEGER FUNCTION get_file_unit(io_max)
+    IMPLICIT NONE
+    INTEGER :: io_max, io, m, iostat
+    LOGICAL :: opened
+
+    m = io_max ; IF (m < 1) m = 97
+    DO io = m,1,-1
+       INQUIRE (unit=io, opened=opened, iostat=iostat)
+       IF(iostat.NE.0) CYCLE
+       IF(.NOT.opened) EXIT
+    END DO
     get_file_unit = io
- 
-  end function get_file_unit
+
+  END FUNCTION get_file_unit
 
   !> Opens a file to write.
   !! \param io Unit for the file.
   !! \param name Name of the file.
   !!
-  subroutine open_file(io,name)
-    implicit none
-    character(len=*) :: name
-    character(100) :: io_name
-    integer :: io
+  SUBROUTINE open_file(io,name)
+    IMPLICIT NONE
+    CHARACTER(len=*) :: name
+    CHARACTER(100) :: io_name
+    INTEGER :: io
 
     io=get_file_unit(100)
-    io_name=trim(name)
-    open(io,file=io_name)
+    io_name=TRIM(name)
+    OPEN(io,file=io_name)
 
-  end subroutine open_file
+  END SUBROUTINE open_file
 
   !> Opens a file to read.
   !! \param io Unit for the file.
   !! \param name Name of the file.
   !!
-  subroutine open_file_to_read(io,name)
-    implicit none
-    character(len=*) :: name
-    character(100) :: io_name
-    integer :: io
-    logical :: exists
-    
+  SUBROUTINE open_file_to_read(io,name)
+    IMPLICIT NONE
+    CHARACTER(len=*) :: name
+    CHARACTER(100) :: io_name
+    INTEGER :: io
+    LOGICAL :: exists
+
     io=get_file_unit(100)
-    io_name=trim(name)
-     
-    inquire(file=io_name, exist=exists) 
-    if(.not.exists)then 
-      write(*,*)"File ",io_name,"does not exist ..."
-      stop
-    endif 
-    open(io,file=io_name,status="old")
+    io_name=TRIM(name)
 
-  end subroutine open_file_to_read
+    INQUIRE(file=io_name, exist=exists) 
+    IF(.NOT.exists)THEN 
+       WRITE(*,*)"File ",io_name,"does not exist ..."
+       STOP
+    ENDIF
+    OPEN(io,file=io_name,status="old")
 
-end module openfiles_mod
+  END SUBROUTINE open_file_to_read
+
+END MODULE openfiles_mod

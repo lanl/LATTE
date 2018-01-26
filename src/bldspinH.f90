@@ -49,21 +49,21 @@ SUBROUTINE BLDSPINH
   ! either add or subtract the spin dependent one for
   ! the up-side and down-spin channels, respectively.
 
-  
+
   DO I = 1, NATS
 
      SELECT CASE(BASIS(ELEMPOINTER(I)))
-           
+
      CASE("s")
-        
+
         HSS = WSS(ELEMPOINTER(I))*DELTASPIN(INDEX + 1)
         INDEX = INDEX + 1
-        
+
         H2VECT(HINDEX + 1) = HSS
         HINDEX = HINDEX + 1
-        
+
      CASE("p")
-     
+
         HPP = WPP(ELEMPOINTER(I))*DELTASPIN(INDEX + 1)
         INDEX = INDEX + 1
 
@@ -71,12 +71,12 @@ SUBROUTINE BLDSPINH
         H2VECT(HINDEX + 2) = HPP
         H2VECT(HINDEX + 3) = HPP
         HINDEX = HINDEX + 3
-        
+
      CASE("d")
-           
+
         HDD = WDD(ELEMPOINTER(I))*DELTASPIN(INDEX + 1)
         INDEX = INDEX + 1
-        
+
         H2VECT(HINDEX + 1) = HDD
         H2VECT(HINDEX + 2) = HDD
         H2VECT(HINDEX + 3) = HDD
@@ -88,7 +88,7 @@ SUBROUTINE BLDSPINH
 
         HFF = WFF(ELEMPOINTER(I))*DELTASPIN(INDEX + 1)
         INDEX = INDEX + 1
-        
+
         H2VECT(HINDEX + 1) = HFF
         H2VECT(HINDEX + 2) = HFF
         H2VECT(HINDEX + 3) = HFF
@@ -99,7 +99,7 @@ SUBROUTINE BLDSPINH
         HINDEX = HINDEX + 7
 
      CASE("sp")
-        
+
         HSS = WSS(ELEMPOINTER(I))*DELTASPIN(INDEX + 1)
         HPP = WPP(ELEMPOINTER(I))*DELTASPIN(INDEX + 2)
         INDEX = INDEX + 2
@@ -109,7 +109,7 @@ SUBROUTINE BLDSPINH
         H2VECT(HINDEX + 3) = HPP
         H2VECT(HINDEX + 4) = HPP
         HINDEX = HINDEX + 4
-        
+
      CASE("sd")
 
         HSS = WSS(ELEMPOINTER(I))*DELTASPIN(INDEX + 1)
@@ -139,9 +139,9 @@ SUBROUTINE BLDSPINH
         H2VECT(HINDEX + 7) = HFF
         H2VECT(HINDEX + 8) = HFF
         HINDEX = HINDEX + 8
-  
+
      CASE("pd")
-           
+
         HPP = WPP(ELEMPOINTER(I))*DELTASPIN(INDEX + 1)
         HDD = WDD(ELEMPOINTER(I))*DELTASPIN(INDEX + 2)
         INDEX = INDEX + 2
@@ -176,7 +176,7 @@ SUBROUTINE BLDSPINH
 
 
      CASE("df")
-           
+
         HDD = WDD(ELEMPOINTER(I))*DELTASPIN(INDEX + 1)
         HFF = WFF(ELEMPOINTER(I))*DELTASPIN(INDEX + 2)
         INDEX = INDEX + 2
@@ -194,7 +194,7 @@ SUBROUTINE BLDSPINH
         H2VECT(HINDEX + 11) = HFF
         H2VECT(HINDEX + 12) = HFF
         HINDEX = HINDEX + 12
-        
+
      CASE("spd")
 
         HSS = WSS(ELEMPOINTER(I))*DELTASPIN(INDEX + 1)
@@ -254,9 +254,9 @@ SUBROUTINE BLDSPINH
         H2VECT(HINDEX + 12) = HFF
         H2VECT(HINDEX + 13) = HFF
         HINDEX = HINDEX + 13
-                     
+
      CASE("pdf")
-        
+
         HPP = WPP(ELEMPOINTER(I))*DELTASPIN(INDEX + 1)
         HDD = WDD(ELEMPOINTER(I))*DELTASPIN(INDEX + 2)
         HFF = WFF(ELEMPOINTER(I))*DELTASPIN(INDEX + 3)
@@ -278,9 +278,9 @@ SUBROUTINE BLDSPINH
         H2VECT(HINDEX + 14) = HFF
         H2VECT(HINDEX + 15) = HFF
         HINDEX = HINDEX + 15
-       
+
      CASE("spdf")
-        
+
         HSS = WSS(ELEMPOINTER(I))*DELTASPIN(INDEX + 1)
         HPP = WPP(ELEMPOINTER(I))*DELTASPIN(INDEX + 2)
         HDD = WDD(ELEMPOINTER(I))*DELTASPIN(INDEX + 3)
@@ -306,11 +306,11 @@ SUBROUTINE BLDSPINH
         HINDEX = HINDEX + 16
 
      END SELECT
-        
+
   ENDDO
 
   IF (BASISTYPE .EQ. "ORTHO") THEN
-     
+
      HUP = H
      HDOWN = H
 
@@ -322,21 +322,21 @@ SUBROUTINE BLDSPINH
   ELSEIF (BASISTYPE .EQ. "NONORTHO") THEN
 
      ! Now we have H_2, we can form SH_2, and then symmetrize it
-     
+
      DO I = 1, HDIM
         DO J = 1, HDIM
-           
+
            SH2(J,I) = SMAT(J,I)*H2VECT(I)
-           
+
         ENDDO
      ENDDO
-     
+
      SH2 = (SH2 + TRANSPOSE(SH2))/TWO
 
      ! H_up = H + SH2 ; H_down = H = SH2
 
      HUP = H + SH2
-     
+
      HDOWN = H - SH2
 
   ENDIF
@@ -345,6 +345,6 @@ SUBROUTINE BLDSPINH
 
 END SUBROUTINE BLDSPINH
 
-                 
 
-              
+
+

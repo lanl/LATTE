@@ -47,9 +47,9 @@ SUBROUTINE TBMD
   ! Read MDcontroller to determine what kind of MD simulation to do
   !
   IF (LATTEINEXISTS) THEN
-    CALL PARSE_MD("latte.in")
+     CALL PARSE_MD("latte.in")
   ELSE
-    CALL READMDCONTROLLER
+     CALL READMDCONTROLLER
   ENDIF
   !
   ! Allocate stuff for building the neighbor lists, then build them
@@ -205,13 +205,13 @@ SUBROUTINE TBMD
 
   TOTSCF = 0
 
-!  OPEN(UNIT=30, STATUS="UNKNOWN", FILE="AMD_gap_Ef.dat")
+  !  OPEN(UNIT=30, STATUS="UNKNOWN", FILE="AMD_gap_Ef.dat")
 
   WRITE(6,17) "#","Time (ps)", "Free energy (eV)", "T (K)", "Pressure (GPa)"
 
 17 FORMAT(A1, 2X, A10, 6X, A16, 2X, A5, 3X, A14)
 
-!  CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
+  !  CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
 
   CURRITER = 0
 
@@ -372,9 +372,9 @@ SUBROUTINE TBMD
 
         TOTE = TRRHOH + EREP + KEE - ENTE - ECOUL + ESPIN
 
-!         write(*,*)"Ekin", KEE
-!         write(*,*)"Epot", TRRHOH + EREP - ENTE - ECOUL + ESPIN
-!         write(*,*)"components",TRRHOH, EREP, ENTE, ECOUL
+        !         write(*,*)"Ekin", KEE
+        !         write(*,*)"Epot", TRRHOH + EREP - ENTE - ECOUL + ESPIN
+        !         write(*,*)"components",TRRHOH, EREP, ENTE, ECOUL
 
         IF (GETHUG .EQ. 1) CALL AVESFORHUG(PRESSURE, TOTE, TEMPERATURE, SYSVOL)
 
@@ -382,7 +382,7 @@ SUBROUTINE TBMD
            CALL ERRORS("tbmd","The calculation has diverged - check SCF parameters")
         ENDIF
 
-!        write(70,*) ITER, CR(1,1)
+        !        write(70,*) ITER, CR(1,1)
 
         THETIME = REAL(ITER)*DT/THOUSAND
 
@@ -400,7 +400,7 @@ SUBROUTINE TBMD
                  ! Special case for Nose Hoover
                  WRITE(6,99)"Data", THETIME, TOTE, TOTE+CONSMOT, TEMPERATURE, PRESSURE, &
                       EGAP, CHEMPOT !, STRTEN(1), STRTEN(2), STRTEN(3), STRTEN(4), &
-                      !STRTEN(5), STRTEN(6)
+                 !STRTEN(5), STRTEN(6)
 
               ENDIF
 
@@ -409,7 +409,7 @@ SUBROUTINE TBMD
            IF (NVTON .EQ. 0 .AND. NPTON .EQ. 0 .AND. GETHUG .EQ. 0) THEN
 
               WRITE(6,99)"Data", THETIME, TOTE, TEMPERATURE, PRESSURE, EGAP, &
-                      CHEMPOT
+                   CHEMPOT
 
            ENDIF
 
@@ -453,11 +453,11 @@ SUBROUTINE TBMD
 
   ENDDO
 
-!  CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
-!  PRINT*, HDIM, FLOAT(STOP_CLOCK - START_CLOCK)/FLOAT(MAXITER*CLOCK_RATE)
+  !  CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
+  !  PRINT*, HDIM, FLOAT(STOP_CLOCK - START_CLOCK)/FLOAT(MAXITER*CLOCK_RATE)
 
   IF (CONTROL .EQ. 1) THEN
-!     CALL DEALLOCATEDIAG
+     !     CALL DEALLOCATEDIAG
   ELSEIF (CONTROL .EQ. 2 .OR. CONTROL .EQ. 4 .OR. CONTROL .EQ. 5) THEN
      CALL DEALLOCATEPURE
   ELSEIF (CONTROL .EQ. 3) THEN

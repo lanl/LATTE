@@ -20,7 +20,7 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SUBROUTINE PRINTSPARSE
-  
+
   USE CONSTANTS_MOD
   USE SETUPARRAY
 
@@ -43,7 +43,7 @@ SUBROUTINE PRINTSPARSE
   ENDDO
 
 10 FORMAT(I6,1X,I6)
-  
+
   CLOSE(67)
 
   RETURN

@@ -48,7 +48,7 @@ SUBROUTINE SETUPTBMD
   !
 
   IF(.NOT.LIBINIT)THEN
-     
+
      IF (LATTEINEXISTS) THEN
         CALL PARSE_MD("latte.in")
      ELSE

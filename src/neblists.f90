@@ -42,9 +42,9 @@ SUBROUTINE NEBLISTS(AMIALLO)
   INTEGER :: NCELL(3), NUMCELL
   INTEGER :: IPIV(3), INFO
   INTEGER :: MYCELL, BOXID(3), COUNT
-!  INTEGER, SAVE :: ALLOCEST
+  !  INTEGER, SAVE :: ALLOCEST
   INTEGER, ALLOCATABLE :: TOTINCELL(:), CELLLIST(:,:)
-!  INTEGER, ALLOCATABLE :: DIMTB(:), DIMPP(:), DIMCOUL(:)
+  !  INTEGER, ALLOCATABLE :: DIMTB(:), DIMPP(:), DIMCOUL(:)
   REAL(LATTEPREC) :: RIJ(3), MAGR2
   REAL(LATTEPREC) :: MAGA(3)
   REAL(LATTEPREC) :: RCUTTB, RCUTCOUL, PPMAX, MAXCUT2
@@ -138,7 +138,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
         XRANGE = INT(MAXCUT/BOX(1,1)) + 1
         YRANGE = INT(MAXCUT/BOX(2,2)) + 1
         ZRANGE = INT(MAXCUT/BOX(3,3)) + 1
-!        print*, maxcut, xrange, yrange, zrange
+        !        print*, maxcut, xrange, yrange, zrange
 
         ! Here we're hoping atom 1 is in a typical environment
 
@@ -225,7 +225,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
 
      NUMCELL = NCELL(1)*NCELL(2)*NCELL(3)
 
-!     PRINT*, NCELL(1), NCELL(2), NCELL(3), NUMCELL
+     !     PRINT*, NCELL(1), NCELL(2), NCELL(3), NUMCELL
 
      IF (AMIALLO .EQ. 0) ALLOCEST = 2*NATS/NUMCELL
 
@@ -273,7 +273,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
         BOXZ = (II - 1)/(NCELL(1)*NCELL(2))
         BOXY = (II - 1 - BOXZ*NCELL(1)*NCELL(2))/NCELL(1)
         BOXX = (II - 1 - NCELL(1)*BOXY - NCELL(1)*NCELL(2)*BOXZ)
-!        print*, boxx, boxy, boxz, totincell(ii), celllist(1,ii), NUMCELL
+        !        print*, boxx, boxy, boxz, totincell(ii), celllist(1,ii), NUMCELL
 
         ! Loop over atoms in cell II
 

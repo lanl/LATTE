@@ -97,7 +97,7 @@ SUBROUTINE ATOMCHARGE(SWITCH)
 
      ITER = 0
      NEWBUILD = 0
-!     SCFS_II = 0
+     !     SCFS_II = 0
 
      DO WHILE (ALLOK .NE. 0)
 
@@ -114,7 +114,7 @@ SUBROUTINE ATOMCHARGE(SWITCH)
 
               IF (ABS(DELTAQ(I)) .LT. ABS(PREVDQ(I))) THEN
 
-              ! Going in the right direction, so go further
+                 ! Going in the right direction, so go further
                  CPROP(I) = RIGHTFACT*CPROP(I)
 
               ELSEIF (ABS(DELTAQ(I)) .GT. ABS(PREVDQ(I))) THEN
@@ -177,15 +177,15 @@ SUBROUTINE ATOMCHARGE(SWITCH)
            ENDIF
 
         ELSEIF (CONTROL .EQ. 3) THEN
-!           IF (SPARSEON .EQ. 0) THEN
-              CALL FERMIEXPANS
-!           ELSEIF (SPARSEON .EQ. 1) THEN
-!              CALL ALLOCATEPURE
-!              CALL GERSHGORIN
-!              CALL INITSPARSESP2
-!              CALL DEALLOCATEPURE
-!              CALL FERMIEXPANSSPARSE
-!           ENDIF
+           !           IF (SPARSEON .EQ. 0) THEN
+           CALL FERMIEXPANS
+           !           ELSEIF (SPARSEON .EQ. 1) THEN
+           !              CALL ALLOCATEPURE
+           !              CALL GERSHGORIN
+           !              CALL INITSPARSESP2
+           !              CALL DEALLOCATEPURE
+           !              CALL FERMIEXPANSSPARSE
+           !           ENDIF
         ENDIF
 
         ALLOK = 0
@@ -296,15 +296,15 @@ SUBROUTINE ATOMCHARGE(SWITCH)
               ENDIF
 
            ELSEIF (CONTROL .EQ. 3) THEN
-!              IF (SPARSEON .EQ. 0) THEN
-                 CALL FERMIEXPANS
-!              ELSEIF (SPARSEON .EQ. 1) THEN
-!                 CALL ALLOCATEPURE
-!                 CALL GERSHGORIN
-!                 CALL INITSPARSESP2
-!                 CALL DEALLOCATEPURE
-!                 CALL FERMIEXPANSSPARSE
-!              ENDIF
+              !              IF (SPARSEON .EQ. 0) THEN
+              CALL FERMIEXPANS
+              !              ELSEIF (SPARSEON .EQ. 1) THEN
+              !                 CALL ALLOCATEPURE
+              !                 CALL GERSHGORIN
+              !                 CALL INITSPARSESP2
+              !                 CALL DEALLOCATEPURE
+              !                 CALL FERMIEXPANSSPARSE
+              !              ENDIF
            ENDIF
 
         ENDIF

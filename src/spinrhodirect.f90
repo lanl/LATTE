@@ -41,7 +41,7 @@ SUBROUTINE SPINRHOEVECS
   REAL(LATTEPREC) :: HOMO, LUMO
   REAL(LATTEPREC) :: S, OCCLOGOCC_ELECTRONS, OCCLOGOCC_HOLES
 
-!  NUMLIMIT = EXP(-EXPTOL)
+  !  NUMLIMIT = EXP(-EXPTOL)
 
   RHOUP = ZERO
   RHODOWN = ZERO
@@ -105,7 +105,7 @@ SUBROUTINE SPINRHOEVECS
 
      IF (ITER .GT. 100) THEN
         CALL ERRORS("spinrhodirect","Newton-Raphson scheme to find the &
-        & chemical potential has not converged")
+             & chemical potential has not converged")
      ENDIF
 
 
@@ -245,7 +245,7 @@ SUBROUTINE SPINRHOEVECS
 
         IF ( UPNE + DOWNNE .EQ. TOTNE ) BREAKLOOP = 1
 
-!        print*, UPNE, DOWNNE
+        !        print*, UPNE, DOWNNE
 
      ENDDO
 

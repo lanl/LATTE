@@ -60,24 +60,24 @@ FUNCTION DGSPDR(I, J, L1, L2, M, MAGR)
   END SELECT
   SELECT CASE(IP2)
   CASE(0)
-     IGLTYPE = trim(IGLTYPE)//"s"
+     IGLTYPE = TRIM(IGLTYPE)//"s"
   CASE(1)
-     IGLTYPE = trim(IGLTYPE)//"p"
+     IGLTYPE = TRIM(IGLTYPE)//"p"
   CASE(2)
-     IGLTYPE = trim(IGLTYPE)//"d"
+     IGLTYPE = TRIM(IGLTYPE)//"d"
   CASE(3)
-     IGLTYPE = trim(IGLTYPE)//"f"
+     IGLTYPE = TRIM(IGLTYPE)//"f"
   END SELECT
   SELECT CASE(M)
   CASE(0)
-     IGLTYPE = trim(IGLTYPE)//"s"
+     IGLTYPE = TRIM(IGLTYPE)//"s"
   CASE(1)
-     IGLTYPE = trim(IGLTYPE)//"p"
+     IGLTYPE = TRIM(IGLTYPE)//"p"
   CASE(2)
-     IGLTYPE = trim(IGLTYPE)//"d"
+     IGLTYPE = TRIM(IGLTYPE)//"d"
   CASE(3)
-     IGLTYPE = trim(IGLTYPE)//"f"
-  END SELECT     
+     IGLTYPE = TRIM(IGLTYPE)//"f"
+  END SELECT
 
   IC = 0
   BINGO = .FALSE.

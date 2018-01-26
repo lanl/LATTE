@@ -9,130 +9,130 @@
 !!   where num is the position of the new keyword in the vector.
 !! - Use DUMMY= as a placeholder. This variable will be ignored by not searched by the parser.
 !!
-module latteparser_latte_mod
+MODULE latteparser_latte_mod
 
-  use CONSTANTS_MOD
-  use SETUPARRAY
-  use PPOTARRAY
-  use NEBLISTARRAY
-  use COULOMBARRAY
-  use SPARSEARRAY
-  use RELAXCOMMON
-  use MDARRAY
+  USE CONSTANTS_MOD
+  USE SETUPARRAY
+  USE PPOTARRAY
+  USE NEBLISTARRAY
+  USE COULOMBARRAY
+  USE SPARSEARRAY
+  USE RELAXCOMMON
+  USE MDARRAY
   USE KSPACEARRAY
 
-  use openfiles_mod
-  use kernelparser_mod
+  USE openfiles_mod
+  USE kernelparser_mod
 
 #ifdef PROGRESSON
-  use bml
+  USE bml
 #endif
 
-  implicit none
+  IMPLICIT NONE
 
-  private
+  PRIVATE
 
-  integer, parameter :: dp = latteprec
+  INTEGER, PARAMETER :: dp = latteprec
 
-  public :: parse_control, parse_md, parse_kmesh
+  PUBLIC :: parse_control, parse_md, parse_kmesh
 
 #ifdef PROGRESSON
-!> General latte input variables type.
-!!
-type, public :: latte_type
+  !> General latte input variables type.
+  !!
+  TYPE, PUBLIC :: latte_type
 
-  !> Name of the current job.
-  character(20) :: jobname
+     !> Name of the current job.
+     CHARACTER(20) :: jobname
 
-  !> Verbosity level.
-  integer :: verbose
+     !> Verbosity level.
+     INTEGER :: verbose
 
-  !> Threshold values for matrix elements.
-  real(dp) :: threshold
+     !> Threshold values for matrix elements.
+     REAL(dp) :: threshold
 
-  !> Max nonzero elements per row for every row see \cite Mniszewski2015 .
-  integer :: mdim
+     !> Max nonzero elements per row for every row see \cite Mniszewski2015 .
+     INTEGER :: mdim
 
-  !> Matrix format (Dense or Ellpack).
-  character(20) :: bml_type
+     !> Matrix format (Dense or Ellpack).
+     CHARACTER(20) :: bml_type
 
-  !> Distribution mode (sequential, distributed, or graph_distributed).
-  character(20) :: bml_dmode
+     !> Distribution mode (sequential, distributed, or graph_distributed).
+     CHARACTER(20) :: bml_dmode
 
-  !> Coulomb Accuracy.
-  real(dp) :: coul_acc
+     !> Coulomb Accuracy.
+     REAL(dp) :: coul_acc
 
-  !> Pulay mixing coefficient.
-  real(dp) :: pulaycoeff
+     !> Pulay mixing coefficient.
+     REAL(dp) :: pulaycoeff
 
-  !> Linear mixing coefficient.
-  real(dp) :: mixcoeff
+     !> Linear mixing coefficient.
+     REAL(dp) :: mixcoeff
 
-  !> Coulomb Accuracy.
-  integer :: mpulay
+     !> Coulomb Accuracy.
+     INTEGER :: mpulay
 
-  !> Maximum SCF iterations.
-  integer :: maxscf
+     !> Maximum SCF iterations.
+     INTEGER :: maxscf
 
-  !> SCF tolerance.
-  real(dp) :: scftol
+     !> SCF tolerance.
+     REAL(dp) :: scftol
 
-  !> Z Matrix calculation type.
-  character(20) :: ZMat
+     !> Z Matrix calculation type.
+     CHARACTER(20) :: ZMat
 
-  !> Solver method
-  character(20) :: method
+     !> Solver method
+     CHARACTER(20) :: method
 
-  !> Estimated ration between real & k space time efficiency.
-  real(dp) :: timeratio
+     !> Estimated ration between real & k space time efficiency.
+     REAL(dp) :: timeratio
 
-  !> Total number of steps for MD simulation.
-  integer :: mdsteps
+     !> Total number of steps for MD simulation.
+     INTEGER :: mdsteps
 
-  !> Total number of steps for MD simulation.
-  real(dp) :: timestep
+     !> Total number of steps for MD simulation.
+     REAL(dp) :: timestep
 
-  !> Total number of steps for MD simulation.
-  character(100) :: parampath
+     !> Total number of steps for MD simulation.
+     CHARACTER(100) :: parampath
 
-  !> File containing coordinates.
-  character(100) :: coordsfile
+     !> File containing coordinates.
+     CHARACTER(100) :: coordsfile
 
-  !> File containing coordinates.
-  integer :: nlisteach
+     !> File containing coordinates.
+     INTEGER :: nlisteach
 
-  !> Restart calculation.
-  logical :: restart
+     !> Restart calculation.
+     LOGICAL :: restart
 
-  !> Restart calculation.
-  real(dp) :: efermi
+     !> Restart calculation.
+     REAL(dp) :: efermi
 
 
-end type latte_type
+  END TYPE latte_type
 
-type(latte_type), public :: lt
+  TYPE(latte_type), PUBLIC :: lt
 
 #endif
 
-contains
+CONTAINS
 
   !> The parser for Latte General input variables.
   !!
-  subroutine parse_control(filename)
+  SUBROUTINE parse_control(filename)
 
-    use FERMICOMMON
+    USE FERMICOMMON
 
-    implicit none
-    integer, parameter :: nkey_char = 6, nkey_int = 51, nkey_re = 21, nkey_log = 1
-    character(len=*) :: filename
+    IMPLICIT NONE
+    INTEGER, PARAMETER :: nkey_char = 6, nkey_int = 51, nkey_re = 21, nkey_log = 1
+    CHARACTER(len=*) :: filename
 
     !Library of keywords with the respective defaults.
-    character(len=50), parameter :: keyvector_char(nkey_char) = [character(len=100) :: &
+    CHARACTER(len=50), PARAMETER :: keyvector_char(nkey_char) = [CHARACTER(len=100) :: &
          'JobName=','BASISTYPE=','SP2CONV=','RELAXTYPE=','PARAMPATH=','COORDSFILE=']
-    character(len=100) :: valvector_char(nkey_char) = [character(len=100) :: &
+    CHARACTER(len=100) :: valvector_char(nkey_char) = [CHARACTER(len=100) :: &
          'MyJob','NONORTHO','REL','SD','./TBparam','./bl/inputblock.dat']
 
-    character(len=50), parameter :: keyvector_int(nkey_int) = [character(len=50) :: &
+    CHARACTER(len=50), PARAMETER :: keyvector_int(nkey_int) = [CHARACTER(len=50) :: &
          'xControl=', 'DEBUGON=', 'FERMIM=', 'CGORLIB=', 'NORECS=', 'ENTROPYKIND=',&
          'PPOTON=', 'VDWON=', 'SPINON=', 'ELECTRO=', 'ELECMETH=', 'MAXSCF=',& !12
          'MINSP2ITER=','FULLQCONV=','QITER=','ORDERNMOL=','SPARSEON=','THRESHOLDON=',& !18
@@ -141,7 +141,7 @@ contains
          'KON=','COMPFORCE=','DOSFIT=','INTS2FIT=','NFITSTEP=','QFIT=',& !39
          'PPFITON=','ALLFITON=','PPSTEP=','BISTEP=','PP2FIT=','BINT2FIT=','PPNMOL=',& !46
          'PPNGEOM=','PARREP=','VERBOSE=','MIXER=','RESTARTLIB=']
-    integer :: valvector_int(nkey_int) = (/ &
+    INTEGER :: valvector_int(nkey_int) = (/ &
          1,0,6,1,1,1, &
          1,0,0,1,0,250, &
          22,0,1,0,0,1, &
@@ -151,27 +151,27 @@ contains
          0,0,500,500,2,6,10,&
          200,0,0,0,0 /)
 
-    character(len=50), parameter :: keyvector_re(nkey_re) = [character(len=50) :: &
+    CHARACTER(len=50), PARAMETER :: keyvector_re(nkey_re) = [CHARACTER(len=50) :: &
          'CGTOL=','KBT=','SPINTOL=','ELEC_ETOL=','ELEC_QTOL=','COULACC=','COULCUT=', 'COULR1=',& !8
          'BREAKTOL=','QMIX=','SPINMIX=','MDMIX=','NUMTHRESH=','CHTOL=','SKIN=',& !15
          'RLXFTOL=','BETA=','MCSIGMA=','PPBETA=','PPSIGMA=','ER='] !21
-    real(dp) :: valvector_re(nkey_re) = (/&
+    REAL(dp) :: valvector_re(nkey_re) = (/&
          1.0e-6,0.0,1.0e-4,0.001,1.0e-8,1.0e-6,-500.0, 500.0,&
          1.0e-6,0.25,0.25,0.25,1.0e-6,0.01,1.0,&
          1.0e-7,1000.0,0.2,1000.0,0.01,1.0/)
 
-    character(len=50), parameter :: keyvector_log(nkey_log) = [character(len=100) :: &
+    CHARACTER(len=50), PARAMETER :: keyvector_log(nkey_log) = [CHARACTER(len=100) :: &
          'LIBINIT=']
-    logical :: valvector_log(nkey_log) = (/&
-         .false./)
+    LOGICAL :: valvector_log(nkey_log) = (/&
+         .FALSE./)
 
     !Start and stop characters
-    character(len=50), parameter :: startstop(2) = [character(len=50) :: &
+    CHARACTER(len=50), PARAMETER :: startstop(2) = [CHARACTER(len=50) :: &
          'CONTROL{', '}']
 
-    call parsing_kernel(keyvector_char,valvector_char&
+    CALL parsing_kernel(keyvector_char,valvector_char&
          ,keyvector_int,valvector_int,keyvector_re,valvector_re,&
-         keyvector_log,valvector_log,trim(filename),startstop)
+         keyvector_log,valvector_log,TRIM(filename),startstop)
 
 
     JOB = valvector_char(1)
@@ -190,9 +190,9 @@ contains
 
     BASISTYPE = valvector_char(2)
 
-    if (BASISTYPE .ne. "ORTHO" .and. BASISTYPE .ne. "NONORTHO") then
+    IF (BASISTYPE .NE. "ORTHO" .AND. BASISTYPE .NE. "NONORTHO") THEN
        CALL ERRORS("latteparser_latte_mod","Error defining basis type (ortho/nonortho)")
-    endif
+    ENDIF
 
     DEBUGON = valvector_int(2)
 
@@ -328,21 +328,21 @@ contains
 
 #ifdef PROGRESSON
 
-    if(SPARSEON == 0)then
-      lt%bml_type = bml_matrix_dense
-    elseif(SPARSEON == 1)then
-      lt%bml_type = bml_matrix_ellpack
-    else
-      CALL ERRORS("latteparser_latte_mod","SPARSEON > 1 yet not implemented")
-    endif
+    IF(SPARSEON == 0)THEN
+       lt%bml_type = bml_matrix_dense
+    ELSEIF(SPARSEON == 1)THEN
+       lt%bml_type = bml_matrix_ellpack
+    ELSE
+       CALL ERRORS("latteparser_latte_mod","SPARSEON > 1 yet not implemented")
+    ENDIF
 
-    if(THRESHOLDON == 0)then
-      lt%threshold = 0.0_dp
-    elseif(THRESHOLDON == 1)then
-      lt%threshold = NUMTHRESH
-    else
-      CALL ERRORS("latteparser_latte_mod","THRESHOLDON > 1 yet not implemented")
-    endif
+    IF(THRESHOLDON == 0)THEN
+       lt%threshold = 0.0_dp
+    ELSEIF(THRESHOLDON == 1)THEN
+       lt%threshold = NUMTHRESH
+    ELSE
+       CALL ERRORS("latteparser_latte_mod","THRESHOLDON > 1 yet not implemented")
+    ENDIF
 
 #endif
 
@@ -357,13 +357,13 @@ contains
 
 #ifdef PROGRESSON
 
-    if(MSPARSE == 0)then
-      lt%mdim = -1  !Defaults to N
-    elseif(MSPARSE > 0)then
-      lt%mdim = MSPARSE
-    else
-      CALL ERRORS("latteparser_latte_mod","MSPARSE cannot be negative")
-    endif
+    IF(MSPARSE == 0)THEN
+       lt%mdim = -1  !Defaults to N
+    ELSEIF(MSPARSE > 0)THEN
+       lt%mdim = MSPARSE
+    ELSE
+       CALL ERRORS("latteparser_latte_mod","MSPARSE cannot be negative")
+    ENDIF
 
 #endif
 
@@ -488,51 +488,51 @@ contains
     PARAMPATH = valvector_char(5)
     COORDSFILE = valvector_char(6)
 
-  end subroutine parse_control
+  END SUBROUTINE parse_control
 
 
   !> The parser for Latte General input variables.
   !!
-  subroutine parse_md(filename)
+  SUBROUTINE parse_md(filename)
 
-    implicit none
-    integer, parameter :: nkey_char = 3, nkey_int = 18, nkey_re = 10, nkey_log = 1
-    character(len=*) :: filename
+    IMPLICIT NONE
+    INTEGER, PARAMETER :: nkey_char = 3, nkey_int = 18, nkey_re = 10, nkey_log = 1
+    CHARACTER(len=*) :: filename
 
     !Library of keywords with the respective defaults.
-    character(len=50), parameter :: keyvector_char(nkey_char) = [character(len=100) :: &
+    CHARACTER(len=50), PARAMETER :: keyvector_char(nkey_char) = [CHARACTER(len=100) :: &
          'RNDIST=','SEEDINIT=','NPTTYPE=']
-    character(len=100) :: valvector_char(nkey_char) = [character(len=100) :: &
+    CHARACTER(len=100) :: valvector_char(nkey_char) = [CHARACTER(len=100) :: &
          'GAUSSIAN','UNIFORM','ISO']
 
-    character(len=50), parameter :: keyvector_int(nkey_int) = [character(len=50) :: &
+    CHARACTER(len=50), PARAMETER :: keyvector_int(nkey_int) = [CHARACTER(len=50) :: &
          'MAXITER=', 'UDNEIGH=', 'DUMPFREQ=','RSFREQ=', 'WRTFREQ=', 'TOINITTEMP5=', 'THERMPER=',& !7
          'THERMRUN=', 'NVTON=', 'NPTON=', 'AVEPER=', 'SEED=', 'SHOCKON=',&
          'SHOCKSTART=','SHOCKDIR=','MDADAPT=','GETHUG=','RSLEVEL=']
-    integer :: valvector_int(nkey_int) = (/ &
+    INTEGER :: valvector_int(nkey_int) = (/ &
          5000,1,250,500,25,1,500, &
          50000,0,0,1000,54,0, &
          100000,1,0,0,0/)
 
-    character(len=50), parameter :: keyvector_re(nkey_re) = [character(len=50) :: &
+    CHARACTER(len=50), PARAMETER :: keyvector_re(nkey_re) = [CHARACTER(len=50) :: &
          'DT=','TEMPERATURE=','FRICTION=','PTARGET=','UPARTICLE=','USHOCK=','C0=', 'E0=',&
          'V0=','P0=']
-    real(dp) :: valvector_re(nkey_re) = (/&
+    REAL(dp) :: valvector_re(nkey_re) = (/&
          0.25,300.00,1000.0,0.0,500.0,-4590.0,1300.0,-795.725,&
          896.984864,0.083149/)
 
-    character(len=50), parameter :: keyvector_log(nkey_log) = [character(len=100) :: &
+    CHARACTER(len=50), PARAMETER :: keyvector_log(nkey_log) = [CHARACTER(len=100) :: &
          'DUMMY=']
-    logical :: valvector_log(nkey_log) = (/&
-         .false./)
+    LOGICAL :: valvector_log(nkey_log) = (/&
+         .FALSE./)
 
     !Start and stop characters
-    character(len=50), parameter :: startstop(2) = [character(len=50) :: &
+    CHARACTER(len=50), PARAMETER :: startstop(2) = [CHARACTER(len=50) :: &
          'MDCONTROL{', '}']
 
-    call parsing_kernel(keyvector_char,valvector_char&
+    CALL parsing_kernel(keyvector_char,valvector_char&
          ,keyvector_int,valvector_int,keyvector_re,valvector_re,&
-         keyvector_log,valvector_log,trim(filename),startstop)
+         keyvector_log,valvector_log,TRIM(filename),startstop)
 
 
     !
@@ -615,9 +615,9 @@ contains
     !   write(*,*)"AVEPER,FRICTION,SEEDTH",AVEPER,FRICTION,SEEDTH
 
 
-    if (NVTON .eq. 1 .and. NPTON .eq. 1) then
+    IF (NVTON .EQ. 1 .AND. NPTON .EQ. 1) THEN
        CALL ERRORS("latteparser_latte_mod","You can't have NVTON = 1 and NPTON = 1")
-    endif
+    ENDIF
 
     ! PTARGET = Target pressure (in GPa) when running NPT
     ! NPTTYPE = ISO or ANISO
@@ -668,51 +668,51 @@ contains
     E0 = valvector_re(8); V0 = valvector_re(9); P0 = valvector_re(10)
     !   write(*,*)"E0,V0,P0",E0,V0,P0
 
-  end subroutine parse_md
+  END SUBROUTINE parse_md
 
 
   !> The parser for K Mesh input variables.
   !!
-  subroutine parse_kmesh(filename)
+  SUBROUTINE parse_kmesh(filename)
 
-    implicit none
-    integer, parameter :: nkey_char = 1, nkey_int = 3, nkey_re = 3, nkey_log = 1
-    character(len=*) :: filename
+    IMPLICIT NONE
+    INTEGER, PARAMETER :: nkey_char = 1, nkey_int = 3, nkey_re = 3, nkey_log = 1
+    CHARACTER(len=*) :: filename
 
     !Library of keywords with the respective defaults.
-    character(len=50), parameter :: keyvector_char(nkey_char) = [character(len=100) :: &
+    CHARACTER(len=50), PARAMETER :: keyvector_char(nkey_char) = [CHARACTER(len=100) :: &
          'DUMMY=']
-    character(len=100) :: valvector_char(nkey_char) = [character(len=100) :: &
+    CHARACTER(len=100) :: valvector_char(nkey_char) = [CHARACTER(len=100) :: &
          'DUMMY']
 
-    character(len=50), parameter :: keyvector_int(nkey_int) = [character(len=50) :: &
+    CHARACTER(len=50), PARAMETER :: keyvector_int(nkey_int) = [CHARACTER(len=50) :: &
          'NKX=','NKY=','NKZ=']
-    integer :: valvector_int(nkey_int) = (/ &
+    INTEGER :: valvector_int(nkey_int) = (/ &
          1,1,1/)
 
-    character(len=50), parameter :: keyvector_re(nkey_re) = [character(len=50) :: &
+    CHARACTER(len=50), PARAMETER :: keyvector_re(nkey_re) = [CHARACTER(len=50) :: &
          'KSHIFTX=','KSHIFTY=','KSHIFTZ=']
-    real(dp) :: valvector_re(nkey_re) = (/&
+    REAL(dp) :: valvector_re(nkey_re) = (/&
          0.0,0.0,0.0/)
 
-    character(len=50), parameter :: keyvector_log(nkey_log) = [character(len=100) :: &
+    CHARACTER(len=50), PARAMETER :: keyvector_log(nkey_log) = [CHARACTER(len=100) :: &
          'DUMMY=']
-    logical :: valvector_log(nkey_log) = (/&
-         .false./)
+    LOGICAL :: valvector_log(nkey_log) = (/&
+         .FALSE./)
 
     !Start and stop characters
-    character(len=50), parameter :: startstop(2) = [character(len=50) :: &
+    CHARACTER(len=50), PARAMETER :: startstop(2) = [CHARACTER(len=50) :: &
          'KMESH{', '}']
 
-    call parsing_kernel(keyvector_char,valvector_char&
+    CALL parsing_kernel(keyvector_char,valvector_char&
          ,keyvector_int,valvector_int,keyvector_re,valvector_re,&
-         keyvector_log,valvector_log,trim(filename),startstop)
+         keyvector_log,valvector_log,TRIM(filename),startstop)
 
-      NKX= valvector_int(1); NKY= valvector_int(2); NKZ=valvector_int(3)
-      KSHIFT(1)= valvector_re(1); KSHIFT(2)= valvector_re(2); KSHIFT(3)= valvector_re(3)
-
-
-  end subroutine parse_kmesh
+    NKX= valvector_int(1); NKY= valvector_int(2); NKZ=valvector_int(3)
+    KSHIFT(1)= valvector_re(1); KSHIFT(2)= valvector_re(2); KSHIFT(3)= valvector_re(3)
 
 
-end module latteparser_latte_mod
+  END SUBROUTINE parse_kmesh
+
+
+END MODULE latteparser_latte_mod

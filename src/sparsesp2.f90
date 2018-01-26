@@ -23,346 +23,346 @@ MODULE SPARSESP2
 
   IMPLICIT NONE
 
-  CONTAINS
+CONTAINS
 
-SUBROUTINE DENSE2SPARSE(HARRAY, HSIZE, II, JJ, VAL)
+  SUBROUTINE DENSE2SPARSE(HARRAY, HSIZE, II, JJ, VAL)
 
-  USE MYPRECISION
-  USE CONSTANTS_MOD
-  USE SPARSEARRAY
-  USE PUREARRAY
-  USE NONOARRAY
+    USE MYPRECISION
+    USE CONSTANTS_MOD
+    USE SPARSEARRAY
+    USE PUREARRAY
+    USE NONOARRAY
 
-  IMPLICIT NONE
-  INTEGER, INTENT(IN) :: HSIZE
-  INTEGER, INTENT(INOUT) :: II(:), JJ(:,:)
-  INTEGER :: I, J, L, K, BANDWIDTH
+    IMPLICIT NONE
+    INTEGER, INTENT(IN) :: HSIZE
+    INTEGER, INTENT(INOUT) :: II(:), JJ(:,:)
+    INTEGER :: I, J, L, K, BANDWIDTH
 
-  REAL(LATTEPREC), INTENT(IN) :: HARRAY(:,:)
-  REAL(LATTEPREC), INTENT(INOUT) :: VAL(:,:)
-  REAL(LATTEPREC) :: XTMP
+    REAL(LATTEPREC), INTENT(IN) :: HARRAY(:,:)
+    REAL(LATTEPREC), INTENT(INOUT) :: VAL(:,:)
+    REAL(LATTEPREC) :: XTMP
 
-  VAL = ZERO
-  JJ = 0
-  II = 0
+    VAL = ZERO
+    JJ = 0
+    II = 0
 
-  BANDWIDTH = 0
+    BANDWIDTH = 0
 
-  IF (BASISTYPE .EQ. "ORTHO") THEN
+    IF (BASISTYPE .EQ. "ORTHO") THEN
 
-    ! New compressed row format
+       ! New compressed row format
 
-    !$OMP PARALLEL DO PRIVATE(I,J,K,L,XTMP) REDUCTION(MAX:BANDWIDTH)
-    DO I = 1,HSIZE
-      L = 0
-      DO J = 1,HSIZE
-        XTMP = HARRAY(J,I)
-        IF (J .EQ. I) THEN
-          L = L + 1
-          JJ(L,I) = J
-          VAL(L,I) = (MAXEVAL - XTMP)/MAXMINUSMIN
-        ELSEIF (ABS(XTMP) .GE. HTHRESH) THEN
-          L = L + 1
-          JJ(L,I) = J
-          VAL(L,I) = -XTMP/MAXMINUSMIN
-          BANDWIDTH = MAX(BANDWIDTH, ABS(I-J))
-        ENDIF
-      ENDDO
-      II(I) = L
-    ENDDO
-    !$OMP END PARALLEL DO
-
-  ELSE
-
-    !$OMP PARALLEL DO PRIVATE(I,J,L,XTMP) REDUCTION(MAX:BANDWIDTH)
-    DO I = 1,HSIZE
-      L = 0
-      DO J = 1,HSIZE
-        XTMP = ORTHOH(J,I)
-        IF (J .EQ. I) THEN
-          L = L + 1
-          JJ(L,I) = J
-          VAL(L,I) = (MAXEVAL - XTMP)/MAXMINUSMIN
-        ELSEIF (ABS(XTMP) .GE. HTHRESH) THEN
-          L = L + 1
-          JJ(L,I) = J
-          VAL(L,I) = -XTMP/MAXMINUSMIN
-          BANDWIDTH = MAX(BANDWIDTH, ABS(I-J))
-        ENDIF
-      ENDDO
-      II(I) = L
-    ENDDO
-    !$OMP END PARALLEL DO
-
-  ENDIF
-
-END SUBROUTINE DENSE2SPARSE
-
-
-SUBROUTINE SPARSE2DENSE(SCALAR, II, JJ, VAL, DARRAY, HSIZE)
-
-  USE MYPRECISION
-  USE CONSTANTS_MOD
-
-  IMPLICIT NONE
-  INTEGER :: I,J
-  INTEGER, INTENT(IN):: HSIZE
-  INTEGER, INTENT(IN):: II(:), JJ(:,:)
-
-  REAL(LATTEPREC), INTENT(IN) :: SCALAR
-  REAL(LATTEPREC), INTENT(IN) :: VAL(:,:)
-  REAL(LATTEPREC), INTENT(INOUT) :: DARRAY(:,:)
-
-  DARRAY = ZERO
-
-  DO I = 1, HSIZE
-    DO J = 1,II(I)
-      DARRAY(I,JJ(J,I)) = SCALAR*VAL(J,I)
-    ENDDO
-  ENDDO
-
-END SUBROUTINE SPARSE2DENSE
-
-SUBROUTINE SP2LOOP(MSIZE, ITER, II, JJ, VAL)
-
-  USE MYPRECISION
-  USE CONSTANTS_MOD
-  USE SPARSEARRAY
-  USE PUREARRAY
-  USE SPARSEMATH
-  USE OMP_LIB
-  USE MATRIXIO
-
-  IMPLICIT NONE
-  INTEGER, INTENT(INOUT) :: MSIZE, ITER
-  INTEGER, INTENT(INOUT) :: II(:), JJ(:,:)
-  INTEGER :: BREAKLOOP, MAXM
-  INTEGER, ALLOCATABLE :: IIC(:), JJC(:,:)
-
-  REAL(LATTEPREC) :: TRX, TRNORM, OCC
-  REAL(LATTEPREC) :: TRX2, TR2XX2, TRXOLD
-  REAL(LATTEPREC) :: LIMDIFF, IDEMPERR, IDEMPERR1, IDEMPERR2
-  REAL(LATTEPREC), INTENT(INOUT) :: VAL(:,:)
-  REAL(LATTEPREC), ALLOCATABLE :: CCN(:,:)
-  REAL(LATTEPREC), PARAMETER :: IDEMTOL = 1.0E-14
-
-  ! Allocate temporary arrays
-  ALLOCATE(IX(HDIM))
-  ALLOCATE(X(HDIM), Y(HDIM))
-  ALLOCATE(IIC(HDIM))
-  ALLOCATE(JJC(MSIZE,HDIM), JJB(MSIZE,HDIM))
-  ALLOCATE(CCN(MSIZE,HDIM))
-
-  OCC = BNDFIL*FLOAT(HDIM)
-
-  IDEMPERR2 = ZERO
-  IDEMPERR1 = ZERO
-  IDEMPERR = ZERO
-
-  MAXM = 0
-
-  IX = 0
-  X = 0
-  Y = 0
-
-  CCN = 0
-  JJC = 0
-  JJB = 0
-  IIC = 0
-
-  ITER = 0
-  BREAKLOOP = 0
-
-  DO WHILE ( BREAKLOOP .EQ. 0 .AND. ITER .LT. 100 )
-
-    ITER = ITER + 1
-
-    !
-    ! Sparse BO * BO
-    !
-
-    TRX = ZERO
-    TRX2 = ZERO
-
-    ! Matrix multiply X^2
-    CALL SPARSEX2(TRX, TRX2, II, JJ, VAL, IIC, JJC, CCN)
-
-    MAXM = MAX(MAXM, 2*MAXVAL(IIC))
-
-    TR2XX2 = TWO*TRX - TRX2
-    TRXOLD = TRX
-    LIMDIFF = ABS(TRX2 - OCC) - ABS(TR2XX2 - OCC)
-
-    IF ( LIMDIFF .GT. IDEMTOL ) THEN ! X <= 2X-X^2
-
-      TRX = TWO * TRX - TRX2
-
-      PP(ITER) = 0
-
-      ! Sparse matrix X = 2X - X^2
-      CALL SPARSEADD(TRNORM, II, JJ, VAL, IIC, JJC, CCN)
-
-   ELSEIF ( LIMDIFF .LT. -IDEMTOL ) THEN ! X <= X^2
-
-      TRX = TRX2
-      PP(ITER) = 1;
-
-      ! Sparse matrix X = X^2
-      CALL SPARSESETX2(TRNORM, II, JJ, VAL, IIC, JJC, CCN)
+       !$OMP PARALLEL DO PRIVATE(I,J,K,L,XTMP) REDUCTION(MAX:BANDWIDTH)
+       DO I = 1,HSIZE
+          L = 0
+          DO J = 1,HSIZE
+             XTMP = HARRAY(J,I)
+             IF (J .EQ. I) THEN
+                L = L + 1
+                JJ(L,I) = J
+                VAL(L,I) = (MAXEVAL - XTMP)/MAXMINUSMIN
+             ELSEIF (ABS(XTMP) .GE. HTHRESH) THEN
+                L = L + 1
+                JJ(L,I) = J
+                VAL(L,I) = -XTMP/MAXMINUSMIN
+                BANDWIDTH = MAX(BANDWIDTH, ABS(I-J))
+             ENDIF
+          ENDDO
+          II(I) = L
+       ENDDO
+       !$OMP END PARALLEL DO
 
     ELSE
 
-      TRX = TRXOLD
-      BREAKLOOP = 1
+       !$OMP PARALLEL DO PRIVATE(I,J,L,XTMP) REDUCTION(MAX:BANDWIDTH)
+       DO I = 1,HSIZE
+          L = 0
+          DO J = 1,HSIZE
+             XTMP = ORTHOH(J,I)
+             IF (J .EQ. I) THEN
+                L = L + 1
+                JJ(L,I) = J
+                VAL(L,I) = (MAXEVAL - XTMP)/MAXMINUSMIN
+             ELSEIF (ABS(XTMP) .GE. HTHRESH) THEN
+                L = L + 1
+                JJ(L,I) = J
+                VAL(L,I) = -XTMP/MAXMINUSMIN
+                BANDWIDTH = MAX(BANDWIDTH, ABS(I-J))
+             ENDIF
+          ENDDO
+          II(I) = L
+       ENDDO
+       !$OMP END PARALLEL DO
 
     ENDIF
 
-    VV(ITER) = SQRT(TRNORM)
-    !WRITE(*,*) 'IT = ', ITER, ' VV(',ITER,',) = ', VV(ITER), PP(ITER)
-
-    IDEMPERR2 = IDEMPERR1
-    IDEMPERR1 = IDEMPERR
-    IDEMPERR = ABS(TRX - TRXOLD)
-
-    IF (SP2CONV .EQ. "REL" .AND.  ITER .GE. MINSP2ITER &
-          .AND. (IDEMPERR .GE. IDEMPERR2) ) BREAKLOOP = 1
-
-    IF (SP2CONV .EQ. "ABS" .AND. ABS(LIMDIFF) .LE. IDEMTOL) BREAKLOOP = 1
-
-    ! NOT converging
-    IF (ITER .EQ. 100) THEN
-      CALL PANIC
-      CALL ERRORS("sparsesp2","Sparse SP2 purification is not converging: STOP!")
-    ENDIF
-
-  ENDDO
-
-  NR_SP2_ITER = ITER
-
-  ! Reset number of non-zeroes per row - MSPARSE
-  MSIZE = MAXM
-
-!  MSIZE = HDIM
-  ! Deallocate temporary arrays
-  DEALLOCATE(IX)
-  DEALLOCATE(X, Y)
-  DEALLOCATE(IIC)
-  DEALLOCATE(JJC, JJB)
-  DEALLOCATE(CCN)
-
-END SUBROUTINE SP2LOOP
+  END SUBROUTINE DENSE2SPARSE
 
 
-SUBROUTINE SP2SEQUENCELOOP(MSIZE, ITER, II, JJ, VAL)
+  SUBROUTINE SPARSE2DENSE(SCALAR, II, JJ, VAL, DARRAY, HSIZE)
 
-  USE MYPRECISION
-  USE CONSTANTS_MOD
-  USE PUREARRAY
-  USE SPARSEARRAY
-  USE SPARSEMATH
-  USE OMP_LIB
+    USE MYPRECISION
+    USE CONSTANTS_MOD
 
-  IMPLICIT NONE
-  INTEGER, INTENT(INOUT) :: MSIZE, ITER
-  INTEGER :: BREAKLOOP, MAXM
-  INTEGER, INTENT(INOUT) :: II(:), JJ(:,:)
-  INTEGER, ALLOCATABLE :: IIC(:), JJC(:,:)
+    IMPLICIT NONE
+    INTEGER :: I,J
+    INTEGER, INTENT(IN):: HSIZE
+    INTEGER, INTENT(IN):: II(:), JJ(:,:)
 
-  REAL(LATTEPREC) :: TRX, TRNORM, OCC
-  REAL(LATTEPREC) :: TRX2, TR2XX2, TRXOLD
-  REAL(LATTEPREC) :: LIMDIFF, IDEMPERR, IDEMPERR1, IDEMPERR2
-  REAL(LATTEPREC), INTENT(INOUT) :: VAL(:,:)
-  REAL(LATTEPREC), ALLOCATABLE :: CCN(:,:)
-  REAL(LATTEPREC), PARAMETER :: IDEMTOL = 1.0E-14
+    REAL(LATTEPREC), INTENT(IN) :: SCALAR
+    REAL(LATTEPREC), INTENT(IN) :: VAL(:,:)
+    REAL(LATTEPREC), INTENT(INOUT) :: DARRAY(:,:)
 
-  ! Allocate temporary arrays
-  ALLOCATE(IX(HDIM))
-  ALLOCATE(X(HDIM), Y(HDIM))
-  ALLOCATE(IIC(HDIM))
-  ALLOCATE(JJC(MSIZE,HDIM), JJB(MSIZE,HDIM))
-  ALLOCATE(CCN(MSIZE,HDIM))
+    DARRAY = ZERO
 
-  OCC = BNDFIL*FLOAT(HDIM)
+    DO I = 1, HSIZE
+       DO J = 1,II(I)
+          DARRAY(I,JJ(J,I)) = SCALAR*VAL(J,I)
+       ENDDO
+    ENDDO
 
-  IDEMPERR2 = 0.0
-  IDEMPERR1 = 0.0
-  IDEMPERR = 0.0
+  END SUBROUTINE SPARSE2DENSE
 
-  MAXM = 0
+  SUBROUTINE SP2LOOP(MSIZE, ITER, II, JJ, VAL)
 
-  IX = 0
-  X = ZERO
-  Y = ZERO
+    USE MYPRECISION
+    USE CONSTANTS_MOD
+    USE SPARSEARRAY
+    USE PUREARRAY
+    USE SPARSEMATH
+    USE OMP_LIB
+    USE MATRIXIO
 
-  CCN = ZERO
-  JJC = 0
-  IIC = 0
+    IMPLICIT NONE
+    INTEGER, INTENT(INOUT) :: MSIZE, ITER
+    INTEGER, INTENT(INOUT) :: II(:), JJ(:,:)
+    INTEGER :: BREAKLOOP, MAXM
+    INTEGER, ALLOCATABLE :: IIC(:), JJC(:,:)
 
-  ITER = 0
-  BREAKLOOP = 0
-!  WRITE(*,*) ' NR_SP2_ITER = ',NR_SP2_ITER
+    REAL(LATTEPREC) :: TRX, TRNORM, OCC
+    REAL(LATTEPREC) :: TRX2, TR2XX2, TRXOLD
+    REAL(LATTEPREC) :: LIMDIFF, IDEMPERR, IDEMPERR1, IDEMPERR2
+    REAL(LATTEPREC), INTENT(INOUT) :: VAL(:,:)
+    REAL(LATTEPREC), ALLOCATABLE :: CCN(:,:)
+    REAL(LATTEPREC), PARAMETER :: IDEMTOL = 1.0E-14
 
-  DO WHILE (ITER .LT. NR_SP2_ITER )
+    ! Allocate temporary arrays
+    ALLOCATE(IX(HDIM))
+    ALLOCATE(X(HDIM), Y(HDIM))
+    ALLOCATE(IIC(HDIM))
+    ALLOCATE(JJC(MSIZE,HDIM), JJB(MSIZE,HDIM))
+    ALLOCATE(CCN(MSIZE,HDIM))
 
-    ITER = ITER + 1
+    OCC = BNDFIL*FLOAT(HDIM)
 
-    !
-    ! Sparse BO * BO
-    !
+    IDEMPERR2 = ZERO
+    IDEMPERR1 = ZERO
+    IDEMPERR = ZERO
 
-    TRX = ZERO
-    TRX2 = ZERO
+    MAXM = 0
 
-    ! Matrix multiply X^2
-    CALL SPARSEX2(TRX, TRX2, II, JJ, VAL, IIC, JJC, CCN)
+    IX = 0
+    X = 0
+    Y = 0
 
-    MAXM = MAX(MAXM, 2*MAXVAL(IIC))
+    CCN = 0
+    JJC = 0
+    JJB = 0
+    IIC = 0
+
+    ITER = 0
+    BREAKLOOP = 0
+
+    DO WHILE ( BREAKLOOP .EQ. 0 .AND. ITER .LT. 100 )
+
+       ITER = ITER + 1
+
+       !
+       ! Sparse BO * BO
+       !
+
+       TRX = ZERO
+       TRX2 = ZERO
+
+       ! Matrix multiply X^2
+       CALL SPARSEX2(TRX, TRX2, II, JJ, VAL, IIC, JJC, CCN)
+
+       MAXM = MAX(MAXM, 2*MAXVAL(IIC))
+
+       TR2XX2 = TWO*TRX - TRX2
+       TRXOLD = TRX
+       LIMDIFF = ABS(TRX2 - OCC) - ABS(TR2XX2 - OCC)
+
+       IF ( LIMDIFF .GT. IDEMTOL ) THEN ! X <= 2X-X^2
+
+          TRX = TWO * TRX - TRX2
+
+          PP(ITER) = 0
+
+          ! Sparse matrix X = 2X - X^2
+          CALL SPARSEADD(TRNORM, II, JJ, VAL, IIC, JJC, CCN)
+
+       ELSEIF ( LIMDIFF .LT. -IDEMTOL ) THEN ! X <= X^2
+
+          TRX = TRX2
+          PP(ITER) = 1;
+
+          ! Sparse matrix X = X^2
+          CALL SPARSESETX2(TRNORM, II, JJ, VAL, IIC, JJC, CCN)
+
+       ELSE
+
+          TRX = TRXOLD
+          BREAKLOOP = 1
+
+       ENDIF
+
+       VV(ITER) = SQRT(TRNORM)
+       !WRITE(*,*) 'IT = ', ITER, ' VV(',ITER,',) = ', VV(ITER), PP(ITER)
+
+       IDEMPERR2 = IDEMPERR1
+       IDEMPERR1 = IDEMPERR
+       IDEMPERR = ABS(TRX - TRXOLD)
+
+       IF (SP2CONV .EQ. "REL" .AND.  ITER .GE. MINSP2ITER &
+            .AND. (IDEMPERR .GE. IDEMPERR2) ) BREAKLOOP = 1
+
+       IF (SP2CONV .EQ. "ABS" .AND. ABS(LIMDIFF) .LE. IDEMTOL) BREAKLOOP = 1
+
+       ! NOT converging
+       IF (ITER .EQ. 100) THEN
+          CALL PANIC
+          CALL ERRORS("sparsesp2","Sparse SP2 purification is not converging: STOP!")
+       ENDIF
+
+    ENDDO
+
+    NR_SP2_ITER = ITER
+
+    ! Reset number of non-zeroes per row - MSPARSE
+    MSIZE = MAXM
+
+    !  MSIZE = HDIM
+    ! Deallocate temporary arrays
+    DEALLOCATE(IX)
+    DEALLOCATE(X, Y)
+    DEALLOCATE(IIC)
+    DEALLOCATE(JJC, JJB)
+    DEALLOCATE(CCN)
+
+  END SUBROUTINE SP2LOOP
 
 
-    TR2XX2 = TWO*TRX - TRX2
-    TRXOLD = TRX
-    LIMDIFF = ABS(TRX2 - OCC) - ABS(TR2XX2 - OCC)
+  SUBROUTINE SP2SEQUENCELOOP(MSIZE, ITER, II, JJ, VAL)
 
-    IF (PP(ITER).EQ.0) THEN ! X <= 2X-X^2
-      TRX = TWO * TRX - TRX2
+    USE MYPRECISION
+    USE CONSTANTS_MOD
+    USE PUREARRAY
+    USE SPARSEARRAY
+    USE SPARSEMATH
+    USE OMP_LIB
 
-      ! Sparse matrix X = 2X - X^2
-      CALL SPARSEADD(TRNORM, II, JJ, VAL, IIC, JJC, CCN)
+    IMPLICIT NONE
+    INTEGER, INTENT(INOUT) :: MSIZE, ITER
+    INTEGER :: BREAKLOOP, MAXM
+    INTEGER, INTENT(INOUT) :: II(:), JJ(:,:)
+    INTEGER, ALLOCATABLE :: IIC(:), JJC(:,:)
 
-    ELSE ! X <= X^2
+    REAL(LATTEPREC) :: TRX, TRNORM, OCC
+    REAL(LATTEPREC) :: TRX2, TR2XX2, TRXOLD
+    REAL(LATTEPREC) :: LIMDIFF, IDEMPERR, IDEMPERR1, IDEMPERR2
+    REAL(LATTEPREC), INTENT(INOUT) :: VAL(:,:)
+    REAL(LATTEPREC), ALLOCATABLE :: CCN(:,:)
+    REAL(LATTEPREC), PARAMETER :: IDEMTOL = 1.0E-14
 
-      TRX = TRX2
+    ! Allocate temporary arrays
+    ALLOCATE(IX(HDIM))
+    ALLOCATE(X(HDIM), Y(HDIM))
+    ALLOCATE(IIC(HDIM))
+    ALLOCATE(JJC(MSIZE,HDIM), JJB(MSIZE,HDIM))
+    ALLOCATE(CCN(MSIZE,HDIM))
 
-      ! Sparse matrix X = X^2
-      CALL SPARSESETX2(TRNORM, II, JJ, VAL, IIC, JJC, CCN)
+    OCC = BNDFIL*FLOAT(HDIM)
 
-    ENDIF
+    IDEMPERR2 = 0.0
+    IDEMPERR1 = 0.0
+    IDEMPERR = 0.0
 
-    VV(ITER) = SQRT(TRNORM)
-!    WRITE(*,*) 'IT = ', ITER, ' VV(',ITER,',) = ', VV(ITER), PP(ITER)
+    MAXM = 0
 
-    ! NOT converging
-    IF (ITER .GE. 100) THEN
-      CALL PANIC
-      CALL ERRORS("sparsesp2","Sparse SP2 purification is not converging: STOP!")
-    ENDIF
+    IX = 0
+    X = ZERO
+    Y = ZERO
 
-  ENDDO
-  NR_SP2_ITER = ITER
+    CCN = ZERO
+    JJC = 0
+    IIC = 0
 
-  ! Reset number of non-zeroes per row - MSPARSE
+    ITER = 0
+    BREAKLOOP = 0
+    !  WRITE(*,*) ' NR_SP2_ITER = ',NR_SP2_ITER
 
-!  PRINT*, MAXM, HDIM, 2*MAXVAL(IIC)
+    DO WHILE (ITER .LT. NR_SP2_ITER )
 
-  MSIZE = MAXM
-!  MSIZE = HDIM
-  ! Deallocate temporary arrays
-  DEALLOCATE(IX)
-  DEALLOCATE(X, Y)
-  DEALLOCATE(IIC)
-  DEALLOCATE(JJC, JJB)
-  DEALLOCATE(CCN)
+       ITER = ITER + 1
 
-END SUBROUTINE SP2SEQUENCELOOP
+       !
+       ! Sparse BO * BO
+       !
+
+       TRX = ZERO
+       TRX2 = ZERO
+
+       ! Matrix multiply X^2
+       CALL SPARSEX2(TRX, TRX2, II, JJ, VAL, IIC, JJC, CCN)
+
+       MAXM = MAX(MAXM, 2*MAXVAL(IIC))
+
+
+       TR2XX2 = TWO*TRX - TRX2
+       TRXOLD = TRX
+       LIMDIFF = ABS(TRX2 - OCC) - ABS(TR2XX2 - OCC)
+
+       IF (PP(ITER).EQ.0) THEN ! X <= 2X-X^2
+          TRX = TWO * TRX - TRX2
+
+          ! Sparse matrix X = 2X - X^2
+          CALL SPARSEADD(TRNORM, II, JJ, VAL, IIC, JJC, CCN)
+
+       ELSE ! X <= X^2
+
+          TRX = TRX2
+
+          ! Sparse matrix X = X^2
+          CALL SPARSESETX2(TRNORM, II, JJ, VAL, IIC, JJC, CCN)
+
+       ENDIF
+
+       VV(ITER) = SQRT(TRNORM)
+       !    WRITE(*,*) 'IT = ', ITER, ' VV(',ITER,',) = ', VV(ITER), PP(ITER)
+
+       ! NOT converging
+       IF (ITER .GE. 100) THEN
+          CALL PANIC
+          CALL ERRORS("sparsesp2","Sparse SP2 purification is not converging: STOP!")
+       ENDIF
+
+    ENDDO
+    NR_SP2_ITER = ITER
+
+    ! Reset number of non-zeroes per row - MSPARSE
+
+    !  PRINT*, MAXM, HDIM, 2*MAXVAL(IIC)
+
+    MSIZE = MAXM
+    !  MSIZE = HDIM
+    ! Deallocate temporary arrays
+    DEALLOCATE(IX)
+    DEALLOCATE(X, Y)
+    DEALLOCATE(IIC)
+    DEALLOCATE(JJC, JJB)
+    DEALLOCATE(CCN)
+
+  END SUBROUTINE SP2SEQUENCELOOP
 
 END MODULE SPARSESP2

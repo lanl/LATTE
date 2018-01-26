@@ -169,7 +169,7 @@ SUBROUTINE BOEVECS
 
      IF (MOD(INT(TOTNE),2) .NE. 0) THEN
         CALL ERRORS("bodirect","Odd number of electrons - run a spin-polarized calculation &
-        & or use a finite electron temperature")
+             & or use a finite electron temperature")
      ENDIF
 
      !
