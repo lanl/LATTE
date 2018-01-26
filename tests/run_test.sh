@@ -12,7 +12,7 @@ echo -e "\nTesting LATTE with new (latte.in) input files \n"
 mv latte.in latte.in.tmp
 
 for name in 0scf 2scf fullscf fullscf.etemp sp2 fullscf.nvt \
-       	fullscf.npt fullscf.vdw fullscf.spin ; do
+       	fullscf.npt fullscf.vdw fullscf.spin fullscf.kon ; do
 
   INLATTEFILE="latte."$name".in"
   REF="energy."$name".out"
