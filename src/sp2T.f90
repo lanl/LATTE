@@ -55,14 +55,14 @@ SUBROUTINE SP2T
            IF (I .EQ. J) THEN
 
               BO(J,I) = (MAXEVAL - H(J,I))/MAXMINUSMIN
-              
+
            ELSEIF (I .NE. J) THEN
-              
+
               BO(J,I) = (ZERO - H(J,I))/MAXMINUSMIN
               BO(I,J) = BO(J,I)
-              
+
            ENDIF
-           
+
         ENDDO
      ENDDO
 
@@ -77,13 +77,13 @@ SUBROUTINE SP2T
         !
 
 #ifdef DOUBLEPREV
-           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                BO, HDIM, BO, HDIM, 0.0D0, X2, HDIM)
+        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+             BO, HDIM, BO, HDIM, 0.0D0, X2, HDIM)
 #elif defined(SINGLEPREC)
-           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                BO, HDIM, BO, HDIM, 0.0, X2, HDIM)
+        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+             BO, HDIM, BO, HDIM, 0.0, X2, HDIM)
 #endif
-        
+
         TRX2 = ZERO
         TRX = ZERO
 
@@ -112,18 +112,18 @@ SUBROUTINE SP2T
      !
 
 #ifdef DOUBLEPREC
-        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-             BO, HDIM, BO, HDIM, 0.0D0, X2, HDIM)
+     CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+          BO, HDIM, BO, HDIM, 0.0D0, X2, HDIM)
 #elif defined(SINGLEPREC)
-        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-             BO, HDIM, BO, HDIM, 0.0, X2, HDIM)
+     CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+          BO, HDIM, BO, HDIM, 0.0, X2, HDIM)
 #endif
 
      TRX = ZERO
      TRX2 = ZERO
 
      DO I = 1, HDIM
-        
+
         TRX = TRX + BO(I,I)
         TRX2 = TRX2 + X2(I,I)
 
@@ -135,7 +135,7 @@ SUBROUTINE SP2T
      ! Here we also double the density matrix to get the 
      ! bond-order in non-spin polarized calculations
      !
-     
+
      BO = TWO*( BO + LAMBDA*( BO - X2 ))
 
   ELSE
@@ -146,16 +146,16 @@ SUBROUTINE SP2T
 
      DO I = 1, HDIM
         DO J = I, HDIM
-           
+
            IF (I .EQ. J) THEN
-              
+
               RHOUP(J,I) = (MAXEVAL - HUP(J,I))/MAXMINUSMIN
 
               RHODOWN(J,I) = (MAXEVAL - HDOWN(J,I)) / &
                    MAXMINUSMIN
 
            ELSEIF (I .NE. J) THEN
-              
+
               RHOUP(J,I) = (ZERO - HUP(J,I))/MAXMINUSMIN
               RHOUP(I,J) = RHOUP(J,I)
 
@@ -163,7 +163,7 @@ SUBROUTINE SP2T
               RHODOWN(I,J) = RHODOWN(J,I)
 
            ENDIF
-           
+
         ENDDO
      ENDDO
 
@@ -178,26 +178,26 @@ SUBROUTINE SP2T
         !
 
 #ifdef DOUBLEPREC
-           
-           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                RHOUP, HDIM, RHOUP, HDIM, 0.0D0, X2UP, HDIM)
-           CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-                RHODOWN, HDIM, RHODOWN, HDIM, 0.0D0, X2DOWN, HDIM)
+
+        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+             RHOUP, HDIM, RHOUP, HDIM, 0.0D0, X2UP, HDIM)
+        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+             RHODOWN, HDIM, RHODOWN, HDIM, 0.0D0, X2DOWN, HDIM)
 
 #elif defined(SINGLEPREC)
 
-           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                RHOUP, HDIM, RHOUP, HDIM, 0.0, X2UP, HDIM)
-           CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-                RHODOWN, HDIM, RHODOWN, HDIM, 0.0, X2DOWN, HDIM)
+        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+             RHOUP, HDIM, RHOUP, HDIM, 0.0, X2UP, HDIM)
+        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+             RHODOWN, HDIM, RHODOWN, HDIM, 0.0, X2DOWN, HDIM)
 
 #endif
-           
+
         TRX = ZERO
         TRX2 = ZERO
 
         DO I = 1, HDIM
-           
+
            TRX = TRX + RHOUP(I,I) + RHODOWN(I,I)
            TRX2 = TRX2 + X2UP(I,I) + X2DOWN(I,I)
 
@@ -223,26 +223,26 @@ SUBROUTINE SP2T
      !
 
 #ifdef DOUBLEPREC
-        
-        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-             RHOUP, HDIM, RHOUP, HDIM, 0.0D0, X2UP, HDIM)
-        CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-             RHODOwN, HDIM, RHODOWN, HDIM, 0.0D0, X2DOWN, HDIM)
-        
+
+     CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+          RHOUP, HDIM, RHOUP, HDIM, 0.0D0, X2UP, HDIM)
+     CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+          RHODOwN, HDIM, RHODOWN, HDIM, 0.0D0, X2DOWN, HDIM)
+
 #elif defined(SINGLEPREC)
-        
-        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-             RHOUP, HDIM, RHOUP, HDIM, 0.0, X2UP, HDIM)
-        CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-             RHODOWN, HDIM, RHODOWN, HDIM, 0.0, X2DOWN, HDIM)
-        
+
+     CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+          RHOUP, HDIM, RHOUP, HDIM, 0.0, X2UP, HDIM)
+     CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+          RHODOWN, HDIM, RHODOWN, HDIM, 0.0, X2DOWN, HDIM)
+
 #endif
-     
+
      TRX = ZERO
      TRX2 = ZERO
 
      DO I = 1, HDIM
-        
+
         TRX = TRX + RHOUP(I,I) + RHODOWN(I,I)
         TRX2 = TRX2 + X2UP(I,I) + X2DOWN(I,I)
 
@@ -251,15 +251,15 @@ SUBROUTINE SP2T
      IF (ABS(TOTNE - TRX) .GT. 1.0D-8) THEN
 
         LAMBDA = (TOTNE - TRX)/(TRX - TRX2)
-        
-!     print*, "TOTNE - TRX = ", TOTNE - TRX
-!     print*, "TRX - TRX2 = ", TRX - TRX2
+
+        !     print*, "TOTNE - TRX = ", TOTNE - TRX
+        !     print*, "TRX - TRX2 = ", TRX - TRX2
 
         RHOUP = RHOUP + LAMBDA*(RHOUP - X2UP)
         RHODOWN = RHODOWN + LAMBDA*(RHODOWN - X2DOWN)   
 
      ENDIF
-        
+
   ENDIF
 
   RETURN

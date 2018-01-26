@@ -28,7 +28,7 @@ FUNCTION AM(M, ALPHA)
   IMPLICIT NONE
 
   REAL(LATTEPREC) :: AM, ALPHA
-!  REAL(LATTEPREC), EXTERNAL:: HEAVI
+  !  REAL(LATTEPREC), EXTERNAL:: HEAVI
   INTEGER :: M
 
   ! Removed the call to the Heaviside step function to save on 

@@ -2,9 +2,9 @@ FUNCTION GAUSSRN(MEAN,STDDEV)
 
   USE MDARRAY
   USE MYPRECISION
-  
+
   IMPLICIT NONE
-  
+
   !
   ! Based on GASDEV from Numerical Recipes
   !
@@ -24,10 +24,10 @@ FUNCTION GAUSSRN(MEAN,STDDEV)
      DO WHILE (R .GE. ONE) 
 
         CALL RANDOM_NUMBER(RN)
-        
+
         V1 = TWO*RN(1) - ONE
         V2 = TWO*RN(2) - ONE
-        
+
         R = V1*V1 + V2*V2
 
      ENDDO
@@ -44,7 +44,7 @@ FUNCTION GAUSSRN(MEAN,STDDEV)
   ELSE 
 
      GAUSSRN = G2
-     
+
      SETTH = 0
 
   ENDIF

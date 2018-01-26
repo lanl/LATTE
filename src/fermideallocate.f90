@@ -20,7 +20,7 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SUBROUTINE FERMIDEALLOCATE
-  
+
   USE CONSTANTS_MOD
   USE FERMICOMMON
 

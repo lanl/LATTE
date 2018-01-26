@@ -4,20 +4,20 @@
 !! \author C. F. A. Negre
 !! (cnegre@lanl.gov)
 !!
-module kernelparser_mod
+MODULE kernelparser_mod
 
-  use openfiles_mod
+  USE openfiles_mod
   !  use parallel_mod
 
-  implicit none
+  IMPLICIT NONE
 
-  private
+  PRIVATE
 
-  integer, parameter :: dp = kind(1.0d0)
+  INTEGER, PARAMETER :: dp = KIND(1.0d0)
 
-  public :: parsing_kernel
+  PUBLIC :: parsing_kernel
 
-contains
+CONTAINS
 
   !> The general parsing function.
   !! It is used to vectorize a set of "keywords" "value" pairs
@@ -27,390 +27,390 @@ contains
   !! \warning If the length of variable vect is changed, this could produce a
   !! segmentation fault.
   !!
-  subroutine parsing_kernel(keyvector_char,valvector_char&
+  SUBROUTINE parsing_kernel(keyvector_char,valvector_char&
        ,keyvector_int,valvector_int,keyvector_re,valvector_re,&
        keyvector_log,valvector_log,filename,startstop)
-    implicit none
-    character(1), allocatable              ::  tempc(:)
-    character(100), allocatable            ::  vect(:,:)
-    character(50)                          ::  keyvector_char(:), keyvector_int(:), keyvector_log(:), keyvector_re(:)
-    character(100)                         ::  valvector_char(:)
-    character(len=*)                       ::  filename
-    character(len=*), intent(in), optional ::  startstop(2)
-    character(len=100)                      ::  tempcflex
-    integer                                ::  i, io_control, ios, j
-    integer                                ::  k, l, lenc, nkey_char
-    integer                                ::  nkey_int, nkey_log, nkey_re, readmaxi
-    integer                                ::  readmaxj, readmini, valvector_int(:)
-    integer                                ::  startatj, totalwords
-    logical                                ::  start, stopl, valid, valvector_log(:), stopparsing, defaultnone
-    logical, allocatable                   ::  checkmissing_char(:), checkmissing_int(:), checkmissing_log(:), checkmissing_re(:)
-    real(dp)                               ::  valvector_re(:)
+    IMPLICIT NONE
+    CHARACTER(1), ALLOCATABLE              ::  tempc(:)
+    CHARACTER(100), ALLOCATABLE            ::  vect(:,:)
+    CHARACTER(50)                          ::  keyvector_char(:), keyvector_int(:), keyvector_log(:), keyvector_re(:)
+    CHARACTER(100)                         ::  valvector_char(:)
+    CHARACTER(len=*)                       ::  filename
+    CHARACTER(len=*), INTENT(in), OPTIONAL ::  startstop(2)
+    CHARACTER(len=100)                      ::  tempcflex
+    INTEGER                                ::  i, io_control, ios, j
+    INTEGER                                ::  k, l, lenc, nkey_char
+    INTEGER                                ::  nkey_int, nkey_log, nkey_re, readmaxi
+    INTEGER                                ::  readmaxj, readmini, valvector_int(:)
+    INTEGER                                ::  startatj, totalwords
+    LOGICAL                                ::  start, stopl, valid, valvector_log(:), stopparsing, defaultnone
+    LOGICAL, ALLOCATABLE                   ::  checkmissing_char(:), checkmissing_int(:), checkmissing_log(:), checkmissing_re(:)
+    REAL(dp)                               ::  valvector_re(:)
 
     readmaxi = 5 ; readmaxj = 1000
-    allocate(vect(readmaxi,readmaxj))
-    nkey_char = size(keyvector_char,dim=1)
-    nkey_re = size(keyvector_re,dim=1)
-    nkey_int = size(keyvector_int,dim=1)
-    nkey_log = size(keyvector_log,dim=1)
+    ALLOCATE(vect(readmaxi,readmaxj))
+    nkey_char = SIZE(keyvector_char,dim=1)
+    nkey_re = SIZE(keyvector_re,dim=1)
+    nkey_int = SIZE(keyvector_int,dim=1)
+    nkey_log = SIZE(keyvector_log,dim=1)
 
-    call open_file_to_read(io_control,filename)
+    CALL open_file_to_read(io_control,filename)
 
-    allocate(checkmissing_char(nkey_char),checkmissing_re(nkey_re), &
+    ALLOCATE(checkmissing_char(nkey_char),checkmissing_re(nkey_re), &
          checkmissing_int(nkey_int), checkmissing_log(nkey_log))
 
     !Initialize the checkmissing flags and the vect arrays
-    checkmissing_char = .false.
-    checkmissing_re = .false.
-    checkmissing_int = .false.
-    checkmissing_log = .false.
-    stopparsing = .false.
-    defaultnone = .false.
+    checkmissing_char = .FALSE.
+    checkmissing_re = .FALSE.
+    checkmissing_int = .FALSE.
+    checkmissing_log = .FALSE.
+    stopparsing = .FALSE.
+    defaultnone = .FALSE.
     vect = '                    '
 
-    do i=1,readmaxi !Here we read all the input into vect
-       read(io_control,*,iostat=ios)(vect(i,j),j=1,readmaxj)
-    end do
+    DO i=1,readmaxi !Here we read all the input into vect
+       READ(io_control,*,iostat=ios)(vect(i,j),j=1,readmaxj)
+    END DO
 
-    close(io_control)
+    CLOSE(io_control)
 
     !Look up for floating hashes (#)
     totalwords = 0
-    do i=1,readmaxi
-       do k=1,readmaxj
-          if(adjustl(trim(vect(i,k))).ne."")totalwords = totalwords + 1
-          if(adjustl(trim(vect(i,k))).eq."#")then
-            write(*,*)" "
-             write(*,*)"ERROR in the the input file ..."
-             write(*,*)" "
-             write(*,*)"In the LATTE parsing routine everything is a comment by default unless theres an = sign"
-             write(*,*)"next to a word, in which case, it will be recognized as a keyword."
-             write(*,*)"This parser does not accept floating hashes (#). This is done in order to make sure"
-             write(*,*)"that a specific keyword is commented"
-             write(*,*)" "
-             write(*,*)"If you have a commented keyword make sure there is a # symbol right next to it"
-             write(*,*)"   "
-             write(*,*)"   The following commented keyword is correct: "
-             write(*,*)"                #KeyWord= 1 "
-             write(*,*)" "
-             write(*,*)"   The following commented keyword is NOT correct: "
-             write(*,*)"                # KeyWord= 1 "
-             write(*,*)" "
-             stop
-          endif
-          if(adjustl(trim(vect(i,k))).eq."STOP{}")stopparsing = .true.
-          if(adjustl(trim(vect(i,k))).eq."DEFAULTNONE")defaultnone = .true.
-       enddo
-    enddo
+    DO i=1,readmaxi
+       DO k=1,readmaxj
+          IF(ADJUSTL(TRIM(vect(i,k))).NE."")totalwords = totalwords + 1
+          IF(ADJUSTL(TRIM(vect(i,k))).EQ."#")THEN
+             WRITE(*,*)" "
+             WRITE(*,*)"ERROR in the the input file ..."
+             WRITE(*,*)" "
+             WRITE(*,*)"In the LATTE parsing routine everything is a comment by default unless theres an = sign"
+             WRITE(*,*)"next to a word, in which case, it will be recognized as a keyword."
+             WRITE(*,*)"This parser does not accept floating hashes (#). This is done in order to make sure"
+             WRITE(*,*)"that a specific keyword is commented"
+             WRITE(*,*)" "
+             WRITE(*,*)"If you have a commented keyword make sure there is a # symbol right next to it"
+             WRITE(*,*)"   "
+             WRITE(*,*)"   The following commented keyword is correct: "
+             WRITE(*,*)"                #KeyWord= 1 "
+             WRITE(*,*)" "
+             WRITE(*,*)"   The following commented keyword is NOT correct: "
+             WRITE(*,*)"                # KeyWord= 1 "
+             WRITE(*,*)" "
+             STOP
+          ENDIF
+          IF(ADJUSTL(TRIM(vect(i,k))).EQ."STOP{}")stopparsing = .TRUE.
+          IF(ADJUSTL(TRIM(vect(i,k))).EQ."DEFAULTNONE")defaultnone = .TRUE.
+       ENDDO
+    ENDDO
 
-    if(totalwords > readmaxi*readmaxj - 100) then
-       write(*,*)""; write(*,*)"Stopping ... Maximum allowed (keys + values + comments) words close to the limit "
-       write(*,*)"Increase the readmaxj variable in the parsing_kernel subroutine or reduce the comments in the input"
-       stop
-    endif
+    IF(totalwords > readmaxi*readmaxj - 100) THEN
+       WRITE(*,*)""; WRITE(*,*)"Stopping ... Maximum allowed (keys + values + comments) words close to the limit "
+       WRITE(*,*)"Increase the readmaxj variable in the parsing_kernel subroutine or reduce the comments in the input"
+       STOP
+    ENDIF
 
     !Look up for boundaries
     readmini=1
-    start=.false.
-    if(present(startstop))then
-       do i=1,readmaxi
-          do k=1,readmaxj
-             if(trim(vect(i,k)).eq.trim(startstop(1)))then
+    start=.FALSE.
+    IF(PRESENT(startstop))THEN
+       DO i=1,readmaxi
+          DO k=1,readmaxj
+             IF(TRIM(vect(i,k)).EQ.TRIM(startstop(1)))THEN
                 readmini=i
                 startatj=k
-                start=.true.
-             endif
-             if(start.and.trim(vect(i,k)).eq.trim(startstop(2)))then
+                start=.TRUE.
+             ENDIF
+             IF(start.AND.TRIM(vect(i,k)).EQ.TRIM(startstop(2)))THEN
                 readmaxi=i
-             endif
-          enddo
-       enddo
-    endif
-    write(*,*)startstop
+             ENDIF
+          ENDDO
+       ENDDO
+    ENDIF
+    WRITE(*,*)startstop
 
     ! Look for invalid characters if startstop is present
-    if(start)then
-       start=.false.
-       stopl=.false.
-       do i=readmini,readmaxi
-          do k=1,readmaxj
-             if(trim(vect(i,k)).eq.trim(startstop(1)))start=.true.
-             valid = .false.
-             if(start)then
-                if(vect(i,k).ne.'                    ')then
-                   do j=1,nkey_char
-                      if(trim(vect(i,k)).eq.trim(keyvector_char(j)))then
-                         valid = .true.
-                      endif
-                   enddo
-                   do j=1,nkey_int
-                      if(trim(vect(i,k)).eq.trim(keyvector_int(j)))then
-                         valid = .true.
-                      endif
-                   enddo
-                   do j=1,nkey_re
-                      if(trim(vect(i,k)).eq.trim(keyvector_re(j)))then
-                         valid = .true.
-                      endif
-                   enddo
-                   do j=1,nkey_log
-                      if(trim(vect(i,k)).eq.trim(keyvector_log(j)))then
-                         valid = .true.
-                      endif
-                   enddo
-                   if(trim(vect(i,k)).eq.trim(startstop(2)))then
-                      stopl=.true.
-                   endif
-                   if(.not.valid.and..not.stopl)call check_valid(vect(i,k))
-                endif
-             endif
-          enddo
-       enddo
-    endif
+    IF(start)THEN
+       start=.FALSE.
+       stopl=.FALSE.
+       DO i=readmini,readmaxi
+          DO k=1,readmaxj
+             IF(TRIM(vect(i,k)).EQ.TRIM(startstop(1)))start=.TRUE.
+             valid = .FALSE.
+             IF(start)THEN
+                IF(vect(i,k).NE.'                    ')THEN
+                   DO j=1,nkey_char
+                      IF(TRIM(vect(i,k)).EQ.TRIM(keyvector_char(j)))THEN
+                         valid = .TRUE.
+                      ENDIF
+                   ENDDO
+                   DO j=1,nkey_int
+                      IF(TRIM(vect(i,k)).EQ.TRIM(keyvector_int(j)))THEN
+                         valid = .TRUE.
+                      ENDIF
+                   ENDDO
+                   DO j=1,nkey_re
+                      IF(TRIM(vect(i,k)).EQ.TRIM(keyvector_re(j)))THEN
+                         valid = .TRUE.
+                      ENDIF
+                   ENDDO
+                   DO j=1,nkey_log
+                      IF(TRIM(vect(i,k)).EQ.TRIM(keyvector_log(j)))THEN
+                         valid = .TRUE.
+                      ENDIF
+                   ENDDO
+                   IF(TRIM(vect(i,k)).EQ.TRIM(startstop(2)))THEN
+                      stopl=.TRUE.
+                   ENDIF
+                   IF(.NOT.valid.AND..NOT.stopl)CALL check_valid(vect(i,k))
+                ENDIF
+             ENDIF
+          ENDDO
+       ENDDO
+    ENDIF
 
-    stopl = .false.
-    do i=readmini,readmaxi  !We search for the character keys
-       if(stopl)exit
-       do k=1,readmaxj
-          if(stopl)exit
-          if(vect(i,k).ne.'                    ')then
-             if(start)then !If we have a start key:
-                if(readmaxj*(i-1)+k .ge.readmaxj*(readmini-1)+startatj) then !If the position is beyond the start key:
-                   if(trim(vect(i,k)).ne.'}')then  !If we don't have a stop key:
-                      do j=1,nkey_char
-                         if(adjustl(trim(vect(i,k))).eq.adjustl(trim(keyvector_char(j))))then
-                            valvector_char(j)=adjustl(trim(vect(i,k+1)))
-                            checkmissing_char(j) = .true.
-                         endif
-                      end do
-                   else
-                      stopl = .true.
-                   endif
-                endif
-             else  !If we don't have a start key:
-                do j=1,nkey_char
-                   if(trim(vect(i,k)).eq.trim(keyvector_char(j)))then
-                      valvector_char(j)=trim(vect(i,k+1))
-                      checkmissing_char(j) = .true.
-                   endif
-                end do
-             endif
-          else
-             exit
-          endif
-       enddo
-    enddo
+    stopl = .FALSE.
+    DO i=readmini,readmaxi  !We search for the character keys
+       IF(stopl)EXIT
+       DO k=1,readmaxj
+          IF(stopl)EXIT
+          IF(vect(i,k).NE.'                    ')THEN
+             IF(start)THEN !If we have a start key:
+                IF(readmaxj*(i-1)+k .GE.readmaxj*(readmini-1)+startatj) THEN !If the position is beyond the start key:
+                   IF(TRIM(vect(i,k)).NE.'}')THEN  !If we don't have a stop key:
+                      DO j=1,nkey_char
+                         IF(ADJUSTL(TRIM(vect(i,k))).EQ.ADJUSTL(TRIM(keyvector_char(j))))THEN
+                            valvector_char(j)=ADJUSTL(TRIM(vect(i,k+1)))
+                            checkmissing_char(j) = .TRUE.
+                         ENDIF
+                      END DO
+                   ELSE
+                      stopl = .TRUE.
+                   ENDIF
+                ENDIF
+             ELSE  !If we don't have a start key:
+                DO j=1,nkey_char
+                   IF(TRIM(vect(i,k)).EQ.TRIM(keyvector_char(j)))THEN
+                      valvector_char(j)=TRIM(vect(i,k+1))
+                      checkmissing_char(j) = .TRUE.
+                   ENDIF
+                END DO
+             ENDIF
+          ELSE
+             EXIT
+          ENDIF
+       ENDDO
+    ENDDO
 
-    stopl = .false.
-    do i=readmini,readmaxi  !We search for the integer keys
-       if(stopl)exit
-       do k=1,readmaxj
-          if(stopl)exit
-          if(vect(i,k).ne.'                    ')then
-             if(start)then
-                if(readmaxj*(i-1)+k .ge.readmaxj*(readmini-1)+startatj) then
-                   if(adjustl(trim(vect(i,k))).ne.'}')then
-                      do j=1,nkey_int
-                         if(trim(vect(i,k)).eq.trim(keyvector_int(j)))then
-                            read(vect(i,k+1),*)valvector_int(j)
-                            checkmissing_int(j) = .true.
-                         endif
-                      enddo
-                   else
-                      stopl = .true.
-                   endif
-                endif
-             else
-                do j=1,nkey_int
-                   if(trim(vect(i,k)).eq.trim(keyvector_int(j)))then
-                      read(vect(i,k+1),*)valvector_int(j)
-                      checkmissing_int(j) = .true.
-                   endif
-                enddo
-             endif
-          else
-             exit
-          endif
-       enddo
-    enddo
+    stopl = .FALSE.
+    DO i=readmini,readmaxi  !We search for the integer keys
+       IF(stopl)EXIT
+       DO k=1,readmaxj
+          IF(stopl)EXIT
+          IF(vect(i,k).NE.'                    ')THEN
+             IF(start)THEN
+                IF(readmaxj*(i-1)+k .GE.readmaxj*(readmini-1)+startatj) THEN
+                   IF(ADJUSTL(TRIM(vect(i,k))).NE.'}')THEN
+                      DO j=1,nkey_int
+                         IF(TRIM(vect(i,k)).EQ.TRIM(keyvector_int(j)))THEN
+                            READ(vect(i,k+1),*)valvector_int(j)
+                            checkmissing_int(j) = .TRUE.
+                         ENDIF
+                      ENDDO
+                   ELSE
+                      stopl = .TRUE.
+                   ENDIF
+                ENDIF
+             ELSE
+                DO j=1,nkey_int
+                   IF(TRIM(vect(i,k)).EQ.TRIM(keyvector_int(j)))THEN
+                      READ(vect(i,k+1),*)valvector_int(j)
+                      checkmissing_int(j) = .TRUE.
+                   ENDIF
+                ENDDO
+             ENDIF
+          ELSE
+             EXIT
+          ENDIF
+       ENDDO
+    ENDDO
 
-    stopl = .false.
-    do i=readmini,readmaxi  !We search for the real keys
-       if(stopl)exit
-       do k=1,readmaxj
-          if(stopl)exit
-          if(vect(i,k).ne.'                    ')then
-             if(start)then
-                if(readmaxj*(i-1)+k .ge.readmaxj*(readmini-1)+startatj) then
-                   if(trim(vect(i,k)).ne.'}')then
-                      do j=1,nkey_re
-                         if(trim(vect(i,k)).eq.trim(keyvector_re(j)))then
-                            read(vect(i,k+1),*)valvector_re(j)
-                            checkmissing_re(j) = .true.
-                         endif
-                      enddo
-                   else
-                      stopl = .true.
-                   endif
-                endif
-             else
-                do j=1,nkey_re
-                   if(trim(vect(i,k)).eq.trim(keyvector_re(j)))then
-                      read(vect(i,k+1),*)valvector_re(j)
-                      checkmissing_re(j) = .true.
-                   endif
-                enddo
-             endif
-          else
-             exit
-          endif
-       enddo
-    enddo
+    stopl = .FALSE.
+    DO i=readmini,readmaxi  !We search for the real keys
+       IF(stopl)EXIT
+       DO k=1,readmaxj
+          IF(stopl)EXIT
+          IF(vect(i,k).NE.'                    ')THEN
+             IF(start)THEN
+                IF(readmaxj*(i-1)+k .GE.readmaxj*(readmini-1)+startatj) THEN
+                   IF(TRIM(vect(i,k)).NE.'}')THEN
+                      DO j=1,nkey_re
+                         IF(TRIM(vect(i,k)).EQ.TRIM(keyvector_re(j)))THEN
+                            READ(vect(i,k+1),*)valvector_re(j)
+                            checkmissing_re(j) = .TRUE.
+                         ENDIF
+                      ENDDO
+                   ELSE
+                      stopl = .TRUE.
+                   ENDIF
+                ENDIF
+             ELSE
+                DO j=1,nkey_re
+                   IF(TRIM(vect(i,k)).EQ.TRIM(keyvector_re(j)))THEN
+                      READ(vect(i,k+1),*)valvector_re(j)
+                      checkmissing_re(j) = .TRUE.
+                   ENDIF
+                ENDDO
+             ENDIF
+          ELSE
+             EXIT
+          ENDIF
+       ENDDO
+    ENDDO
 
-    stopl = .false.
-    do i=1,readmaxi  !We search for the logical keys
-       if(stopl)exit
-       do k=1,readmaxj
-          if(stopl)exit
-          if(vect(i,k).ne.'                    ')then
-             if(start)then
-                if(readmaxj*(i-1)+k .ge.readmaxj*(readmini-1)+startatj) then
-                   if(trim(vect(i,k)).ne.'}')then
-                      do j=1,nkey_log
-                         if(trim(vect(i,k)).eq.trim(keyvector_log(j)))then
-                            read(vect(i,k+1),*)valvector_log(j)
-                            checkmissing_log(j) = .true.
-                         end if
-                      end do
-                   else
-                      stopl = .true.
-                   endif
-                endif
-             else
-                do j=1,nkey_log
-                   if(trim(vect(i,k)).eq.trim(keyvector_log(j)))then
-                      read(vect(i,k+1),*)valvector_log(j)
-                      checkmissing_log(j) = .true.
-                   endif
-                enddo
-             endif
-          else
-             exit
-          endif
-       enddo
-    enddo
+    stopl = .FALSE.
+    DO i=1,readmaxi  !We search for the logical keys
+       IF(stopl)EXIT
+       DO k=1,readmaxj
+          IF(stopl)EXIT
+          IF(vect(i,k).NE.'                    ')THEN
+             IF(start)THEN
+                IF(readmaxj*(i-1)+k .GE.readmaxj*(readmini-1)+startatj) THEN
+                   IF(TRIM(vect(i,k)).NE.'}')THEN
+                      DO j=1,nkey_log
+                         IF(TRIM(vect(i,k)).EQ.TRIM(keyvector_log(j)))THEN
+                            READ(vect(i,k+1),*)valvector_log(j)
+                            checkmissing_log(j) = .TRUE.
+                         END IF
+                      END DO
+                   ELSE
+                      stopl = .TRUE.
+                   ENDIF
+                ENDIF
+             ELSE
+                DO j=1,nkey_log
+                   IF(TRIM(vect(i,k)).EQ.TRIM(keyvector_log(j)))THEN
+                      READ(vect(i,k+1),*)valvector_log(j)
+                      checkmissing_log(j) = .TRUE.
+                   ENDIF
+                ENDDO
+             ENDIF
+          ELSE
+             EXIT
+          ENDIF
+       ENDDO
+    ENDDO
 
     !Check for missing keywords
-    write(*,*)' '
-    do i = 1,nkey_char
-       if(defaultnone .eqv..true.)then
-          if(checkmissing_char(i).neqv..true..and.trim(keyvector_char(i)).ne."DUMMY=")then
-             write(*,*)'ERROR: variable ',trim(keyvector_char(i)),&
+    WRITE(*,*)' '
+    DO i = 1,nkey_char
+       IF(defaultnone .EQV..TRUE.)THEN
+          IF(checkmissing_char(i).NEQV..TRUE..AND.TRIM(keyvector_char(i)).NE."DUMMY=")THEN
+             WRITE(*,*)'ERROR: variable ',TRIM(keyvector_char(i)),&
                   ' is missing. Set this variable or remove the DEFAULTNONE keyword from the input file...'
-             write(*,*)'Default value is:',valvector_char(i)
-             stop
-          endif
-       endif
-       if(checkmissing_char(i).neqv..true.)  write(*,*)'WARNING: variable ',trim(keyvector_char(i)),&
+             WRITE(*,*)'Default value is:',valvector_char(i)
+             STOP
+          ENDIF
+       ENDIF
+       IF(checkmissing_char(i).NEQV..TRUE.)  WRITE(*,*)'WARNING: variable ',TRIM(keyvector_char(i)),&
             ' is missing. I will use a default value instead ...'
-    enddo
-    do i = 1,nkey_int
-       if(defaultnone .eqv..true.)then
-          if(checkmissing_int(i).neqv..true..and.trim(keyvector_int(i)).ne."DUMMY=")then
-             write(*,*)'ERROR: variable ',trim(keyvector_int(i)),&
+    ENDDO
+    DO i = 1,nkey_int
+       IF(defaultnone .EQV..TRUE.)THEN
+          IF(checkmissing_int(i).NEQV..TRUE..AND.TRIM(keyvector_int(i)).NE."DUMMY=")THEN
+             WRITE(*,*)'ERROR: variable ',TRIM(keyvector_int(i)),&
                   ' is missing. Set this variable or remove the DEFAULTNONE keyword from the input file...'
-             write(*,*)'Default value is:',valvector_int(i)
-             stop
-          endif
-       endif
-       if(checkmissing_int(i).neqv..true.) write(*,*)'WARNING: variable ',trim(keyvector_int(i)),&
+             WRITE(*,*)'Default value is:',valvector_int(i)
+             STOP
+          ENDIF
+       ENDIF
+       IF(checkmissing_int(i).NEQV..TRUE.) WRITE(*,*)'WARNING: variable ',TRIM(keyvector_int(i)),&
             ' is missing. I will use a default value instead ...'
-    enddo
-    do i = 1,nkey_re
-       if(defaultnone .eqv..true.)then
-          if(checkmissing_re(i).neqv..true..and.trim(keyvector_re(i)).ne."DUMMY=")then
-             write(*,*)'ERROR: variable ',trim(keyvector_re(i)),&
+    ENDDO
+    DO i = 1,nkey_re
+       IF(defaultnone .EQV..TRUE.)THEN
+          IF(checkmissing_re(i).NEQV..TRUE..AND.TRIM(keyvector_re(i)).NE."DUMMY=")THEN
+             WRITE(*,*)'ERROR: variable ',TRIM(keyvector_re(i)),&
                   ' is missing. Set this variable or remove the DEFAULTNONE keyword from the input file...'
-             write(*,*)'Default value is:',valvector_re(i)
-             stop
-          endif
-       endif
-       if(checkmissing_re(i).neqv..true.) write(*,*)'WARNING: variable ',trim(keyvector_re(i)),&
+             WRITE(*,*)'Default value is:',valvector_re(i)
+             STOP
+          ENDIF
+       ENDIF
+       IF(checkmissing_re(i).NEQV..TRUE.) WRITE(*,*)'WARNING: variable ',TRIM(keyvector_re(i)),&
             ' is missing. I will use a default value instead ...'
-    enddo
-    do i = 1,nkey_log
-       if(defaultnone .eqv..true.)then
-          if(checkmissing_log(i).neqv..true..and.trim(keyvector_log(i)).ne."DUMMY=")then
-             write(*,*)'ERROR: variable ',trim(keyvector_log(i)),&
+    ENDDO
+    DO i = 1,nkey_log
+       IF(defaultnone .EQV..TRUE.)THEN
+          IF(checkmissing_log(i).NEQV..TRUE..AND.TRIM(keyvector_log(i)).NE."DUMMY=")THEN
+             WRITE(*,*)'ERROR: variable ',TRIM(keyvector_log(i)),&
                   ' is missing. Set this variable or remove the DEFAULTNONE keyword from the input file...'
-             write(*,*)'Default value is:',valvector_log(i)
-             stop
-          endif
-       endif
-       if(checkmissing_log(i).neqv..true.) write(*,*)'WARNING: variable ',trim(keyvector_log(i)),&
+             WRITE(*,*)'Default value is:',valvector_log(i)
+             STOP
+          ENDIF
+       ENDIF
+       IF(checkmissing_log(i).NEQV..TRUE.) WRITE(*,*)'WARNING: variable ',TRIM(keyvector_log(i)),&
             ' is missing. I will use a default value instead ...'
-    enddo
-    write(*,*)' '
+    ENDDO
+    WRITE(*,*)' '
 
-    deallocate(checkmissing_char,checkmissing_re, checkmissing_int, checkmissing_log)
+    DEALLOCATE(checkmissing_char,checkmissing_re, checkmissing_int, checkmissing_log)
 
     ! Only rank 0 prints parameters if compiled with MPI
-    write(*,*)' '
+    WRITE(*,*)' '
     !    if (printRank() .eq. 1) then
 
-    write(*,*)"############### Parameters used for this run ################"
-    if(start)write(*,*)" ",startstop(1)
-    do j=1,nkey_int
-       write(*,*)" ",trim(keyvector_int(j)),valvector_int(j)
-    enddo
+    WRITE(*,*)"############### Parameters used for this run ################"
+    IF(start)WRITE(*,*)" ",startstop(1)
+    DO j=1,nkey_int
+       WRITE(*,*)" ",TRIM(keyvector_int(j)),valvector_int(j)
+    ENDDO
 
-    do j=1,nkey_re
-       write(*,*)" ",trim(keyvector_re(j)),valvector_re(j)
-    enddo
+    DO j=1,nkey_re
+       WRITE(*,*)" ",TRIM(keyvector_re(j)),valvector_re(j)
+    ENDDO
 
-    do j=1,nkey_char
-       write(*,*)" ",trim(keyvector_char(j)),valvector_char(j)
-    enddo
+    DO j=1,nkey_char
+       WRITE(*,*)" ",TRIM(keyvector_char(j)),valvector_char(j)
+    ENDDO
 
-    do j=1,nkey_log
-       write(*,*)" ",trim(keyvector_log(j)),valvector_log(j)
-    enddo
-    if(start)write(*,*)" ",startstop(2)
+    DO j=1,nkey_log
+       WRITE(*,*)" ",TRIM(keyvector_log(j)),valvector_log(j)
+    ENDDO
+    IF(start)WRITE(*,*)" ",startstop(2)
 
     !   endif
-    write(*,*)' '
+    WRITE(*,*)' '
 
-    if(stopparsing)then
-       write(*,*)"" ; write(*,*)"STOP key found. Stop parsing ... "; write(*,*)""
-       stop
-    endif
+    IF(stopparsing)THEN
+       WRITE(*,*)"" ; WRITE(*,*)"STOP key found. Stop parsing ... "; WRITE(*,*)""
+       STOP
+    ENDIF
 
-    deallocate(vect)
+    DEALLOCATE(vect)
 
-  end subroutine parsing_kernel
+  END SUBROUTINE parsing_kernel
 
   !> Check for valid keywords (checks for an = sign)
   !! \param invalidc Keyword to check.
   !!
-  subroutine check_valid(invalidc)
-    implicit none
-    character(1), allocatable     ::  tempc(:)
-    character(len=*), intent(in)  ::  invalidc
-    character(len=100)            ::  tempcflex
-    integer                       ::  l, lenc
+  SUBROUTINE check_valid(invalidc)
+    IMPLICIT NONE
+    CHARACTER(1), ALLOCATABLE     ::  tempc(:)
+    CHARACTER(len=*), INTENT(in)  ::  invalidc
+    CHARACTER(len=100)            ::  tempcflex
+    INTEGER                       ::  l, lenc
 
-    lenc=len(adjustl(trim(invalidc)))
-    if(.not.allocated(tempc))allocate(tempc(lenc))
-    do l = 1,len(adjustl(trim(invalidc)))
-       tempcflex = adjustl(trim(invalidc))
+    lenc=LEN(ADJUSTL(TRIM(invalidc)))
+    IF(.NOT.ALLOCATED(tempc))ALLOCATE(tempc(lenc))
+    DO l = 1,LEN(ADJUSTL(TRIM(invalidc)))
+       tempcflex = ADJUSTL(TRIM(invalidc))
        tempc(l) = tempcflex(l:l)
-       if(tempc(l).eq."=".and.tempc(1).ne."#")then
-          write(*,*)"Input ERROR: ",adjustl(trim(invalidc))," is not a valid keyword"
-          stop
-       endif
-    enddo
+       IF(tempc(l).EQ."=".AND.tempc(1).NE."#")THEN
+          WRITE(*,*)"Input ERROR: ",ADJUSTL(TRIM(invalidc))," is not a valid keyword"
+          STOP
+       ENDIF
+    ENDDO
 
-  end subroutine check_valid
+  END SUBROUTINE check_valid
 
 
-end module kernelparser_mod
+END MODULE kernelparser_mod

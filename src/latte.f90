@@ -66,7 +66,7 @@ PROGRAM LATTE
 
   INQUIRE( FILE="latte.in", exist=LATTEINEXISTS )
   IF (LATTEINEXISTS) THEN
-     IF(.NOT. INITIALIZED) CALL PARSE_CONTROL("latte.in")
+     IF(.NOT. LIBINIT) CALL PARSE_CONTROL("latte.in")
   ELSE
      CALL READCONTROLS
   ENDIF
@@ -390,8 +390,7 @@ PROGRAM LATTE
 
   ELSE
 
-     WRITE(6,*) "You can't have RELAXME = 1 and MDON = 1"
-     STOP
+     CALL ERRORS("latte","You can't have RELAXME = 1 and MDON = 1")
 
   ENDIF
 

@@ -38,7 +38,7 @@ SUBROUTINE PROPSPINS(ITER)
      ! Dissipation off
 
      IF (XBODISON .EQ. 0) THEN
-       
+
         DO I = 1, DELTADIM
            SPIN_PNK(1,I) = DELTASPIN(I)
            SPIN_PNK(2,I) = SPIN_PNK(1,I)
@@ -47,7 +47,7 @@ SUBROUTINE PROPSPINS(ITER)
         ! Dissipation on
 
      ELSEIF (XBODISON .EQ. 1) THEN
-        
+
         DO I = 1, DELTADIM
 
            SPIN_PNK(1,I) = DELTASPIN(I)
@@ -65,7 +65,7 @@ SUBROUTINE PROPSPINS(ITER)
      IF (XBODISON .EQ. 0) THEN
 
         DO I = 1, DELTADIM
-           
+
            DELTASPIN(I) = TWO*SPIN_PNK(1,I) - SPIN_PNK(2,I) + &
                 TWO*(DELTASPIN(I) - SPIN_PNK(1,I))
 
@@ -77,22 +77,22 @@ SUBROUTINE PROPSPINS(ITER)
      ELSE ! Dissipation on (XBODISON .EQ. 1)
 
         DO I = 1, DELTADIM
-           
+
            DELTASPIN(I) = TWO*SPIN_PNK(1,I) - SPIN_PNK(2,I) + &
                 KAPPA_SCALE*KAPPA_XBO*(DELTASPIN(I) - SPIN_PNK(1,I))
 
            DO J = 1, XBODISORDER + 1
-              
+
               DELTASPIN(I) = DELTASPIN(I) + &
                    ALPHA_XBO*CNK(J)*SPIN_PNK(J,I)
-              
+
            ENDDO
 
            DO J = 1, XBODISORDER 
 
               SPIN_PNK(XBODISORDER + 2 - J, I) = &
                    SPIN_PNK(XBODISORDER + 1 - J, I)
-              
+
            ENDDO
 
            SPIN_PNK(1,I) = DELTASPIN(I)
@@ -102,9 +102,9 @@ SUBROUTINE PROPSPINS(ITER)
      ENDIF
 
   ENDIF
-  
+
   RETURN
 
 END SUBROUTINE PROPSPINS
 
-  
+

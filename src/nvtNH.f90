@@ -38,64 +38,64 @@ SUBROUTINE NVTNH
 
   KEV = ZERO
   DO I = 1, NATS
-     
+
      KEV = KEV + MASS(ELEMPOINTER(I)) * & 
           (V(1,I)*V(1,I) + V(2,I)*V(2,I) + V(3,I)*V(3,I))
-     
+
   ENDDO
-  
+
   KEV = MVV2KE*KEV/TWO
 
   KO = THREE*REAL(NATS)*TTARGET/(TWO*KE2T)
-  
+
   DGAMMA = DGAMMA + (DT/FRICTION)*(KEV - KO)/TWO
   GAMMA = GAMMA + DT*DGAMMA/TWO
   DGAMMA = DGAMMA + (DT/FRICTION)*(KEV - KO)/TWO
-  
+
   PREF1 = F2V*DT/TWO
   NOSEPREF = ONE / (ONE + (DT*DGAMMA/TWO))
 
   DO I = 1, NATS
-     
+
      PREF2 = PREF1/MASS(ELEMPOINTER(I))
-     
+
      V(1,I) = NOSEPREF*( V(1,I) + PREF2*FTOT(1,I) )
      V(2,I) = NOSEPREF*( V(2,I) + PREF2*FTOT(2,I) )
      V(3,I) = NOSEPREF*( V(3,I) + PREF2*FTOT(3,I) )
-     
+
      CR(1,I) = CR(1,I) + DT*V(1,I)
      CR(2,I) = CR(2,I) + DT*V(2,I)
      CR(3,I) = CR(3,I) + DT*V(3,I)
-     
+
   ENDDO
 
   CALL GETMDF(1, 100)
 
-  
+
   NOSEPREF = ONE - DT*DGAMMA/TWO
-  
+
   DO I = 1, NATS
-     
+
      PREF2 = PREF1/MASS(ELEMPOINTER(I))
-     
+
      V(1,I) = NOSEPREF*V(1,I) + PREF2*FTOT(1,I)
      V(2,I) = NOSEPREF*V(2,I) + PREF2*FTOT(2,I)
      V(3,I) = NOSEPREF*V(3,I) + PREF2*FTOT(3,I)
-     
+
   ENDDO
-  
+
   KEV = ZERO
   DO I = 1, NATS
      KEV = KEV + MASS(ELEMPOINTER(I)) * & 
           (V(1,I)*V(1,I) + V(2,I)*V(2,I) + V(3,I)*V(3,I))      
   ENDDO
-  
+
   KEV = MVV2KE*KEV/TWO
 
   DGAMMA = DGAMMA + (DT/FRICTION)*(KEV - KO)/TWO
   GAMMA = GAMMA + DT*DGAMMA/TWO
   DGAMMA = DGAMMA + (DT/FRICTION)*(KEV - KO)/TWO
-  
+
   CONSMOT = FRICTION*DGAMMA*DGAMMA/TWO + TWO*KO*GAMMA
 
   RETURN
