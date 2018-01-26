@@ -27,7 +27,7 @@ MODULE MIXER_MOD
 
   USE MYPRECISION
   USE COULOMBARRAY
-  USE SETUPARRAY  
+  USE SETUPARRAY
   USE PRG_PULAYMIXER_MOD
 
   PRIVATE
@@ -36,7 +36,7 @@ MODULE MIXER_MOD
 
   !For mixing scheme
   INTEGER, PUBLIC                      ::  PITER = 1
-  LOGICAL, PUBLIC                      ::  MIXINITIALIZED = .FALSE.
+  LOGICAL, PUBLIC                      ::  MIXINIT = .FALSE.
   REAL(LATTEPREC), ALLOCATABLE, PUBLIC  ::  DQIN(:,:), DQOUT(:,:)
   REAL(LATTEPREC), PUBLIC              ::  SCFERROR
   TYPE(MX_TYPE), PUBLIC                ::  MX
@@ -49,12 +49,13 @@ CONTAINS
        CALL PRG_LINEARMIXER(DELTAQ,OLDDELTAQS,SCFERROR,MX%MIXCOEFF,MX%VERBOSE)
     ELSEIF(MX%MIXERTYPE == "Pulay")THEN
        CALL PRG_QMIXER(DELTAQ,OLDDELTAQS,DQIN,DQOUT,SCFERROR,PITER,MX%MIXCOEFF,MX%MPULAY,MX%VERBOSE)
-    ELSE  
-       STOP "Mixing scheme not implemented. Check MixerType keyword in the input file"
+    ELSE
+       CALL ERRORS("mixer_mod:qmixprg","Mixing scheme not implemented. &
+            & Check MixerType keyword in the input file")
     ENDIF
 
   END SUBROUTINE QMIXPRG
 
-#endif  
+#endif
 
 END MODULE MIXER_MOD

@@ -46,18 +46,18 @@ SUBROUTINE FITTINGOUTPUT(BECLEAN)
      ELSE
         TOTE = TRRHOH + EREP - ECOUL - ENTE + ESPIN
      ENDIF
-     
+
      WRITE(66,10) TOTE
      DO I = 1, NATS
         WRITE(66,11) FTOT(1,I), FTOT(2,I), FTOT(3,I)
      ENDDO
-     
+
      CALL GETDIPOLE(MYDIPOLE)
-     
+
      WRITE(66,12) MYDIPOLE
-  
+
   ELSEIF (BECLEAN .EQ. 1) THEN ! There was a problem with the calculation
-     
+
      WRITE(66,10) BIGNO
      DO I = 1, NATS
         WRITE(66,11) BIGNO, BIGNO, BIGNO

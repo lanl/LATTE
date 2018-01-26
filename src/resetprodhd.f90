@@ -44,9 +44,9 @@ SUBROUTINE RESETPRODHD
      DO I = 1, HDIM
         MYSUM = MYSUM + H(I,I)*BO(I,I)
      ENDDO
-     
+
      MYSUM = MYSUM/FLOAT(HDIM)
-     
+
      DO I = 1, HDIM
         H(I,I) = H(I,I) - MYSUM
      ENDDO
@@ -56,7 +56,7 @@ SUBROUTINE RESETPRODHD
      DO K = 1, NKTOT
         INDEX = 0
         DO I = 1, NATS
-           
+
            SELECT CASE(BASIS(ELEMPOINTER(I)))
 
            CASE("s")
@@ -100,17 +100,17 @@ SUBROUTINE RESETPRODHD
 
      ZMYSUM = ZMYSUM/REAL(HDIM*NKTOT)
 
-!     PRINT*, REAL(ZMYSUM)
+     !     PRINT*, REAL(ZMYSUM)
 
      DO I = 1, NATS
 
         LCNSHIFT(I) = LCNSHIFT(I) - REAL(ZMYSUM)
-            
+
      ENDDO
-     
+
   ENDIF
 
   RETURN
 
 END SUBROUTINE RESETPRODHD
-  
+

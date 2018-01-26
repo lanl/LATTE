@@ -37,9 +37,9 @@ SUBROUTINE SUMMARY
 
   INTEGER :: I, J, INDEX, NUMORB
   REAL(LATTEPREC) :: FDIRAC, SUMQ, ATOMSPIN
-  
+
   IF( VERBOSE < 0 ) RETURN
-  
+
   CALL WRTCFGS(-999)
 
   OPEN(UNIT=24, STATUS="UNKNOWN", FILE="mylastLATTEcalc")
@@ -48,9 +48,9 @@ SUBROUTINE SUMMARY
      WRITE(6,'("# Molecular dynamics calculation")')
      WRITE(24,'("Molecular dynamics calculation")')
      IF (QITER .EQ. 0) THEN
-         WRITE(6,'("# Using SCF-free Fast QMD")')
-         WRITE(24,'("Using SCF-free Fast QMD")')
-      ENDIF
+        WRITE(6,'("# Using SCF-free Fast QMD")')
+        WRITE(24,'("Using SCF-free Fast QMD")')
+     ENDIF
   ENDIF
 
 
@@ -80,7 +80,7 @@ SUBROUTINE SUMMARY
      WRITE(24,'("Local charge neutrality: on")')    
      WRITE(24,'("SCF tolerance = ", G8.3)') ELEC_QTOL
   ENDIF
-  
+
   IF (SPINON .EQ. 1) THEN
      WRITE(6,'("# Spin-polarized calculation")')
      WRITE(24,'("Spin-polarized calculation")')
@@ -92,7 +92,7 @@ SUBROUTINE SUMMARY
      WRITE(6,'("# Numerical threshold = ",G8.3)') NUMTHRESH
      WRITE(24,'("Numerical threshold = ",G8.3)') NUMTHRESH
   ENDIF
-  
+
   IF (CONTROL .EQ. 1) THEN
      WRITE(6,'("# Diagonalization")')
      WRITE(24,'("Diagonalization")')
@@ -110,7 +110,7 @@ SUBROUTINE SUMMARY
      WRITE(24,'("SP2/Fermi method at finite temperature")')
   ENDIF
 
-!  CALL ALLOCATEDIAG
+  !  CALL ALLOCATEDIAG
 
   IF (ALLOCATED(DIAG_IWORK) .EQV. .TRUE.) THEN
      WRITE(6,'("# Using xSYEVD for diaginalization - potentially fast and potentially unreliable")')
@@ -160,29 +160,29 @@ SUBROUTINE SUMMARY
   WRITE(6,'("# Pairwise energy = ", F16.8)') EREP
   WRITE(24,'("Tr[ rho*H ] = ", F16.8)') TRRHOH
   WRITE(24,'("Pairwise energy = ", F16.8)') EREP
-  
+
   IF (ELECTRO .EQ. 1) THEN
      WRITE(6,'("# Coulombic + onsite E = ", F16.8)') ECOUL
      WRITE(24,'("Coulombic + onsite E = ", F16.8)') ECOUL
   ENDIF
-  
+
   IF (CONTROL .NE. 2) THEN
      WRITE(6,'("# Electron entropy TS = ", F16.8)') ENTE
      WRITE(24,'("Electron entropy TS = ", F16.8)') ENTE
   ENDIF
-  
+
   IF (CONTROL .EQ. 1 .OR. CONTROL .EQ. 3 .OR. CONTROL .EQ. 5) THEN
      WRITE(6,'("# Chemical potential = ", F16.8)') CHEMPOT
      WRITE(24,'("Chemical potential = ", F16.8)') CHEMPOT
   ENDIF
-  
+
   IF (SPINON .EQ. 1) THEN
      WRITE(6,'("# Self-consistent spin energy = ", F16.8)') ESPIN
      WRITE(6,'("# Free atom spin energy = ", F16.8)') ESPIN_ZERO
      WRITE(24,'("Self-consistent spin energy = ", F16.8)') ESPIN
      WRITE(24,'("Free atom spin energy = ", F16.8)') ESPIN_ZERO
   ENDIF
-  
+
   CALL GETPRESSURE
 
   WRITE(6,'("# Pressure (GPa) = ", F16.8)') PRESSURE
@@ -236,291 +236,291 @@ SUBROUTINE SUMMARY
 
   IF (KON .EQ. 0) THEN
 
-  IF (SPINON .EQ. 0) THEN
+     IF (SPINON .EQ. 0) THEN
 
-     ! Analyse the eigenvalues only if we've used diagonalization
-     ! to compute the density matrix
+        ! Analyse the eigenvalues only if we've used diagonalization
+        ! to compute the density matrix
 
-     IF (CONTROL .EQ. 1) THEN
-     
-        IF (BASISTYPE .EQ. "ORTHO") THEN
-           
-           WRITE(6,'("")')
-           WRITE(6,'("# Eigenvalues")')
-           WRITE(24,'("")')
-           WRITE(24,'("Eigenvalues")')
-           
-           IF (KBT .GT. 0.00000001) THEN
-              
-              DO I = 1, HDIM
-                 
-                 FDIRAC = ONE/(ONE+EXP((EVALS(I) - CHEMPOT)/KBT))
-                 
-                 IF (EVALS(I) .LE. CHEMPOT) THEN
-                    
-                    WRITE(6, 54) "# ", I, EVALS(I), FDIRAC, "*"
-                    WRITE(24, 53) I, EVALS(I),  FDIRAC, "*"
-                    
-                 ELSE 
-                    
-                    WRITE(6, 54) "# ", I, EVALS(I), FDIRAC, "o"
-                    WRITE(24, 53) I, EVALS(I), FDIRAC, "o"
-                    
-                 ENDIF
-                 
-              ENDDO
-              
-           ELSE
-              
-              DO I = 1, HDIM
-                 
-                 IF (EVALS(I) .LE. CHEMPOT) THEN
-                    
-                    WRITE(6, 54) "# ", I, EVALS(I), ONE, "*"
-                    WRITE(24, 53) I, EVALS(I),  ONE, "*"
-                    
-                 ELSE 
-                    
-                    WRITE(6, 54) "# ", I, EVALS(I), ZERO, "o"
-                    WRITE(24, 53) I, EVALS(I), ZERO, "o"
-                    
-                 ENDIF
-                 
-              ENDDO
-              
-           ENDIF
-           
-           WRITE(6,'("")')
-           WRITE(6,'("# Band width = ", F12.6)') EVALS(HDIM) - EVALS(1)
-           WRITE(6,'("")')
-           WRITE(24,'("")')
-           WRITE(24,'("Band width = ", F12.6)') EVALS(HDIM) - EVALS(1)
-           WRITE(24,'("")')
-           
-           WRITE(6,'("")')
-           WRITE(6,'("# HOMO-LUMO = ", F12.6)') EGAP
-           WRITE(6,'("")')
-           WRITE(24,'("")')
-           WRITE(24,'("HOMO-LUMO = ", F12.6)') EGAP
-           WRITE(24,'("")')
-           
-           
-        ELSE
-           
-           ! Non-orthogonal basis - look at eigenvalus of H and XHX
-           
-           WRITE(6,'("")')
-           WRITE(6,'("# Eigenvalues XHX")')
-           WRITE(24,'("")')
-           WRITE(24,'("Eigenvalues XHX")')
-           
-           IF (KBT .GT. 0.00000001) THEN
-              
-              DO I = 1, HDIM
-                 
-                 FDIRAC = ONE/(ONE+EXP((EVALS(I) - CHEMPOT)/KBT))
-                 
-                 IF (EVALS(I) .LE. CHEMPOT) THEN
-                    
-                    WRITE(6, 54) "# ", I, EVALS(I), FDIRAC, "*"
-                    WRITE(24, 53) I, EVALS(I),  FDIRAC, "*"
-                    
-                 ELSE 
-                    
-                    WRITE(6, 54) "# ", I, EVALS(I), FDIRAC, "o"
-                    WRITE(24, 53) I, EVALS(I), FDIRAC, "o"
-                    
-                 ENDIF
+        IF (CONTROL .EQ. 1) THEN
 
-              ENDDO
+           IF (BASISTYPE .EQ. "ORTHO") THEN
 
-!              WRITE(6,'("Eigenvectors of XHX")')
-!              WRITE(24,'("Eigenvectors of XHX")')
-              ! Eigenvectors too 
-              
-!              DO I = 1, HDIM
+              WRITE(6,'("")')
+              WRITE(6,'("# Eigenvalues")')
+              WRITE(24,'("")')
+              WRITE(24,'("Eigenvalues")')
 
-!                 WRITE(6,'(100F12.6)') (EVECS(I,J), J = 1, HDIM)
-!                 WRITE(24,'(100F12.6)') (EVECS(I,J), J = 1, HDIM)
-                 
-!              ENDDO
-              
-           ELSE
-              
-              DO I = 1, HDIM
-                 
-                 IF (EVALS(I) .LE. CHEMPOT) THEN
-                    
-                    WRITE(6, 54) "# ", I, EVALS(I), ONE, "*"
-                    WRITE(24, 53) I, EVALS(I),  ONE, "*"
-                    
-                 ELSE 
-                    
-                    WRITE(6, 54) "# ", I, EVALS(I), ZERO, "o"
-                    WRITE(24, 53) I, EVALS(I), ZERO, "o"
-                    
-                 ENDIF
-                 
-              ENDDO
-              
-!              WRITE(6,'("Eigenvectors of XHX")')
-!              WRITE(24,'("Eigenvectors of XHX")')
-              ! Eigenvectors too                                                                                 
-              
-!              DO I = 1, HDIM
-                    
-!                 WRITE(6,'(100F12.6)') (EVECS(I,J), J = 1, HDIM)
-!                 WRITE(24,'(100F12.6)') (EVECS(I,J), J = 1, HDIM)
+              IF (KBT .GT. 0.00000001) THEN
 
-!              ENDDO
+                 DO I = 1, HDIM
 
-           ENDIF
+                    FDIRAC = ONE/(ONE+EXP((EVALS(I) - CHEMPOT)/KBT))
 
-           ORTHOH = H
-           
-           CALL DIAGMYH
-           
-           WRITE(6,'("")')
-           WRITE(6,'("# Eigenvalues H")')
-           WRITE(24,'("")')
-           WRITE(24,'("Eigenvalues H")')
-           
-           IF (KBT .GT. 0.00000001) THEN
-              
-              DO I = 1, HDIM
-                 
-                 FDIRAC = ONE/(ONE+EXP((EVALS(I) - CHEMPOT)/KBT))
-                 
-                 IF (EVALS(I) .LE. CHEMPOT) THEN
-                    
-                    WRITE(6, 54) "# ", I, EVALS(I), FDIRAC, "*"
-                    WRITE(24, 53) I, EVALS(I),  FDIRAC, "*"
-                    
-                 ELSE 
-                    
-                    WRITE(6, 54) "# ", I, EVALS(I), FDIRAC, "o"
-                    WRITE(24, 53) I, EVALS(I), FDIRAC, "o"
-                    
-                 ENDIF
-                 
-              ENDDO
-              
-!              WRITE(6,'("Eigenvectors of H")')
-!              WRITE(24,'("Eigenvectors of H")')
-              ! Eigenvectors too 
-              
- !             DO I = 1, HDIM
-              
- !                WRITE(6,'(100F12.6)') (EVECS(I,J), J = 1, HDIM)
- !                WRITE(24,'(100F12.6)') (EVECS(I,J), J = 1, HDIM)
+                    IF (EVALS(I) .LE. CHEMPOT) THEN
 
- !             ENDDO
+                       WRITE(6, 54) "# ", I, EVALS(I), FDIRAC, "*"
+                       WRITE(24, 53) I, EVALS(I),  FDIRAC, "*"
+
+                    ELSE 
+
+                       WRITE(6, 54) "# ", I, EVALS(I), FDIRAC, "o"
+                       WRITE(24, 53) I, EVALS(I), FDIRAC, "o"
+
+                    ENDIF
+
+                 ENDDO
+
+              ELSE
+
+                 DO I = 1, HDIM
+
+                    IF (EVALS(I) .LE. CHEMPOT) THEN
+
+                       WRITE(6, 54) "# ", I, EVALS(I), ONE, "*"
+                       WRITE(24, 53) I, EVALS(I),  ONE, "*"
+
+                    ELSE 
+
+                       WRITE(6, 54) "# ", I, EVALS(I), ZERO, "o"
+                       WRITE(24, 53) I, EVALS(I), ZERO, "o"
+
+                    ENDIF
+
+                 ENDDO
+
+              ENDIF
+
+              WRITE(6,'("")')
+              WRITE(6,'("# Band width = ", F12.6)') EVALS(HDIM) - EVALS(1)
+              WRITE(6,'("")')
+              WRITE(24,'("")')
+              WRITE(24,'("Band width = ", F12.6)') EVALS(HDIM) - EVALS(1)
+              WRITE(24,'("")')
+
+              WRITE(6,'("")')
+              WRITE(6,'("# HOMO-LUMO = ", F12.6)') EGAP
+              WRITE(6,'("")')
+              WRITE(24,'("")')
+              WRITE(24,'("HOMO-LUMO = ", F12.6)') EGAP
+              WRITE(24,'("")')
 
 
            ELSE
-              
-              DO I = 1, HDIM
-                 
-                 IF (EVALS(I) .LE. CHEMPOT) THEN
-                    
-                    WRITE(6, 54) "# ", I, EVALS(I), ONE, "*"
-                    WRITE(24, 53) I, EVALS(I),  ONE, "*"
-                    
-                 ELSE 
-                    
-                    WRITE(6, 54) "# ", I, EVALS(I), ZERO, "o"
-                    WRITE(24, 53) I, EVALS(I), ZERO, "o"
-                    
-                 ENDIF
-                 
-              ENDDO
 
-!              WRITE(6,'("Eigenvectors of H")')
-!              WRITE(24,'("Eigenvectors of H")')
-              ! Eigenvectors too 
+              ! Non-orthogonal basis - look at eigenvalus of H and XHX
 
- !             DO I = 1, HDIM
-              
- !                WRITE(6,'(100F12.6)') (EVECS(I,J), J = 1, HDIM)
- !                WRITE(24,'(100F12.6)') (EVECS(I,J), J = 1, HDIM)
+              WRITE(6,'("")')
+              WRITE(6,'("# Eigenvalues XHX")')
+              WRITE(24,'("")')
+              WRITE(24,'("Eigenvalues XHX")')
 
- !             ENDDO
+              IF (KBT .GT. 0.00000001) THEN
 
-           
+                 DO I = 1, HDIM
+
+                    FDIRAC = ONE/(ONE+EXP((EVALS(I) - CHEMPOT)/KBT))
+
+                    IF (EVALS(I) .LE. CHEMPOT) THEN
+
+                       WRITE(6, 54) "# ", I, EVALS(I), FDIRAC, "*"
+                       WRITE(24, 53) I, EVALS(I),  FDIRAC, "*"
+
+                    ELSE 
+
+                       WRITE(6, 54) "# ", I, EVALS(I), FDIRAC, "o"
+                       WRITE(24, 53) I, EVALS(I), FDIRAC, "o"
+
+                    ENDIF
+
+                 ENDDO
+
+                 !              WRITE(6,'("Eigenvectors of XHX")')
+                 !              WRITE(24,'("Eigenvectors of XHX")')
+                 ! Eigenvectors too 
+
+                 !              DO I = 1, HDIM
+
+                 !                 WRITE(6,'(100F12.6)') (EVECS(I,J), J = 1, HDIM)
+                 !                 WRITE(24,'(100F12.6)') (EVECS(I,J), J = 1, HDIM)
+
+                 !              ENDDO
+
+              ELSE
+
+                 DO I = 1, HDIM
+
+                    IF (EVALS(I) .LE. CHEMPOT) THEN
+
+                       WRITE(6, 54) "# ", I, EVALS(I), ONE, "*"
+                       WRITE(24, 53) I, EVALS(I),  ONE, "*"
+
+                    ELSE 
+
+                       WRITE(6, 54) "# ", I, EVALS(I), ZERO, "o"
+                       WRITE(24, 53) I, EVALS(I), ZERO, "o"
+
+                    ENDIF
+
+                 ENDDO
+
+                 !              WRITE(6,'("Eigenvectors of XHX")')
+                 !              WRITE(24,'("Eigenvectors of XHX")')
+                 ! Eigenvectors too                                                                                 
+
+                 !              DO I = 1, HDIM
+
+                 !                 WRITE(6,'(100F12.6)') (EVECS(I,J), J = 1, HDIM)
+                 !                 WRITE(24,'(100F12.6)') (EVECS(I,J), J = 1, HDIM)
+
+                 !              ENDDO
+
+              ENDIF
+
+              ORTHOH = H
+
+              CALL DIAGMYH
+
+              WRITE(6,'("")')
+              WRITE(6,'("# Eigenvalues H")')
+              WRITE(24,'("")')
+              WRITE(24,'("Eigenvalues H")')
+
+              IF (KBT .GT. 0.00000001) THEN
+
+                 DO I = 1, HDIM
+
+                    FDIRAC = ONE/(ONE+EXP((EVALS(I) - CHEMPOT)/KBT))
+
+                    IF (EVALS(I) .LE. CHEMPOT) THEN
+
+                       WRITE(6, 54) "# ", I, EVALS(I), FDIRAC, "*"
+                       WRITE(24, 53) I, EVALS(I),  FDIRAC, "*"
+
+                    ELSE 
+
+                       WRITE(6, 54) "# ", I, EVALS(I), FDIRAC, "o"
+                       WRITE(24, 53) I, EVALS(I), FDIRAC, "o"
+
+                    ENDIF
+
+                 ENDDO
+
+                 !              WRITE(6,'("Eigenvectors of H")')
+                 !              WRITE(24,'("Eigenvectors of H")')
+                 ! Eigenvectors too 
+
+                 !             DO I = 1, HDIM
+
+                 !                WRITE(6,'(100F12.6)') (EVECS(I,J), J = 1, HDIM)
+                 !                WRITE(24,'(100F12.6)') (EVECS(I,J), J = 1, HDIM)
+
+                 !             ENDDO
+
+
+              ELSE
+
+                 DO I = 1, HDIM
+
+                    IF (EVALS(I) .LE. CHEMPOT) THEN
+
+                       WRITE(6, 54) "# ", I, EVALS(I), ONE, "*"
+                       WRITE(24, 53) I, EVALS(I),  ONE, "*"
+
+                    ELSE 
+
+                       WRITE(6, 54) "# ", I, EVALS(I), ZERO, "o"
+                       WRITE(24, 53) I, EVALS(I), ZERO, "o"
+
+                    ENDIF
+
+                 ENDDO
+
+                 !              WRITE(6,'("Eigenvectors of H")')
+                 !              WRITE(24,'("Eigenvectors of H")')
+                 ! Eigenvectors too 
+
+                 !             DO I = 1, HDIM
+
+                 !                WRITE(6,'(100F12.6)') (EVECS(I,J), J = 1, HDIM)
+                 !                WRITE(24,'(100F12.6)') (EVECS(I,J), J = 1, HDIM)
+
+                 !             ENDDO
+
+
+              ENDIF
+
            ENDIF
+
+           !        CALL GENDIAG
+
+
+           CALL DEALLOCATEDIAG
 
         ENDIF
 
-!        CALL GENDIAG
+53      FORMAT(I6, 2X, F14.8, 1X, G18.12, 1X,  A1)
+54      FORMAT(A2, I6, 2X, F14.8, 1X, G18.12, 1X, A1)
 
+        !     CALL DEALLOCATEDIAG
+
+     ELSEIF (SPINON .EQ. 1 .AND. CONTROL .EQ. 1) THEN
+
+        WRITE(6,'("")')
+        WRITE(6,'("# Eigenvalues")')
+        WRITE(6,'("#        Up            :           Down")')
+        WRITE(24,'("")')
+        WRITE(24,'("Eigenvalues")')
+        WRITE(24,'("        Up            :           Down")')
+        DO I = 1, HDIM
+           WRITE(6, 152) "# ", I, UPEVALS(I), DOWNEVALS(I)
+           WRITE(24, 52) I, UPEVALS(I), DOWNEVALS(I)
+        ENDDO
+
+52      FORMAT(I6, 2X, F14.8, 4X, F14.8)
+152     FORMAT(A2, I6, 2X, F14.8, 4X, F14.8)
 
         CALL DEALLOCATEDIAG
 
      ENDIF
-     
-53   FORMAT(I6, 2X, F14.8, 1X, G18.12, 1X,  A1)
-54   FORMAT(A2, I6, 2X, F14.8, 1X, G18.12, 1X, A1)
-
-!     CALL DEALLOCATEDIAG
-     
-  ELSEIF (SPINON .EQ. 1 .AND. CONTROL .EQ. 1) THEN
-     
-     WRITE(6,'("")')
-     WRITE(6,'("# Eigenvalues")')
-     WRITE(6,'("#        Up            :           Down")')
-     WRITE(24,'("")')
-     WRITE(24,'("Eigenvalues")')
-     WRITE(24,'("        Up            :           Down")')
-     DO I = 1, HDIM
-        WRITE(6, 152) "# ", I, UPEVALS(I), DOWNEVALS(I)
-        WRITE(24, 52) I, UPEVALS(I), DOWNEVALS(I)
-     ENDDO
-     
-52   FORMAT(I6, 2X, F14.8, 4X, F14.8)
-152  FORMAT(A2, I6, 2X, F14.8, 4X, F14.8)
-     
-     CALL DEALLOCATEDIAG
-  
-  ENDIF
 
   ENDIF
-!  IF (ELECTRO .EQ. 1) THEN
-     
-     WRITE(6,'("# Partial charges")')
-     WRITE(6,'("#  Atom    Type      Charge (e)")')
-     WRITE(24,'("Partial charges")')
-     WRITE(24,'("  Atom    Type      Charge (e)")')
-     SUMQ = ZERO
-     DO I = 1, NATS
-        WRITE(6,150) "# ", I, ATELE(I), -DELTAQ(I)
-        WRITE(24,50) I, ATELE(I), -DELTAQ(I)
-        SUMQ = SUMQ + DELTAQ(I)
-     ENDDO
+  !  IF (ELECTRO .EQ. 1) THEN
 
-     WRITE(6,'("# Mulliken occupancies")')
-     WRITE(6,'("#  Atom    Type     Free atom     Self-consistent")')
-     WRITE(24,'("Mulliken occupancies")')
-     WRITE(24,'("  Atom    Type     Free atom     Self-consistent")')
+  WRITE(6,'("# Partial charges")')
+  WRITE(6,'("#  Atom    Type      Charge (e)")')
+  WRITE(24,'("Partial charges")')
+  WRITE(24,'("  Atom    Type      Charge (e)")')
+  SUMQ = ZERO
+  DO I = 1, NATS
+     WRITE(6,150) "# ", I, ATELE(I), -DELTAQ(I)
+     WRITE(24,50) I, ATELE(I), -DELTAQ(I)
+     SUMQ = SUMQ + DELTAQ(I)
+  ENDDO
 
-     DO I = 1, NATS
-        WRITE(6,155) "# ", I, ATELE(I), ATOCC(ELEMPOINTER(I)), MYCHARGE(I)
-        WRITE(24,55) I, ATELE(I), ATOCC(ELEMPOINTER(I)), MYCHARGE(I)
-     ENDDO
+  WRITE(6,'("# Mulliken occupancies")')
+  WRITE(6,'("#  Atom    Type     Free atom     Self-consistent")')
+  WRITE(24,'("Mulliken occupancies")')
+  WRITE(24,'("  Atom    Type     Free atom     Self-consistent")')
 
-     
-     WRITE(6,'("# Sum of partial charges =", G16.8)') SUMQ
-     WRITE(24,'(" Sum of partial charges =", G16.8)') SUMQ
-     
-50   FORMAT(I6, 4X, A2, 2X, F11.8)
-150  FORMAT(A2, I6, 4X, A2, 2X, F11.8)
+  DO I = 1, NATS
+     WRITE(6,155) "# ", I, ATELE(I), ATOCC(ELEMPOINTER(I)), MYCHARGE(I)
+     WRITE(24,55) I, ATELE(I), ATOCC(ELEMPOINTER(I)), MYCHARGE(I)
+  ENDDO
 
-55   FORMAT(I6, 4X, A2, 7X, F12.6, 5X, F12.6)
-155  FORMAT(A2, I6, 4X, A2, 7X, F12.6, 5X, F12.6)
 
-!  ENDIF
-  
+  WRITE(6,'("# Sum of partial charges =", G16.8)') SUMQ
+  WRITE(24,'(" Sum of partial charges =", G16.8)') SUMQ
+
+50 FORMAT(I6, 4X, A2, 2X, F11.8)
+150 FORMAT(A2, I6, 4X, A2, 2X, F11.8)
+
+55 FORMAT(I6, 4X, A2, 7X, F12.6, 5X, F12.6)
+155 FORMAT(A2, I6, 4X, A2, 7X, F12.6, 5X, F12.6)
+
+  !  ENDIF
+
   IF (SPINON .EQ. 1) THEN
-     
+
      WRITE(6,'("")')
      WRITE(6,'("# Orbital spin densities")')
      WRITE(6,'("# Orbital index         Spin density")')
@@ -541,21 +541,21 @@ SUBROUTINE SUMMARY
 
      INDEX = 0
      DO I = 1, NATS
-        
+
         SELECT CASE(BASIS(ELEMPOINTER(I)))
 
         CASE("s")
 
            NUMORB = 1
-           
+
         CASE("p")
-           
+
            NUMORB = 1
 
         CASE("d")
-           
+
            NUMORB = 1
-  
+
         CASE("f")
 
            NUMORB = 1
@@ -581,13 +581,13 @@ SUBROUTINE SUMMARY
            NUMORB = 2
 
         CASE("df")
-           
+
            NUMORB = 2
 
         CASE("spd")
 
            NUMORB = 3
-         
+
         CASE("spf")
 
            NUMORB = 3
@@ -595,13 +595,13 @@ SUBROUTINE SUMMARY
         CASE("sdf")
 
            NUMORB = 3
-                     
+
         CASE("pdf")
-           
+
            NUMORB = 3
 
         CASE("spdf") 
-           
+
            NUMORB = 4
 
         END SELECT
@@ -611,15 +611,15 @@ SUBROUTINE SUMMARY
            INDEX = INDEX + 1
            ATOMSPIN = ATOMSPIN + DELTASPIN(INDEX)
         ENDDO
-        
-        
+
+
         WRITE(6,156) "# ", I, ATELE(I), ATOMSPIN
         WRITE(24,56) I, ATELE(I), ATOMSPIN
-        
+
      ENDDO
 
 
-156   FORMAT(A2,1X,I6,3X,A2,6X,F12.6)
+156  FORMAT(A2,1X,I6,3X,A2,6X,F12.6)
 56   FORMAT(I6,1X,A2,1X,F12.6) 
 
 
@@ -631,7 +631,7 @@ SUBROUTINE SUMMARY
 
   CLOSE(24)
 
-!  CALL WRTCFGS(-999)
+  !  CALL WRTCFGS(-999)
 
 
   RETURN

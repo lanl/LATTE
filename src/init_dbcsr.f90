@@ -27,11 +27,11 @@ SUBROUTINE INIT_DBCSR
   USE dbcsr_methods
   USE dbcsr_error_handling
   USE array_types,                     ONLY: array_data,&
-                                             array_i1d_obj,&
-                                             array_new,&
-                                             array_nullify,&
-                                             array_release,&
-                                             array_size
+       array_i1d_obj,&
+       array_new,&
+       array_nullify,&
+       array_release,&
+       array_size
   USE dbcsr_io
   USE dbcsr_operations
   USE dbcsr_ptr_util
@@ -42,74 +42,74 @@ SUBROUTINE INIT_DBCSR
 
   USE dbcsr_block_access
   USE dbcsr_iterator_operations,       ONLY: dbcsr_iterator_blocks_left,&
-                                               dbcsr_iterator_next_block,&
-                                               dbcsr_iterator_start,&
-                                               dbcsr_iterator_stop
+       dbcsr_iterator_next_block,&
+       dbcsr_iterator_start,&
+       dbcsr_iterator_stop
 
   USE dbcsr_dist_operations,           ONLY: create_bl_distribution,&
-                                               dbcsr_get_stored_coordinates
+       dbcsr_get_stored_coordinates
 
   USE CONSTANTS_MOD
 
   IMPLICIT NONE
 
-!sets mpi
+  !sets mpi
 
-!sets up dbcsr matrix
+  !sets up dbcsr matrix
   ! the matrix will contain nblkrows_total row blocks and nblkcols_total column blocks
 
 
   !initiallizing mpi
 
   CALL mp_world_init(mp_comm)
-  
+
   npdims(:) = 0
-  
+
   CALL mp_cart_create (mp_comm, 2, npdims, myploc, group)	
-  
+
   CALL mp_environ (numnodes, mynode, group)
-  
+
   ALLOCATE (pgrid(0:npdims(1)-1, 0:npdims(2)-1))
-  
+
   DO prow = 0, npdims(1)-1
      DO pcol = 0, npdims(2)-1
         CALL mp_cart_rank (group, (/ prow, pcol /), pgrid(prow, pcol))
      ENDDO
   ENDDO
-  
+
   ! Create the dbcsr_mp_obj
   CALL dbcsr_mp_new (mp_env, pgrid, group, mynode, numnodes,&
        myprow=myploc(1), mypcol=myploc(2))
-  
+
   DEALLOCATE(pgrid)
-  
+
   ! Use BLAS rather than the SMM
-  
+
   CALL dbcsr_set_conf_mm_driver(2, error=error)
-  
+
   ! Now with padding
-  
+
   nblkrows_total=(HDIM-1)/BLKSZ + BLKSZ
   nblkcols_total=(HDIM-1)/BLKSZ + BLKSZ
-  
-  
+
+
   !sets the block size for each row and column
   ALLOCATE(rbs(nblkrows_total))
   ALLOCATE(cbs(nblkcols_total))  
   rbs(:)=BLKSZ
   cbs(:)=BLKSZ
-  
+
   CALL array_nullify (row_blk_sizes)
   CALL array_nullify (col_blk_sizes)
   CALL array_new (row_blk_sizes, rbs, gift=.TRUE.)
   CALL array_new (col_blk_sizes, cbs, gift=.TRUE.)
-  
-  
+
+
   !sets distribution to processors
   CALL myset_dist (row_dist_a, nblkrows_total, npdims(1))
   CALL myset_dist (col_dist_a, nblkcols_total, npdims(2))
-  
-  
+
+
   !Sets the distribution object
   CALL dbcsr_distribution_new (dist_a, mp_env, row_dist_a, col_dist_a)
 

@@ -43,25 +43,25 @@ SUBROUTINE GERSHGORIN
      IF (BASISTYPE .EQ. "ORTHO") THEN
 
         ! No spin, orthogonal
-        
+
         DO I = 1, HDIM
-           
+
            RADIUS = ZERO
-           
+
            DO J = 1, HDIM
-              
+
               ABSHAM = ABS( H(J,I) )
               RADIUS = RADIUS + ABSHAM
-              
+
               IF ( ABSHAM .GT. HTHRESH ) NNZ = NNZ + 1
-              
+
            ENDDO
-           
+
            RADIUS = RADIUS - ABS(H(I,I))
-           
+
            MAXEVAL = MAX(MAXEVAL, H(I,I) + RADIUS)
            MINEVAL = MIN(MINEVAL, H(I,I) - RADIUS)
-           
+
         ENDDO
 
      ELSE
@@ -69,81 +69,81 @@ SUBROUTINE GERSHGORIN
         ! No spin, non-orthogonal
 
         DO I = 1, HDIM
-           
+
            RADIUS = ZERO
-           
+
            DO J = 1, HDIM
-              
+
               ABSHAM = ABS( ORTHOH(J,I) )
               RADIUS = RADIUS + ABSHAM
-              
+
               IF ( ABSHAM .GT. HTHRESH ) NNZ = NNZ + 1
-                            
+
            ENDDO
-           
+
            RADIUS = RADIUS - ABS(ORTHOH(I,I))
-           
+
            MAXEVAL = MAX(MAXEVAL, ORTHOH(I,I) + RADIUS)
            MINEVAL = MIN(MINEVAL, ORTHOH(I,I) - RADIUS)
-           
+
         ENDDO
 
      ENDIF
-     
+
   ELSE
 
      IF (BASISTYPE .EQ. "ORTHO") THEN
-        
+
         ! Spin polarized, orthogonal
 
         DO I = 1, HDIM
-           
+
            UPRAD = ZERO
            DOWNRAD = ZERO
-           
+
            DO J = 1, HDIM
 
               UPRAD = UPRAD + ABS( HUP(J,I) )
               DOWNRAD = DOWNRAD + ABS( HDOWN(J,I) )
-              
+
            ENDDO
-           
+
            UPRAD = UPRAD - ABS(HUP(I,I))
            DOWNRAD = DOWNRAD - ABS(HDOWN(I,I))
-           
+
            MAXEVAL = MAX(MAXEVAL, HUP(I,I) + UPRAD, &
                 HDOWN(I,I) + DOWNRAD)
            MINEVAL = MIN(MINEVAL, HUP(I,I) - UPRAD, &
                 HDOWN(I,I) - DOWNRAD)
-           
+
         ENDDO
-        
+
      ELSE 
 
         ! Spin-polarized, non-orthogonal
 
         DO I = 1, HDIM
-           
+
            UPRAD = ZERO
            DOWNRAD = ZERO
-           
+
            DO J = 1, HDIM
 
               UPRAD = UPRAD + ABS( ORTHOHUP(J,I) )
               DOWNRAD = DOWNRAD + ABS( ORTHOHDOWN(J,I) )
-              
+
            ENDDO
-           
+
            UPRAD = UPRAD - ABS(ORTHOHUP(I,I))
            DOWNRAD = DOWNRAD - ABS(ORTHOHDOWN(I,I))
-           
+
            MAXEVAL = MAX(MAXEVAL, ORTHOHUP(I,I) + UPRAD, &
                 ORTHOHDOWN(I,I) + DOWNRAD)
            MINEVAL = MIN(MINEVAL, ORTHOHUP(I,I) - UPRAD, &
                 ORTHOHDOWN(I,I) - DOWNRAD)
-           
+
         ENDDO
-        
+
      ENDIF
 
   ENDIF

@@ -37,7 +37,7 @@ SUBROUTINE PBC
 #ifdef DOUBLEPREC
 
   CALL DGETRF(3, 3, BOXINV, 3, IPIV, INFO)
-  
+
   CALL DGETRI(3, BOXINV, 3, IPIV, WORK, 3, INFO)
 
 #elif defined(SINGLEPREC)
@@ -61,7 +61,7 @@ SUBROUTINE PBC
 #endif
 
      ! If we're outside the box, add or subtract the corresponding vector accordingly
-     
+
      IF (S(1) .GT. ONE) CR(:,I) = CR(:,I) - BOX(1,:) 
      IF (S(1) .LT. ZERO) CR(:,I) = CR(:,I) + BOX(1,:)
 

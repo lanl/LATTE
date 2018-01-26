@@ -34,11 +34,11 @@ SUBROUTINE AVEPRESS
   CALL GETPRESSURE
 
   IF (NPTTYPE .EQ. "ISO") THEN
-     
+
      DO I = 1, AVEPER - 1
-        
+
         PHIST(I) = PHIST(I + 1)
-        
+
      ENDDO
 
      PHIST(AVEPER) = PRESSURE
@@ -46,11 +46,11 @@ SUBROUTINE AVEPRESS
   ELSE
 
      DO I = 1, AVEPER - 1
-        
+
         PHISTX(I) = PHISTX(I + 1)
         PHISTY(I) = PHISTY(I + 1)
         PHISTZ(I) = PHISTZ(I + 1)
-        
+
      ENDDO
 
      PHISTX(AVEPER) = STRTEN(1)
@@ -60,5 +60,5 @@ SUBROUTINE AVEPRESS
   ENDIF
 
   RETURN
-  
+
 END SUBROUTINE AVEPRESS

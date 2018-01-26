@@ -20,7 +20,7 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SUBROUTINE NOELEC(NUMEL)
-  
+
   USE CONSTANTS_MOD
   USE SETUPARRAY
   USE MYPRECISION
@@ -33,9 +33,9 @@ SUBROUTINE NOELEC(NUMEL)
   NUMEL = ZERO
 
   DO I = 1, HDIM
-    
+
      NUMEL = NUMEL + BO(I,I)
-     
+
   ENDDO
 
   RETURN

@@ -28,10 +28,10 @@ FUNCTION BM(M, ALPHA)
   IMPLICIT NONE
 
   REAL(LATTEPREC) :: BM, ALPHA
-!  REAL(LATTEPREC), EXTERNAL :: HEAVI
+  !  REAL(LATTEPREC), EXTERNAL :: HEAVI
   INTEGER :: M
 
-! Removed the Heaviside step function: MJC 1/10/13
+  ! Removed the Heaviside step function: MJC 1/10/13
 
   IF (M == 0) THEN
      BM = ZERO

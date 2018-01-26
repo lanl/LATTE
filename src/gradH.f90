@@ -28,7 +28,7 @@ SUBROUTINE GRADH
   USE SPINARRAY
   USE VIRIALARRAY
   USE MYPRECISION
-  
+
   IMPLICIT NONE
 
   INTEGER :: I, J, K, L, M, N, KK, INDI, INDJ
@@ -47,15 +47,15 @@ SUBROUTINE GRADH
   F = ZERO
   VIRBOND = ZERO
 
-!$OMP PARALLEL DO DEFAULT (NONE) &
-!$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &
-!$OMP SHARED(CR, BOX, BO, RHOUP, RHODOWN, SPINON, NOINT, ATELE, ELE1, ELE2) &
-!$OMP SHARED(BOND, OVERL, MATINDLIST, BASISTYPE) &
-!$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &
-!$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP2, MAGRP, PATH, PHI, ALPHA, BETA, COSBETA, FTMP) &
-!$OMP PRIVATE(DC, LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET, RHO) &
-!$OMP PRIVATE(MYDFDA, MYDFDB, MYDFDR, RCUTTB) &
-!$OMP REDUCTION(+:F, VIRBOND)        
+  !$OMP PARALLEL DO DEFAULT (NONE) &
+  !$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &
+  !$OMP SHARED(CR, BOX, BO, RHOUP, RHODOWN, SPINON, NOINT, ATELE, ELE1, ELE2) &
+  !$OMP SHARED(BOND, OVERL, MATINDLIST, BASISTYPE) &
+  !$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &
+  !$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP2, MAGRP, PATH, PHI, ALPHA, BETA, COSBETA, FTMP) &
+  !$OMP PRIVATE(DC, LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET, RHO) &
+  !$OMP PRIVATE(MYDFDA, MYDFDB, MYDFDR, RCUTTB) &
+  !$OMP REDUCTION(+:F, VIRBOND)        
 
   DO I = 1, NATS
 
@@ -124,7 +124,7 @@ SUBROUTINE GRADH
         BASISI(3) = 2
         BASISI(4) = 3
         BASISI(5) = -1
-     END SELECT 
+     END SELECT
 
      INDI = MATINDLIST(I)
 
@@ -137,41 +137,41 @@ SUBROUTINE GRADH
 
         RIJ(1) = CR(1,J) + REAL(PBCI)*BOX(1,1) + REAL(PBCJ)*BOX(2,1) + &
              REAL(PBCK)*BOX(3,1) - CR(1,I)
-        
+
         RIJ(2) = CR(2,J) + REAL(PBCI)*BOX(1,2) + REAL(PBCJ)*BOX(2,2) + &
              REAL(PBCK)*BOX(3,2) - CR(2,I)
-        
+
         RIJ(3) = CR(3,J) + REAL(PBCI)*BOX(1,3) + REAL(PBCJ)*BOX(2,3) + &
              REAL(PBCK)*BOX(3,3) - CR(3,I)
-        
+
         MAGR2 = RIJ(1)*RIJ(1) + RIJ(2)*RIJ(2) + RIJ(3)*RIJ(3)
 
         ! Building the forces is expensive - use the cut-off                                             
 
         RCUTTB = ZERO
         DO K = 1, NOINT
-           
+
            IF ( (ATELE(I) .EQ. ELE1(K) .AND. &
                 ATELE(J) .EQ. ELE2(K)) .OR. &
                 (ATELE(J) .EQ. ELE1(K) .AND. &
                 ATELE(I) .EQ. ELE2(K) )) THEN
-              
+
               IF (BOND(8,K) .GT. RCUTTB ) RCUTTB = BOND(8,K)
-              
+
               IF (BASISTYPE .EQ. "NONORTHO") THEN
                  IF (OVERL(8,K) .GT. RCUTTB ) RCUTTB = OVERL(8,K)
               ENDIF
-              
+
            ENDIF
-           
+
         ENDDO
-        
+
         IF (MAGR2 .LT. RCUTTB*RCUTTB) THEN
 
            MAGR = SQRT(MAGR2)
-                      
+
            ! Build list of orbitals on atom J
-           
+
            SELECT CASE(BASIS(ELEMPOINTER(J)))
            CASE("s")
               BASISJ(1) = 0
@@ -236,15 +236,15 @@ SUBROUTINE GRADH
               BASISJ(4) = 3
               BASISJ(5) = -1
            END SELECT
-                      
+
            INDJ = MATINDLIST(J)
-           
+
            MAGRP2 = RIJ(1)*RIJ(1) + RIJ(2)*RIJ(2)
            MAGRP = SQRT(MAGRP2)
-           
-           
+
+
            ! transform to system in which z-axis is aligned with RIJ
-           
+
            PATH = .FALSE.
            IF (ABS(RIJ(1)) .GT. 1E-12) THEN
               IF (RIJ(1) .GT. ZERO .AND. RIJ(2) .GE. ZERO) THEN
@@ -265,135 +265,135 @@ SUBROUTINE GRADH
               ! pathological case: pole in alpha at beta=0
               PATH = .TRUE.
            ENDIF
-           
+
            COSBETA = RIJ(3)/MAGR
            BETA = ACOS(RIJ(3) / MAGR) 
-           
+
            !        PRINT*, ALPHA, BETA
-           
+
            DC = RIJ/MAGR
-           
+
            ! build forces using PRB 72 165107 eq. (12) - the sign of the
            ! dfda contribution seems to be wrong, but gives the right 
            ! answer(?)
-           
+
            FTMP = ZERO
            K = INDI
-           
+
            LBRAINC = 1
            DO WHILE (BASISI(LBRAINC) .NE. -1)
-              
+
               LBRA = BASISI(LBRAINC)
               LBRAINC = LBRAINC + 1
-              
+
               DO MBRA = -LBRA, LBRA
-                 
+
                  K = K + 1
                  L = INDJ
-                 
+
                  LKETINC = 1
                  DO WHILE (BASISJ(LKETINC) .NE. -1)
-                    
+
                     LKET = BASISJ(LKETINC)
                     LKETINC = LKETINC + 1
-                    
+
                     DO MKET = -LKET, LKET
-                       
+
                        L = L + 1
-                       
+
                        SELECT CASE(SPINON)              
                        CASE(0)
                           RHO = BO(L, K)
                        CASE(1)
                           RHO = RHOUP(L, K) + RHODOWN(L, K)
                        END SELECT
-                       
+
                        IF (.NOT. PATH) THEN
-                          
+
                           ! Unroll loops and pre-compute
-                          
+
                           MYDFDA = DFDA(I, J, LBRA, LKET, MBRA, &
                                MKET, MAGR, ALPHA, COSBETA, "H")
-                          
+
                           MYDFDB = DFDB(I, J, LBRA, LKET, MBRA, &
                                MKET, MAGR, ALPHA, COSBETA, "H")
-                          
+
                           MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
                                MKET, MAGR, ALPHA, COSBETA, "H")
-                          
+
                           !
                           ! d/d_alpha
                           !
-                          
+
                           FTMP(1) = FTMP(1) + RHO * &
                                (-RIJ(2) / MAGRP2 * MYDFDA)
-                          
+
                           FTMP(2) = FTMP(2) + RHO * &
                                (RIJ(1)/ MAGRP2 * MYDFDA)
-                          
+
                           !
                           ! d/d_beta
                           !
-                          
+
                           FTMP(1) = FTMP(1) + RHO * &
                                (((((RIJ(3) * RIJ(1)) / &
                                MAGR2)) / MAGRP) * MYDFDB)
-                          
+
                           FTMP(2) = FTMP(2) + RHO * &
                                (((((RIJ(3) * RIJ(2)) / &
                                MAGR2)) / MAGRP) * MYDFDB)
-                          
+
                           FTMP(3) = FTMP(3) - RHO * &
                                (((ONE - ((RIJ(3) * RIJ(3)) / &
                                MAGR2)) / MAGRP) * MYDFDB)
-                          
+
                           !
                           ! d/dR
                           !
-                          
+
                           FTMP(1) = FTMP(1) - RHO * DC(1) * &
                                MYDFDR
-                          
+
                           FTMP(2) = FTMP(2) - RHO * DC(2) * &
                                MYDFDR
-                          
+
                           FTMP(3) = FTMP(3) - RHO * DC(3) * &
                                MYDFDR
-                          
-                       
+
+
                        ELSE
-                          
+
                           ! pathological configuration in which beta=0
                           ! or pi => alpha undefined
 
                           ! fixed: MJC 12/17/13
-                          
+
                           MYDFDB = DFDB(I, J, LBRA, LKET, &
                                MBRA, MKET, MAGR, ZERO, COSBETA, "H") / MAGR
-                          
+
                           FTMP(1) = FTMP(1) - RHO * (COSBETA * MYDFDB)
-                          
+
                           MYDFDB = DFDB(I, J, LBRA, LKET, &
                                MBRA, MKET, MAGR, PI/TWO, COSBETA, "H") / MAGR
-                          
+
                           FTMP(2) = FTMP(2) - RHO * (COSBETA * MYDFDB)
-                          
+
                           MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
                                MKET, MAGR, ZERO, COSBETA, "H")
-                          
+
                           FTMP(3) = FTMP(3) - RHO * COSBETA * MYDFDR                          
-                          
+
                        ENDIF
-                       
+
                     ENDDO
                  ENDDO
               ENDDO
            ENDDO
-           
+
            F(1,I) = F(1,I) + FTMP(1)
            F(2,I) = F(2,I) + FTMP(2)
            F(3,I) = F(3,I) + FTMP(3)
-           
+
            VIRBOND(1) = VIRBOND(1) + RIJ(1) * FTMP(1)
            VIRBOND(2) = VIRBOND(2) + RIJ(2) * FTMP(2)
            VIRBOND(3) = VIRBOND(3) + RIJ(3) * FTMP(3)
@@ -402,14 +402,14 @@ SUBROUTINE GRADH
            VIRBOND(6) = VIRBOND(6) + RIJ(3) * FTMP(1)
 
         ENDIF
-        
+
      ENDDO
-     
-!     INDI = INDI + NORBI
-     
+
+     !     INDI = INDI + NORBI
+
   ENDDO
- 
-!$OMP END PARALLEL DO
+
+  !$OMP END PARALLEL DO
 
   RETURN
 

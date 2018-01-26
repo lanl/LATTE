@@ -48,7 +48,7 @@ SUBROUTINE ORTHOMYHPRG
   MLSI = MLS()
   IF (SPINON .EQ. 0) THEN
      !! Convert Hamiltonian to bml format
-     if(LT%MDIM == -1)LT%MDIM = HDIM
+     IF(LT%MDIM == -1)LT%MDIM = HDIM
 
      CALL BML_ZERO_MATRIX(LT%BML_TYPE, BML_ELEMENT_REAL, &
           LATTEPREC, HDIM, LT%MDIM, ORTHOH_BML)

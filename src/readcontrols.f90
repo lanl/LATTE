@@ -23,7 +23,7 @@ SUBROUTINE READCONTROLS
 
   USE CONSTANTS_MOD
   USE SETUPARRAY
-  USE PPOTARRAY  
+  USE PPOTARRAY
   USE NEBLISTARRAY
   USE COULOMBARRAY
   USE FERMICOMMON
@@ -34,33 +34,32 @@ SUBROUTINE READCONTROLS
 
   CHARACTER(LEN=20) :: HD
 
-  OPEN(UNIT=13, STATUS="OLD", FILE=trim(PARAMPATH)//"/control.in")
+  OPEN(UNIT=13, STATUS="OLD", FILE=TRIM(PARAMPATH)//"/control.in")
 
   !
-  ! CONTROL determines how the density matrix is going to be 
+  ! CONTROL determines how the density matrix is going to be
   ! calculated: 1 = diagonalization, 2 = SP2 purification,
   ! 3 = recursive expansion of the Fermi operator, 4 = SP2T,
   ! 5 = SP2 Fermi (truncated SP2)
   !
 
-  READ(13,*) HD, CONTROL 
+  READ(13,*) HD, CONTROL
 
   !
-  ! BASISTYPE can equal "ORTHO" OR "NONORTHO", 
+  ! BASISTYPE can equal "ORTHO" OR "NONORTHO",
   !
 
   READ(13,*) HD, BASISTYPE
 
   IF (BASISTYPE .NE. "ORTHO" .AND. BASISTYPE .NE. "NONORTHO") THEN
-     PRINT*, "Error defining basis type (ortho/nonortho)"
-     STOP
+     CALL ERRORS("readcontrols","Error defining basis type (ortho/nonortho)")
   ENDIF
 
   READ(13,*) HD, DEBUGON
 
 
   !
-  ! Read the order of the recursion in the expansion of the Fermi 
+  ! Read the order of the recursion in the expansion of the Fermi
   ! operator, M.
   !
 
@@ -99,7 +98,7 @@ SUBROUTINE READCONTROLS
 
   READ(13,*) HD, ENTROPYKIND
 
-  ! 
+  !
   ! Do we want long-range C/R^6 tails?
   !
   ! PPOTON = 1: Turn on pairwise interaction
@@ -123,14 +122,14 @@ SUBROUTINE READCONTROLS
   ! Controls for electrostatics:
   !
   ! ELECTRO: 0 = LCN is applied, 1 = charge dependent TB on
-  ! ELECMETH: 0 = Ewald  summation, 1 = All real space 
+  ! ELECMETH: 0 = Ewald  summation, 1 = All real space
   ! ELEC_ETOL: Tolerance on energy when determining charges (not implemented)
   ! ELEC_QTOL: Tolerance on charges during self-consistent calc
   !
 
   READ(13,*) HD, ELECTRO, HD, ELECMETH, HD, ELEC_ETOL, HD, ELEC_QTOL
 
-  ! 
+  !
   ! COULACC: Accuracy for the Ewald method (1.0e-4 works)
   ! COULCUT: If we're using the Ewald method, this is the cut-off for the
   ! real space part. If we're doing it all in real space, this is the radial
@@ -144,7 +143,7 @@ SUBROUTINE READCONTROLS
   !
   ! MAXSCF:  Maximum number of SCF cycles
   !
-  
+
   READ(13,*) HD, MAXSCF
 
   !
@@ -155,7 +154,7 @@ SUBROUTINE READCONTROLS
   READ(13,*) HD, BREAKTOL, HD, MINSP2ITER, HD, SP2CONV
 
   !
-  ! FULLQCONV: 0 = We'll run QITER SCF cycles during MD, = 1, we'll run 
+  ! FULLQCONV: 0 = We'll run QITER SCF cycles during MD, = 1, we'll run
   ! SCF cycles until we've reached ELEC_QTOL. Only important for MD
   ! QITER: Number of SCF cycles we're going to run at each MD time step
   !
@@ -172,29 +171,29 @@ SUBROUTINE READCONTROLS
   !
   ! ORDERNMOL: Turn on molecule-ID-based density matrix blocking
   !
-  
+
   READ(13,*) HD, ORDERNMOL
 
   !
   ! SPARSEON: 0 = all dense matrix stuff, 1 = use CSR format and
   ! Gustavson's algorithm for matrix-matrix multiplication
   ! THRESHOLDON: 0 = do not throw away elements; 1 = throw away elements
-  ! NUMTHRESH: If THRESHOLDON = 1 throw away element whose absolute value is 
+  ! NUMTHRESH: If THRESHOLDON = 1 throw away element whose absolute value is
   ! smaller than NUMTHRESH
   ! FILLINSTOP: Number of purification cycles beyond which we stop allowing
   ! for further fill-in
   !
 
-   READ(13,*) HD, SPARSEON, HD, THRESHOLDON,  HD, NUMTHRESH, HD, FILLINSTOP, HD, BLKSZ
+  READ(13,*) HD, SPARSEON, HD, THRESHOLDON,  HD, NUMTHRESH, HD, FILLINSTOP, HD, BLKSZ
 
   !
   ! MSPARSE: value for M when SPARSEON = 1, used by sp2 sparse algorithm
   !          0 = value for M is not known, defaults to N
   !
-  
-   READ(13,*) HD, MSPARSE
 
-  ! 
+  READ(13,*) HD, MSPARSE
+
+  !
   ! LCNON: 0 = during charge neutral MD simulations we'll run LCNITER SCF
   ! cycles at each time step, 1 = we'll run SCF cycles until CHTOL is reached
   ! LCNITER: Number of SCF cycles to achieve LCN at each MD time step
@@ -207,7 +206,7 @@ SUBROUTINE READCONTROLS
   ! Read the SKIN for the neighbor list (Angstrom)
   !
 
-  READ(13,*) HD, SKIN  
+  READ(13,*) HD, SKIN
 
   !
   ! RELAXME: 0 = Don't run relaxation, 1 = relax geometry
@@ -226,7 +225,7 @@ SUBROUTINE READCONTROLS
   READ(13,*) HD, MDON
 
   !
-  ! PBCON: 1 = full periodic boundary conditions, 0 = gas phase: no pbc and 
+  ! PBCON: 1 = full periodic boundary conditions, 0 = gas phase: no pbc and
   ! electrostatics done all in real space
   !
 
@@ -242,20 +241,20 @@ SUBROUTINE READCONTROLS
   ! XBOON: 0 = Niklasson's extended Lagrangian Born-Oppenheimer MD off,
   ! 1 = on.
   !
-  
+
   READ(13,*) HD, XBOON
-  
+
   !
   ! XBODISON: We have the option of turning on damping for the XBO
   ! to remedy the accumulation of noise. 0 = off, 1 = on.
   !
-  
+
   READ(13,*) HD, XBODISON
-  
-  ! 
+
+  !
   ! XBODISORDER: = Order of the damping function (1 - 9)
   !
-  
+
   READ(13,*) HD, XBODISORDER
 
   FITON = 0
@@ -265,7 +264,7 @@ SUBROUTINE READCONTROLS
   !
 
   READ(13,*) HD, NGPU
-  
+
   ! Are we doing k-space?
 
   READ(13,*) HD, KON
@@ -287,38 +286,38 @@ SUBROUTINE READCONTROLS
   READ(13,*) HD, PPNFITSTEP, HD, BINFITSTEP, HD, PP2FIT, HD, BINT2FIT
 
   READ(13,*) HD, PPBETA, HD, PPSIGMA, HD, PPNMOL, HD, PPNGEOM
-  
+
   READ(13,*) HD, PARREP
 
   ! Dielectric constant
 
   READ(13,*) HD, RELPERM
 
-  CLOSE(13) 
+  CLOSE(13)
 
   !
   ! Summarize the calculation we're doing here
   !
 
-!  OPEN(UNIT=99, STATUS="UNKNOWN", FILE="my_last_LATTE_calc")
+  !  OPEN(UNIT=99, STATUS="UNKNOWN", FILE="my_last_LATTE_calc")
 
-!  IF (CONTROL .EQ. 1) THEN
-!     WRITE(99,*) "Diagonization used to calculate bond order"
-!  ELSEIF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 0) THEN
-!     WRITE(99,*) "Dense matrix SP2 used to calculate bond order"
-!  ELSEIF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 1) THEN
-!     WRITE(99,*) "Quasi-sparse matrix SP2 used to calculated bond order"
-!  ELSEIF (CONTROL .EQ. 3) THEN
-!     WRITE(99,*) "Recursive expansion of the Fermi operator"
-!     IF (CGORLIB .EQ. 0) THEN
-!        WRITE(99,*) "Dense matrix: using LAPACK routine to solve AX=B"
-!     ENDIF
-!     IF (CGORLIB .EQ. 1 .AND. SPARSEON .EQ. 0) THEN
-!        WRITE(99,*) "Dense matrix conjugate gradient scheme to solve AX=B"
-!     ELSEIF (CGORLIB .EQ. 1 .AND. SPARSEON .EQ. 1) THEN
-!        WRITE(99,*) "Sparse matrix conjugate gradient scheme to solve AX=B"
-!     ENDIF
-!  ENDIF
+  !  IF (CONTROL .EQ. 1) THEN
+  !     WRITE(99,*) "Diagonization used to calculate bond order"
+  !  ELSEIF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 0) THEN
+  !     WRITE(99,*) "Dense matrix SP2 used to calculate bond order"
+  !  ELSEIF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 1) THEN
+  !     WRITE(99,*) "Quasi-sparse matrix SP2 used to calculated bond order"
+  !  ELSEIF (CONTROL .EQ. 3) THEN
+  !     WRITE(99,*) "Recursive expansion of the Fermi operator"
+  !     IF (CGORLIB .EQ. 0) THEN
+  !        WRITE(99,*) "Dense matrix: using LAPACK routine to solve AX=B"
+  !     ENDIF
+  !     IF (CGORLIB .EQ. 1 .AND. SPARSEON .EQ. 0) THEN
+  !        WRITE(99,*) "Dense matrix conjugate gradient scheme to solve AX=B"
+  !     ELSEIF (CGORLIB .EQ. 1 .AND. SPARSEON .EQ. 1) THEN
+  !        WRITE(99,*) "Sparse matrix conjugate gradient scheme to solve AX=B"
+  !     ENDIF
+  !  ENDIF
 
 
   RETURN

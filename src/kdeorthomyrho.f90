@@ -20,14 +20,14 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    
 
 SUBROUTINE KDEORTHOMYRHO
-  
+
   USE CONSTANTS_MOD
   USE SETUPARRAY
   USE NONOARRAY
   USE SPINARRAY
   USE KSPACEARRAY
   USE MYPRECISION
-  
+
   IMPLICIT NONE
 
   INTEGER :: I
@@ -46,7 +46,7 @@ SUBROUTINE KDEORTHOMYRHO
           KBO(:,:,I), HDIM, BETA, KTMP, HDIM)
      CALL ZGEMM('N', 'C', HDIM, HDIM, HDIM, ALPHA, KTMP, HDIM, &
           KXMAT(:,:,I), HDIM, BETA, KBO(:,:,I), HDIM)
-          
+
   ENDDO
 
   DEALLOCATE(KTMP)
