@@ -1,6 +1,7 @@
 
 [![Build Status](https://travis-ci.org/lanl/LATTE.svg?branch=master)](https://travis-ci.org/lanl/LATTE)
 
+[![codecov](https://codecov.io/gh/lanl/LATTE/branch/master/graph/badge.svg)](https://codecov.io/gh/lanl/LATTE)
 
 # LATTE
 
