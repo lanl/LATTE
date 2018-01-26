@@ -51,7 +51,7 @@ LIB = -llapack -lblas
  -lmkl_gnu_thread -lmkl_core -ldl -lpthread -lm
 
 # Uncomment for coverage
-#CVR = ON
+CVR = ON
 ifeq ($(CVR), ON)
 	FFLAGS += -fprofile-arcs -ftest-coverage -O0
 	LINKFLAG += -fprofile-arcs -ftest-coverage -O0
