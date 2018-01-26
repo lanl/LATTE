@@ -12,7 +12,7 @@ os:
 
 before_install:
   - sudo apt-get install gfortran libblas-dev liblapack-dev
-  - sudo apt-get install cmake python gcc cmake-data g++
+  - sudo apt-get install cmake python gcc cmake-data g++ curl
   - cd; git clone https://github.com/lanl/qmd-progress.git
   - cd; git clone https://github.com/lanl/bml.git
 
@@ -34,6 +34,5 @@ script:
   -  make; make test
 
 after_success:
-  - echo "success"
-  - make cov
-  - bash <(curl -s https://codecov.io/bash)
+  - ./tests/run_cov
+  - curl -s https://codecov.io/bash
