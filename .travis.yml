@@ -15,6 +15,7 @@ before_install:
   - sudo apt-get install cmake python gcc cmake-data g++ curl
   - cd; git clone https://github.com/lanl/qmd-progress.git
   - cd; git clone https://github.com/lanl/bml.git
+  - pip install --user codecov
 
   # Install BML, PROGRESS and LAMMPS
   - cd bml; CC=gcc FC=gfortran CMAKE_BUILD_TYPE=Release BLAS_VENDOR=GNU BML_OPENMP=yes BML_TESTING=no ./build.sh configure
@@ -36,3 +37,4 @@ script:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -v -X gcov
+  - codecov
