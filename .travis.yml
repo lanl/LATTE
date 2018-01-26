@@ -32,7 +32,7 @@ env:
 script:
   -  cp -f -v ./makefiles/makefile.CHOICES.${CHOICES} makefile.CHOICES
   -  make; make test
-  -  gcov
+  -  gcov -a -b -c  $(find ./src/ -name '*.gcda')
 
 after_success:
   - curl -s https://codecov.io/bash
