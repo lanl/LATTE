@@ -32,7 +32,7 @@ env:
 script:
   -  cp -f -v ./makefiles/makefile.CHOICES.${CHOICES} makefile.CHOICES
   -  make; make test
+  - ./tests/run_cov
 
 after_success:
-  - ./tests/run_cov
   - curl -s https://codecov.io/bash
