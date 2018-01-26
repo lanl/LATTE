@@ -58,28 +58,27 @@ SUBROUTINE FERMIEXPANS
      ITER = ITER + 1
 
      IF (ITER .EQ. 100) THEN
-        WRITE(6,*) "Fermi expansion is not converging: STOP!"
         CALL PANIC
-        STOP
-     ENDIF     
+        CALL ERRORS("fermiexpans","Fermi expansion is not converging: STOP!")
+     ENDIF
 
      IF (SPINON .EQ. 0) THEN
- 
+
         BO = -BOVER2M*H
-	
-	HFACT = HALF + BOVER2M*CHEMPOT 
+
+	HFACT = HALF + BOVER2M*CHEMPOT
 
 	DO I = 1, HDIM
            BO(I,I) = HFACT + BO(I,I)
-	ENDDO   
-       
-     ELSE 
+	ENDDO
+
+     ELSE
 
         RHOUP = -BOVER2M*HUP
         RHODOWN = -BOVER2M*HDOWN
-        
+
         HFACT = HALF + BOVER2M*CHEMPOT
-        
+
         DO I = 1, HDIM
            RHOUP(I,I) = HFACT + RHOUP(I,I)
            RHODOWN(I,I) = HFACT + RHODOWN(I,I)
@@ -92,13 +91,13 @@ SUBROUTINE FERMIEXPANS
 
         IF (CGORLIB .EQ. 0) THEN
 
-	! Call GESV-based solver
+           ! Call GESV-based solver
 
            CALL SOLVEMATLAPACK
 
         ELSE
 
-	! Call the conjugate gradient solver on the CPU
+           ! Call the conjugate gradient solver on the CPU
 
            CALL SOLVEMATCG
 
@@ -108,15 +107,15 @@ SUBROUTINE FERMIEXPANS
 
 #elif defined(GPUON)
 
-      !
-      ! This calls Sanville's CUDA routines on the GPU
-      ! Now modified by MJC to send down FERMIM too
-      !
-	
-      CALL SOLVE_MATRIX_CG(BO, RHOUP, RHODOWN, HDIM, CGTOL2, &
-	                     SPINON, LATTEPREC, FERMIM)
-			     
-#endif     
+     !
+     ! This calls Sanville's CUDA routines on the GPU
+     ! Now modified by MJC to send down FERMIM too
+     !
+
+     CALL SOLVE_MATRIX_CG(BO, RHOUP, RHODOWN, HDIM, CGTOL2, &
+          SPINON, LATTEPREC, FERMIM)
+
+#endif
 
      ! Modifying chemical potential
 
@@ -127,48 +126,48 @@ SUBROUTINE FERMIEXPANS
 
         DO I = 1, HDIM
            DO J = I, HDIM
-              
+
               IF (I .EQ. J) THEN
-                 
+
                  TRXOMX = TRXOMX + BO(I,I)*(ONE - BO(I,I))
-                 
+
               ELSE
-                 
+
                  TRXOMX = TRXOMX - TWO*BO(J,I)*BO(J,I)
-                 
+
               ENDIF
-              
+
            ENDDO
-           
+
            TRX = TRX + BO(I,I)
 
         ENDDO
 
         SHIFTCP = KBT*(OCC - TRX)/TRXOMX
-        
+
         PREVERROR3 = PREVERROR2
         PREVERROR2 = PREVERROR
         PREVERROR = OCCERROR
         OCCERROR = ABS(OCC - TRX)
-!        PRINT*, ITER, OCCERROR
+        !        PRINT*, ITER, OCCERROR
 
-     ELSE 
+     ELSE
 
         DO I = 1, HDIM
            DO J = I, HDIM
-              
+
               IF (I .EQ. J) THEN
-                 
+
                  TRXOMX = TRXOMX + RHOUP(I,I)*(ONE - RHOUP(I,I)) + &
                       RHODOWN(I,I)*(ONE - RHODOWN(I,I))
-                 
+
               ELSE
-                 
+
                  TRXOMX = TRXOMX - TWO*(RHOUP(J,I)*RHOUP(J,I) + &
                       RHODOWN(J,I)*RHODOWN(J,I))
-                 
+
               ENDIF
-              
+
            ENDDO
 
            TRX = TRX + RHOUP(I,I) + RHODOWN(I,I)
@@ -176,15 +175,15 @@ SUBROUTINE FERMIEXPANS
         ENDDO
 
         SHIFTCP = KBT*(TOTNE - TRX)/TRXOMX
-        
+
         PREVERROR3 = PREVERROR2
         PREVERROR2 = PREVERROR
         PREVERROR = OCCERROR
-        OCCERROR = ABS(TOTNE - TRX)        
+        OCCERROR = ABS(TOTNE - TRX)
 
      ENDIF
 
-!     PRINT*, ITER, OCCERROR
+     !     PRINT*, ITER, OCCERROR
 
      IF (ABS(SHIFTCP) .GT. MAXSHIFT) THEN
         SHIFTCP = SIGN(MAXSHIFT, SHIFTCP)
@@ -194,21 +193,21 @@ SUBROUTINE FERMIEXPANS
 
 #ifdef DOUBLEPREC
 
-        IF (ITER .GE. 3 .AND. OCCERROR .LT. BREAKTOL) THEN
-           BREAKLOOP = 1
-        ENDIF
+     IF (ITER .GE. 3 .AND. OCCERROR .LT. BREAKTOL) THEN
+        BREAKLOOP = 1
+     ENDIF
 
 #elif defined(SINGLEPREC)
 
-        IF ( ITER .GE. 3 .AND. ((OCCERROR .LT. BREAKTOL) .AND. &
-             (OCCERROR .EQ. PREVERROR .OR. &
-             OCCERROR .EQ. PREVERROR2 .OR. &
-             OCCERROR .EQ. PREVERROR3)) .OR. & 
-             ITER .EQ. 25) THEN
-           
-           BREAKLOOP = 1
-        
-        ENDIF
+     IF ( ITER .GE. 3 .AND. ((OCCERROR .LT. BREAKTOL) .AND. &
+          (OCCERROR .EQ. PREVERROR .OR. &
+          OCCERROR .EQ. PREVERROR2 .OR. &
+          OCCERROR .EQ. PREVERROR3)) .OR. &
+          ITER .EQ. 25) THEN
+
+        BREAKLOOP = 1
+
+     ENDIF
 
 #endif
 
@@ -221,6 +220,3 @@ SUBROUTINE FERMIEXPANS
   RETURN
 
 END SUBROUTINE FERMIEXPANS
-           
-  
-  

@@ -43,21 +43,21 @@ SUBROUTINE NVTRESCALE
 
   MYTEMP = TMPTEMP/FLOAT(AVEPER)
 
-!  CHI = SQRT(TTARGET/MYTEMP)
+  !  CHI = SQRT(TTARGET/MYTEMP)
 
- ! CHI = MIN(CHI, MAXCHI)
+  ! CHI = MIN(CHI, MAXCHI)
   CHI = MIN(SQRT(TTARGET/MYTEMP), MAXCHI)
 
-!  PRINT*, "MYTEMP = ", MYTEMP, "CHI = ", CHI
+  !  PRINT*, "MYTEMP = ", MYTEMP, "CHI = ", CHI
 
   DO I = 1, NATS
-     
+
      PREFACTOR = PREPREFACT/MASS(ELEMPOINTER(I))
 
      !
      ! Half timestep advance in V with velocity rescale
      !
-     
+
      V(1,I) = CHI*V(1,I) + PREFACTOR*FTOT(1,I)
      V(2,I) = CHI*V(2,I) + PREFACTOR*FTOT(2,I)
      V(3,I) = CHI*V(3,I) + PREFACTOR*FTOT(3,I)
@@ -73,7 +73,7 @@ SUBROUTINE NVTRESCALE
   !
   ! Get new force to complete advance in V
   !
-  
+
   CALL GETMDF(1, 100)
 
   !
@@ -81,7 +81,7 @@ SUBROUTINE NVTRESCALE
   !
 
   DO I = 1, NATS
-    
+
      PREFACTOR = PREPREFACT/MASS(ELEMPOINTER(I))
 
      V(1,I) = V(1,I) + PREFACTOR*FTOT(1,I)
@@ -91,7 +91,7 @@ SUBROUTINE NVTRESCALE
   ENDDO
 
   ! Remove drift
-  
+
   MOMENTUM = ZERO
 
   DO I = 1, NATS
@@ -111,4 +111,4 @@ SUBROUTINE NVTRESCALE
   RETURN
 
 END SUBROUTINE NVTRESCALE
-        
+

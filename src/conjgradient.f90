@@ -24,7 +24,7 @@ SUBROUTINE CONJGRADIENT(ITER, DELTAENERGY)
            ! Limit maximum displacement in case the initial
            ! geometry is not good
            !
-           
+
            MYSHIFT = KAPPA*FTOT(J,I)
 
            IF (ABS( MYSHIFT ) .GT. MAXSHIFT) THEN
@@ -53,7 +53,7 @@ SUBROUTINE CONJGRADIENT(ITER, DELTAENERGY)
 
            BETA1 = BETA1 + FTOT(J,I) * (FTOT(J,I) - OLDF(J,I))
            BETA2 = BETA2 + OLDF(J,I) * OLDF(J,I)
-  
+
         ENDDO
 
      ENDDO
@@ -67,29 +67,29 @@ SUBROUTINE CONJGRADIENT(ITER, DELTAENERGY)
         BETA = BETA1/BETA2
 
      ENDIF
-  
+
      DO I = 1, NATS
 
         DO J = 1, 3
-           
+
            D1(J,I) = FTOT(J,I) + BETA*OLDD(J,I)
-           
+
            MYSHIFT = KAPPA*D1(J,I)
-           
+
            IF ( ABS( MYSHIFT ) .GT. MAXSHIFT ) THEN
               MYSHIFT = SIGN( MAXSHIFT, MYSHIFT )
            ENDIF
-           
+
            CR(J,I) = CR(J,I) + MYSHIFT
-           
+
         ENDDO
      ENDDO
 
      OLDF = FTOT
      OLDD = D1
-     
+
   ENDIF
-  
+
   RETURN
-  
+
 END SUBROUTINE CONJGRADIENT

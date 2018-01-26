@@ -30,6 +30,9 @@ test :
 test_lmp : 
 	(./tests/run_test_lmp.sh)
 
+cov : 
+	(./tests/run_cov)
+
 matrix : 
 ifeq ($(GPUOPT),ON)
 	(cd MATRIX; make; cd ..)

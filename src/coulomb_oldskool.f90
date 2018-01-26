@@ -71,19 +71,19 @@ SUBROUTINE GASPCOULOMB
         PBCJ = NEBCOUL(3, NEWJ, I)
         PBCK = NEBCOUL(4, NEWJ, I)
 
-         RIJ(1) = CR(1,J) + REAL(PBCI)*BOX(1,1) + REAL(PBCJ)*BOX(2,1) + &
-                REAL(PBCK)*BOX(3,1) - CR(1,I)
+        RIJ(1) = CR(1,J) + REAL(PBCI)*BOX(1,1) + REAL(PBCJ)*BOX(2,1) + &
+             REAL(PBCK)*BOX(3,1) - CR(1,I)
 
-         RIJ(2) = CR(2,J) + REAL(PBCI)*BOX(1,2) + REAL(PBCJ)*BOX(2,2) + &
-              REAL(PBCK)*BOX(3,2) - CR(2,I)
-         
-         RIJ(3) = CR(3,J) + REAL(PBCI)*BOX(1,3) + REAL(PBCJ)*BOX(2,3) + &
-              REAL(PBCK)*BOX(3,3) - CR(3,I)
-           
+        RIJ(2) = CR(2,J) + REAL(PBCI)*BOX(1,2) + REAL(PBCJ)*BOX(2,2) + &
+             REAL(PBCK)*BOX(3,2) - CR(2,I)
 
-!        RIJ(1) = CR(1,J) + PBCI*BOXDIMS(1) - CR(1,I)
-!        RIJ(2) = CR(2,J) + PBCJ*BOXDIMS(2) - CR(2,I)
-!        RIJ(3) = CR(3,J) + PBCK*BOXDIMS(3) - CR(3,I)
+        RIJ(3) = CR(3,J) + REAL(PBCI)*BOX(1,3) + REAL(PBCJ)*BOX(2,3) + &
+             REAL(PBCK)*BOX(3,3) - CR(3,I)
+
+
+        !        RIJ(1) = CR(1,J) + PBCI*BOXDIMS(1) - CR(1,I)
+        !        RIJ(2) = CR(2,J) + PBCJ*BOXDIMS(2) - CR(2,I)
+        !        RIJ(3) = CR(3,J) + PBCK*BOXDIMS(3) - CR(3,I)
 
         MAGR2 = RIJ(1)*RIJ(1) + RIJ(2)*RIJ(2) + RIJ(3)*RIJ(3)
 
@@ -109,7 +109,7 @@ SUBROUTINE GASPCOULOMB
 
                  COULOMBV(I) = COULOMBV(I) - DELTAQ(J)*EXPTI* &
                       (SSB*MAGR2 + SSC*MAGR + SSD + SSE/MAGR)
-              
+
                  FORCE = FORCE + (KECONST*DELTAQ(I)*DELTAQ(J)*EXPTI) * &
                       ((SSE/MAGR2 - TWO*SSB*MAGR - SSC) + &
                       SSA*(SSB*MAGR2 + SSC*MAGR + SSD + SSE/MAGR))
@@ -122,27 +122,27 @@ SUBROUTINE GASPCOULOMB
                  TJ3 = TJ2*TJ
                  TJ4 = TJ2*TJ2
                  TJ6 = TJ4*TJ2
-                 
+
                  EXPTJ = EXP( -TJ*MAGR )
-                 
+
                  TI2MTJ2 = TI2 - TJ2
                  TJ2MTI2 = -TI2MTJ2
-                 
+
                  SA = TI
                  SB = TJ4*TI/(TWO * TI2MTJ2 * TI2MTJ2)
                  SC = (TJ6 - THREE*TJ4*TI2)/(TI2MTJ2 * TI2MTJ2 * TI2MTJ2)
-                 
+
                  SD = TJ
                  SE = TI4*TJ/(TWO * TJ2MTI2 * TJ2MTI2)
                  SF = (TI6 - THREE*TI4*TJ2)/(TJ2MTI2*TJ2MTI2*TJ2MTI2)
-                 
+
                  COULOMBV(I) = COULOMBV(I) - (DELTAQ(J) * &
                       (EXPTI*(SB - (SC/MAGR)) + EXPTJ*(SE - (SF/MAGR))))
-                 
+
                  FORCE = FORCE + KECONST*DELTAQ(I)*DELTAQ(J) * &
                       ((EXPTI * (SA*(SB - (SC/MAGR)) - (SC/MAGR2))) + &
                       (EXPTJ * (SD*(SE - (SF/MAGR)) - (SF/MAGR2))))
-                 
+
               ENDIF
 
            ELSEIF (MAGR .GE. COULR1) THEN
@@ -176,7 +176,7 @@ SUBROUTINE GASPCOULOMB
            VIRCOUL(4) = VIRCOUL(4) + RIJ(1)*DC(2)*FORCE
            VIRCOUL(5) = VIRCOUL(5) + RIJ(2)*DC(3)*FORCE
            VIRCOUL(6) = VIRCOUL(6) + RIJ(3)*DC(1)*FORCE
-           
+
         ENDIF
 
      ENDDO

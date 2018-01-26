@@ -41,7 +41,7 @@ SUBROUTINE MOFIT
   REAL(LATTEPREC), EXTERNAL :: GAUSSRN
 
   ! Read in the DOS from a VASP calculation
-  
+
   OPEN(UNIT=20, STATUS="OLD", FILE="MO2fit.dat")
 
   ALLOCATE(DFTMO(HDIM))
@@ -59,7 +59,7 @@ SUBROUTINE MOFIT
 
   ! Initialize stuff
 
-  
+
   IF (CONTROL .EQ. 1) THEN
      CALL ALLOCATEDIAG
   ELSEIF (CONTROL .EQ. 2 .OR. CONTROL .EQ. 4 .OR. CONTROL .EQ. 5) THEN
@@ -95,68 +95,68 @@ SUBROUTINE MOFIT
      TBBEST(I) = BOND(1,I)
      TBBESTSCL(I) = BOND(2,I)
   ENDDO
-  
+
 
   DO II = 1, NFITSTEP
 
      ! Change set of TB parameters
 
      DO I = 1, INT2FIT
-        
+
         TBOLD(I) = BOND(1,I)
         TBSCLOLD(I) = BOND(2,I)
      ENDDO
-     
+
      ! Pick one to change
-     
+
 
      IF (II .GT. 1) THEN
-        
+
         CALL RANDOM_NUMBER(RN)
-        
+
         PICK = INT(RN*REAL(INT2FIT)) + 1
 
         CALL RANDOM_NUMBER(RN)
 
-!        AB = INT(RN*2.0D0) + 1
+        !        AB = INT(RN*2.0D0) + 1
         AB = 1
         CALL RANDOM_NUMBER(RN)
-        
+
         ! Change by +/- 20%
-        
+
         BOND(AB,PICK) = BOND(AB,PICK) * GAUSSRN(1.0, MCSIGMA)
-     
+
 
         IF (ABS(BOND(1,PICK)) .LT. 0.01) &
              BOND(1,PICK) = SIGN(0.01D0, TBORIG(PICK))
 
-!        IF (BOND(1,PICK)/TBORIG(PICK) .LT. 0.5D0) THEN
-!           BOND(1,PICK) = 0.5D0*TBORIG(PICK)
-!        ELSEIF (BOND(1,PICK)/TBORIG(PICK) .GT. 1.5D0) THEN
-!           BOND(1,PICK) = 1.5D0*TBORIG(PICK)
-!        ENDIF
+        !        IF (BOND(1,PICK)/TBORIG(PICK) .LT. 0.5D0) THEN
+        !           BOND(1,PICK) = 0.5D0*TBORIG(PICK)
+        !        ELSEIF (BOND(1,PICK)/TBORIG(PICK) .GT. 1.5D0) THEN
+        !           BOND(1,PICK) = 1.5D0*TBORIG(PICK)
+        !        ENDIF
 
-!        IF (BOND(1,4) .GT. BOND(1,3)) BOND(1,3) = BOND(1,4)
-        
-!        IF (ABS(BOND(1,3)/BOND(1,4)) .LT. 2.0D0) THEN
-!           BOND(1,3) = 2.0D0*BOND(1,4)
-!        ENDIF
+        !        IF (BOND(1,4) .GT. BOND(1,3)) BOND(1,3) = BOND(1,4)
+
+        !        IF (ABS(BOND(1,3)/BOND(1,4)) .LT. 2.0D0) THEN
+        !           BOND(1,3) = 2.0D0*BOND(1,4)
+        !        ENDIF
 
 
 
-!        IF (BOND(2,PICK)/TBSCLORIG(PICK) .LT. 0.5D0) THEN
-!           BOND(2,PICK) = 0.5D0*TBSCLORIG(PICK)
-!        ELSEIF (BOND(1,PICK)/TBORIG(PICK) .GT. 1.5D0) THEN
-!           BOND(2,PICK) = 1.5D0*TBSCLORIG(PICK)
-!        ENDIF
+        !        IF (BOND(2,PICK)/TBSCLORIG(PICK) .LT. 0.5D0) THEN
+        !           BOND(2,PICK) = 0.5D0*TBSCLORIG(PICK)
+        !        ELSEIF (BOND(1,PICK)/TBORIG(PICK) .GT. 1.5D0) THEN
+        !           BOND(2,PICK) = 1.5D0*TBSCLORIG(PICK)
+        !        ENDIF
 
-        
+
         CALL UNIVTAILCOEF(BOND(:,PICK))
-        
+
      ENDIF
-        
+
      ! Re-build cut-off tails
-          
+
      ! Build H
 
      CALL BLDNEWHS_SP
@@ -164,15 +164,15 @@ SUBROUTINE MOFIT
      IF (QFIT .EQ. 0) THEN
 
         CALL DIAGMYH
-        
+
      ELSE
-        
+
         IF (ELECTRO .EQ. 0) THEN
            CALL QNEUTRAL(0, 1)  ! Local charge neutrality
         ELSE
            CALL QCONSISTENCY(0,1) ! Self-consistent charges
         ENDIF
-        
+
      ENDIF
 
      ! Compute errors
@@ -187,9 +187,9 @@ SUBROUTINE MOFIT
 
      IF (II .EQ. 1) OLDMERIT = MERIT
      IF (II .EQ. 1) MINERR = MERIT
-     
+
      IF (MERIT .LT. OLDMERIT) THEN
-        
+
         ACC = ACC + 1
         OLDMERIT = MERIT
 
@@ -207,94 +207,94 @@ SUBROUTINE MOFIT
 
 
      ELSE
-        
+
         CALL RANDOM_NUMBER(RN)
-        
+
         IF ( EXP( -(MERIT - OLDMERIT)*MCBETA) .GT. RN ) THEN
-           
+
            ACC = ACC + 1
            OLDMERIT = MERIT
 
            WRITE(*,11) II, ACC, MERIT, OLDMERIT, &
                 (BOND(1,J), BOND(2,J), J = 1, INT2FIT)
-           
+
         ELSE
-           
+
            DO I = 1, INT2FIT
-              
+
               BOND(1,I) = TBOLD(I)
               BOND(2,I) = TBSCLOLD(I)
 
            ENDDO
-           
-           
+
+
         ENDIF
-        
+
      ENDIF
-     
-!     WRITE(*,11) II, ACC, MERIT, OLDMERIT, &
-!          (BOND(1,J), BOND(2,J), J = 1, INT2FIT)
-!     11 FORMAT(2I9, 2F12.6, 50F12.6) 
-  
+
+     !     WRITE(*,11) II, ACC, MERIT, OLDMERIT, &
+     !          (BOND(1,J), BOND(2,J), J = 1, INT2FIT)
+     !     11 FORMAT(2I9, 2F12.6, 50F12.6) 
+
   ENDDO
 
   PRINT*, "MINERR = ", MINERR
-  
+
   DO I = 1, INT2FIT
      BOND(1,I) = TBBEST(I)
      BOND(2,I) = TBBESTSCL(I)
   ENDDO
-  
-  
+
+
   DO I = 1, INT2FIT                                                 
      CALL UNIVTAILCOEF(BOND(:,I))                                   
   ENDDO
-  
-  
-     CALL BLDNEWHS_SP
 
-     IF (QFIT .EQ. 0) THEN
-        
-        CALL DIAGMYH
-        
+
+  CALL BLDNEWHS_SP
+
+  IF (QFIT .EQ. 0) THEN
+
+     CALL DIAGMYH
+
+  ELSE
+
+     IF (ELECTRO .EQ. 0) THEN
+        CALL QNEUTRAL(0, 1)  ! Local charge neutrality
      ELSE
-
-        IF (ELECTRO .EQ. 0) THEN
-           CALL QNEUTRAL(0, 1)  ! Local charge neutrality
-        ELSE
-           CALL QCONSISTENCY(0,1) ! Self-consistent charges
-        ENDIF
-        
-
+        CALL QCONSISTENCY(0,1) ! Self-consistent charges
      ENDIF
- 
-     
+
+
+  ENDIF
+
+
   OPEN(UNIT=20, STATUS="UNKNOWN", FILE="checkmofit.dat")
-  
+
   DO I = 1, HDIM
-     
+
      WRITE(20,10) EVALS(I), DFTMO(I)
-     
+
   ENDDO
-  
+
   DO I = 1, INT2FIT
-     
+
      PRINT*, "# ", BOND(1,I)
      WRITE(20,*) "# ", BOND(1,I)
-     
+
   ENDDO
 
   WRITE(20,20) (BOND(1,I), I = 1, INT2FIT)
-  
+
   CLOSE(20)
-  
+
 10 FORMAT(F12.3, 2G18.9)
 20 FORMAT(100G18.9)
 
   DEALLOCATE(DFTMO, TBSCLORIG, TBSCLOLD, TBOLD, TBORIG, TBBEST, TBBESTSCL)
 
   IF (CONTROL .EQ. 1) THEN
-!     CALL DEALLOCATEDIAG
+     !     CALL DEALLOCATEDIAG
   ELSEIF (CONTROL .EQ. 2 .OR. CONTROL .EQ. 4 .OR. CONTROL .EQ. 5) THEN
      CALL DEALLOCATEPURE
   ELSEIF (CONTROL .EQ. 3) THEN

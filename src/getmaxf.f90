@@ -33,7 +33,7 @@ SUBROUTINE GETMAXF(MAXF)
   MAXF = ZERO
 
   DO I = 1, NATS
-     
+
      ABSF = FTOT(1,I)*FTOT(1,I) + FTOT(2,I)*FTOT(2,I) + &
           FTOT(3,I)*FTOT(3,I)
 

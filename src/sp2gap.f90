@@ -39,7 +39,7 @@ SUBROUTINE SP2GAP
 
   INTEGER :: I, J, ITER
   REAL(LATTEPREC) :: TRX, TRX2, TRXT, GERSHFACT
- 
+
   ! Estimate the largest and smallest eigenvalues
 
   CALL GERSHGORIN
@@ -51,15 +51,15 @@ SUBROUTINE SP2GAP
   ELSE
      BO = -ORTHOH/MAXMINUSMIN
   ENDIF
-  
+
   GERSHFACT =  MAXEVAL/MAXMINUSMIN
-  
+
   TRX = ZERO  
   DO I = 1, HDIM     
      BO(I,I) = GERSHFACT + BO(I,I)
      TRX = TRX + BO(I,I)
   ENDDO
-  
+
   ITER = 0
 
   DO WHILE (ITER .LT. NR_SP2_ITER )
@@ -73,7 +73,7 @@ SUBROUTINE SP2GAP
      CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
           BO, HDIM, BO, HDIM, ZERO, X2, HDIM)
 #endif    
-     
+
      TRX2 = ZERO
      DO I = 1, HDIM
         TRX2 = TRX2 + X2(I,I)
@@ -85,14 +85,14 @@ SUBROUTINE SP2GAP
         DO J = 1, HDIM
 
            TRXT = TRXT + (BO(J,I) - X2(J,I))*(BO(J,I) - X2(J,I))
-           
+
         ENDDO
      ENDDO
-  
+
      IF (PP(ITER) .EQ. 0) THEN
 
         TRX = TWO*TRX - TRX2
-        
+
         BO = TWO*BO - X2
 
      ELSE
@@ -106,11 +106,11 @@ SUBROUTINE SP2GAP
      VV(ITER) = SQRT(TRXT)
 
   ENDDO
-  
+
   BO = TWO*BO
-  
+
   CALL HOMOLUMOGAP(ITER)
-  
+
   RETURN
-  
+
 END SUBROUTINE SP2GAP

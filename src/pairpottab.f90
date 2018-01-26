@@ -44,7 +44,7 @@ SUBROUTINE PAIRPOTTAB
 
   DO I = 1, NATS
 
-!     FORCE = ZERO
+     !     FORCE = ZERO
 
      ! Loop over all neighbors of I
 
@@ -117,7 +117,7 @@ SUBROUTINE PAIRPOTTAB
                 ((ONE - THREE*A*A)*PPSPL(KLO,PPSEL) + &
                 (THREE*B*B - ONE)*PPSPL(KHI,PPSEL))*(DX/SIX)
 
-!           GRAD = ZERO
+           !           GRAD = ZERO
 
            FORCE = GRAD*DC
 

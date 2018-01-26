@@ -50,7 +50,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
   REAL(LATTEPREC) :: RCUTTB, RCUTCOUL, PPMAX, MAXCUT2
   REAL(LATTEPREC) :: WORK(3), BOXINV(3,3), S(3)
   REAL(LATTEPREC), PARAMETER :: MINR = 0.01
-  
+
 
   IF (PBCON .EQ. 1) CALL PBC
 
@@ -87,31 +87,31 @@ SUBROUTINE NEBLISTS(AMIALLO)
      ! Find the maximum cut off
 
      DO K = 1, NOINT
-        
+
         IF (BOND(8,K) .GT. RCUTTB ) RCUTTB = BOND(8,K)
-        
+
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (OVERL(8,K) .GT. RCUTTB ) RCUTTB = OVERL(8,K)
         ENDIF
-        
+
      ENDDO
-     
+
      IF (PPOTON .GT. 0) THEN
 
         DO K = 1, NOPPS
-                 
+
            IF (PPOTON .EQ. 1 .AND. POTCOEF(10,K) .GT. PPMAX ) PPMAX = POTCOEF(10,K)
-                    
+
            IF (PPOTON .EQ. 2 .AND. PPR(PPTABLENGTH(K), K) .GT. PPMAX) &
                 PPMAX = PPR(PPTABLENGTH(K), K)
 
         ENDDO
-           
+
      ENDIF
 
      RCUTTB = RCUTTB + SKIN
      RCUTTB2 = RCUTTB*RCUTTB
-     
+
      IF (PPOTON .GT. 0) THEN
         PPMAX = PPMAX + SKIN
         PPMAX2 = PPMAX*PPMAX
@@ -119,7 +119,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
         PPMAX = ZERO
         PPMAX2 = ZERO
      ENDIF
-        
+
      RCUTCOUL = COULCUT + SKIN
      RCUTCOUL2 = RCUTCOUL * RCUTCOUL
 
@@ -129,7 +129,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
 
      MAXCUT2 = MAXCUT*MAXCUT
 
-     ! Now let's estimate the size of the arrays we need for to 
+     ! Now let's estimate the size of the arrays we need for to
      ! store the neighbor lists, plus some
 
      IF (PBCON .EQ. 1) THEN
@@ -140,7 +140,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
 !        print*, maxcut, xrange, yrange, zrange
 
         ! Here we're hoping atom 1 is in a typical environment
-        
+
         COUNT = 0
         DO J = 1, NATS
            DO II = -XRANGE, XRANGE
@@ -157,7 +157,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
                          REAL(JJ)*BOX(2,3) + REAL(KK)*BOX(3,3) - CR(3,1)
 
                     MAGR2 = RIJ(1)*RIJ(1) + RIJ(2)*RIJ(2) + RIJ(3)*RIJ(3)
-                    
+
                     IF (MAGR2 .LE. MAXCUT2) COUNT = COUNT + 1
 
                  ENDDO
@@ -181,11 +181,11 @@ SUBROUTINE NEBLISTS(AMIALLO)
               RIJ(3) = CR(3,J) - CR(3,I)
 
               MAGR2 = RIJ(1)*RIJ(1) + RIJ(2)*RIJ(2) + RIJ(3)*RIJ(3)
-              
+
               IF (MAGR2 .LE. MAXCUT2) COUNT = COUNT + 1
 
            ENDDO
-              
+
            IF (COUNT .GT. DIMLIST) DIMLIST = COUNT
 
         ENDDO
@@ -195,11 +195,11 @@ SUBROUTINE NEBLISTS(AMIALLO)
         MAXDIMCOUL = DIMLIST
 
      ENDIF
-     
+
      ALLOCATE ( NEBTB( 4, MAXDIMTB, NATS ) )
-     IF (PPOTON .GT. 0) ALLOCATE(NEBPP( 4, MAXDIMPP, NATS ) ) 
+     IF (PPOTON .GT. 0) ALLOCATE(NEBPP( 4, MAXDIMPP, NATS ) )
      IF (ELECTRO .EQ. 1) ALLOCATE(NEBCOUL( 4, MAXDIMCOUL, NATS ))
-     
+
   ENDIF
 
   ! Now build the neighbor list
@@ -211,17 +211,17 @@ SUBROUTINE NEBLISTS(AMIALLO)
      MAGA(1) = SQRT(BOX(1,1)*BOX(1,1) + BOX(1,2)*BOX(1,2) + BOX(1,3)*BOX(1,3))
      MAGA(2) = SQRT(BOX(2,1)*BOX(2,1) + BOX(2,2)*BOX(2,2) + BOX(2,3)*BOX(2,3))
      MAGA(3) = SQRT(BOX(3,1)*BOX(3,1) + BOX(3,2)*BOX(3,2) + BOX(3,3)*BOX(3,3))
-     
+
      XRANGE = INT(MAXCUT/MAGA(1)) + 1
      YRANGE = INT(MAXCUT/MAGA(2)) + 1
      ZRANGE = INT(MAXCUT/MAGA(3)) + 1
 
-     ! This gives the number of sub-cells along each lattice vector 
-     
+     ! This gives the number of sub-cells along each lattice vector
+
      NCELL(1) = MAX(INT(MAGA(1)/MAXCUT),1)
      NCELL(2) = MAX(INT(MAGA(2)/MAXCUT),1)
      NCELL(3) = MAX(INT(MAGA(3)/MAXCUT),1)
-     
+
      NUMCELL = NCELL(1)*NCELL(2)*NCELL(3)
 
 !     PRINT*, NCELL(1), NCELL(2), NCELL(3), NUMCELL
@@ -235,21 +235,21 @@ SUBROUTINE NEBLISTS(AMIALLO)
      BOXINV = BOX
 
      CALL DGETRF(3, 3, BOXINV, 3, IPIV, INFO)
-     
+
      CALL DGETRI(3, BOXINV, 3, IPIV, WORK, 3, INFO)
 
      ! Put the atoms into the sub-cells
 
      DO I = 1, NATS
-        
+
         CALL DGEMV('T', 3, 3, ONE, BOXINV, 3, CR(1,I), 1, ZERO, S, 1)
-        
+
         BOXID(1) = INT(S(1)*NCELL(1))
         BOXID(2) = INT(S(2)*NCELL(2))
         BOXID(3) = INT(S(3)*NCELL(3))
-        
+
         MYCELL = BOXID(1) + NCELL(1)*BOXID(2) + NCELL(1)*NCELL(2)*BOXID(3) + 1
-        
+
         TOTINCELL(MYCELL) = TOTINCELL(MYCELL) + 1
         CELLLIST(TOTINCELL(MYCELL), MYCELL) = I
 
@@ -258,7 +258,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
      ALLOCEST = 2*MAXVAL(TOTINCELL)
 
      ! Loop over the subcells and build the lists
-     
+
      DO II = 1, NUMCELL
 
         ! Indices of subcell II
@@ -279,7 +279,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
            DO A = BOXZ - ZRANGE, BOXZ + ZRANGE
               DO B = BOXY - YRANGE, BOXY + YRANGE
                  DO C = BOXX - XRANGE, BOXX + XRANGE
-                    
+
                     PBCX = 0
                     PBCY = 0
                     PBCZ = 0
@@ -295,7 +295,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
                        PBCZ = A - NCELL(3) + 1
                        BOXID(3) = 0
                     ENDIF
-                    
+
                     IF (B .LT. 0) THEN
                        PBCY = B
                        BOXID(2) = NCELL(2) - 1
@@ -303,7 +303,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
                        PBCY = B - NCELL(2) + 1
                        BOXID(2) = 0
                     ENDIF
-                    
+
                     IF (C .LT. 0) THEN
                        PBCX = C
                        BOXID(1) = NCELL(1) - 1
@@ -319,50 +319,48 @@ SUBROUTINE NEBLISTS(AMIALLO)
                     DO J = 1, TOTINCELL(MYCELL)
 
                        MYATOMJ = CELLLIST(J, MYCELL)
-                       
+
                        RIJ(1) = CR(1,MYATOMJ) + REAL(PBCX)*BOX(1,1) + &
                             REAL(PBCY)*BOX(2,1) + REAL(PBCZ)*BOX(3,1) - CR(1,MYATOMI)
-                       
+
                        RIJ(2) = CR(2,MYATOMJ) + REAL(PBCX)*BOX(1,2) + &
                             REAL(PBCY)*BOX(2,2) + REAL(PBCZ)*BOX(3,2) - CR(2,MYATOMI)
-                       
+
                        RIJ(3) = CR(3,MYATOMJ) + REAL(PBCX)*BOX(1,3) + &
                             REAL(PBCY)*BOX(2,3) + REAL(PBCZ)*BOX(3,3) - CR(3,MYATOMI)
-                       
+
                        MAGR2 = RIJ(1)*RIJ(1) + RIJ(2)*RIJ(2) + RIJ(3)*RIJ(3)
-                       
+
                        IF (MAGR2 .GT. MINR .AND. MAGR2 .LT. RCUTTB2) THEN
-                          
+
                           TOTNEBTB(MYATOMI) = TOTNEBTB(MYATOMI) + 1
 
                           IF (TOTNEBTB(MYATOMI) .GT. MAXDIMTB) THEN
-                             PRINT*, "NUMBER OF NEIGHBORS EXCEEDS ARRAY DIMENSION (TB)"
-                             STOP
+                             CALL ERRORS("neblists","NUMBER OF NEIGHBORS EXCEEDS ARRAY DIMENSION (TB)")
                           ENDIF
 
                           NEBTB( 1, TOTNEBTB(MYATOMI), MYATOMI ) = MYATOMJ
                           NEBTB( 2, TOTNEBTB(MYATOMI), MYATOMI ) = PBCX
                           NEBTB( 3, TOTNEBTB(MYATOMI), MYATOMI ) = PBCY
                           NEBTB( 4, TOTNEBTB(MYATOMI), MYATOMI ) = PBCZ
-                          
+
                        ENDIF
 
                        IF (PPOTON .NE. 0) THEN
-                          
+
                           IF (MAGR2 .GT. MINR .AND. MAGR2 .LT. PPMAX2) THEN
-                             
+
                              TOTNEBPP(MYATOMI) = TOTNEBPP(MYATOMI) + 1
-                             
+
                              IF (TOTNEBPP(MYATOMI) .GT. MAXDIMPP) THEN
-                                PRINT*, "NUMBER OF NEIGHBORS EXCEEDS ARRAY DIMENSION (PP)"
-                                STOP
+                                CALL ERRORS("neblists","NUMBER OF NEIGHBORS EXCEEDS ARRAY DIMENSION (PP)")
                              ENDIF
 
                              NEBPP( 1, TOTNEBPP(MYATOMI), MYATOMI ) = MYATOMJ
                              NEBPP( 2, TOTNEBPP(MYATOMI), MYATOMI ) = PBCX
                              NEBPP( 3, TOTNEBPP(MYATOMI), MYATOMI ) = PBCY
                              NEBPP( 4, TOTNEBPP(MYATOMI), MYATOMI ) = PBCZ
-                             
+
                           ENDIF
 
                        ENDIF
@@ -372,10 +370,9 @@ SUBROUTINE NEBLISTS(AMIALLO)
                           IF (MAGR2 .GT. MINR .AND. MAGR2 .LT. RCUTCOUL2) THEN
 
                              TOTNEBCOUL(MYATOMI) = TOTNEBCOUL(MYATOMI) + 1
-                             
+
                              IF (TOTNEBCOUL(MYATOMI) .GT. MAXDIMCOUL) THEN
-                                PRINT*, "NUMBER OF NEIGHBORS EXCEEDS ARRAY DIMENSION (COUL)"
-                                STOP
+                                CALL ERRORS("neblists","NUMBER OF NEIGHBORS EXCEEDS ARRAY DIMENSION (COUL)")
                              ENDIF
 
                              NEBCOUL( 1, TOTNEBCOUL(MYATOMI), MYATOMI ) = MYATOMJ
@@ -399,50 +396,50 @@ SUBROUTINE NEBLISTS(AMIALLO)
      ENDDO
 
      DEALLOCATE(TOTINCELL, CELLLIST)
-     
+
   ELSEIF (PBCON .EQ. 0) THEN
 
      ! Now we're doing building the neighbor lists for gas-phase systems
 
      DO I = 1, NATS
         DO J = 1, NATS
-           
+
            RIJ(1) = CR(1,J) - CR(1,I)
-           
+
            RIJ(2) = CR(2,J) - CR(2,I)
-           
+
            RIJ(3) = CR(3,J) - CR(3,I)
-           
+
            MAGR2 = RIJ(1)*RIJ(1) + RIJ(2)*RIJ(2) + RIJ(3)*RIJ(3)
-            
+
            IF (MAGR2 .GT. MINR .AND. MAGR2 .LT. RCUTTB2) THEN
-              
+
               TOTNEBTB(I) = TOTNEBTB(I) + 1
               NEBTB( 1, TOTNEBTB(I), I ) = J
               NEBTB( 2, TOTNEBTB(I), I ) = 0
               NEBTB( 3, TOTNEBTB(I), I ) = 0
               NEBTB( 4, TOTNEBTB(I), I ) = 0
-              
+
            ENDIF
 
            IF (PPOTON .NE. 0) THEN
-              
+
               IF (MAGR2 .GT. MINR .AND. MAGR2 .LT. PPMAX2) THEN
-                 
+
                  TOTNEBPP(I) = TOTNEBPP(I) + 1
                  NEBPP( 1, TOTNEBPP(I), I ) = J
                  NEBPP( 2, TOTNEBPP(I), I ) = 0
                  NEBPP( 3, TOTNEBPP(I), I ) = 0
                  NEBPP( 4, TOTNEBPP(I), I ) = 0
-                 
+
               ENDIF
-              
+
            ENDIF
-              
+
            IF (ELECTRO .NE. 0) THEN
 
               IF (MAGR2 .GT. MINR .AND. MAGR2 .LT. RCUTCOUL2) THEN
-                 
+
                  TOTNEBCOUL(I) = TOTNEBCOUL(I) + 1
                  NEBCOUL( 1, TOTNEBCOUL(I), I ) = J
                  NEBCOUL( 2, TOTNEBCOUL(I), I ) = 0
@@ -450,7 +447,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
                  NEBCOUL( 4, TOTNEBCOUL(I), I ) = 0
 
               ENDIF
-              
+
            ENDIF
 
         ENDDO
@@ -462,7 +459,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
   ! loop through here
 
   MAXDIMTB = 2*MAXVAL(TOTNEBTB)
-  IF (PPOTON .NE. 0) MAXDIMPP = 2*MAXVAL(TOTNEBPP) 
+  IF (PPOTON .NE. 0) MAXDIMPP = 2*MAXVAL(TOTNEBPP)
   IF (ELECTRO .NE. 0) MAXDIMCOUL = 2*MAXVAL(TOTNEBCOUL)
 
   RETURN

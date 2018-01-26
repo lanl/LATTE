@@ -20,15 +20,15 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    
 
 SUBROUTINE DEORTHOMYRHO
-  
+
   USE CONSTANTS_MOD
   USE SETUPARRAY
   USE NONOARRAY
   USE SPINARRAY
   USE MYPRECISION
-  
+
   IMPLICIT NONE
-  
+
   !
   ! RHO = X ORTHORHO X^dag
   !
@@ -39,7 +39,7 @@ SUBROUTINE DEORTHOMYRHO
 
      CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
           XMAT, HDIM, BO, HDIM, ZERO, NONOTMP, HDIM)
-     
+
      CALL DGEMM('N', 'C', HDIM, HDIM, HDIM, ONE, &
           NONOTMP, HDIM, XMAT, HDIM, ZERO, BO, HDIM)
 
@@ -47,10 +47,10 @@ SUBROUTINE DEORTHOMYRHO
 
      CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
           XMAT, HDIM, BO, HDIM, ZERO, NONOTMP, HDIM)
-     
+
      CALL SGEMM('N', 'C', HDIM, HDIM, HDIM, ONE, &
           NONOTMP, HDIM, XMAT, HDIM, ZERO, BO, HDIM)
-     
+
 #endif
 
   ELSE
@@ -59,13 +59,13 @@ SUBROUTINE DEORTHOMYRHO
 
      CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
           XMAT, HDIM, RHOUP, HDIM, ZERO, NONOTMP, HDIM)
-     
+
      CALL DGEMM('N', 'T', HDIM, HDIM, HDIM, ONE, &
           NONOTMP, HDIM, XMAT, HDIM, ZERO, RHOUP, HDIM)
 
      CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
           XMAT, HDIM, RHODOWN, HDIM, ZERO, NONOTMP, HDIM)
-     
+
      CALL DGEMM('N', 'T', HDIM, HDIM, HDIM, ONE, &
           NONOTMP, HDIM, XMAT, HDIM, ZERO, RHODOWN, HDIM)
 
@@ -73,16 +73,16 @@ SUBROUTINE DEORTHOMYRHO
 
      CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
           XMAT, HDIM, RHOUP, HDIM, ZERO, NONOTMP, HDIM)
-     
+
      CALL SGEMM('N', 'T', HDIM, HDIM, HDIM, ONE, &
           NONOTMP, HDIM, XMAT, HDIM, ZERO, RHOUP, HDIM)
 
      CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
           XMAT, HDIM, RHODOWN, HDIM, ZERO, NONOTMP, HDIM)
-     
+
      CALL SGEMM('N', 'T', HDIM, HDIM, HDIM, ONE, &
           NONOTMP, HDIM, XMAT, HDIM, ZERO, RHODOWN, HDIM)     
-    
+
 #endif
 
   ENDIF

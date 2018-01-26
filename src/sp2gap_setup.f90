@@ -44,11 +44,11 @@ SUBROUTINE SP2GAP_SETUP
   REAL(LATTEPREC) :: IDEMPERR, TRXOLD
   REAL(LATTEPREC) :: IDEMPERR1, IDEMPERR2
   REAL(LATTEPREC), PARAMETER :: IDEMTOL = 1.0D-14
- 
+
   ! Estimate the largest and smallest eigenvalues
 
   CALL GERSHGORIN
-  
+
   IDEMPERR = ZERO
   IDEMPERR1 = ZERO
   IDEMPERR2 = ZERO
@@ -61,16 +61,16 @@ SUBROUTINE SP2GAP_SETUP
 
   IF (SPINON .EQ. 0) THEN
 
-  ! Using intrinsics is probably better than coding this ourselves
+     ! Using intrinsics is probably better than coding this ourselves
 
-  ! Build the starting guess	
+     ! Build the starting guess
 
      IF (BASISTYPE .EQ. "ORTHO") THEN
-        BO = -H/MAXMINUSMIN	 
+        BO = -H/MAXMINUSMIN
      ELSE
         BO = -ORTHOH/MAXMINUSMIN
      ENDIF
- 
+
      GERSHFACT =  MAXEVAL/MAXMINUSMIN
 
      TRX = ZERO
@@ -80,13 +80,13 @@ SUBROUTINE SP2GAP_SETUP
      ENDDO
 
      ITER = 0
-     
+
      BREAKLOOP = 0
 
      ! Compute X^2
 
 
-#ifdef DOUBLEPREC     
+#ifdef DOUBLEPREC
      CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
           BO, HDIM, BO, HDIM, ZERO, X2, HDIM)
 #elif defined(SINGLEPREC)
@@ -95,50 +95,50 @@ SUBROUTINE SP2GAP_SETUP
 #endif
 
      DO WHILE ( BREAKLOOP .EQ. 0 .AND. ITER .LT. 100 )
-        
+
         ITER = ITER + 1
-        
+
         TRX2 = ZERO
 
         DO I = 1, HDIM
            TRX2 = TRX2 + X2(I,I)
         ENDDO
-        
+
         TRXOLD = TRX
 
         TRXT = ZERO
 
         DO I = 1, HDIM
            DO J = 1, HDIM
-                 
+
               ! Both BO amd X2 are symmetric
-              
+
               TRXT = TRXT + (BO(J,I) - X2(J,I))*(BO(J,I) - X2(J,I))
-              
+
            ENDDO
         ENDDO
-        
+
         IF ( ABS(TRX2 - OCC) .LT. ABS(TWO*TRX - TRX2 - OCC) ) THEN
 
 	   BO = X2
 
            TRX = TRX2
-           
+
            PP(ITER) = 1
 
         ELSE
-         
+
 	   BO = TWO*BO - X2
-             
+
            TRX = TWO*TRX - TRX2
-           
+
            PP(ITER)  = 0
 
         ENDIF
-        
+
         ! Compute square again
 
-#ifdef DOUBLEPREC     
+#ifdef DOUBLEPREC
         CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
              BO, HDIM, BO, HDIM, ZERO, X2, HDIM)
 #elif defined(SINGLEPREC)
@@ -151,24 +151,23 @@ SUBROUTINE SP2GAP_SETUP
 	IDEMPERR2 = IDEMPERR1
 	IDEMPERR1 = IDEMPERR
         IDEMPERR = ABS(TRX - TRXOLD)
-        
+
  	IF (SP2CONV .EQ. "REL" .AND. ITER .GE. MINSP2ITER &
-           .AND. (IDEMPERR2 .LE. IDEMPERR .OR. &
-	   IDEMPERR .LT. IDEMTOL)) BREAKLOOP = 1
+             .AND. (IDEMPERR2 .LE. IDEMPERR .OR. &
+             IDEMPERR .LT. IDEMTOL)) BREAKLOOP = 1
 
         IF (SP2CONV .EQ. "ABS" .AND. &
              ABS(TRX - TRXOLD) .LT. IDEMTOL) BREAKLOOP = 1
-        
+
      ENDDO
 
      IF (ITER .EQ. 100) THEN
-        WRITE(6,*) "SP2 purification is not converging: STOP!"
         CALL PANIC
-        STOP
+        CALL ERRORS("sp2gap_setup","SP2 purification is not converging: STOP!")
      ENDIF
-     
+
      BO = TWO*BO
-     
+
      CALL HOMOLUMOGAP(ITER)
 
   ENDIF

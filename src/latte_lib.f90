@@ -81,6 +81,7 @@ CONTAINS
   !! \param VEL Velocities passed to latte.
   !! \param DT integration step passed to latte.
   !! \param VIRIALINOUT Components of the second virial coefficient
+  !! \param EXISTERROR Returns an error flag (.true.) to the hosting code.
   !!
   !! \brief This routine will be used load call latte_lib from a C/C++ program:
   !!
@@ -112,6 +113,7 @@ CONTAINS
     REAL(LATTEPREC), INTENT(OUT) :: FTOT_OUT(:,:), VENERG
     REAL(LATTEPREC), INTENT(OUT) :: VIRIALINOUT(6)
     INTEGER, INTENT(IN) ::  NTYPES, TYPES(:), MAXITER_IN
+    LOGICAL :: EXISTERROR
 
 #ifdef PROGRESSON
     TYPE(SYSTEM_TYPE) :: SY
@@ -125,8 +127,11 @@ CONTAINS
     CALL MPI_COMM_SIZE( MPI_COMM_WORLD, NUMPROCS, IERR )
 #endif
 
+    LIBRUN = .TRUE.
+    IF(EXISTERROR) RETURN
+
     !INITIALIZATION
-    IF(.NOT. INITIALIZED)THEN
+    IF(.NOT. LIBINIT)THEN
 
        LIBCALLS = 0 ; MAXITER = -10
 
@@ -148,14 +153,14 @@ CONTAINS
        INQUIRE( FILE="latte.in", exist=LATTEINEXISTS )
 
        IF (LATTEINEXISTS) THEN
-          IF(.NOT. INITIALIZED) CALL PARSE_CONTROL("latte.in")
+          IF(.NOT. LIBINIT) CALL PARSE_CONTROL("latte.in")
 
 #ifdef PROGRESSON
-          IF(.NOT.INITIALIZED) CALL PRG_PARSE_MIXER(MX,"latte.in")
+          IF(.NOT.LIBINIT) CALL PRG_PARSE_MIXER(MX,"latte.in")
 #endif
 
        ELSE
-          IF(.NOT. INITIALIZED) CALL READCONTROLS
+          IF(.NOT. LIBINIT) CALL READCONTROLS
        ENDIF
 
        CALL READTB
@@ -183,7 +188,7 @@ CONTAINS
           IF(.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
           CR = CR_IN
 
-          IF(.NOT.INITIALIZED)THEN
+          IF(.NOT.LIBINIT)THEN
              IF(VERBOSE >= 1)WRITE(*,*)"Converting masses to symbols ..."
              ALLOCATE(ATELE(NATS))
              CALL MASSES2SYMBOLS(TYPES,NTYPES,MASSES_IN,NATS,ATELE)
@@ -523,7 +528,7 @@ CONTAINS
 
        CALL DEALLOCATEALL
 
-       STOP
+       RETURN
 
     ELSEIF (MDON .EQ. 1 .AND. RELAXME .EQ. 0 .AND. MAXITER_IN < 0 ) THEN
 
@@ -623,7 +628,7 @@ CONTAINS
 
        ENDIF
 
-       IF(RESTARTLIB == 1 .AND. .NOT.INITIALIZED)THEN
+       IF(RESTARTLIB == 1 .AND. .NOT.LIBINIT)THEN
           CALL READRESTARTLIB(LIBCALLS)
        ENDIF
 
@@ -651,7 +656,7 @@ CONTAINS
 
        VIRIALINOUT = -VIRIAL
 
-       INITIALIZED = .TRUE.
+       LIBINIT = .TRUE.
 
 #ifdef PROGRESSON
        IF(MOD(LIBCALLS,WRTFREQ) == 0)THEN
@@ -790,8 +795,7 @@ CONTAINS
 
     ELSE
 
-       WRITE(6,*) "You can't have RELAXME = 1 and MDON = 1"
-       STOP
+       CALL ERRORS("latte_lib","You can't have RELAXME = 1 and MDON = 1")
 
     ENDIF
 
@@ -819,7 +823,7 @@ CONTAINS
     CALL MPI_FINALIZE( IERR )
 #endif
 
-    INITIALIZED = .TRUE.
+    LIBINIT = .TRUE.
 
   END SUBROUTINE LATTE
 

@@ -34,10 +34,10 @@ SUBROUTINE GETDELTASPIN
   INDEX = 0
   DINDEX = 0
 
-!  deltaspin = number of spin ups - number of spin downs
+  !  deltaspin = number of spin ups - number of spin downs
 
   IF (BASISTYPE .EQ. "ORTHO") THEN
-     
+
      DO I = 1, NATS
 
         SELECT CASE(BASIS(ELEMPOINTER(I)))
@@ -50,23 +50,23 @@ SUBROUTINE GETDELTASPIN
            ! s
 
            DELTASPIN(DINDEX) = RHOUP(INDEX, INDEX) - RHODOWN(INDEX,INDEX)
-           
+
         CASE("p")
-           
+
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
                 RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
-           
+
 
            INDEX = INDEX + 3
 
         CASE("d")
-           
+
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
@@ -75,11 +75,11 @@ SUBROUTINE GETDELTASPIN
                 RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
 
            INDEX = INDEX + 5
-  
+
         CASE("f")
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
@@ -88,58 +88,58 @@ SUBROUTINE GETDELTASPIN
                 RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5) + &
                 RHOUP(INDEX + 6, INDEX + 6) - RHODOWN(INDEX + 6, INDEX + 6) + &
                 RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
-           
+
            INDEX = INDEX + 7
 
         CASE("sp")
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
-           
+
            INDEX = INDEX + 1
-           
+
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
                 RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
-           
+
            INDEX = INDEX + 3 
-                
+
         CASE("sd")
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
-           
+
            INDEX = INDEX + 1
-           
+
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
                 RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
                 RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
                 RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
-           
+
            INDEX = INDEX + 5 
 
         CASE("sf")
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
-           
+
            INDEX = INDEX + 1
-           
+
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
@@ -149,44 +149,44 @@ SUBROUTINE GETDELTASPIN
                 RHOUP(INDEX + 6, INDEX + 6) - RHODOWN(INDEX + 6, INDEX + 6) + &
                 RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
 
-           
+
            INDEX = INDEX + 7
 
         CASE("pd")
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
                 RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
-           
+
            INDEX = INDEX + 3
-           
+
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
                 RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
                 RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
                 RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
-                
+
            INDEX = INDEX + 5
 
         CASE("pf")
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
                 RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
-           
+
            INDEX = INDEX + 3
-           
+
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
@@ -201,7 +201,7 @@ SUBROUTINE GETDELTASPIN
         CASE("df")
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
@@ -210,9 +210,9 @@ SUBROUTINE GETDELTASPIN
                 RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
 
            INDEX = INDEX + 5
-           
+
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
@@ -227,23 +227,23 @@ SUBROUTINE GETDELTASPIN
         CASE("spd")
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
-           
+
            INDEX = INDEX + 1
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
                 RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
-           
+
            INDEX = INDEX + 3
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
@@ -252,27 +252,27 @@ SUBROUTINE GETDELTASPIN
                 RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
 
            INDEX = INDEX + 5
-           
+
         CASE("spf")
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
-           
+
            INDEX = INDEX + 1
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
                 RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
-           
+
            INDEX = INDEX + 3
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
@@ -287,14 +287,14 @@ SUBROUTINE GETDELTASPIN
         CASE("sdf")
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
-           
+
            INDEX = INDEX + 1
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
@@ -305,7 +305,7 @@ SUBROUTINE GETDELTASPIN
            INDEX = INDEX + 5
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
@@ -316,21 +316,21 @@ SUBROUTINE GETDELTASPIN
                 RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
 
            INDEX = INDEX + 7
-  
-                     
+
+
         CASE("pdf")
-           
+
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
                 RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
-           
+
            INDEX = INDEX + 3
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
@@ -341,7 +341,7 @@ SUBROUTINE GETDELTASPIN
            INDEX = INDEX + 5
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
@@ -352,27 +352,27 @@ SUBROUTINE GETDELTASPIN
                 RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
 
            INDEX = INDEX + 7
-          
+
         CASE("spdf") 
-           
+
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
-           
+
            INDEX = INDEX + 1
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
                 RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
-           
+
            INDEX = INDEX + 3
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
@@ -383,7 +383,7 @@ SUBROUTINE GETDELTASPIN
            INDEX = INDEX + 5
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) =  &
                 RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
                 RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
@@ -396,7 +396,7 @@ SUBROUTINE GETDELTASPIN
            INDEX = INDEX + 7
 
         END SELECT
-           
+
      ENDDO
 
   ELSEIF (BASISTYPE .EQ. "NONORTHO") THEN
@@ -404,7 +404,7 @@ SUBROUTINE GETDELTASPIN
      ! Mulliken spin densities in non-orthogonal basis:
 
      ! m = n_up - n_down
-     
+
      ! n_sigma = partial_trace(rho_sigma S)
 
      SPINLIST = ZERO
@@ -413,12 +413,12 @@ SUBROUTINE GETDELTASPIN
         DO J = 1, HDIM
 
            SPINLIST(I) = SPINLIST(I) + (RHOUP(J,I) - RHODOWN(J,I))*SMAT(J,I)
-           
+
         ENDDO
      ENDDO
-     
+
      DO I = 1, NATS
-        
+
         SELECT CASE(BASIS(ELEMPOINTER(I)))
 
         CASE("s")
@@ -428,35 +428,35 @@ SUBROUTINE GETDELTASPIN
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1)
 
            INDEX = INDEX + 1
-           
+
         CASE("p")
-           
+
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3)
-            
+
            INDEX = INDEX + 3
 
         CASE("d")
-           
+
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)
-           
+
            INDEX = INDEX + 5
-  
+
         CASE("f")
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)  + &
                 SPINLIST(INDEX + 6) + SPINLIST(INDEX + 7)
-           
+
            INDEX = INDEX + 7
 
         CASE("sp")
@@ -468,12 +468,12 @@ SUBROUTINE GETDELTASPIN
            INDEX = INDEX + 1
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3)
-            
+
            INDEX = INDEX + 3
-                
+
         CASE("sd")
 
            DINDEX = DINDEX + 1
@@ -483,11 +483,11 @@ SUBROUTINE GETDELTASPIN
            INDEX = INDEX + 1
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)
-           
+
            INDEX = INDEX + 5
 
         CASE("sf")
@@ -497,71 +497,71 @@ SUBROUTINE GETDELTASPIN
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1)
 
            INDEX = INDEX + 1
-           
+
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)  + &
                 SPINLIST(INDEX + 6) + SPINLIST(INDEX + 7)
-           
+
            INDEX = INDEX + 7           
 
-  
+
         CASE("pd")
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3)
-            
+
            INDEX = INDEX + 3           
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)
-           
+
            INDEX = INDEX + 5
 
         CASE("pf")
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3)
-            
+
            INDEX = INDEX + 3 
-          
+
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)  + &
                 SPINLIST(INDEX + 6) + SPINLIST(INDEX + 7)
-           
+
            INDEX = INDEX + 7                  
 
         CASE("df")
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)
-           
+
            INDEX = INDEX + 5
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)  + &
                 SPINLIST(INDEX + 6) + SPINLIST(INDEX + 7)
-           
+
            INDEX = INDEX + 7     
-           
+
 
         CASE("spd")
 
@@ -572,20 +572,20 @@ SUBROUTINE GETDELTASPIN
            INDEX = INDEX + 1
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3)
-            
+
            INDEX = INDEX + 3
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)
-           
+
            INDEX = INDEX + 5
-         
+
         CASE("spf")
 
            DINDEX = DINDEX + 1
@@ -595,19 +595,19 @@ SUBROUTINE GETDELTASPIN
            INDEX = INDEX + 1
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3)
-            
+
            INDEX = INDEX + 3
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)  + &
                 SPINLIST(INDEX + 6) + SPINLIST(INDEX + 7)
-           
+
            INDEX = INDEX + 7                
 
         CASE("sdf")
@@ -617,52 +617,52 @@ SUBROUTINE GETDELTASPIN
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1)
 
            INDEX = INDEX + 1
-           
+
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)
-           
+
            INDEX = INDEX + 5
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)  + &
                 SPINLIST(INDEX + 6) + SPINLIST(INDEX + 7)
-           
+
            INDEX = INDEX + 7       
-                     
+
         CASE("pdf")
-           
+
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3)
-            
+
            INDEX = INDEX + 3 
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)
-           
+
            INDEX = INDEX + 5
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)  + &
                 SPINLIST(INDEX + 6) + SPINLIST(INDEX + 7)
-           
+
            INDEX = INDEX + 7    
 
         CASE("spdf") 
-           
+
            DINDEX = DINDEX + 1
 
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1)
@@ -670,35 +670,35 @@ SUBROUTINE GETDELTASPIN
            INDEX = INDEX + 1
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3)
-            
+
            INDEX = INDEX + 3 
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)
-           
+
            INDEX = INDEX + 5
 
            DINDEX = DINDEX + 1
-           
+
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)  + &
                 SPINLIST(INDEX + 6) + SPINLIST(INDEX + 7)
-           
+
            INDEX = INDEX + 7   
 
         END SELECT
 
      ENDDO
-     
+
   ENDIF
-  
+
   RETURN
 
 END SUBROUTINE GETDELTASPIN

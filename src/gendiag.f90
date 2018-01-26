@@ -32,22 +32,22 @@ SUBROUTINE GENDIAG
   INTEGER :: INFO
   INTEGER :: I, J, K, M, LWORK
   REAL(LATTEPREC), ALLOCATABLE :: GENWORK(:), STMP(:,:)
-  
+
   LWORK = 3*HDIM - 1
   ALLOCATE(GENWORK(LWORK), STMP(HDIM, HDIM))
 
   EVECS = H
   STMP = SMAT
-  
+
   CALL DSYGV(1,'V','U', HDIM, EVECS, HDIM, STMP, HDIM, EVALS, GENWORK, &
        LWORK, INFO)
-  
+
   IF (DEBUGON .EQ. 1) THEN
-     
+
      DO I = 1, HDIM 
         PRINT*, I, EVALS(I)
      ENDDO
-     
+
      DO I = 1, HDIM
         WRITE(6,'(100F12.6)') (EVECS(J,I), J = 1, HDIM)
      ENDDO

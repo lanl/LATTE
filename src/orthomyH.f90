@@ -20,21 +20,21 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    
 
 SUBROUTINE ORTHOMYH
-  
+
   USE CONSTANTS_MOD
   USE SETUPARRAY
   USE NONOARRAY
   USE SPINARRAY
   USE MYPRECISION
-  
+
   IMPLICIT NONE
 
   INTEGER I, J
-  
+
   !
   ! ORTHOH = X^dag H X
   !
-  
+
   !
   ! Don't overwrite H - we update this with new charges and build it 
   ! from scratch only after moving the atoms
@@ -59,11 +59,11 @@ SUBROUTINE ORTHOMYH
 #endif  
 
      IF (DEBUGON .EQ. 1) THEN
-        
+
         OPEN (UNIT=33, STATUS="UNKNOWN", FILE="myXHX.dat")
 
         DO I = 1, HDIM
-           
+
            WRITE(33,10) (ORTHOH(I,J), J = 1, HDIM)
 
         ENDDO
@@ -87,7 +87,7 @@ SUBROUTINE ORTHOMYH
           XMAT, HDIM, HDOWN, HDIM, ZERO, NONOTMP, HDIM)
      CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
           NONOTMP, HDIM, XMAT, HDIM, ZERO, ORTHOHDOWN, HDIM)
-     
+
 #elif defined(SINGLEPREC)
 
      CALL SGEMM('T', 'N', HDIM, HDIM, HDIM, ONE, &

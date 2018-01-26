@@ -42,13 +42,13 @@ SUBROUTINE PANIC
      !
      ! Write a .cfg file with our problematic configuration
      !
-     
+
      CALL WRTCFGS(-1)
 
   ELSE
 
      CALL WRTCFGS(-999)
-     
+
   ENDIF
 
   OPEN(UNIT=24, STATUS="UNKNOWN", FILE="myPANICfile.dat")
@@ -74,7 +74,7 @@ SUBROUTINE PANIC
              COULR1, COULCUT
      ENDIF
   ENDIF
-  
+
   IF (SPINON .EQ. 1) THEN
      WRITE(24,'("Spin-polarized calculation")')
   ENDIF
@@ -83,9 +83,9 @@ SUBROUTINE PANIC
      WRITE(24,'("Sparse matrix calculation")')
      WRITE(24,'("Numerical threshold = ",G8.3)') NUMTHRESH
   ENDIF
-  
 
-  
+
+
   IF (CONTROL .EQ. 1) THEN
      WRITE(24,'("Diagonalization")')
   ELSEIF (CONTROL .EQ. 2) THEN
@@ -126,24 +126,24 @@ SUBROUTINE PANIC
 
   WRITE(24,'("Tr[ rho*H ] = ", F16.8)') TRRHOH
   WRITE(24,'("Pairwise energy = ", F16.8)') EREP
-  
+
   IF (ELECTRO .EQ. 1) THEN
      WRITE(24,'("Coulombic + onsite E = ", F16.8)') ECOUL
   ENDIF
-  
+
   IF (CONTROL .NE. 2) THEN
      WRITE(24,'("Electron entropy TS = ", F16.8)') ENTE
   ENDIF
-  
+
   IF (CONTROL .EQ. 1 .OR. CONTROL .EQ. 3 .OR. CONTROL .EQ. 5) THEN
      WRITE(24,'("Chemical potential = ", F16.8)') CHEMPOT
   ENDIF
-  
+
   IF (SPINON .EQ. 1) THEN
      WRITE(24,'("Self-consistent spin energy = ", F16.8)') ESPIN
      WRITE(24,'("Free atom spin energy = ", F16.8)') ESPIN_ZERO
   ENDIF
-  
+
   IF (SPINON .EQ. 0) THEN
      WRITE(24,'("Total energy (zero K) = ", F16.8)') TRRHOH + EREP - ECOUL
      WRITE(24,'("")')
@@ -157,47 +157,47 @@ SUBROUTINE PANIC
           ESPIN - ESPIN_ZERO
      WRITE(24,'("")')
   ENDIF
-  
+
   IF (ELECTRO .EQ. 1) THEN
-     
+
      WRITE(24,'("Partial charges")')
      WRITE(24,'("  Atom         Charge")')
      DO I = 1, NATS
         WRITE(24,50) I, DELTAQ(I)
      ENDDO
-     
+
 50   FORMAT(I6, 9X, F11.8)
-     
+
   ENDIF
-  
+
   IF (SPINON .EQ. 1) THEN
-     
+
      WRITE(24,'("")')
      WRITE(24,'("Orbital spin densitites")')
      WRITE(24,'("Orbital index         Spin density")')
      DO I = 1, DELTADIM
         WRITE(24,51) I, DELTASPIN(I)
      ENDDO
-     
+
 51   FORMAT(I6, 16X,F14.8)
-     
+
      IF (CONTROL .NE. 1) THEN
         CALL ALLOCATEDIAG
      ENDIF
-     
+
      CALL DIAGMYH
-     
+
      WRITE(24,'("")')
      WRITE(24,'("Eigenvalues")')
      WRITE(24,'("        Up            :           Down")')
      DO I = 1, HDIM
         WRITE(24, 52) I, UPEVALS(I), DOWNEVALS(I)
      ENDDO
-     
+
 52   FORMAT(I6, 2X, F14.8, 4X, F14.8)
-     
+
      CALL DEALLOCATEDIAG
-     
+
   ENDIF
 
 
@@ -209,7 +209,7 @@ SUBROUTINE PANIC
 
 53 FORMAT(I6, 1X, 3F18.9, 1X, A2)
 54 FORMAT(A2, 1X, 3G18.9)
-  
+
   IF (MDON .EQ. 1) THEN
 
      WRITE(24,'("")')
@@ -219,7 +219,7 @@ SUBROUTINE PANIC
      ENDDO
 
   ENDIF
-     
+
   WRITE(24,'("")')
   WRITE(24,'("Forces")')
   DO I = 1, NATS
@@ -245,9 +245,9 @@ SUBROUTINE PANIC
      DO I = 1, NATS
         WRITE(24,53) I, FCOUL(1,I), FCOUL(2,I), FCOUL(3,I), ATELE(I)
      ENDDO
-     
+
   ENDIF
-  
+
   CLOSE(24)
 
   RETURN

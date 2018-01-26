@@ -43,39 +43,39 @@ SUBROUTINE NVTLANGEVIN(ITER)
   REAL(LATTEPREC) :: GAMMA1, GAMMA2, TSQRT, DTF, DTV, DTFM
   REAL(LATTEPREC) :: PREF1, PREF2, MELPREF, MULTFACT, MYMASS
   INTEGER :: OPTION
-  
+
   SETTH = 0
-  
+
   BOLTZ = ONE/KE2T
-  
+
   MEAN = ZERO
-  
+
   DO I = 1, NATS
-     
+
 !!$     Update positions
 
      MYMASS = MASS(ELEMPOINTER(I))
 
      GAMMA1 = MYMASS/FRICTION
-     
+
      STDDEV = SQRT(TWO*GAMMA1*BOLTZ*TTARGET*F2V*DT) 
-     
+
      PREFRIC = (GAMMA1*DT)/(TWO*MYMASS)
      b = ONE / (ONE + PREFRIC)
      A = (ONE - PREFRIC)/(ONE + PREFRIC)
      PREB = (b*DT)/(TWO*MYMASS)
-     
+
      CR(1,I) = CR(1,I) + b*DT*V(1,I) + PREB*DT*F2V*FTOT(1,I) + &
           PREB*GAUSSRN(MEAN,STDDEV)
-     
+
      CR(2,I) = CR(2,I) + b*DT*V(2,I) + PREB*DT*F2V*FTOT(2,I) + &
           PREB*GAUSSRN(MEAN,STDDEV)
-     
+
      CR(3,I) = CR(3,I) + b*DT*V(3,I) + PREB*DT*F2V*FTOT(3,I) + &
           PREB*GAUSSRN(MEAN,STDDEV)
-     
-! Update velocities
-        
+
+     ! Update velocities
+
      MULTFACT = (DT*F2V)/(TWO*MYMASS)
 
      V(1,I) = A * (V(1,I) + MULTFACT * FTOT(1,I)) + &
@@ -88,13 +88,13 @@ SUBROUTINE NVTLANGEVIN(ITER)
           (b/MYMASS)*GAUSSRN(MEAN,STDDEV)
 
   ENDDO
-  
+
   !
   ! Get new force to complete advance in V
   !
-  
+
   CALL GETMDF(1, 100)
-  
+
   DO I = 1, NATS
 
      MULTFACT = (DT*F2V)/(TWO*MASS(ELEMPOINTER(I)))
@@ -102,11 +102,11 @@ SUBROUTINE NVTLANGEVIN(ITER)
      V(1,I) = V(1,I) + MULTFACT*FTOT(1,I)
      V(2,I) = V(2,I) + MULTFACT*FTOT(2,I)
      V(3,I) = V(3,I) + MULTFACT*FTOT(3,I)
-     
+
   ENDDO
-  
+
   RETURN
-  
+
 END SUBROUTINE NVTLANGEVIN
 
 
