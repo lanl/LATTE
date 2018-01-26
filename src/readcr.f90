@@ -107,7 +107,7 @@ SUBROUTINE READCR
   SUMMASS = ZERO
 
   DO I = 1, NATS
-    SUMMASS = SUMMASS + MASS(ELEMPOINTER(I))
+     SUMMASS = SUMMASS + MASS(ELEMPOINTER(I))
   ENDDO
 
   ! Let's check whether we have only sp elements. If so, we can

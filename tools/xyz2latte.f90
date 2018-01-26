@@ -3,31 +3,31 @@
 ! Written by C. F. A. Negre. Nov. 2014. Los Alamos Nat. Lab.
 
 
-program xyz2latte
+PROGRAM xyz2latte
 
-  implicit none
-  real(8) :: xmin,xmax,ymin,ymax,zmin,zmax
-  integer :: N, i, io
-  character :: dummy
-  character(2), allocatable :: atom(:)
-  real(8), allocatable :: x(:),y(:),z(:)
+  IMPLICIT NONE
+  REAL(8) :: xmin,xmax,ymin,ymax,zmin,zmax
+  INTEGER :: N, i, io
+  CHARACTER :: dummy
+  CHARACTER(2), ALLOCATABLE :: atom(:)
+  REAL(8), ALLOCATABLE :: x(:),y(:),z(:)
 
-  write(*,*) 'Reading coordinates ...'
+  WRITE(*,*) 'Reading coordinates ...'
 
-  open(1,file='coords.xyz') ! Default coordinates name.
+  OPEN(1,file='coords.xyz') ! Default coordinates name.
 
-  read(1,*) N ! Number of atoms.
+  READ(1,*) N ! Number of atoms.
 
-  allocate(atom(N),x(N),y(N),z(N)) ! Allocate manes and coordinates.
+  ALLOCATE(atom(N),x(N),y(N),z(N)) ! Allocate manes and coordinates.
 
-  read(1,'(A1)',IOSTAT=io) dummy  ! Reads the dummy name of the xyz file.
+  READ(1,'(A1)',IOSTAT=io) dummy  ! Reads the dummy name of the xyz file.
 
-  write(*,*)'Number of atoms', N
+  WRITE(*,*)'Number of atoms', N
 
-  do i=1,N ! Reading names and coordinates.
-    read(1,*)atom(i),x(i),y(i),z(i)
-    write(*,*)atom(i),x(i),y(i),z(i)
-  enddo
+  DO i=1,N ! Reading names and coordinates.
+     READ(1,*)atom(i),x(i),y(i),z(i)
+     WRITE(*,*)atom(i),x(i),y(i),z(i)
+  ENDDO
 
   xmin=1000000 ! Initial guess for the boundaries.
   xmax=-100000
@@ -36,22 +36,22 @@ program xyz2latte
   zmin=1000000
   zmax=-10000000
 
-  do i=1,N  ! Searching for the boundaries.
+  DO i=1,N  ! Searching for the boundaries.
 
-    if(xmin.GT.x(i))xmin=x(i)
-    if(xmax.LT.x(i))xmax=x(i)
+     IF(xmin.GT.x(i))xmin=x(i)
+     IF(xmax.LT.x(i))xmax=x(i)
 
-    if(ymin.GT.y(i))ymin=y(i)
-    if(ymax.LT.y(i))ymax=y(i)
+     IF(ymin.GT.y(i))ymin=y(i)
+     IF(ymax.LT.y(i))ymax=y(i)
 
-    if(zmin.GT.z(i))zmin=z(i)
-    if(zmax.LT.z(i))zmax=z(i)
+     IF(zmin.GT.z(i))zmin=z(i)
+     IF(zmax.LT.z(i))zmax=z(i)
 
-  enddo
+  ENDDO
 
-  write(*,*)'xmin xmax', xmin,xmax
-  write(*,*)'ymin ymax', ymin,ymax
-  write(*,*)'zmin zmax', zmin,zmax
+  WRITE(*,*)'xmin xmax', xmin,xmax
+  WRITE(*,*)'ymin ymax', ymin,ymax
+  WRITE(*,*)'zmin zmax', zmin,zmax
 
   xmin=xmin-5.0 ! Adding some space to the simulation box.
   xmax=xmax+5.0
@@ -60,17 +60,15 @@ program xyz2latte
   zmin=zmin-5.0
   zmax=zmax+5.0
 
-  open(2,file='inputblock.dat')
+  OPEN(2,file='inputblock.dat')
 
   ! inputblock.dat format. See LATTE documentation files.
-  !write(2,*)'NATS=',N
-  write(2,*)N
-  ! write(2,*)'1.0'
-  write(2,"(3F20.5)")xmax-xmin,0.0,0.0
-  write(2,"(3F20.5)")0.0,ymax-ymin,0.0
-  write(2,"(3F20.5)")0.0,0.0,zmax-zmin
-  do i=1,N
-    write(2,'(A2,3F20.5)')atom(i),x(i),y(i),z(i)
-  enddo
+  WRITE(2,*)N
+  WRITE(2,"(3F20.5)")xmax-xmin,0.0,0.0
+  WRITE(2,"(3F20.5)")0.0,ymax-ymin,0.0
+  WRITE(2,"(3F20.5)")0.0,0.0,zmax-zmin
+  DO i=1,N
+     WRITE(2,'(A2,3F20.5)')atom(i),x(i),y(i),z(i)
+  ENDDO
 
-end
+END PROGRAM xyz2latte

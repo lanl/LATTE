@@ -1,58 +1,58 @@
-       CASE("s")
-
- 
-           
-        CASE("p")
-           
-
-        CASE("d")
-           
-
-  
-        CASE("f")
+  CASE("s")
 
 
 
-        CASE("sp")
+  CASE("p")
 
 
-        CASE("sd")
-
-
-
-        CASE("sf")
-
-       
-
-  
-        CASE("pd")
+  CASE("d")
 
 
 
-        CASE("pf")
+  CASE("f")
 
 
-        CASE("df")
-           
 
-        CASE("spd")
+  CASE("sp")
 
 
-         
-        CASE("spf")
-
-             
-
-        CASE("sdf")
-
-     
-                     
-        CASE("pdf")
-           
+  CASE("sd")
 
 
-        CASE("spdf") 
-           
+
+  CASE("sf")
 
 
-        END SELECT
+
+
+  CASE("pd")
+
+
+
+  CASE("pf")
+
+
+  CASE("df")
+
+
+  CASE("spd")
+
+
+
+  CASE("spf")
+
+
+
+  CASE("sdf")
+
+
+
+  CASE("pdf")
+
+
+
+  CASE("spdf") 
+
+
+
+  END SELECT

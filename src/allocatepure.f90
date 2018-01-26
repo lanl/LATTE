@@ -32,7 +32,7 @@ SUBROUTINE ALLOCATEPURE
   USE SPARSEARRAY
 
   IMPLICIT NONE
-  
+
   IF (CONTROL .EQ. 5) THEN
      ALLOCATE(SIGNLIST(NORECS))
   ENDIF
@@ -44,15 +44,15 @@ SUBROUTINE ALLOCATEPURE
      ELSE
         ALLOCATE(X2UP(HDIM, HDIM), X2DOWN(HDIM, HDIM))
      ENDIF
-     
+
   ELSE 
-  
-!  ALLOCATE(PP(100))
-!  ALLOCATE(VV(100))
+
+     !  ALLOCATE(PP(100))
+     !  ALLOCATE(VV(100))
 
 #ifdef DBCSR_ON
 
-    ALLOCATE(BO_PADDED(BLKSZ*nblkrows_total, BLKSZ*nblkcols_total))
+     ALLOCATE(BO_PADDED(BLKSZ*nblkrows_total, BLKSZ*nblkcols_total))
 
 #elif defined(DBCSR_OFF)
 

@@ -38,83 +38,83 @@ SUBROUTINE SOLVEMATLAPACK
   IF (SPINON .EQ. 0) THEN
 
 #ifdef DOUBLEPREC
-        CALL  DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-             BO, HDIM, BO, HDIM, 0.0D0, X2, HDIM)
+     CALL  DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+          BO, HDIM, BO, HDIM, 0.0D0, X2, HDIM)
 #elif defined(SINGLEPREC)
-        CALL  SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-             BO, HDIM, BO, HDIM, 0.0, X2, HDIM)
+     CALL  SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+          BO, HDIM, BO, HDIM, 0.0, X2, HDIM)
 #endif
-     
+
      A = TWO*(X2 - BO)
-     
+
      DO I = 1, HDIM
         A(I,I) = A(I,I) + ONE
      ENDDO
-     
+
      BO = X2
-     
+
 #ifdef DOUBLEPREC
-        CALL DGESV(HDIM,  HDIM, A, HDIM, IPIV, BO, HDIM, INFO)
+     CALL DGESV(HDIM,  HDIM, A, HDIM, IPIV, BO, HDIM, INFO)
 #elif defined(SINGLEPREC)
-        CALL SGESV(HDIM,  HDIM, A, HDIM, IPIV, BO, HDIM, INFO)
+     CALL SGESV(HDIM,  HDIM, A, HDIM, IPIV, BO, HDIM, INFO)
 #endif
 
   ELSE
 
 #ifdef DOUBLEPREC
-        CALL  DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-             RHOUP, HDIM, RHOUP, HDIM, 0.0D0, X2, HDIM)
+     CALL  DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+          RHOUP, HDIM, RHOUP, HDIM, 0.0D0, X2, HDIM)
 #elif defined(SINGLEPREC)
-        CALL  SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-             RHOUP, HDIM, RHOUP, HDIM, 0.0, X2, HDIM)
+     CALL  SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+          RHOUP, HDIM, RHOUP, HDIM, 0.0, X2, HDIM)
 #endif
 
      A = TWO*(X2 - RHOUP)
-     
+
      DO I = 1, HDIM
         A(I,I) = A(I,I) + ONE
      ENDDO
-     
+
      RHOUP = X2
-     
+
 #ifdef DOUBLEPREC
-        CALL DGESV(HDIM,  HDIM, A, HDIM, IPIV, RHOUP, HDIM, INFO)
+     CALL DGESV(HDIM,  HDIM, A, HDIM, IPIV, RHOUP, HDIM, INFO)
 #elif defined(SINGLEPREC)
-        CALL SGESV(HDIM,  HDIM, A, HDIM, IPIV, RHOUP, HDIM, INFO)
+     CALL SGESV(HDIM,  HDIM, A, HDIM, IPIV, RHOUP, HDIM, INFO)
 #endif
 
 
 #ifdef DOUBLEPREC
-        CALL  DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
-             RHODOWN, HDIM, RHODOWN, HDIM, 0.0D0, X2, HDIM)
+     CALL  DGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0D0, &
+          RHODOWN, HDIM, RHODOWN, HDIM, 0.0D0, X2, HDIM)
 #elif defined(SINGLEPREC)
-        CALL  SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
-             RHODOWN, HDIM, RHODOWN, HDIM, 0.0, X2, HDIM)
+     CALL  SGEMM('N', 'N', HDIM, HDIM, HDIM, 1.0, &
+          RHODOWN, HDIM, RHODOWN, HDIM, 0.0, X2, HDIM)
 #endif
 
      A = TWO*(X2 - RHODOWN)
-     
+
      DO I = 1, HDIM
         A(I,I) = A(I,I) + ONE
      ENDDO
-     
+
      RHODOWN = X2
-     
+
 #ifdef DOUBLEPREC
-        CALL DGESV(HDIM,  HDIM, A, HDIM, IPIV, RHODOWN, HDIM, INFO)
+     CALL DGESV(HDIM,  HDIM, A, HDIM, IPIV, RHODOWN, HDIM, INFO)
 #elif defined(SINGLEPREC)
-        CALL SGESV(HDIM,  HDIM, A, HDIM, IPIV, RHODOWN, HDIM, INFO)
+     CALL SGESV(HDIM,  HDIM, A, HDIM, IPIV, RHODOWN, HDIM, INFO)
 #endif
 
   ENDIF
-     
+
   DEALLOCATE(IPIV)
-     
+
   RETURN
 
 END SUBROUTINE SOLVEMATLAPACK
 
-  
 
-     
-     
+
+
+

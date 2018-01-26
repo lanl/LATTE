@@ -20,13 +20,13 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SUBROUTINE SP2PURE_SUBGRAPH_PARALLEL(MDITER)
-  
+
   !
   ! PARALLEL SHARED MEMORY OPENMP VERSION
   ! This subroutine implements Niklasson's SP2 density matrix purification
   ! algorithm. 
   !
-  
+
   USE CONSTANTS_MOD
   USE TIMER_MOD
   USE SETUPARRAY
@@ -53,16 +53,16 @@ SUBROUTINE SP2PURE_SUBGRAPH_PARALLEL(MDITER)
 
   ! First time through use current Hamiltonian and threshold
   IF (FIRST_STEP.EQ.1) THEN
-    WRITE(*,*) '  '
-    WRITE(*,*) '# WARNING PARTITIONED SUBGRAPH TECHNIQUE NOT YET EVAULATED, EXPERIMENTAL VERISON !!!!! '
-    WRITE(*,*) '  '
+     WRITE(*,*) '  '
+     WRITE(*,*) '# WARNING PARTITIONED SUBGRAPH TECHNIQUE NOT YET EVAULATED, EXPERIMENTAL VERISON !!!!! '
+     WRITE(*,*) '  '
 
-    WRITE(*,*) '# SUBGRAPH FIRST '
-    G = BO
-    CALL THRESHOLDGRAPH
-    TRACE = TRACEGRAPH(HDIM)
-    !write(*,*) "graph trace = ", TRACE
-    FIRST_STEP = 0
+     WRITE(*,*) '# SUBGRAPH FIRST '
+     G = BO
+     CALL THRESHOLDGRAPH
+     TRACE = TRACEGRAPH(HDIM)
+     !write(*,*) "graph trace = ", TRACE
+     FIRST_STEP = 0
   ENDIF
 
   ! Calculate M
@@ -121,10 +121,10 @@ SUBROUTINE SP2PURE_SUBGRAPH_PARALLEL(MDITER)
 
   ! Write out input and output matrix
   IF (DEBUGON .GE. 2) THEN
-    CALL WRITEHMATRIX(HDIM, MSPARSE, H, NR_SP2_ITER, PP)
+     CALL WRITEHMATRIX(HDIM, MSPARSE, H, NR_SP2_ITER, PP)
   ENDIF
   IF (DEBUGON .EQ. 3) THEN
-    CALL WRITEDMATRIX(HDIM, BO)
+     CALL WRITEDMATRIX(HDIM, BO)
   ENDIF
 
   ! Deallocate for sparse format

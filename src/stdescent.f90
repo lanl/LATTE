@@ -38,7 +38,7 @@ SUBROUTINE STDESCENT(ITER, DELTAENERGY, DELTAF)
      RELCONST = TWO*MINMCONST
 
   ELSE
-     
+
      ! If the energy and maximum force have gone down, increase the step size
 
      IF (DELTAENERGY .LE. ZERO .AND. DELTAF .LT. ZERO) THEN
@@ -46,7 +46,7 @@ SUBROUTINE STDESCENT(ITER, DELTAENERGY, DELTAF)
         RELCONST = 1.01*RELCONST
 
      ELSEIF (DELTAENERGY .GT. ZERO .OR. DELTAF .GT. ZERO) THEN
-        
+
         ! If the energy is increasing - decrease the step size
 
         RELCONST = 0.5*RELCONST
@@ -58,16 +58,16 @@ SUBROUTINE STDESCENT(ITER, DELTAENERGY, DELTAF)
   RELCONST = MIN(RELCONST, MAXMCONST)
   RELCONST = MAX(RELCONST, MINMCONST)
 
-!  PREVF = MAXF
+  !  PREVF = MAXF
 
   DO I = 1, NATS
 
      DO J = 1, 3
 
         MYSHIFT = RELCONST*FTOT(J,I)
-        
+
         IF (ABS(MYSHIFT) .GT. MAXSHIFT) MYSHIFT = SIGN(MAXSHIFT, MYSHIFT)
-   
+
         CR(J,I) = CR(J,I) + MYSHIFT
 
      ENDDO

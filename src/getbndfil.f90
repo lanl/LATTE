@@ -33,87 +33,87 @@ SUBROUTINE GETBNDFIL()
   SUMBASIS = 0
 
   DO I = 1, NATS
-     
+
      TOTNE = TOTNE + ATOCC(ELEMPOINTER(I))
-     
+
      SELECT CASE(BASIS(ELEMPOINTER(I)))
-        
+
      CASE("s")
-        
+
         NUMORB = 1
-        
+
      CASE("p")
-        
+
         NUMORB = 3
-        
+
      CASE("d")
-        
+
         NUMORB = 5
-        
+
      CASE("f")
-        
+
         NUMORB = 7
-        
+
      CASE("sp")
-        
+
         NUMORB = 4
-        
+
      CASE("sd")
-        
+
         NUMORB = 6
-        
+
      CASE("sf")
-        
+
         NUMORB = 8
-        
+
      CASE("pd")
-        
+
         NUMORB = 8
-        
+
      CASE("pf")
-        
+
         NUMORB = 10
-        
+
      CASE("df")
-        
+
         NUMORB = 12
-        
+
      CASE("spd")
-        
+
         NUMORB = 9
-        
+
      CASE("spf")
-        
+
         NUMORB = 11
-        
+
      CASE("sdf")
-        
+
         NUMORB = 13
-        
+
      CASE("pdf")
-        
+
         NUMORB = 15
-        
+
      CASE("spdf") 
-        
+
         NUMORB = 16
-        
+
      END SELECT
-     
+
      SUMBASIS = SUMBASIS + NUMORB
-     
+
   ENDDO
-  
+
   SUMBASIS = 2*SUMBASIS
-        
+
   !
   ! TOTNE = total number of electrons = tr(rho_up) + tr(rho_down) = tr(bo)
   !
 
   TOTNE = TOTNE - REAL(CHARGE)
-  
+
   BNDFIL = TOTNE/REAL(SUMBASIS)
-!  print*, bndfil
+  !  print*, bndfil
   RETURN
 
 END SUBROUTINE GETBNDFIL

@@ -41,39 +41,39 @@ SUBROUTINE TABTEST
   OPEN(UNIT=47, STATUS="UNKNOWN", FILE="tabtest.dat")
 
   DO I = 1, 1001
-     
+
      MAGR =  ONE + ONE*REAL(I-1)/1000
-     
+
      KLO = 1
      KHI = PPTABLENGTH(1)
-     
+
      DO WHILE (KHI - KLO .GT. 1) 
-        
+
         K = (KHI + KLO)/2
-        
+
         IF (PPR(K,1) .GT. MAGR) THEN
            KHI = K
         ELSE
            KLO = K
         ENDIF
-        
+
      ENDDO
 
      DX = PPR(KHI,1) - PPR(KLO,1)
 
      A = (PPR(KHI, 1) - MAGR)/DX
      B = (MAGR - PPR(KLO, 1))/DX
-     
+
      TMPE = A*PPVAL(KLO,1) + B*PPVAL(KHI, 1) + &
           ((A*A*A - A)*PPSPL(KLO,1) + &
           (B*B*B - B)*PPSPL(KHI,1))*(DX*DX/SIX)
-     
+
      EREP = EREP + TMPE
-     
+
      GRAD = (PPVAL(KHI,1) - PPVAL(KLO,1))/DX + &
           ((ONE - THREE*A*A)*PPSPL(KLO,1) + &
           (THREE*B*B - ONE)*PPSPL(KHI,1))*(DX/SIX)
-     
+
      WRITE(47,*) MAGR, TMPE, GRAD
 
   ENDDO
@@ -81,6 +81,6 @@ SUBROUTINE TABTEST
   CLOSE(47)
 
   RETURN
-  
+
 END SUBROUTINE TABTEST
 

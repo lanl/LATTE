@@ -28,19 +28,19 @@ SUBROUTINE GETDENSITY
   IMPLICIT NONE
 
   REAL(LATTEPREC) :: SYSVOL
-  
+
   SYSVOL = ABS(BOX(1,1)*(BOX(2,2)*BOX(3,3) - BOX(3,2)*BOX(2,3)) + &
        BOX(1,2)*(BOX(2,1)*BOX(3,3) - BOX(3,1)*BOX(2,3)) + &
        BOX(1,3)*(BOX(2,1)*BOX(3,2) - BOX(3,1)*BOX(2,2)))
-  
+
   ! Let's have the mass density in g/cm3
 
   MASSDEN = 1.660538921*SUMMASS/SYSVOL
 
-!  print*, summass, massden
+  !  print*, summass, massden
 
   RETURN
 
 END SUBROUTINE GETDENSITY
 
-        
+

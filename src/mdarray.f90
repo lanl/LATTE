@@ -46,19 +46,19 @@ MODULE MDARRAY
   INTEGER :: SEEDTH
   INTEGER :: SETTH
   REAL(LATTEPREC) :: FRICTION
-  
+
 !!$  These are for Langevin dynamics
-  
+
   REAL(LATTEPREC), ALLOCATABLE :: FRANPREV(:,:)
-  
+
 !!$  These are for Andersen thermostat
- 
+
   REAL(LATTEPREC) :: CUMDT
-!  REAL(LATTEPREC) :: CUMDT, TAU
-!  INTEGER :: QITERAND, QITERIN
-  
+  !  REAL(LATTEPREC) :: CUMDT, TAU
+  !  INTEGER :: QITERAND, QITERIN
+
 !!$  These are for Nose thermostat
-  
+
   REAL(LATTEPREC) :: GAMMA, DGAMMA
   REAL(LATTEPREC) :: CONSMOT
 

@@ -50,6 +50,13 @@ LIB = -llapack -lblas
  -lmkl_lapack95_lp64 -lmkl_gf_lp64 -lmkl_gnu_thread -lmkl_core \
  -lmkl_gnu_thread -lmkl_core -ldl -lpthread -lm
 
+# Uncomment for coverage
+CVR = ON
+ifeq ($(CVR), ON)
+	FFLAGS += -fprofile-arcs -ftest-coverage -O0
+	LINKFLAG += -fprofile-arcs -ftest-coverage -O0
+endif
+
 ifeq ($(PROGRESS), ON)
 	LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml
         FFLAGS += -I$(BML_PATH)/../include -I$(PROGRESS_PATH)/../include
