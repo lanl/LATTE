@@ -392,7 +392,7 @@ SUBROUTINE TBMD
 
               IF (NVTON .NE. 4) THEN
 
-                 WRITE(6,99) THETIME, TOTE, TEMPERATURE, PRESSURE, EGAP, &
+                 WRITE(6,99)"Data", THETIME, TOTE, TEMPERATURE, PRESSURE, EGAP, &
                       CHEMPOT !, TRRHOH, EREP, KEE, ECOUL, REAL(NUMSCF)
 
               ELSE
