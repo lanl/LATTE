@@ -9,130 +9,130 @@
 !!   where num is the position of the new keyword in the vector.
 !! - Use DUMMY= as a placeholder. This variable will be ignored by not searched by the parser.
 !!
-module latteparser_latte_mod
+MODULE LATTEPARSER_LATTE_MOD
 
-  use CONSTANTS_MOD
-  use SETUPARRAY
-  use PPOTARRAY
-  use NEBLISTARRAY
-  use COULOMBARRAY
-  use SPARSEARRAY
-  use RELAXCOMMON
-  use MDARRAY
+  USE CONSTANTS_MOD
+  USE SETUPARRAY
+  USE PPOTARRAY
+  USE NEBLISTARRAY
+  USE COULOMBARRAY
+  USE SPARSEARRAY
+  USE RELAXCOMMON
+  USE MDARRAY
   USE KSPACEARRAY
 
-  use openfiles_mod
-  use kernelparser_mod
+  USE OPENFILES_MOD
+  USE KERNELPARSER_MOD
 
 #ifdef PROGRESSON
-  use bml
+  USE BML
 #endif
 
-  implicit none
+  IMPLICIT NONE
 
-  private
+  PRIVATE
 
-  integer, parameter :: dp = latteprec
+  INTEGER, PARAMETER :: DP = LATTEPREC
 
-  public :: parse_control, parse_md, parse_kmesh
+  PUBLIC :: PARSE_CONTROL, PARSE_MD, PARSE_KMESH
 
 #ifdef PROGRESSON
-!> General latte input variables type.
-!!
-type, public :: latte_type
+  !> General latte input variables type.
+  !!
+  TYPE, PUBLIC :: LATTE_TYPE
 
-  !> Name of the current job.
-  character(20) :: jobname
+     !> Name of the current job.
+     CHARACTER(20) :: JOBNAME
 
-  !> Verbosity level.
-  integer :: verbose
+     !> Verbosity level.
+     INTEGER :: VERBOSE
 
-  !> Threshold values for matrix elements.
-  real(dp) :: threshold
+     !> Threshold values for matrix elements.
+     REAL(DP) :: THRESHOLD
 
-  !> Max nonzero elements per row for every row see \cite Mniszewski2015 .
-  integer :: mdim
+     !> Max nonzero elements per row for every row see \cite Mniszewski2015 .
+     INTEGER :: MDIM
 
-  !> Matrix format (Dense or Ellpack).
-  character(20) :: bml_type
+     !> Matrix format (Dense or Ellpack).
+     CHARACTER(20) :: BML_TYPE
 
-  !> Distribution mode (sequential, distributed, or graph_distributed).
-  character(20) :: bml_dmode
+     !> Distribution mode (sequential, distributed, or graph_distributed).
+     CHARACTER(20) :: BML_DMODE
 
-  !> Coulomb Accuracy.
-  real(dp) :: coul_acc
+     !> Coulomb Accuracy.
+     REAL(DP) :: COUL_ACC
 
-  !> Pulay mixing coefficient.
-  real(dp) :: pulaycoeff
+     !> Pulay mixing coefficient.
+     REAL(DP) :: PULAYCOEFF
 
-  !> Linear mixing coefficient.
-  real(dp) :: mixcoeff
+     !> Linear mixing coefficient.
+     REAL(DP) :: MIXCOEFF
 
-  !> Coulomb Accuracy.
-  integer :: mpulay
+     !> Coulomb Accuracy.
+     INTEGER :: MPULAY
 
-  !> Maximum SCF iterations.
-  integer :: maxscf
+     !> Maximum SCF iterations.
+     INTEGER :: MAXSCF
 
-  !> SCF tolerance.
-  real(dp) :: scftol
+     !> SCF tolerance.
+     REAL(DP) :: SCFTOL
 
-  !> Z Matrix calculation type.
-  character(20) :: ZMat
+     !> Z Matrix calculation type.
+     CHARACTER(20) :: ZMAT
 
-  !> Solver method
-  character(20) :: method
+     !> Solver method
+     CHARACTER(20) :: METHOD
 
-  !> Estimated ration between real & k space time efficiency.
-  real(dp) :: timeratio
+     !> Estimated ration between real & k space time efficiency.
+     REAL(DP) :: TIMERATIO
 
-  !> Total number of steps for MD simulation.
-  integer :: mdsteps
+     !> Total number of steps for MD simulation.
+     INTEGER :: MDSTEPS
 
-  !> Total number of steps for MD simulation.
-  real(dp) :: timestep
+     !> Total number of steps for MD simulation.
+     REAL(DP) :: TIMESTEP
 
-  !> Total number of steps for MD simulation.
-  character(100) :: parampath
+     !> Total number of steps for MD simulation.
+     CHARACTER(100) :: PARAMPATH
 
-  !> File containing coordinates.
-  character(100) :: coordsfile
+     !> File containing coordinates.
+     CHARACTER(100) :: COORDSFILE
 
-  !> File containing coordinates.
-  integer :: nlisteach
+     !> File containing coordinates.
+     INTEGER :: NLISTEACH
 
-  !> Restart calculation.
-  logical :: restart
+     !> Restart calculation.
+     LOGICAL :: RESTART
 
-  !> Restart calculation.
-  real(dp) :: efermi
+     !> Restart calculation.
+     REAL(DP) :: EFERMI
 
 
-end type latte_type
+  END TYPE LATTE_TYPE
 
-type(latte_type), public :: lt
+  TYPE(LATTE_TYPE), PUBLIC :: LT
 
 #endif
 
-contains
+CONTAINS
 
   !> The parser for Latte General input variables.
   !!
-  subroutine parse_control(filename)
+  SUBROUTINE PARSE_CONTROL(FILENAME)
 
-    use FERMICOMMON
+    USE FERMICOMMON
 
-    implicit none
-    integer, parameter :: nkey_char = 6, nkey_int = 51, nkey_re = 21, nkey_log = 1
-    character(len=*) :: filename
+    IMPLICIT NONE
+    INTEGER, PARAMETER :: NKEY_CHAR = 6, NKEY_INT = 51, NKEY_RE = 21, NKEY_LOG = 1
+    CHARACTER(LEN=*) :: FILENAME
 
     !Library of keywords with the respective defaults.
-    character(len=50), parameter :: keyvector_char(nkey_char) = [character(len=100) :: &
+    CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_CHAR(NKEY_CHAR) = [CHARACTER(LEN=100) :: &
          'JobName=','BASISTYPE=','SP2CONV=','RELAXTYPE=','PARAMPATH=','COORDSFILE=']
-    character(len=100) :: valvector_char(nkey_char) = [character(len=100) :: &
+    CHARACTER(LEN=100) :: VALVECTOR_CHAR(NKEY_CHAR) = [CHARACTER(LEN=100) :: &
          'MyJob','NONORTHO','REL','SD','./TBparam','./bl/inputblock.dat']
 
-    character(len=50), parameter :: keyvector_int(nkey_int) = [character(len=50) :: &
+    CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_INT(NKEY_INT) = [CHARACTER(LEN=50) :: &
          'xControl=', 'DEBUGON=', 'FERMIM=', 'CGORLIB=', 'NORECS=', 'ENTROPYKIND=',&
          'PPOTON=', 'VDWON=', 'SPINON=', 'ELECTRO=', 'ELECMETH=', 'MAXSCF=',& !12
          'MINSP2ITER=','FULLQCONV=','QITER=','ORDERNMOL=','SPARSEON=','THRESHOLDON=',& !18
@@ -141,7 +141,7 @@ contains
          'KON=','COMPFORCE=','DOSFIT=','INTS2FIT=','NFITSTEP=','QFIT=',& !39
          'PPFITON=','ALLFITON=','PPSTEP=','BISTEP=','PP2FIT=','BINT2FIT=','PPNMOL=',& !46
          'PPNGEOM=','PARREP=','VERBOSE=','MIXER=','RESTARTLIB=']
-    integer :: valvector_int(nkey_int) = (/ &
+    INTEGER :: VALVECTOR_INT(NKEY_INT) = (/ &
          1,0,6,1,1,1, &
          1,0,0,1,0,250, &
          22,0,1,0,0,1, &
@@ -151,30 +151,30 @@ contains
          0,0,500,500,2,6,10,&
          200,0,0,0,0 /)
 
-    character(len=50), parameter :: keyvector_re(nkey_re) = [character(len=50) :: &
+    CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_RE(NKEY_RE) = [CHARACTER(LEN=50) :: &
          'CGTOL=','KBT=','SPINTOL=','ELEC_ETOL=','ELEC_QTOL=','COULACC=','COULCUT=', 'COULR1=',& !8
          'BREAKTOL=','QMIX=','SPINMIX=','MDMIX=','NUMTHRESH=','CHTOL=','SKIN=',& !15
          'RLXFTOL=','BETA=','MCSIGMA=','PPBETA=','PPSIGMA=','ER='] !21
-    real(dp) :: valvector_re(nkey_re) = (/&
+    REAL(DP) :: VALVECTOR_RE(NKEY_RE) = (/&
          1.0e-6,0.0,1.0e-4,0.001,1.0e-8,1.0e-6,-500.0, 500.0,&
          1.0e-6,0.25,0.25,0.25,1.0e-6,0.01,1.0,&
          1.0e-7,1000.0,0.2,1000.0,0.01,1.0/)
 
-    character(len=50), parameter :: keyvector_log(nkey_log) = [character(len=100) :: &
-         'INITIALIZED=']
-    logical :: valvector_log(nkey_log) = (/&
-         .false./)
+    CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_LOG(NKEY_LOG) = [CHARACTER(LEN=100) :: &
+         'LIBINIT=']
+    LOGICAL :: VALVECTOR_LOG(NKEY_LOG) = (/&
+         .FALSE./)
 
     !Start and stop characters
-    character(len=50), parameter :: startstop(2) = [character(len=50) :: &
+    CHARACTER(LEN=50), PARAMETER :: STARTSTOP(2) = [CHARACTER(LEN=50) :: &
          'CONTROL{', '}']
 
-    call parsing_kernel(keyvector_char,valvector_char&
-         ,keyvector_int,valvector_int,keyvector_re,valvector_re,&
-         keyvector_log,valvector_log,trim(filename),startstop)
+    CALL PARSING_KERNEL(KEYVECTOR_CHAR,VALVECTOR_CHAR&
+         ,KEYVECTOR_INT,VALVECTOR_INT,KEYVECTOR_RE,VALVECTOR_RE,&
+         KEYVECTOR_LOG,VALVECTOR_LOG,TRIM(FILENAME),STARTSTOP)
 
 
-    JOB = valvector_char(1)
+    JOB = VALVECTOR_CHAR(1)
 
     ! CONTROL determines how the density matrix is going to be
     ! calculated: 1 = diagonalization, 2 = SP2 purification,
@@ -182,20 +182,19 @@ contains
     ! 5 = SP2 Fermi
     !
 
-    CONTROL = valvector_int(1)
+    CONTROL = VALVECTOR_INT(1)
 
     !
     ! BASISTYPE can equal "ORTHO" OR "NONORTHO",
     !
 
-    BASISTYPE = valvector_char(2)
+    BASISTYPE = VALVECTOR_CHAR(2)
 
-    if (BASISTYPE .ne. "ORTHO" .and. BASISTYPE .ne. "NONORTHO") then
-       print*, "Error defining basis type (ortho/nonortho)"
-       stop
-    endif
+    IF (BASISTYPE .NE. "ORTHO" .AND. BASISTYPE .NE. "NONORTHO") THEN
+       CALL ERRORS("latteparser_latte_mod","Error defining basis type (ortho/nonortho)")
+    ENDIF
 
-    DEBUGON = valvector_int(2)
+    DEBUGON = VALVECTOR_INT(2)
 
 
     !
@@ -203,27 +202,27 @@ contains
     ! operator, M.
     !
 
-    FERMIM = valvector_int(3)
+    FERMIM = VALVECTOR_INT(3)
 
     ! If we're using the expansion of the Fermi operator, we can
     ! use a LAPACK routine or Niklasson's conjugate gradient method to
     ! solve AX = B. CGORLIB: 0 = LAPACK, 1 = conjugate gradient
     ! CGTOL = the user-supplied tolerance for the CG solution of AX = B
 
-    CGORLIB = valvector_int(4); CGTOL = valvector_re(1)
+    CGORLIB = VALVECTOR_INT(4); CGTOL = VALVECTOR_RE(1)
 
     CGTOL2 = CGTOL*CGTOL
 
     ! Electronic temperature, in eV
 
-    KBT = valvector_re(2)
+    KBT = VALVECTOR_RE(2)
 
     !
     ! Read the number of recursions for the truncated, finite
     ! temperature SP2 algorithm
     !
 
-    NORECS = valvector_int(5)
+    NORECS = VALVECTOR_INT(5)
 
     !
     ! What kind of entropy are we going to use in a finite Te calculation
@@ -236,7 +235,7 @@ contains
     ! ENTROPYKIND = 4 : 8th order expansion of exact form (no diag)
     !
 
-    ENTROPYKIND = valvector_int(6)
+    ENTROPYKIND = VALVECTOR_INT(6)
 
     !
     ! Do we want long-range C/R^6 tails?
@@ -248,7 +247,7 @@ contains
     ! VDWON = 1: Use tails
     !
 
-    PPOTON = valvector_int(7);  VDWON = valvector_int(8)
+    PPOTON = VALVECTOR_INT(7);  VDWON = VALVECTOR_INT(8)
 
 
     !
@@ -256,7 +255,7 @@ contains
     ! SPINON = 1 = yes
     ! SPINON = 0 = no
 
-    SPINON = valvector_int(9); SPINTOL = valvector_re(3)
+    SPINON = VALVECTOR_INT(9); SPINTOL = VALVECTOR_RE(3)
 
     !
     ! Controls for electrostatics:
@@ -267,8 +266,8 @@ contains
     ! ELEC_QTOL: Tolerance on charges during self-consistent calc
     !
 
-    ELECTRO = valvector_int(10); ELECMETH = valvector_int(11)
-    ELEC_ETOL = valvector_re(4); ELEC_QTOL = valvector_re(5)
+    ELECTRO = VALVECTOR_INT(10); ELECMETH = VALVECTOR_INT(11)
+    ELEC_ETOL = VALVECTOR_RE(4); ELEC_QTOL = VALVECTOR_RE(5)
 
     !
     ! COULACC: Accuracy for the Ewald method (1.0e-4 works)
@@ -279,20 +278,20 @@ contains
     ! applied here at terminated at COULCUT.
     !
 
-    COULACC = valvector_re(6); COULCUT = valvector_re(7); COULR1 = valvector_re(8)
+    COULACC = VALVECTOR_RE(6); COULCUT = VALVECTOR_RE(7); COULR1 = VALVECTOR_RE(8)
 
     !
     ! MAXSCF:  Maximum number of SCF cycles
     !
 
-    MAXSCF = valvector_int(12)
+    MAXSCF = VALVECTOR_INT(12)
 
     !
     ! BREAKTOL: Tolerance for breaking SP2 loops
     ! MINSP2ITER: Minimum number of iterations during SP2 purification
     !
 
-    BREAKTOL = valvector_re(9); MINSP2ITER = valvector_int(13); SP2CONV = valvector_char(3)
+    BREAKTOL = VALVECTOR_RE(9); MINSP2ITER = VALVECTOR_INT(13); SP2CONV = VALVECTOR_CHAR(3)
 
     !
     ! FULLQCONV: 0 = We'll run QITER SCF cycles during MD, = 1, we'll run
@@ -300,20 +299,20 @@ contains
     ! QITER: Number of SCF cycles we're going to run at each MD time step
     !
 
-    FULLQCONV = valvector_int(14); QITER = valvector_int(15)
+    FULLQCONV = VALVECTOR_INT(14); QITER = VALVECTOR_INT(15)
 
     !
     ! QMIX AND SPINMIX are the coefficients for the linear mixing of
     ! new and old charge and spin densities, respectively, during SCF cycles
     !
 
-    QMIX = valvector_re(10); SPINMIX = valvector_re(11); MDMIX = valvector_re(12)
+    QMIX = VALVECTOR_RE(10); SPINMIX = VALVECTOR_RE(11); MDMIX = VALVECTOR_RE(12)
 
     !
     ! ORDERNMOL: Turn on molecule-ID-based density matrix blocking
     !
 
-    ORDERNMOL = valvector_int(16)
+    ORDERNMOL = VALVECTOR_INT(16)
 
     !
     ! SPARSEON: 0 = all dense matrix stuff, 1 = use CSR format and
@@ -325,46 +324,46 @@ contains
     ! for further fill-in
     !
 
-    SPARSEON = valvector_int(17); THRESHOLDON = valvector_int(18); NUMTHRESH = valvector_re(13)
+    SPARSEON = VALVECTOR_INT(17); THRESHOLDON = VALVECTOR_INT(18); NUMTHRESH = VALVECTOR_RE(13)
 
 #ifdef PROGRESSON
 
-    if(SPARSEON == 0)then
-      lt%bml_type = bml_matrix_dense
-    elseif(SPARSEON == 1)then
-      lt%bml_type = bml_matrix_ellpack
-    else
-      STOP 'SPARSEON > 1 yet not implemented'
-    endif
+    IF(SPARSEON == 0)THEN
+       LT%BML_TYPE = BML_MATRIX_DENSE
+    ELSEIF(SPARSEON == 1)THEN
+       LT%BML_TYPE = BML_MATRIX_ELLPACK
+    ELSE
+       CALL ERRORS("latteparser_latte_mod","SPARSEON > 1 yet not implemented")
+    ENDIF
 
-    if(THRESHOLDON == 0)then
-      lt%threshold = 0.0_dp
-    elseif(THRESHOLDON == 1)then
-      lt%threshold = NUMTHRESH
-    else
-      STOP 'THRESHOLDON > 1 yet not implemented'
-    endif
+    IF(THRESHOLDON == 0)THEN
+       LT%THRESHOLD = 0.0_DP
+    ELSEIF(THRESHOLDON == 1)THEN
+       LT%THRESHOLD = NUMTHRESH
+    ELSE
+       CALL ERRORS("latteparser_latte_mod","THRESHOLDON > 1 yet not implemented")
+    ENDIF
 
 #endif
 
-    FILLINSTOP = valvector_int(19); BLKSZ = valvector_int(20)
+    FILLINSTOP = VALVECTOR_INT(19); BLKSZ = VALVECTOR_INT(20)
 
     !
     ! MSPARSE: value for M when SPARSEON = 1, used by sp2 sparse algorithm
     !          0 = value for M is not known, defaults to N
     !
 
-    MSPARSE = valvector_int(21)
+    MSPARSE = VALVECTOR_INT(21)
 
 #ifdef PROGRESSON
 
-    if(MSPARSE == 0)then
-      lt%mdim = -1  !Defaults to N
-    elseif(MSPARSE > 0)then
-      lt%mdim = MSPARSE
-    else
-      STOP 'MSPARSE cannot be negative'
-    endif
+    IF(MSPARSE == 0)THEN
+       LT%MDIM = -1  !Defaults to N
+    ELSEIF(MSPARSE > 0)THEN
+       LT%MDIM = MSPARSE
+    ELSE
+       CALL ERRORS("latteparser_latte_mod","MSPARSE cannot be negative")
+    ENDIF
 
 #endif
 
@@ -375,13 +374,13 @@ contains
     ! CHTOL: Tolerance on atomic charges (Mulliken) before LCN is declared
     !
 
-    LCNON = valvector_int(22); LCNITER = valvector_int(23); CHTOL = valvector_re(14)
+    LCNON = VALVECTOR_INT(22); LCNITER = VALVECTOR_INT(23); CHTOL = VALVECTOR_RE(14)
 
     !
     ! Read the SKIN for the neighbor list (Angstrom)
     !
 
-    SKIN = valvector_re(15)
+    SKIN = VALVECTOR_RE(15)
 
     !
     ! RELAXME: 0 = Don't run relaxation, 1 = relax geometry
@@ -390,48 +389,48 @@ contains
     ! RLXFTOT: Run optimization until all forces are less than RLXFTOL
     !
 
-    RELAXME = valvector_int(24); RELTYPE = valvector_char(4) ;MXRLX = valvector_int(25)
-    RLXFTOL = valvector_re(16)
+    RELAXME = VALVECTOR_INT(24); RELTYPE = VALVECTOR_CHAR(4) ;MXRLX = VALVECTOR_INT(25)
+    RLXFTOL = VALVECTOR_RE(16)
 
     !
     ! MDON: 0 = Molecular dynamics off, 1 = Molecular dynamics on
     ! (MD is controlled using the file MDcontroller)
     !
 
-    MDON = valvector_int(26)
+    MDON = VALVECTOR_INT(26)
 
     !
     ! PBCON: 1 = full periodic boundary conditions, 0 = gas phase: no pbc and
     ! electrostatics done all in real space
     !
 
-    PBCON = valvector_int(27)
+    PBCON = VALVECTOR_INT(27)
 
-    RESTART = valvector_int(28)
+    RESTART = VALVECTOR_INT(28)
 
     ! Add or remove electrons. 2+ -> charge = +2 since TOTNE = TOTNE - CHARGE
 
-    CHARGE = valvector_int(29)
+    CHARGE = VALVECTOR_INT(29)
 
     !
     ! XBOON: 0 = Niklasson's extended Lagrangian Born-Oppenheimer MD off,
     ! 1 = on.
     !
 
-    XBOON = valvector_int(30)
+    XBOON = VALVECTOR_INT(30)
 
     !
     ! XBODISON: We have the option of turning on damping for the XBO
     ! to remedy the accumulation of noise. 0 = off, 1 = on.
     !
 
-    XBODISON = valvector_int(31)
+    XBODISON = VALVECTOR_INT(31)
 
     !
     ! XBODISORDER: = Order of the damping function (1 - 9)
     !
 
-    XBODISORDER = valvector_int(32)
+    XBODISORDER = VALVECTOR_INT(32)
 
     FITON = 0
 
@@ -439,120 +438,120 @@ contains
     ! Read in the number of GPUs per node
     !
 
-    NGPU = valvector_int(33)
+    NGPU = VALVECTOR_INT(33)
 
     ! Are we doing k-space?
 
-    KON = valvector_int(34)
+    KON = VALVECTOR_INT(34)
 
     ! Do we want to calculate forces too (not always necessary when fitting)
 
-    COMPFORCE = valvector_int(35)
+    COMPFORCE = VALVECTOR_INT(35)
 
     ! Turn on the simulated annealing subroutine to fit DOS
 
 
-    DOSFITON = valvector_int(36); INT2FIT = valvector_int(37)
-    MCBETA = valvector_re(17); NFITSTEP = valvector_int(38); QFIT = valvector_int(39)
-    MCSIGMA = valvector_re(18)
+    DOSFITON = VALVECTOR_INT(36); INT2FIT = VALVECTOR_INT(37)
+    MCBETA = VALVECTOR_RE(17); NFITSTEP = VALVECTOR_INT(38); QFIT = VALVECTOR_INT(39)
+    MCSIGMA = VALVECTOR_RE(18)
 
-    PPFITON = valvector_int(40)
+    PPFITON = VALVECTOR_INT(40)
 
-    ALLFITON = valvector_int(41)
+    ALLFITON = VALVECTOR_INT(41)
 
-    PPNFITSTEP = valvector_int(42); BINFITSTEP = valvector_int(43)
-    PP2FIT = valvector_int(44); BINT2FIT = valvector_int(45)
+    PPNFITSTEP = VALVECTOR_INT(42); BINFITSTEP = VALVECTOR_INT(43)
+    PP2FIT = VALVECTOR_INT(44); BINT2FIT = VALVECTOR_INT(45)
 
-    PPBETA = valvector_re(19); PPSIGMA = valvector_re(20)
-    PPNMOL = valvector_int(46); PPNGEOM = valvector_int(47)
+    PPBETA = VALVECTOR_RE(19); PPSIGMA = VALVECTOR_RE(20)
+    PPNMOL = VALVECTOR_INT(46); PPNGEOM = VALVECTOR_INT(47)
 
-    PARREP = valvector_int(48)
+    PARREP = VALVECTOR_INT(48)
 
     ! Verbosity level to control general output
 
-    VERBOSE = valvector_int(49)
+    VERBOSE = VALVECTOR_INT(49)
 
     ! If Pulay Mixer
 
-    MIXER = valvector_int(50)
+    MIXER = VALVECTOR_INT(50)
 
     ! Restart option for latte lib.
 
-    MIXER = valvector_int(51)
+    MIXER = VALVECTOR_INT(51)
 
     ! Dielectric constant
 
-    RELPERM = valvector_re(21)
+    RELPERM = VALVECTOR_RE(21)
 
     ! Coordinates and parameter paths
 
-    PARAMPATH = valvector_char(5)
-    COORDSFILE = valvector_char(6)
+    PARAMPATH = VALVECTOR_CHAR(5)
+    COORDSFILE = VALVECTOR_CHAR(6)
 
-  end subroutine parse_control
+  END SUBROUTINE PARSE_CONTROL
 
 
   !> The parser for Latte General input variables.
   !!
-  subroutine parse_md(filename)
+  SUBROUTINE PARSE_MD(FILENAME)
 
-    implicit none
-    integer, parameter :: nkey_char = 3, nkey_int = 18, nkey_re = 10, nkey_log = 1
-    character(len=*) :: filename
+    IMPLICIT NONE
+    INTEGER, PARAMETER :: NKEY_CHAR = 3, NKEY_INT = 18, NKEY_RE = 10, NKEY_LOG = 1
+    CHARACTER(LEN=*) :: FILENAME
 
     !Library of keywords with the respective defaults.
-    character(len=50), parameter :: keyvector_char(nkey_char) = [character(len=100) :: &
+    CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_CHAR(NKEY_CHAR) = [CHARACTER(LEN=100) :: &
          'RNDIST=','SEEDINIT=','NPTTYPE=']
-    character(len=100) :: valvector_char(nkey_char) = [character(len=100) :: &
+    CHARACTER(LEN=100) :: VALVECTOR_CHAR(NKEY_CHAR) = [CHARACTER(LEN=100) :: &
          'GAUSSIAN','UNIFORM','ISO']
 
-    character(len=50), parameter :: keyvector_int(nkey_int) = [character(len=50) :: &
+    CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_INT(NKEY_INT) = [CHARACTER(LEN=50) :: &
          'MAXITER=', 'UDNEIGH=', 'DUMPFREQ=','RSFREQ=', 'WRTFREQ=', 'TOINITTEMP5=', 'THERMPER=',& !7
          'THERMRUN=', 'NVTON=', 'NPTON=', 'AVEPER=', 'SEED=', 'SHOCKON=',&
          'SHOCKSTART=','SHOCKDIR=','MDADAPT=','GETHUG=','RSLEVEL=']
-    integer :: valvector_int(nkey_int) = (/ &
+    INTEGER :: VALVECTOR_INT(NKEY_INT) = (/ &
          5000,1,250,500,25,1,500, &
          50000,0,0,1000,54,0, &
          100000,1,0,0,0/)
 
-    character(len=50), parameter :: keyvector_re(nkey_re) = [character(len=50) :: &
+    CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_RE(NKEY_RE) = [CHARACTER(LEN=50) :: &
          'DT=','TEMPERATURE=','FRICTION=','PTARGET=','UPARTICLE=','USHOCK=','C0=', 'E0=',&
          'V0=','P0=']
-    real(dp) :: valvector_re(nkey_re) = (/&
+    REAL(DP) :: VALVECTOR_RE(NKEY_RE) = (/&
          0.25,300.00,1000.0,0.0,500.0,-4590.0,1300.0,-795.725,&
          896.984864,0.083149/)
 
-    character(len=50), parameter :: keyvector_log(nkey_log) = [character(len=100) :: &
+    CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_LOG(NKEY_LOG) = [CHARACTER(LEN=100) :: &
          'DUMMY=']
-    logical :: valvector_log(nkey_log) = (/&
-         .false./)
+    LOGICAL :: VALVECTOR_LOG(NKEY_LOG) = (/&
+         .FALSE./)
 
     !Start and stop characters
-    character(len=50), parameter :: startstop(2) = [character(len=50) :: &
+    CHARACTER(LEN=50), PARAMETER :: STARTSTOP(2) = [CHARACTER(LEN=50) :: &
          'MDCONTROL{', '}']
 
-    call parsing_kernel(keyvector_char,valvector_char&
-         ,keyvector_int,valvector_int,keyvector_re,valvector_re,&
-         keyvector_log,valvector_log,trim(filename),startstop)
+    CALL PARSING_KERNEL(KEYVECTOR_CHAR,VALVECTOR_CHAR&
+         ,KEYVECTOR_INT,VALVECTOR_INT,KEYVECTOR_RE,VALVECTOR_RE,&
+         KEYVECTOR_LOG,VALVECTOR_LOG,TRIM(FILENAME),STARTSTOP)
 
 
     !
     ! MAXITER = run this many MD time steps
     !
 
-    MAXITER = valvector_int(1)
+    MAXITER = VALVECTOR_INT(1)
 
     !
     ! UDNEIGH = update the neighbor lists every UDNEIGH time steps
     !
 
-    UDNEIGH = valvector_int(2)
+    UDNEIGH = VALVECTOR_INT(2)
     !   write(*,*)"UDNEIGH",UDNEIGH
     !
     ! DT = size of the time step in fs
     !
 
-    DT = valvector_re(1)
+    DT = VALVECTOR_RE(1)
     !   write(*,*)"DT",DT
     !
     ! TTARGET = temperature in K were initialize and aim for during NVT MD
@@ -563,25 +562,25 @@ contains
     !          = DEFAULT - use the same, default seed every time
     !
 
-    TTARGET = valvector_re(2); RNDIST = valvector_char(1); SEEDINIT = valvector_char(2)
+    TTARGET = VALVECTOR_RE(2); RNDIST = VALVECTOR_CHAR(1); SEEDINIT = VALVECTOR_CHAR(2)
     !   write(*,*)"TTARGET,RNDIST,SEEDINIT",TTARGET,RNDIST,SEEDINIT
     !
     ! DUMPFREQ: Write a dump file every DUMPFREQ time steps
     !
 
-    DUMPFREQ = valvector_int(3)
+    DUMPFREQ = VALVECTOR_INT(3)
     !   write(*,*)"DUMPFREQ",DUMPFREQ
     !
     ! RSFREQ: Write a restart file every RSFREQ time steps
     !
 
-    RSFREQ = valvector_int(4)
+    RSFREQ = VALVECTOR_INT(4)
     !   write(*,*)"RSFREQ",RSFREQ
     !
     ! WRTFREQ: Output energy and temperature every WRTFREQ time steps
     !
 
-    WRTFREQ = valvector_int(5)
+    WRTFREQ = VALVECTOR_INT(5)
     !   write(*,*)"WRTFREQ",WRTFREQ
     !
     ! TOINITTEMP: Whether or not we are going to initialize velocities
@@ -589,20 +588,20 @@ contains
     ! may not want to reinitialize the temperature
     !
 
-    TOINITTEMP = valvector_int(6)
+    TOINITTEMP = VALVECTOR_INT(6)
     !   write(*,*)"TOINITTEMP",TOINITTEMP
     !
     ! THERMPER: If we're running NVT, rescale velocities every THERMPER
     ! time steps.
     !
 
-    THERMPER = valvector_int(7)
+    THERMPER = VALVECTOR_INT(7)
     !   write(*,*)"THERMPER",THERMPER
     !
     ! THERMRUN: Thermalize over this many time steps when NVT is on
     !
 
-    THERMRUN = valvector_int(8)
+    THERMRUN = VALVECTOR_INT(8)
     !   write(*,*)"THERMRUN",THERMRUN
     !
     ! NVTON: 0 = running NVE MD, 1 = running NVT MD
@@ -610,22 +609,20 @@ contains
     ! how to rescale velocities
     !
 
-    NVTON = valvector_int(9); NPTON = valvector_int(10)
+    NVTON = VALVECTOR_INT(9); NPTON = VALVECTOR_INT(10)
     !   write(*,*)"NVTON,NPTON",NVTON,NPTON
-    AVEPER = valvector_int(11); FRICTION = valvector_re(3); SEEDTH = valvector_int(12)
+    AVEPER = VALVECTOR_INT(11); FRICTION = VALVECTOR_RE(3); SEEDTH = VALVECTOR_INT(12)
     !   write(*,*)"AVEPER,FRICTION,SEEDTH",AVEPER,FRICTION,SEEDTH
 
 
-    if (NVTON .eq. 1 .and. NPTON .eq. 1) then
-       write(6,*) "You can't have NVTON = 1 and NPTON = 1"
-       write(6,*) "STOP!!!"
-       stop
-    endif
+    IF (NVTON .EQ. 1 .AND. NPTON .EQ. 1) THEN
+       CALL ERRORS("latteparser_latte_mod","You can't have NVTON = 1 and NPTON = 1")
+    ENDIF
 
     ! PTARGET = Target pressure (in GPa) when running NPT
     ! NPTTYPE = ISO or ANISO
 
-    PTARGET = valvector_re(4); NPTTYPE = valvector_char(3)
+    PTARGET = VALVECTOR_RE(4); NPTTYPE = VALVECTOR_CHAR(3)
     !   write(*,*)"PTARGET,NPTTYPE",PTARGET,NPTTYPE
 
     !
@@ -634,88 +631,88 @@ contains
 
     ! On (1) or off (0)?
 
-    SHOCKON = valvector_int(13)
+    SHOCKON = VALVECTOR_INT(13)
     !   write(*,*)"SHOCKON",SHOCKON
     !
     ! SHOCKSTART = the MD iteration where we will start to compress
     ! the iteration when we stop depends on the size of the block and Us
     !
 
-    SHOCKSTART = valvector_int(14)
+    SHOCKSTART = VALVECTOR_INT(14)
     !   write(*,*)"SHOCKSTART",SHOCKSTART
     !
     ! SHOCKDIR is the cartensian direction (1 = X, 2 = Y, 3 = Z),
     ! parallel to which we're going to compress uniaxially
     !
 
-    SHOCKDIR = valvector_int(15)
+    SHOCKDIR = VALVECTOR_INT(15)
     !   write(*,*)"SHOCKDIR",SHOCKDIR
     !
     ! And finally, the particle and shock velocities
     ! IN UNITS OF METRES PER SECOND
     !
 
-    UPARTICLE = valvector_re(5); USHOCK = valvector_re(6); C0 = valvector_re(7)
+    UPARTICLE = VALVECTOR_RE(5); USHOCK = VALVECTOR_RE(6); C0 = VALVECTOR_RE(7)
     !   write(*,*)"UPARTICLE,USHOCK,C0",UPARTICLE,USHOCK,C0
     ! Adapt SCF on the fly?
 
-    MDADAPT = valvector_int(16)
+    MDADAPT = VALVECTOR_INT(16)
     !   write(*,*)"MDADAPT",MDADAPT
     ! Calculating Hugoniot points?
 
-    GETHUG = valvector_int(17)
+    GETHUG = VALVECTOR_INT(17)
 
-    RSLEVEL = valvector_int(18)
+    RSLEVEL = VALVECTOR_INT(18)
 
     !   write(*,*)"GETHUG",GETHUG
-    E0 = valvector_re(8); V0 = valvector_re(9); P0 = valvector_re(10)
+    E0 = VALVECTOR_RE(8); V0 = VALVECTOR_RE(9); P0 = VALVECTOR_RE(10)
     !   write(*,*)"E0,V0,P0",E0,V0,P0
 
-  end subroutine parse_md
+  END SUBROUTINE PARSE_MD
 
 
   !> The parser for K Mesh input variables.
   !!
-  subroutine parse_kmesh(filename)
+  SUBROUTINE PARSE_KMESH(FILENAME)
 
-    implicit none
-    integer, parameter :: nkey_char = 1, nkey_int = 3, nkey_re = 3, nkey_log = 1
-    character(len=*) :: filename
+    IMPLICIT NONE
+    INTEGER, PARAMETER :: NKEY_CHAR = 1, NKEY_INT = 3, NKEY_RE = 3, NKEY_LOG = 1
+    CHARACTER(LEN=*) :: FILENAME
 
     !Library of keywords with the respective defaults.
-    character(len=50), parameter :: keyvector_char(nkey_char) = [character(len=100) :: &
+    CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_CHAR(NKEY_CHAR) = [CHARACTER(LEN=100) :: &
          'DUMMY=']
-    character(len=100) :: valvector_char(nkey_char) = [character(len=100) :: &
+    CHARACTER(LEN=100) :: VALVECTOR_CHAR(NKEY_CHAR) = [CHARACTER(LEN=100) :: &
          'DUMMY']
 
-    character(len=50), parameter :: keyvector_int(nkey_int) = [character(len=50) :: &
+    CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_INT(NKEY_INT) = [CHARACTER(LEN=50) :: &
          'NKX=','NKY=','NKZ=']
-    integer :: valvector_int(nkey_int) = (/ &
+    INTEGER :: VALVECTOR_INT(NKEY_INT) = (/ &
          1,1,1/)
 
-    character(len=50), parameter :: keyvector_re(nkey_re) = [character(len=50) :: &
+    CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_RE(NKEY_RE) = [CHARACTER(LEN=50) :: &
          'KSHIFTX=','KSHIFTY=','KSHIFTZ=']
-    real(dp) :: valvector_re(nkey_re) = (/&
+    REAL(DP) :: VALVECTOR_RE(NKEY_RE) = (/&
          0.0,0.0,0.0/)
 
-    character(len=50), parameter :: keyvector_log(nkey_log) = [character(len=100) :: &
+    CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_LOG(NKEY_LOG) = [CHARACTER(LEN=100) :: &
          'DUMMY=']
-    logical :: valvector_log(nkey_log) = (/&
-         .false./)
+    LOGICAL :: VALVECTOR_LOG(NKEY_LOG) = (/&
+         .FALSE./)
 
     !Start and stop characters
-    character(len=50), parameter :: startstop(2) = [character(len=50) :: &
+    CHARACTER(LEN=50), PARAMETER :: STARTSTOP(2) = [CHARACTER(LEN=50) :: &
          'KMESH{', '}']
 
-    call parsing_kernel(keyvector_char,valvector_char&
-         ,keyvector_int,valvector_int,keyvector_re,valvector_re,&
-         keyvector_log,valvector_log,trim(filename),startstop)
+    CALL PARSING_KERNEL(KEYVECTOR_CHAR,VALVECTOR_CHAR&
+         ,KEYVECTOR_INT,VALVECTOR_INT,KEYVECTOR_RE,VALVECTOR_RE,&
+         KEYVECTOR_LOG,VALVECTOR_LOG,TRIM(FILENAME),STARTSTOP)
 
-      NKX= valvector_int(1); NKY= valvector_int(2); NKZ=valvector_int(3)
-      KSHIFT(1)= valvector_re(1); KSHIFT(2)= valvector_re(2); KSHIFT(3)= valvector_re(3)
-
-
-  end subroutine parse_kmesh
+    NKX= VALVECTOR_INT(1); NKY= VALVECTOR_INT(2); NKZ=VALVECTOR_INT(3)
+    KSHIFT(1)= VALVECTOR_RE(1); KSHIFT(2)= VALVECTOR_RE(2); KSHIFT(3)= VALVECTOR_RE(3)
 
 
-end module latteparser_latte_mod
+  END SUBROUTINE PARSE_KMESH
+
+
+END MODULE LATTEPARSER_LATTE_MOD

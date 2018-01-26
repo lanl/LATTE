@@ -34,11 +34,11 @@ SUBROUTINE GETHDIM
   DELTADIM = 0
 
   IF (RESTART .EQ. 0) THEN
-     
+
      HDIM = 0
 
      DO I = 1, NATS
-        
+
         SELECT CASE(BASIS(ELEMPOINTER(I)))
 
         CASE("s")
@@ -74,7 +74,7 @@ SUBROUTINE GETHDIM
         END SELECT
 
         HDIM = HDIM + NUMORB
-        
+
      ENDDO
 
   ELSEIF (RESTART .EQ. 1) THEN
@@ -98,11 +98,11 @@ SUBROUTINE GETHDIM
   ELSE ! k-space
 
      ALLOCATE(HK(HDIM, HDIM, NKTOT), HKDIAG(HDIM, NKTOT))
-          
+
   ENDIF
 
   ! If we're using a non-orthogonal basis:
-  
+
   IF (BASISTYPE .EQ. "NONORTHO") THEN
      IF (KON .EQ. 0) THEN
         ALLOCATE(H0(HDIM, HDIM))
@@ -135,7 +135,7 @@ SUBROUTINE GETHDIM
      ALLOCATE(HUP(HDIM, HDIM), HDOWN(HDIM, HDIM))
      ALLOCATE(RHOUP(HDIM, HDIM), RHODOWN(HDIM, HDIM))
      ALLOCATE(H2VECT(HDIM))
-     
+
      HUP = ZERO
      HDOWN = ZERO
      RHOUP = ZERO
@@ -188,7 +188,7 @@ SUBROUTINE GETHDIM
         END SELECT
 
         DELTADIM = DELTADIM + NUMORB
-              
+
      ENDDO
 
      ! This array is required when we calculate Mulliken spin densities

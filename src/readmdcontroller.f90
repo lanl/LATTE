@@ -22,7 +22,7 @@
 SUBROUTINE READMDCONTROLLER
 
   USE CONSTANTS_MOD
-  USE SETUPARRAY  
+  USE SETUPARRAY
   USE MDARRAY
   USE NEBLISTARRAY
 
@@ -40,7 +40,7 @@ SUBROUTINE READMDCONTROLLER
 
   !
   ! UDNEIGH = update the neighbor lists every UDNEIGH time steps
-  ! 
+  !
 
   READ(15,*) HD, UDNEIGH
 
@@ -58,7 +58,7 @@ SUBROUTINE READMDCONTROLLER
   !          = RANDOM - seed changes every time
   !          = DEFAULT - use the same, default seed every time
   !
-  
+
   READ(15,*) HD, TTARGET, HD, RNDIST, HD, SEEDINIT
 
   !
@@ -72,7 +72,7 @@ SUBROUTINE READMDCONTROLLER
   !
 
   READ(15,*) HD, RSFREQ
-  
+
   !
   ! WRTFREQ: Output energy and temperature every WRTFREQ time steps
   !
@@ -88,7 +88,7 @@ SUBROUTINE READMDCONTROLLER
   READ(15,*) HD, TOINITTEMP
 
   !
-  ! THERMPER: If we're running NVT, rescale velocities every THERMPER 
+  ! THERMPER: If we're running NVT, rescale velocities every THERMPER
   ! time steps.
   !
 
@@ -110,9 +110,7 @@ SUBROUTINE READMDCONTROLLER
        HD, SEEDTH
 
   IF (NVTON .EQ. 1 .AND. NPTON .EQ. 1) THEN
-     WRITE(6,*) "You can't have NVTON = 1 and NPTON = 1"
-     WRITE(6,*) "STOP!!!"
-     STOP
+     CALL ERRORS("readmdcontroller","You can't have NVTON = 1 and NPTON = 1")
   ENDIF
 
   ! PTARGET = Target pressure (in GPa) when running NPT
@@ -120,35 +118,35 @@ SUBROUTINE READMDCONTROLLER
 
   READ(15,*) HD, PTARGET, HD, NPTTYPE
 
-  ! 
+  !
   ! The following are for the Hugoniostat
   !
 
   ! On (1) or off (0)?
 
   READ(15,*) HD, SHOCKON
-  
+
   !
   ! SHOCKSTART = the MD iteration where we will start to compress
   ! the iteration when we stop depends on the size of the block and Us
   !
 
   READ(15,*) HD, SHOCKSTART
-  
+
   !
-  ! SHOCKDIR is the cartensian direction (1 = X, 2 = Y, 3 = Z), 
+  ! SHOCKDIR is the cartensian direction (1 = X, 2 = Y, 3 = Z),
   ! parallel to which we're going to compress uniaxially
   !
 
   READ(15,*) HD, SHOCKDIR
 
   !
-  ! And finally, the particle and shock velocities 
+  ! And finally, the particle and shock velocities
   ! IN UNITS OF METRES PER SECOND
   !
 
   READ(15,*) HD, UPARTICLE, HD, USHOCK, HD, C0
-  
+
   ! Adapt SCF on the fly?
 
   READ(15,*) HD, MDADAPT
@@ -156,7 +154,7 @@ SUBROUTINE READMDCONTROLLER
   ! Calculating Hugoniot points?
 
   READ(15,*) HD, GETHUG, HD, E0, HD, V0, HD, P0
-  
+
 
   CLOSE(15)
 

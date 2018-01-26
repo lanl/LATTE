@@ -62,136 +62,136 @@ SUBROUTINE KBLDNEWH
   A1A2XA3 = BOX(1,1)*B1(1) + BOX(1,2)*B1(2) + BOX(1,3)*B1(3)
 
   ! B1 = (A2 X A3)/(A1.(A2 X A3))
-  
+
   B1 = B1/A1A2XA3
 
   ! B2 = (A3 x A1)/(A1(A2 X A3))
-  
+
   B2(1) = (BOX(3,2)*BOX(1,3) - BOX(1,2)*BOX(3,3))/A1A2XA3
   B2(2) = (BOX(1,1)*BOX(3,3) - BOX(3,1)*BOX(1,3))/A1A2XA3
   B2(3) = (BOX(3,1)*BOX(1,2) - BOX(1,1)*BOX(3,2))/A1A2XA3
 
   ! B3 = (A1 x A2)/(A1(A2 X A3))
-  
+
   B3(1) = (BOX(1,2)*BOX(2,3) - BOX(2,2)*BOX(1,3))/A1A2XA3
   B3(2) = (BOX(2,1)*BOX(1,3) - BOX(1,1)*BOX(2,3))/A1A2XA3
   B3(3) = (BOX(1,1)*BOX(2,2) - BOX(2,1)*BOX(1,2))/A1A2XA3
-  
+
   INDEX = 0
 
   ! Build diagonal elements
   DO I = 1, NATS
 
      SELECT CASE(BASIS(ELEMPOINTER(I))) 
-        
+
      CASE("s")
-        
+
         INDEX = INDEX + 1           
         HK(INDEX, INDEX, 1) = CMPLX(HES(ELEMPOINTER(I)))
-        
+
      CASE("p")
-        
+
         DO SUBI = 1, 3
            INDEX = INDEX + 1
            HK(INDEX,INDEX, 1) = CMPLX(HEP(ELEMPOINTER(I)))
         ENDDO
-        
+
      CASE("d")
-        
+
         DO SUBI = 1, 5              
            INDEX = INDEX + 1
            HK(INDEX,INDEX, 1) = CMPLX(HED(ELEMPOINTER(I)))
         ENDDO
-        
+
      CASE("f")
-        
+
         DO SUBI = 1, 7
            INDEX = INDEX + 1
            HK(INDEX,INDEX, 1) = CMPLX(HEF(ELEMPOINTER(I)))
         ENDDO
-        
+
      CASE("sp")
-        
+
         DO SUBI = 1, 4
-           
+
            INDEX = INDEX + 1
            IF (SUBI .EQ. 1) THEN
               HK(INDEX,INDEX, 1) = CMPLX(HES(ELEMPOINTER(I)))
            ELSE
               HK(INDEX,INDEX, 1) = CMPLX(HEP(ELEMPOINTER(I)))
            ENDIF
-           
+
         ENDDO
-        
+
      CASE("sd")
-        
+
         DO SUBI = 1, 6
-           
+
            INDEX = INDEX + 1
            IF (SUBI .EQ. 1) THEN
               HK(INDEX,INDEX, 1) = CMPLX(HES(ELEMPOINTER(I)))
            ELSE
               HK(INDEX,INDEX, 1) = CMPLX(HED(ELEMPOINTER(I)))
            ENDIF
-           
+
         ENDDO
-        
+
      CASE("sf")
-        
+
         DO SUBI = 1, 8
-           
+
            INDEX = INDEX + 1
            IF (SUBI .EQ. 1) THEN
               HK(INDEX,INDEX, 1) = CMPLX(HES(ELEMPOINTER(I)))
            ELSE
               HK(INDEX,INDEX, 1) = CMPLX(HEF(ELEMPOINTER(I)))
            ENDIF
-           
+
         ENDDO
-        
+
      CASE("pd")
-        
+
         DO SUBI = 1, 8
-           
+
            INDEX = INDEX + 1
            IF (SUBI .LE. 3) THEN
               HK(INDEX,INDEX, 1) = CMPLX(HEP(ELEMPOINTER(I)))
            ELSE
               HK(INDEX,INDEX, 1) = CMPLX(HED(ELEMPOINTER(I)))
            ENDIF
-           
+
         ENDDO
-        
+
      CASE("pf")
-        
+
         DO SUBI = 1, 10
-           
+
            INDEX = INDEX + 1
            IF (SUBI .LE. 3) THEN
               HK(INDEX,INDEX, 1) = CMPLX(HEP(ELEMPOINTER(I)))
            ELSE
               HK(INDEX,INDEX, 1) = CMPLX(HEF(ELEMPOINTER(I)))
            ENDIF
-           
+
         ENDDO
-        
+
      CASE("df")
-        
+
         DO SUBI = 1, 12
-              
+
            INDEX = INDEX + 1
            IF (SUBI .LE. 5) THEN
               HK(INDEX,INDEX, 1) = CMPLX(HED(ELEMPOINTER(I)))
            ELSE
               HK(INDEX,INDEX, 1) = CMPLX(HEF(ELEMPOINTER(I)))
            ENDIF
-           
+
         ENDDO
-        
+
      CASE("spd")
-        
+
         DO SUBI = 1, 9
-           
+
            INDEX = INDEX + 1
            IF (SUBI .EQ. 1) THEN
               HK(INDEX,INDEX, 1) = CMPLX(HES(ELEMPOINTER(I)))
@@ -200,13 +200,13 @@ SUBROUTINE KBLDNEWH
            ELSE
               HK(INDEX,INDEX, 1) = CMPLX(HED(ELEMPOINTER(I)))
            ENDIF
-           
+
         ENDDO
-        
+
      CASE("spf")
-        
+
         DO SUBI = 1, 11
-           
+
            INDEX = INDEX + 1
            IF (SUBI .EQ. 1) THEN
               HK(INDEX,INDEX, 1) = CMPLX(HES(ELEMPOINTER(I)))
@@ -215,13 +215,13 @@ SUBROUTINE KBLDNEWH
            ELSE
               HK(INDEX,INDEX, 1) = CMPLX(HEF(ELEMPOINTER(I)))
            ENDIF
-           
+
         ENDDO
-        
+
      CASE("sdf")
-        
+
         DO SUBI = 1, 13
-           
+
            INDEX = INDEX + 1
            IF (SUBI .EQ. 1) THEN
               HK(INDEX,INDEX, 1) = CMPLX(HES(ELEMPOINTER(I)))
@@ -230,14 +230,14 @@ SUBROUTINE KBLDNEWH
            ELSE
               HK(INDEX,INDEX, 1) = CMPLX(HEF(ELEMPOINTER(I)))
            ENDIF
-           
+
         ENDDO
-        
-           
+
+
      CASE("pdf")
-        
+
         DO SUBI = 1, 15
-           
+
            INDEX = INDEX + 1
            IF (SUBI .LE. 3) THEN
               HK(INDEX,INDEX, 1) = CMPLX(HEP(ELEMPOINTER(I)))
@@ -246,13 +246,13 @@ SUBROUTINE KBLDNEWH
            ELSE
               HK(INDEX,INDEX, 1) = CMPLX(HEF(ELEMPOINTER(I)))
            ENDIF
-           
+
         ENDDO
-        
+
      CASE("spdf") 
-        
+
         DO SUBI = 1, 16
-           
+
            INDEX = INDEX + 1              
            IF (SUBI .EQ. 1) THEN                       
               HK(INDEX, INDEX, 1) = CMPLX(HES(ELEMPOINTER(I)))
@@ -265,11 +265,11 @@ SUBROUTINE KBLDNEWH
            ELSE
               HK(INDEX, INDEX, 1) = CMPLX(HEF(ELEMPOINTER(I)))
            ENDIF
-           
+
         ENDDO
-        
+
      END SELECT
-     
+
   ENDDO
 
   DO I = 2, NKTOT
@@ -277,7 +277,7 @@ SUBROUTINE KBLDNEWH
         HK(J,J,I) = HK(J,J,1)
      ENDDO
   ENDDO
-  
+
   ! We assign the diagonal elements in ADDQDEP
 
 
@@ -297,23 +297,23 @@ SUBROUTINE KBLDNEWH
        PI*(ONE - REAL(NKY))/(REAL(NKY))*B2 + &
        PI*(ONE - REAL(NKZ))/(REAL(NKZ))*B3 - PI*KSHIFT
 
-!$OMP PARALLEL DO DEFAULT (NONE) & 
-!$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &    
-!$OMP SHARED(CR, BOX, B1, B2, B3, NOINT, ATELE, ELE1, ELE2, HK, SK) &           
-!$OMP SHARED(BOND, OVERL, MATINDLIST, BASISTYPE, K0, NKX, NKY, NKZ) &
-!$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &
-!$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP, PHI, ALPHA, BETA, COSBETA) &
-!$OMP PRIVATE(LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET) &        
-!$OMP PRIVATE(BLOCH, KDOTL, KPOINT, KCOUNT, KHTMP, KSTMP)&
-!$OMP PRIVATE(RCUTTB, IBRA, IKET, AMMBRA, WIGLBRAMBRA, ANGFACTOR, MP) 
+  !$OMP PARALLEL DO DEFAULT (NONE) & 
+  !$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &    
+  !$OMP SHARED(CR, BOX, B1, B2, B3, NOINT, ATELE, ELE1, ELE2, HK, SK) &           
+  !$OMP SHARED(BOND, OVERL, MATINDLIST, BASISTYPE, K0, NKX, NKY, NKZ) &
+  !$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &
+  !$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP, PHI, ALPHA, BETA, COSBETA) &
+  !$OMP PRIVATE(LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET) &        
+  !$OMP PRIVATE(BLOCH, KDOTL, KPOINT, KCOUNT, KHTMP, KSTMP)&
+  !$OMP PRIVATE(RCUTTB, IBRA, IKET, AMMBRA, WIGLBRAMBRA, ANGFACTOR, MP) 
 !!$OMP REDUCTION(+:HK)
 
   DO I = 1, NATS
-     
+
      ! Build the lists of orbitals on each atom
-     
+
      SELECT CASE(BASIS(ELEMPOINTER(I)))
-        
+
      CASE("s")
         BASISI(1) = 0
         BASISI(2) = -1
@@ -377,52 +377,52 @@ SUBROUTINE KBLDNEWH
         BASISI(4) = 3
         BASISI(5) = -1
      END SELECT
-     
+
      INDI = MATINDLIST(I)
-     
+
      ! open loop over neighbors J of atom I
      DO NEWJ = 1, TOTNEBTB(I)
-        
+
         J = NEBTB(1, NEWJ, I)
-        
+
         PBCI = NEBTB(2, NEWJ, I)
         PBCJ = NEBTB(3, NEWJ, I)
         PBCK = NEBTB(4, NEWJ, I)
 
         RIJ(1) = CR(1,J) + REAL(PBCI)*BOX(1,1) + REAL(PBCJ)*BOX(2,1) + &
              REAL(PBCK)*BOX(3,1) - CR(1,I)
-        
+
         RIJ(2) = CR(2,J) + REAL(PBCI)*BOX(1,2) + REAL(PBCJ)*BOX(2,2) + &
              REAL(PBCK)*BOX(3,2) - CR(2,I)
-        
+
         RIJ(3) = CR(3,J) + REAL(PBCI)*BOX(1,3) + REAL(PBCJ)*BOX(2,3) + &
              REAL(PBCK)*BOX(3,3) - CR(3,I)
-        
+
         MAGR2 = RIJ(1)*RIJ(1) + RIJ(2)*RIJ(2) + RIJ(3)*RIJ(3)
-        
+
         RCUTTB = ZERO
-        
+
         DO K = 1, NOINT
-           
+
            IF ( (ATELE(I) .EQ. ELE1(K) .AND. &
                 ATELE(J) .EQ. ELE2(K)) .OR. &
                 (ATELE(J) .EQ. ELE1(K) .AND. &
                 ATELE(I) .EQ. ELE2(K) )) THEN
-              
+
               IF (BOND(8,K) .GT. RCUTTB ) RCUTTB = BOND(8,K)
-              
+
               IF (BASISTYPE .EQ. "NONORTHO") THEN
                  IF (OVERL(8,K) .GT. RCUTTB ) RCUTTB = OVERL(8,K)
               ENDIF
-                       
+
            ENDIF
-           
+
         ENDDO
-        
+
         IF (MAGR2 .LT. RCUTTB*RCUTTB) THEN
-           
+
            MAGR = SQRT(MAGR2)
-           
+
            SELECT CASE(BASIS(ELEMPOINTER(J)))
            CASE("s")
               BASISJ(1) = 0
@@ -487,14 +487,14 @@ SUBROUTINE KBLDNEWH
               BASISJ(4) = 3
               BASISJ(5) = -1
            END SELECT
-           
+
            INDJ = MATINDLIST(J)
-           
+
            MAGRP = SQRT(RIJ(1) * RIJ(1) + RIJ(2) * RIJ(2))
-           
+
            ! transform to system in which z-axis is aligned with RIJ,
            IF (ABS(RIJ(1)) .GT. 1.0E-12) THEN
-              
+
               IF (RIJ(1) .GT. ZERO .AND. RIJ(2) .GE. ZERO) THEN
                  PHI = ZERO
               ELSEIF (RIJ(1) .GT. ZERO .AND. RIJ(2) .LT. ZERO) THEN
@@ -503,71 +503,71 @@ SUBROUTINE KBLDNEWH
                  PHI = PI
               ENDIF
               ALPHA = ATAN(RIJ(2) / RIJ(1)) + PHI
-              
+
            ELSEIF (ABS(RIJ(2)) .GT. 1.0E-12) THEN
-              
+
               IF (RIJ(2) .GT. 1.0E-12) THEN
                  ALPHA = PI / TWO
               ELSE
                  ALPHA = THREE * PI / TWO
               ENDIF
-              
+
            ELSE
 
               ! pathological case: beta=0 and alpha undefined, but 
               ! this doesn't matter for matrix elements
-              
+
               ALPHA = ZERO
-                       
+
            ENDIF
-           
+
            COSBETA = RIJ(3)/MAGR
            BETA = ACOS( RIJ(3) / MAGR )
-           
+
            ! Build matrix elements using eqns (1)-(9) in PRB 72 165107
-           
+
            ! The loops over LBRA and LKET need to take into account
            ! the orbitals assigned to each atom, e.g., sd rather than
            ! spd...
-           
+
            IBRA = INDI + 1
-           
+
            LBRAINC = 1
            DO WHILE (BASISI(LBRAINC) .NE. -1)
-              
+
               LBRA = BASISI(LBRAINC)
               LBRAINC = LBRAINC + 1
-              
+
               DO MBRA = -LBRA, LBRA
-                 
+
                  ! We can calculate these two outside the 
                  ! MKET loop...
-                 
+
                  AMMBRA = AM(MBRA, ALPHA)
                  WIGLBRAMBRA = WIGNERD(LBRA, ABS(MBRA), 0, COSBETA)
-                 
+
                  IKET = INDJ + 1
-                 
+
                  LKETINC = 1
                  DO WHILE (BASISJ(LKETINC) .NE. -1)
-                    
+
                     LKET = BASISJ(LKETINC)
                     LKETINC = LKETINC + 1
-                    
+
                     DO MKET = -LKET, LKET
-                       
+
                        ! This is the sigma bonds (mp = 0)
-                       
+
                        ! Hamiltonian build
-                       
+
                        ! Pre-compute the angular part so we can use it
                        ! again later if we're building the S matrix too
-                       
+
                        ANGFACTOR = TWO * AMMBRA * &
                             AM(MKET, ALPHA) * &
                             WIGLBRAMBRA * & 
                             WIGNERD(LKET, ABS(MKET), 0, COSBETA)
-                       
+
                        KHTMP = CMPLX(ANGFACTOR * & 
                             UNIVSCALE(I, J, LBRA, LKET, &
                             0, MAGR, "H"))
@@ -579,7 +579,7 @@ SUBROUTINE KBLDNEWH
                        ENDIF
 
                        KCOUNT = 0
-                       
+
                        !Loop over k-points
 
                        DO KX = 1, NKX
@@ -591,14 +591,14 @@ SUBROUTINE KBLDNEWH
                                 KPOINT = TWO*PI*(REAL(KX-1)*B1/REAL(NKX) + &
                                      REAL(KY-1)*B2/REAL(NKY) + &
                                      REAL(KZ-1)*B3/REAL(NKZ)) + K0
-                                
+
                                 KCOUNT = KCOUNT+1
-                                
+
                                 KDOTL = KPOINT(1)*RIJ(1) + KPOINT(2)*RIJ(2) + &
                                      KPOINT(3)*RIJ(3)
-                                
+
                                 BLOCH = EXP(CMPLX(ZERO,KDOTL))
-                                
+
                                 HK(IBRA, IKET, KCOUNT) = &
                                      HK(IBRA, IKET, KCOUNT) + &
                                      BLOCH*KHTMP
@@ -612,22 +612,22 @@ SUBROUTINE KBLDNEWH
                              ENDDO
                           ENDDO
                        ENDDO
-                       
-                                                 
+
+
                        ! everything else
-                                   
+
                        DO MP = 1, MIN(LBRA, LKET)
-                          
+
                           ANGFACTOR = &
                                SLMMP(LBRA, MBRA, MP, ALPHA, COSBETA)* &
                                SLMMP(LKET, MKET, MP, ALPHA, COSBETA)+ &
                                TLMMP(LBRA, MBRA, MP, ALPHA, COSBETA)* &
                                TLMMP(LKET, MKET, MP, ALPHA, COSBETA)
-                          
+
                           KHTMP = CMPLX(ANGFACTOR * &
                                UNIVSCALE(I, J, LBRA, LKET, &
                                MP, MAGR, "H"))
-                          
+
                           IF (BASISTYPE .EQ. "NONORTHO") THEN
                              KSTMP = CMPLX(ANGFACTOR * &
                                   UNIVSCALE(I, J, LBRA, LKET, &
@@ -639,18 +639,18 @@ SUBROUTINE KBLDNEWH
                           DO KX = 1, NKX
                              DO KY = 1, NKY
                                 DO KZ = 1, NKZ
-                                   
+
                                    KPOINT = TWO*PI*(REAL(KX-1)*B1/REAL(NKX) + &
                                         REAL(KY-1)*B2/REAL(NKY) + &
                                         REAL(KZ-1)*B3/REAL(NKZ)) + K0
-                                   
+
                                    KCOUNT = KCOUNT+1
-                                   
+
                                    KDOTL = KPOINT(1)*RIJ(1) + &
                                         KPOINT(2)*RIJ(2) + KPOINT(3)*RIJ(3)
-                                   
+
                                    BLOCH = EXP(CMPLX(ZERO,KDOTL))
-                                   
+
                                    HK(IBRA, IKET, KCOUNT) = &
                                         HK(IBRA, IKET, KCOUNT) + &
                                         BLOCH*KHTMP
@@ -660,29 +660,29 @@ SUBROUTINE KBLDNEWH
                                            SK(IBRA, IKET, KCOUNT) + &
                                            BLOCH*KSTMP
                                    ENDIF
-                                   
+
                                 ENDDO
                              ENDDO
                           ENDDO
-                                   
+
                        ENDDO
-                          
+
                        IKET = IKET + 1
-                          
+
                     ENDDO
-                    
+
                  ENDDO
-                 
+
                  IBRA = IBRA + 1
-                 
+
               ENDDO
            ENDDO
         ENDIF
      ENDDO
   ENDDO
 
-!$OMP END PARALLEL DO
-  
+  !$OMP END PARALLEL DO
+
   ! Save the diagonal elements: it will help a lot when we add in the partial charges
 
   IF (BASISTYPE .EQ. "ORTHO") THEN
@@ -705,11 +705,11 @@ SUBROUTINE KBLDNEWH
 
 
   IF (DEBUGON .EQ. 1 ) THEN
-     
+
      OPEN(UNIT=31, STATUS="UNKNOWN", FILE="myS0_k_R.dat")
-     
+
      OPEN(UNIT=32, STATUS="UNKNOWN", FILE="myS0_k_I.dat")
-     
+
      DO K = 1, NKTOT
         WRITE(31,*) K
         WRITE(32,*) K
@@ -718,14 +718,14 @@ SUBROUTINE KBLDNEWH
            WRITE(32,10) (AIMAG(SK(I,J,K)), J = 1, HDIM)
         ENDDO
      ENDDO
-     
+
      CLOSE(31)
      CLOSE(32)
-     
+
 10   FORMAT(648F12.6)
 
   ENDIF
 
   RETURN
-  
+
 END SUBROUTINE KBLDNEWH

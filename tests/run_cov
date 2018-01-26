@@ -1,8 +1,9 @@
 #!/bin/bash
 # 
-set +e
-make clean
-set -e
-make; ./tests/run_test.sh
-cd src ; ../tests/run_gcov > coverage.dat
-../tests/get_cov; cd -
+#set +e
+#make clean
+#set -e
+#make; ./tests/run_test.sh
+cd src ; gcov -a -b -c  $(find . -name '*.gcda') | tee  coverage.dat
+cd -
+#../tests/get_cov; cd -

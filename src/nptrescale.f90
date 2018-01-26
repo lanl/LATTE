@@ -69,21 +69,21 @@ SUBROUTINE NPTRESCALE
   ! Change box dimensions depending on the average pressure
 
   IF (NPTTYPE .EQ. "ISO") THEN
-     
+
      DBOX = MIN(ABS(MYPRESS - PTARGET)*MAXDBOX, MAXDBOX)
-     
+
      DBOX = SIGN(DBOX, MYPRESS - PTARGET)
- 
+
      BOX = BOX * (ONE + DBOX)
-     
+
      CR = CR * (ONE + DBOX)
-   
+
   ELSE ! Allow the three vectors to change length independently
 
      DBOXX = MIN(ABS(MYPRESSX - PTARGET)*MAXDBOX, MAXDBOX)
      DBOXY = MIN(ABS(MYPRESSY - PTARGET)*MAXDBOX, MAXDBOX)
      DBOXZ = MIN(ABS(MYPRESSZ - PTARGET)*MAXDBOX, MAXDBOX)
-     
+
      DBOXX = SIGN(DBOXX, MYPRESSX - PTARGET)
      DBOXY = SIGN(DBOXY, MYPRESSY - PTARGET)
      DBOXZ = SIGN(DBOXZ, MYPRESSZ - PTARGET)
@@ -93,11 +93,11 @@ SUBROUTINE NPTRESCALE
      BOX(3,3) = BOX(3,3) * (ONE + DBOXZ) 
 
      DO I = 1, NATS
-        
+
         CR(1,I) = CR(1,I) * (ONE + DBOXX)
         CR(2,I) = CR(2,I) * (ONE + DBOXY)
         CR(3,I) = CR(3,I) * (ONE + DBOXZ)
-        
+
      ENDDO
 
   ENDIF
@@ -105,4 +105,4 @@ SUBROUTINE NPTRESCALE
   RETURN
 
 END SUBROUTINE NPTRESCALE
-        
+

@@ -24,15 +24,15 @@ MODULE MYPRECISION
   IMPLICIT NONE
   SAVE
 
-!
-! The precision for the calculation (double = 8, real = 4)
-! Selected during the preprocessing of myprecision.F
-!
- 
+  !
+  ! The precision for the calculation (double = 8, real = 4)
+  ! Selected during the preprocessing of myprecision.F
+  !
+
 #ifdef DOUBLEPREC	
-      INTEGER, PARAMETER :: LATTEPREC = 8
+  INTEGER, PARAMETER :: LATTEPREC = 8
 #elif defined(SINGLEPREC)
-      INTEGER, PARAMETER :: LATTEPREC = 4
+  INTEGER, PARAMETER :: LATTEPREC = 4
 #endif
 
   !

@@ -43,7 +43,7 @@ SUBROUTINE COULOMBEWALD
   ! LMAX, MMAX, NMAX computed during initialization
 
   DO L = LMIN, LMAX
-     
+
      IF (L .EQ. 0) THEN
         MMIN = 0
      ELSE
@@ -53,13 +53,13 @@ SUBROUTINE COULOMBEWALD
      L11 = REAL(L)*RECIPVECS(1,1)
      L12 = REAL(L)*RECIPVECS(1,2)
      L13 = REAL(L)*RECIPVECS(1,3)
-        
+
      DO M = MMIN, MMAX
 
         NMIN = -NMAX
 
         IF (L .EQ. 0 .AND. M .EQ. 0) NMIN = 1
-        
+
         M21 = L11 + REAL(M)*RECIPVECS(2,1)
         M22 = L12 + REAL(M)*RECIPVECS(2,2)
         M23 = L13 + REAL(M)*RECIPVECS(2,3)
@@ -87,7 +87,7 @@ SUBROUTINE COULOMBEWALD
               DO I = 1, NATS
 
                  DOT = K(1)*CR(1,I) + K(2)*CR(2,I) + K(3)*CR(3,I)
-                 
+
                  ! We re-use these in the next loop...
 
                  SINLIST(I) = SIN(DOT)
@@ -102,7 +102,7 @@ SUBROUTINE COULOMBEWALD
               SINSUM2 = SINSUM*SINSUM
 
               ! Add up energy and force contributions
-              
+
               KEPREF = KECONST*PREFACTOR
 
               DO I = 1, NATS
@@ -133,7 +133,7 @@ SUBROUTINE COULOMBEWALD
                    K(2)*K(3)
               VIRCOUL(6) = VIRCOUL(6) - KEPREF*PREVIR* &
                    K(3)*K(1)
-              
+
            ENDIF
 
         ENDDO
@@ -149,4 +149,4 @@ SUBROUTINE COULOMBEWALD
   RETURN
 
 END SUBROUTINE COULOMBEWALD
-              
+

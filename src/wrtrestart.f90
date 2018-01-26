@@ -36,7 +36,7 @@ SUBROUTINE WRTRESTART(ITER)
   INTEGER :: MYID, IERR
   COMPLEX(LATTEPREC) :: KSUM
   CHARACTER(LEN=100) :: FLNM
-  
+
   IF( VERBOSE < 0 ) RETURN
 
   IF (MDON .EQ. 1) THEN
@@ -58,7 +58,7 @@ SUBROUTINE WRTRESTART(ITER)
         ELSEIF (ITER .GE. 1000000 .AND. ITER .LT. 10000000) THEN
            WRITE(FLNM,'("Restarts/restartMD.", I7,".dat")') ITER
         ENDIF
-        
+
         OPEN (UNIT = 21, STATUS="UNKNOWN", FILE=FLNM)
         OPEN (UNIT = 19, STATUS="UNKNOWN", &
              FILE="Restarts/restartMD.last.dat")
@@ -124,7 +124,7 @@ SUBROUTINE WRTRESTART(ITER)
            ENDIF
 
         ENDIF
-        
+
         OPEN (UNIT = 21, STATUS="UNKNOWN", FILE=FLNM)
 
         IF (MYID .LT. 10) THEN
@@ -134,17 +134,17 @@ SUBROUTINE WRTRESTART(ITER)
         ELSEIF (MYID .GE. 100 .AND. MYID .LT. 1000) THEN
            WRITE(FLNM,'(I3,"/Restarts/restartMD.last.dat")') MYID
         ENDIF
-        
+
         OPEN (UNIT = 19, STATUS="UNKNOWN", FILE=FLNM)
-        
+
      ENDIF
-        
+
   ELSEIF (RELAXME .EQ. 1) THEN
 
      OPEN (UNIT = 21, STATUS="UNKNOWN", FILE="restartREL.dat")
-     
+
   ELSEIF (RELAXME .EQ. 0 .AND. MDON .EQ. 0) THEN
-     
+
      OPEN (UNIT = 21, STATUS="UNKNOWN", FILE="restart_singlepoint.dat")
 
   ENDIF
@@ -155,11 +155,11 @@ SUBROUTINE WRTRESTART(ITER)
   WRITE(21,*) BOX(2,1), BOX(2,2), BOX(2,3)
   WRITE(21,*) BOX(3,1), BOX(3,2), BOX(3,3)
 
-	
-!  WRITE(21,10) "Nats= ", NATS
-!  WRITE(21,11) "1.0"
-!  WRITE(21,12) BOX(1,1), BOX(2,1), BOX(1,2), BOX(2,2), &
-!       BOX(1,3), BOX(2,3)
+
+  !  WRITE(21,10) "Nats= ", NATS
+  !  WRITE(21,11) "1.0"
+  !  WRITE(21,12) BOX(1,1), BOX(2,1), BOX(1,2), BOX(2,2), &
+  !       BOX(1,3), BOX(2,3)
 
   DO I = 1, NATS
      WRITE(21,14) ATELE(I), CR(1,I), CR(2,I), CR(3,I)
@@ -168,7 +168,7 @@ SUBROUTINE WRTRESTART(ITER)
   WRITE(21,17) CHEMPOT
 
   IF (SPINON .EQ. 0) THEN
- 
+
      WRITE(21,18) HDIM
 
      IF (KON .EQ. 0) THEN
@@ -176,9 +176,9 @@ SUBROUTINE WRTRESTART(ITER)
         DO I = 1, HDIM
            WRITE(21,19) BO(I,I)/TWO, BO(I,I)/TWO
         ENDDO
-        
+
      ELSE
-        
+
         DO I = 1, HDIM
            KSUM = CMPLX(ZERO)
 
@@ -210,7 +210,7 @@ SUBROUTINE WRTRESTART(ITER)
   CLOSE(21)
 
   IF (MDON .EQ. 1) THEN
-     
+
      WRITE(19,16) "Iter= ", ITER
      WRITE(19,*) NATS
      WRITE(19,*) BOX(1,1), BOX(1,2), BOX(1,3)
@@ -220,55 +220,55 @@ SUBROUTINE WRTRESTART(ITER)
      DO I = 1, NATS
         WRITE(19,14) ATELE(I), CR(1,I), CR(2,I), CR(3,I)
      ENDDO
-     
+
      WRITE(19,17) CHEMPOT
-     
+
      IF (SPINON .EQ. 0) THEN
-        
+
         WRITE(19,18) HDIM
-        
+
         IF (KON .EQ. 0) THEN
 
            DO I = 1, HDIM
               WRITE(19,19) BO(I,I)/TWO, BO(I,I)/TWO
            ENDDO
-           
+
         ELSE
-           
+
            DO I = 1, HDIM
               KSUM = CMPLX(ZERO)
-              
+
               DO K = 1, NKTOT
                  KSUM = KSUM + KBO(I,I,K)
               ENDDO
-              
+
               WRITE(19,19) REAL(KSUM)/(TWO*REAL(NKTOT)), &
                    REAL(KSUM)/(TWO*REAL(NKTOT))
            ENDDO
-           
+
         ENDIF
-       
+
      ELSEIF (SPINON .EQ. 1) THEN
-        
+
         WRITE(19,18) HDIM
         DO I = 1, HDIM
            WRITE(19,19) RHOUP(I,I), RHODOWN(I,I)
         ENDDO
-        
+
      ENDIF
-     
+
      DO I = 1, NATS
         WRITE(19,15) V(1,I), V(2,I), V(3,I)
      ENDDO
-     
+
      CLOSE(19)
-     
+
   ENDIF
 
 10 FORMAT(A6,1X,I7)
 11 FORMAT(A3)
 12 FORMAT(6(E24.16,1X))
-!13 FORMAT(3(E24.16,1X),A2,1X,3(I4,1X))
+  !13 FORMAT(3(E24.16,1X),A2,1X,3(I4,1X))
 14 FORMAT(A2, 1X, 3G24.14)
 15 FORMAT(3(E24.16,1X))
 16 FORMAT(A6, 1X, I10)

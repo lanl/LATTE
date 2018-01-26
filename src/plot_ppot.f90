@@ -55,68 +55,68 @@ SUBROUTINE PLOTPPOT
   DC(1) = ONE
   DC(2) = ZERO
   DC(3) = ZERO
-  
+
   DO PPSEL = 1, NOPPS
-     
+
      R1 = POTCOEF(9, PPSEL)
      RCUT = POTCOEF(10,PPSEL)
-      
+
      DO II = 1, 1000
 
         MAGR = 0.7D0 + 4.3D0*REAL(II-1)/THOUSAND
 
-!        MAGR = MAGR - POTCOEF(6,PPSEL)
+        !        MAGR = MAGR - POTCOEF(6,PPSEL)
 
         MAGR2 = MAGR*MAGR
 
         IF (MAGR .LT. R1) THEN
 
            MAGR = MAGR - POTCOEF(6,PPSEL)
-           
-!           CALL DUNIVSCALE(MAGR, POTCOEF(:,PPSEL), DC, PHI, DPHI)
+
+           !           CALL DUNIVSCALE(MAGR, POTCOEF(:,PPSEL), DC, PHI, DPHI)
 
            POLYNOM = MAGR*(POTCOEF(2,PPSEL) + MAGR*(POTCOEF(3,PPSEL) + &
                 MAGR*(POTCOEF(4,PPSEL) + MAGR*POTCOEF(5,PPSEL))))
-           
+
            PHI = POTCOEF(1,PPSEL)*EXP(POLYNOM)
-           
+
            DPOLYNOM = POTCOEF(2,PPSEL) + MAGR*(TWO*POTCOEF(3,PPSEL) + &
                 MAGR*(THREE*POTCOEF(4,PPSEL) + &
                 FOUR*POTCOEF(5,PPSEL)*MAGR))
-           
+
            DPHI = -DC*PHI*DPOLYNOM           
-           
-!           EXPTMP = POTCOEF(6,PPSEL)*EXP(POTCOEF(7,PPSEL) * &
-!                (MAGR - POTCOEF(8,PPSEL)))
+
+           !           EXPTMP = POTCOEF(6,PPSEL)*EXP(POTCOEF(7,PPSEL) * &
+           !                (MAGR - POTCOEF(8,PPSEL)))
 
            EXPTMP = ZERO
 
            MYPAIRPOTS(II, PPSEL) = PHI + EXPTMP
 
-!           MYPAIRPOTS(II, PPSEL) =  PHI + EXPTMP - &
-!                POTCOEF(8,PPSEL)/(MAGR2*MAGR2*MAGR2)
+           !           MYPAIRPOTS(II, PPSEL) =  PHI + EXPTMP - &
+           !                POTCOEF(8,PPSEL)/(MAGR2*MAGR2*MAGR2)
 
-!           MYF(II,PPSEL) = -DPHI(1) + DC(1)*(POTCOEF(7,PPSEL)*EXPTMP + &
-!                SIX*POTCOEF(8,PPSEL)/(MAGR*MAGR2*MAGR2*MAGR2))
-           
+           !           MYF(II,PPSEL) = -DPHI(1) + DC(1)*(POTCOEF(7,PPSEL)*EXPTMP + &
+           !                SIX*POTCOEF(8,PPSEL)/(MAGR*MAGR2*MAGR2*MAGR2))
+
         ELSEIF (MAGR .GE. R1 .AND. MAGR .LT. RCUT) THEN
 
            MYR = MAGR - R1
 
            MYPAIRPOTS(II, PPSEL) = POTCOEF(11,PPSEL) + &
-                         MYR*(POTCOEF(12,PPSEL) + MYR*(POTCOEF(13,PPSEL) + &
-                         MYR*(POTCOEF(14,PPSEL) + MYR*(POTCOEF(15,PPSEL) + &
-                         MYR*POTCOEF(16,PPSEL)))))
+                MYR*(POTCOEF(12,PPSEL) + MYR*(POTCOEF(13,PPSEL) + &
+                MYR*(POTCOEF(14,PPSEL) + MYR*(POTCOEF(15,PPSEL) + &
+                MYR*POTCOEF(16,PPSEL)))))
 
            MYF(II,PPSEL) = POTCOEF(12,PPSEL) +  MYR*(TWO*POTCOEF(13,PPSEL) + &
-                         MYR*(THREE*POTCOEF(14,PPSEL) + &
-                         MYR*(FOUR*POTCOEF(15,PPSEL) + &
-                         MYR*FIVE*POTCOEF(16,PPSEL))))
+                MYR*(THREE*POTCOEF(14,PPSEL) + &
+                MYR*(FOUR*POTCOEF(15,PPSEL) + &
+                MYR*FIVE*POTCOEF(16,PPSEL))))
 
         ENDIF
-          
+
      ENDDO
-     
+
   ENDDO
 
   DO II = 1, 1000
@@ -134,10 +134,10 @@ SUBROUTINE PLOTPPOT
 
   CLOSE(56)
   CLOSE(57)
-  
+
   DEALLOCATE(MYPAIRPOTS, MYF)
-  
+
   RETURN
-  
+
 END SUBROUTINE PLOTPPOT
 

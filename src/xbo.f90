@@ -59,147 +59,147 @@ SUBROUTINE XBO(ITER)
   ! Required for the Fast-QMMD scheme                                                                  
 
   IF (QITER .EQ. 0) THEN
-    KAPPA_SCALE = MDMIX
+     KAPPA_SCALE = MDMIX
   ELSE
-    KAPPA_SCALE = ONE
+     KAPPA_SCALE = ONE
   ENDIF
 
-  
+
   IF (ITER .EQ. 1) THEN
 
      IF (ELECTRO .EQ. 1) THEN
-        
+
         IF (XBODISON .EQ. 0) THEN
-           
+
            DO I = 1, NATS
               PNK(1,I) = DELTAQ(I)
               PNK(2,I) = PNK(1,I)
            ENDDO
-           
+
         ELSEIF (XBODISON .EQ. 1) THEN
-           
+
            DO I = 1, NATS
               PNK(1,I) = DELTAQ(I)
-              
+
               DO J = 2, XBODISORDER + 1
                  PNK(J,I) = PNK(J-1,I)
               ENDDO
-              
+
            ENDDO
-           
+
         ENDIF
-        
+
      ELSEIF (ELECTRO .EQ. 0) THEN
-        
+
         IF (XBODISON .EQ. 0) THEN
-           
+
            DO I = 1, NATS
               PNK(1,I) = LCNSHIFT(I)
               PNK(2,I) = PNK(1,I)
            ENDDO
-           
+
         ELSEIF (XBODISON .EQ. 1) THEN
-           
+
            DO I = 1, NATS
               PNK(1,I) = LCNSHIFT(I)
-              
+
               DO J = 2, XBODISORDER + 1
                  PNK(J,I) = PNK(J-1,I)
               ENDDO
-              
+
            ENDDO
-           
+
         ENDIF
-        
+
      ENDIF
-     
+
   ELSEIF (ITER .GT. 1) THEN
-     
+
      IF (XBODISON .EQ. 0) THEN
-        
+
         IF (ELECTRO .EQ. 0) THEN
-           
+
            DO I = 1, NATS
-              
+
               LCNSHIFT(I) = TWO*PNK(1,I) - PNK(2,I) + &
                    TWO*(LCNSHIFT(I) - PNK(1,I))
-              
+
               PNK(2,I) = PNK(1,I)
               PNK(1,I) = LCNSHIFT(I)
-              
+
            ENDDO
-           
+
         ELSEIF (ELECTRO .EQ. 1) THEN
-           
+
            DO I = 1, NATS
-              
+
               DELTAQ(I) = TWO*PNK(1,I) - PNK(2,I) + &
                    TWO*(DELTAQ(I) - PNK(1,I))
-              
+
               PNK(2,I) = PNK(1,I)
               PNK(1,I) = DELTAQ(I)
-              
+
            ENDDO
-           
+
         ENDIF
-        
+
      ELSEIF (XBODISON .EQ. 1) THEN
-        
+
         IF (ELECTRO .EQ. 0) THEN
-           
+
            DO I = 1, NATS
-              
+
               LCNSHIFT(I) =  TWO*PNK(1,I) - PNK(2,I) + &
                    KAPPA_SCALE*KAPPA_XBO*(LCNSHIFT(I) - PNK(1,I))
-              
+
               DO J = 1, XBODISORDER+1
-                 
+
                  LCNSHIFT(I) = LCNSHIFT(I) + ALPHA_XBO*CNK(J)*PNK(J,I)
-                 
+
               ENDDO
-              
+
               DO J = 1, XBODISORDER
-                 
+
                  PNK(XBODISORDER+2 - J,I) = PNK(XBODISORDER+1 - J,I)
-                 
+
               ENDDO
-              
+
               PNK(1,I) = LCNSHIFT(I)
-              
+
            ENDDO
-           
+
         ELSEIF (ELECTRO .EQ. 1) THEN
 
            DO I = 1, NATS
-             
-               DELTAQ(I) =  TWO*PNK(1,I) - PNK(2,I) + & 
-                    KAPPA_SCALE*KAPPA_XBO*(DELTAQ(I) - PNK(1,I))
-              
-               DO J = 1, XBODISORDER+1
-                 
-                  DELTAQ(I) = DELTAQ(I) + ALPHA_XBO*CNK(J)*PNK(J,I)
-                 
-               ENDDO
-              
-               DO J = 1, XBODISORDER
-                 
-                  PNK(XBODISORDER+2 - J,I) = PNK(XBODISORDER+1 - J,I)
-                 
-               ENDDO
-              
-               PNK(1,I) = DELTAQ(I)
-              
+
+              DELTAQ(I) =  TWO*PNK(1,I) - PNK(2,I) + & 
+                   KAPPA_SCALE*KAPPA_XBO*(DELTAQ(I) - PNK(1,I))
+
+              DO J = 1, XBODISORDER+1
+
+                 DELTAQ(I) = DELTAQ(I) + ALPHA_XBO*CNK(J)*PNK(J,I)
+
+              ENDDO
+
+              DO J = 1, XBODISORDER
+
+                 PNK(XBODISORDER+2 - J,I) = PNK(XBODISORDER+1 - J,I)
+
+              ENDDO
+
+              PNK(1,I) = DELTAQ(I)
+
            ENDDO
 
         ENDIF
-        
+
      ENDIF
-     
+
   ENDIF
-  
+
   RETURN
 
 END SUBROUTINE XBO
-  
 
-  
+
+

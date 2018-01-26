@@ -526,7 +526,7 @@ SUBROUTINE BLDNEWHS
                                WIGNERD(LKET, ABS(MKET), 0, COSBETA)
 
                           H(IBRA, IKET) = H(IBRA, IKET) + ANGFACTOR * &
-                               !                          H(IKET, IBRA) = H(IKET, IBRA) + ANGFACTOR * &
+                                !                          H(IKET, IBRA) = H(IKET, IBRA) + ANGFACTOR * &
                                UNIVSCALE(I, J, LBRA, LKET, 0, MAGR, "H")
 
                           ! Overlap matrix build

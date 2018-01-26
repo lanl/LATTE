@@ -20,7 +20,7 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SUBROUTINE TOTENG
-  
+
   USE CONSTANTS_MOD
   USE SETUPARRAY
   USE SPINARRAY
@@ -36,106 +36,106 @@ SUBROUTINE TOTENG
   TRRHOH = ZERO
   ZTRRHOH = CMPLX(ZERO,ZERO)
 
-!  IF (ELECTRO .EQ. 1) THEN
-     
-     IF (SPINON .EQ. 0) THEN
-        
-        IF (KON .EQ. 0) THEN
-           
-           DO I = 1, HDIM
-              DO J = 1, HDIM
-                 
-                 TRRHOH = TRRHOH + BO(J,I)*H(J,I)
-                 
-              ENDDO
-              
-              TRRHOH = TRRHOH - BOZERO(I)*H(I,I)
-              
-           ENDDO
-           
-        ELSE
-           
-           DO K = 1, NKTOT
-              
-              DO I = 1, HDIM
-                 DO J = 1, HDIM
-                    
-                    ZTRRHOH = ZTRRHOH + KBO(J,I,K)*(HK(I,J,K))
-                    
-                 ENDDO
-                 
-                 ZTRRHOH = ZTRRHOH - CMPLX(BOZERO(I))*HK(I,I,K)
-                 
-              ENDDO
-              
-           ENDDO
-           
-           TRRHOH = REAL(ZTRRHOH)/REAL(NKTOT)
-           
-        ENDIF
-        
-     ELSE
+  !  IF (ELECTRO .EQ. 1) THEN
 
-        !
-        ! This is everything: tr(rhoup - rhoupzero)*Hup + 
-        ! tr(rhodown - rhodownzero)*Hdown
-        !
-        ! Hup = H(Slater-Koster) + H(electrostatic) + H(spin)
-        ! Hdown = H(Slater-Koster) + H(electrostatic) - H(spin)
-        !
-        ! Thus, we're calculating Covalent (from SK) + electrostatic (from H1) +
-        ! spin (from H2) and we just need to add on the entropy and pairwise 
-        ! bits to get the total energy
-        !
-        
+  IF (SPINON .EQ. 0) THEN
+
+     IF (KON .EQ. 0) THEN
+
         DO I = 1, HDIM
            DO J = 1, HDIM
-              
-              TRRHOH = TRRHOH + (RHOUP(J,I) + RHODOWN(J,I))*H(J,I)
-              
+
+              TRRHOH = TRRHOH + BO(J,I)*H(J,I)
+
            ENDDO
-           
-           TRRHOH = TRRHOH - (RHOUPZERO(I) + RHODOWNZERO(I))*H(I,I)
-           
+
+           TRRHOH = TRRHOH - BOZERO(I)*H(I,I)
+
         ENDDO
-        
+
+     ELSE
+
+        DO K = 1, NKTOT
+
+           DO I = 1, HDIM
+              DO J = 1, HDIM
+
+                 ZTRRHOH = ZTRRHOH + KBO(J,I,K)*(HK(I,J,K))
+
+              ENDDO
+
+              ZTRRHOH = ZTRRHOH - CMPLX(BOZERO(I))*HK(I,I,K)
+
+           ENDDO
+
+        ENDDO
+
+        TRRHOH = REAL(ZTRRHOH)/REAL(NKTOT)
+
      ENDIF
 
-!  ELSE
+  ELSE
 
-!     IF (KON .EQ. 0) THEN
+     !
+     ! This is everything: tr(rhoup - rhoupzero)*Hup + 
+     ! tr(rhodown - rhodownzero)*Hdown
+     !
+     ! Hup = H(Slater-Koster) + H(electrostatic) + H(spin)
+     ! Hdown = H(Slater-Koster) + H(electrostatic) - H(spin)
+     !
+     ! Thus, we're calculating Covalent (from SK) + electrostatic (from H1) +
+     ! spin (from H2) and we just need to add on the entropy and pairwise 
+     ! bits to get the total energy
+     !
 
-!        DO I = 1, HDIM
-!           DO J = 1, HDIM!
-!
-!              TRRHOH = TRRHOH + BO(J,I)*H(J,I)
-!
-!           ENDDO
-!        ENDDO
+     DO I = 1, HDIM
+        DO J = 1, HDIM
 
-!     ELSE
+           TRRHOH = TRRHOH + (RHOUP(J,I) + RHODOWN(J,I))*H(J,I)
 
-!        DO K = 1, NKTOT
+        ENDDO
 
-!           DO I = 1, HDIM
-!              DO J = 1, HDIM
-                 
-!                 ZTRRHOH = ZTRRHOH + KBO(J,I,K)*HK(I,J,K)
-                 
-!              ENDDO
-!           ENDDO
-        
-!        ENDDO
+        TRRHOH = TRRHOH - (RHOUPZERO(I) + RHODOWNZERO(I))*H(I,I)
 
-!        TRRHOH = REAL(ZTRRHOH)/REAL(NKTOT)
-!     
-!     ENDIF
+     ENDDO
 
-!  ENDIF
-     
+  ENDIF
+
+  !  ELSE
+
+  !     IF (KON .EQ. 0) THEN
+
+  !        DO I = 1, HDIM
+  !           DO J = 1, HDIM!
+  !
+  !              TRRHOH = TRRHOH + BO(J,I)*H(J,I)
+  !
+  !           ENDDO
+  !        ENDDO
+
+  !     ELSE
+
+  !        DO K = 1, NKTOT
+
+  !           DO I = 1, HDIM
+  !              DO J = 1, HDIM
+
+  !                 ZTRRHOH = ZTRRHOH + KBO(J,I,K)*HK(I,J,K)
+
+  !              ENDDO
+  !           ENDDO
+
+  !        ENDDO
+
+  !        TRRHOH = REAL(ZTRRHOH)/REAL(NKTOT)
+  !     
+  !     ENDIF
+
+  !  ENDIF
+
   ! Check for something bad happening
 
 
   RETURN
-  
+
 END SUBROUTINE TOTENG

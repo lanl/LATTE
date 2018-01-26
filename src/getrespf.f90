@@ -23,7 +23,7 @@ SUBROUTINE GETRESPF
 
   ! Use our already computed eigenvalues and eigenvectors to compute
   ! the response function while enforcing LCN
-  
+
   USE CONSTANTS_MOD
   USE SETUPARRAY
   USE DIAGARRAY
@@ -40,32 +40,32 @@ SUBROUTINE GETRESPF
   RESPF = ZERO
 
   IF (KON .EQ. 0) THEN
-     
+
      DO I = 1, HDIM
-        
+
         IF (EVALS(I) .LE. CHEMPOT) THEN
-           
+
            DO J = I, HDIM
-              
+
               IF (EVALS(J) .GT. CHEMPOT .AND. ABS(EVALS(I)-EVALS(J)) .GT. 1.0D-4) THEN
-                 
+
                  DO K = 1, HDIM
-                    
+
                     RESPF(K) = RESPF(K) + &
                          TWO*EVECS(K,I)*EVECS(K,I)*EVECS(K,J)*EVECS(K,J)/ &
                          (EVALS(I) - EVALS(J))
-                    
+
                  ENDDO
-                 
+
               ENDIF
            ENDDO
-           
+
         ENDIF
-        
+
      ENDDO
 
   ELSE ! K-space integration now
-     
+
      DO KK = 1, NKTOT
 
         DO I = 1, HDIM
@@ -75,37 +75,37 @@ SUBROUTINE GETRESPF
               DO J = I, HDIM
 
                  IF (KEVALS(J,KK) .GT. CHEMPOT) THEN
-                    
+
                     DO K = 1, HDIM
-                       
+
                        RESPF(K) = RESPF(K) - &
                             (FOUR/(KEVALS(I,KK) - KEVALS(J,KK)))*&
                             REAL(CONJG(KEVECS(K,I,KK))*KEVECS(K,I,KK) &
                             *CONJG(KEVECS(K,J,KK))*KEVECS(K,J,KK))
-                           
-                       
+
+
                     ENDDO
-                    
+
                  ENDIF
               ENDDO
-              
+
            ENDIF
-           
+
         ENDDO
-        
+
      ENDDO
-     
+
      RESPF = RESPF/REAL(NKTOT)
 
   ENDIF
 
   RESPCHI = ZERO
   INDEX = 0
-  
+
   DO I = 1, NATS
-     
+
      SELECT CASE(BASIS(ELEMPOINTER(I)))
-        
+
      CASE("s")
         NUMORB = 1
      CASE("p")
@@ -137,24 +137,24 @@ SUBROUTINE GETRESPF
      CASE("spdf") 
         NUMORB = 16
      END SELECT
-     
+
      DO J = 1, NUMORB
         INDEX = INDEX + 1
         RESPCHI(I) = RESPCHI(I) + RESPF(INDEX)
      ENDDO
-     
+
      RESPCHI(I) = RESPCHI(I)/REAL(NUMORB)
-     
+
   ENDDO
 
-!  DO I = 1, NATS
-!     PRINT*, RESPCHI(I)
-!  ENDDO
+  !  DO I = 1, NATS
+  !     PRINT*, RESPCHI(I)
+  !  ENDDO
 
-  
+
   DEALLOCATE(RESPF)
-  
+
   RETURN
-  
+
 END SUBROUTINE GETRESPF
-   
+

@@ -41,11 +41,11 @@ SUBROUTINE INITRNG
 
 
   CALL RANDOM_SEED(SIZE = N)
-  
+
   ALLOCATE(SEED(N))
-  
+
   CALL SYSTEM_CLOCK(COUNT = CLOCK)
-  
+
   ! Adding MPI rank to the seed should make each rank use a different seed...
 
   IF (PARREP .EQ. 0) MYID = 0
@@ -53,9 +53,9 @@ SUBROUTINE INITRNG
   DO I = 1, N
      SEED(I) = CLOCK + 37*(I - 1) + MYID
   ENDDO
-  
+
   CALL RANDOM_SEED(PUT = SEED)
-     
+
   DEALLOCATE(SEED)
 
   RETURN

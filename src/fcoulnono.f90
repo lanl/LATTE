@@ -30,7 +30,7 @@ SUBROUTINE FCOULNONO
   USE SPINARRAY
   USE VIRIALARRAY
   USE MYPRECISION
-  
+
   IMPLICIT NONE
 
   INTEGER :: I, J, K, L, M, N, KK, INDI, INDJ
@@ -50,16 +50,16 @@ SUBROUTINE FCOULNONO
   FSCOUL = ZERO
   VIRSCOUL = ZERO
 
-!$OMP PARALLEL DO DEFAULT (NONE) &                                              
-!$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &                      
-!$OMP SHARED(CR, BOX, BO, RHOUP, RHODOWN, SPINON, NOINT, ATELE, ELE1, ELE2) &   
-!$OMP SHARED(BOND, OVERL, MATINDLIST, BASISTYPE) &                              
-!$OMP SHARED(HUBBARDU, DELTAQ, COULOMBV) &
-!$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &    
-!$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP2, MAGRP, PATH, PHI, ALPHA, BETA, COSBETA, FTMP) &
-!$OMP PRIVATE(DC, LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET, RHO) &           
-!$OMP PRIVATE(MYDFDA, MYDFDB, MYDFDR, RCUTTB) &                                 
-!$OMP REDUCTION(+:FSCOUL, VIRSCOUL)
+  !$OMP PARALLEL DO DEFAULT (NONE) &                                              
+  !$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &                      
+  !$OMP SHARED(CR, BOX, BO, RHOUP, RHODOWN, SPINON, NOINT, ATELE, ELE1, ELE2) &   
+  !$OMP SHARED(BOND, OVERL, MATINDLIST, BASISTYPE) &                              
+  !$OMP SHARED(HUBBARDU, DELTAQ, COULOMBV) &
+  !$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &    
+  !$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP2, MAGRP, PATH, PHI, ALPHA, BETA, COSBETA, FTMP) &
+  !$OMP PRIVATE(DC, LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET, RHO) &           
+  !$OMP PRIVATE(MYDFDA, MYDFDB, MYDFDR, RCUTTB) &                                 
+  !$OMP REDUCTION(+:FSCOUL, VIRSCOUL)
 
   DO I = 1, NATS
 
@@ -130,7 +130,7 @@ SUBROUTINE FCOULNONO
         BASISI(5) = -1
      END SELECT
 
-         INDI = MATINDLIST(I)
+     INDI = MATINDLIST(I)
 
      DO NEWJ = 1, TOTNEBTB(I)
 
@@ -150,7 +150,7 @@ SUBROUTINE FCOULNONO
 
         MAGR2 = RIJ(1)*RIJ(1) + RIJ(2)*RIJ(2) + RIJ(3)*RIJ(3)
 
-                RCUTTB = ZERO
+        RCUTTB = ZERO
         DO K = 1, NOINT
 
            IF ( (ATELE(I) .EQ. ELE1(K) .AND. &
@@ -238,12 +238,12 @@ SUBROUTINE FCOULNONO
               BASISJ(4) = 3
               BASISJ(5) = -1
            END SELECT
-           
+
            INDJ = MATINDLIST(J)
 
            MAGRP2 = RIJ(1)*RIJ(1) + RIJ(2)*RIJ(2)
            MAGRP = SQRT(MAGRP2)
-           
+
            ! transform to system in which z-axis is aligned with RIJ              
 
            PATH = .FALSE.
@@ -270,7 +270,7 @@ SUBROUTINE FCOULNONO
            COSBETA = RIJ(3)/MAGR
            BETA = ACOS(RIJ(3) / MAGR)
 
-                     DC = RIJ/MAGR
+           DC = RIJ/MAGR
 
            ! build forces using PRB 72 165107 eq. (12) - the sign of the          
            ! dfda contribution seems to be wrong, but gives the right             
@@ -329,7 +329,7 @@ SUBROUTINE FCOULNONO
 
                           FTMP(2) = FTMP(2) + RHO * &
                                (RIJ(1)/ MAGRP2 * MYDFDA)
-                          
+
                           !                                                       
                           ! d/d_beta                                              
                           !                                                       
@@ -345,7 +345,7 @@ SUBROUTINE FCOULNONO
                           FTMP(3) = FTMP(3) - RHO * &
                                (((ONE - ((RIJ(3) * RIJ(3)) / &
                                MAGR2)) / MAGRP) * MYDFDB)
-                          
+
                           !                                                       
                           ! d/dR                                                  
                           !                                                       
@@ -369,21 +369,21 @@ SUBROUTINE FCOULNONO
 
                           MYDFDB = DFDB(I, J, LBRA, LKET, &
                                MBRA, MKET, MAGR, ZERO, COSBETA, "S") / MAGR
-                          
+
                           FTMP(1) = FTMP(1) - RHO * (COSBETA * MYDFDB)
-                          
+
                           MYDFDB = DFDB(I, J, LBRA, LKET, &
                                MBRA, MKET, MAGR, PI/TWO, COSBETA, "S") / MAGR
-                          
+
                           FTMP(2) = FTMP(2) - RHO * (COSBETA * MYDFDB)
-                          
+
                           MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
                                MKET, MAGR, ZERO, COSBETA, "S")
-                          
+
                           FTMP(3) = FTMP(3) - RHO * COSBETA * MYDFDR
-                          
+
                        ENDIF
-                       
+
                     ENDDO
                  ENDDO
               ENDDO
@@ -392,35 +392,35 @@ SUBROUTINE FCOULNONO
            FTMP = FTMP * ( HUBBARDU(ELEMPOINTER(J))*DELTAQ(J) + COULOMBV(J) &
                 +HUBBARDU(ELEMPOINTER(I))*DELTAQ(I) + COULOMBV(I))
 
-           
+
            FSCOUL(1,I) = FSCOUL(1,I) + FTMP(1)
            FSCOUL(2,I) = FSCOUL(2,I) + FTMP(2)
            FSCOUL(3,I) = FSCOUL(3,I) + FTMP(3)
-           
+
            ! with the factor of 2...                                               
-           
+
            VIRSCOUL(1) = VIRSCOUL(1) + RIJ(1)*FTMP(1)
            VIRSCOUL(2) = VIRSCOUL(2) + RIJ(2)*FTMP(2)
            VIRSCOUL(3) = VIRSCOUL(3) + RIJ(3)*FTMP(3)
            VIRSCOUL(4) = VIRSCOUL(4) + RIJ(1)*FTMP(2)
            VIRSCOUL(5) = VIRSCOUL(5) + RIJ(2)*FTMP(3)
            VIRSCOUL(6) = VIRSCOUL(6) + RIJ(3)*FTMP(1)
-          
+
 
         ENDIF
      ENDDO
-        
+
   ENDDO
 
-!$OMP END PARALLEL DO
+  !$OMP END PARALLEL DO
 
   VIRSCOUL = VIRSCOUL/TWO
 
-!  DO I = 1, NATS
-!     WRITE(6,10) I, FSCOUL(1,I), FSCOUL(2,I), FSCOUL(3,I)
-!  ENDDO
+  !  DO I = 1, NATS
+  !     WRITE(6,10) I, FSCOUL(1,I), FSCOUL(2,I), FSCOUL(3,I)
+  !  ENDDO
 
-!10 FORMAT(I4, 3F12.6)
+  !10 FORMAT(I4, 3F12.6)
 
   RETURN
 

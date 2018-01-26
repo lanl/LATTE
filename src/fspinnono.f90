@@ -30,7 +30,7 @@ SUBROUTINE FSPINNONO
   USE SPINARRAY
   USE VIRIALARRAY
   USE MYPRECISION
-  
+
   IMPLICIT NONE
 
   INTEGER :: I, J, K, L, M, N, KK, INDI, INDJ
@@ -51,17 +51,17 @@ SUBROUTINE FSPINNONO
   FSSPIN = ZERO
   VIRSSPIN = ZERO
 
-!$OMP PARALLEL DO DEFAULT (NONE) &                                              
-!$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &                      
-!$OMP SHARED(CR, BOX, BO, RHOUP, RHODOWN, SPINON, NOINT, ATELE, ELE1, ELE2) &   
-!$OMP SHARED(BOND, OVERL, MATINDLIST, BASISTYPE) &                              
-!$OMP SHARED(DELTASPIN, WSS, WPP, WDD, WFF, SPININDLIST) &
-!$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &    
-!$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP2, MAGRP, PATH, PHI, ALPHA, BETA, COSBETA, FTMP) &
-!$OMP PRIVATE(DC, LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET, RHO) &           
-!$OMP PRIVATE(MYDFDA, MYDFDB, MYDFDR, RCUTTB, WSPINI, WSPINJ) &
-!$OMP PRIVATE(SPININDI, SPININDJ) &
-!$OMP REDUCTION(+:FSSPIN, VIRSSPIN)
+  !$OMP PARALLEL DO DEFAULT (NONE) &                                              
+  !$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &                      
+  !$OMP SHARED(CR, BOX, BO, RHOUP, RHODOWN, SPINON, NOINT, ATELE, ELE1, ELE2) &   
+  !$OMP SHARED(BOND, OVERL, MATINDLIST, BASISTYPE) &                              
+  !$OMP SHARED(DELTASPIN, WSS, WPP, WDD, WFF, SPININDLIST) &
+  !$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &    
+  !$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP2, MAGRP, PATH, PHI, ALPHA, BETA, COSBETA, FTMP) &
+  !$OMP PRIVATE(DC, LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET, RHO) &           
+  !$OMP PRIVATE(MYDFDA, MYDFDB, MYDFDR, RCUTTB, WSPINI, WSPINJ) &
+  !$OMP PRIVATE(SPININDI, SPININDJ) &
+  !$OMP REDUCTION(+:FSSPIN, VIRSSPIN)
 
   DO I = 1, NATS
 
@@ -241,7 +241,7 @@ SUBROUTINE FSPINNONO
               BASISJ(4) = 3
               BASISJ(5) = -1
            END SELECT
-           
+
            INDJ = MATINDLIST(J)
            SPININDJ = SPININDLIST(J)
 
@@ -288,7 +288,7 @@ SUBROUTINE FSPINNONO
 
               LBRA = BASISI(LBRAINC)
               LBRAINC = LBRAINC + 1
-              
+
               SELECT CASE(LBRA)
               CASE(0)
                  WSPINI = WSS(ELEMPOINTER(I))
@@ -312,7 +312,7 @@ SUBROUTINE FSPINNONO
 
                     LKET = BASISJ(LKETINC)
                     LKETINC = LKETINC + 1
-                                      
+
                     SELECT CASE(LKET)
                     CASE(0)
                        WSPINJ = WSS(ELEMPOINTER(J))
@@ -331,9 +331,9 @@ SUBROUTINE FSPINNONO
                        L = L + 1
 
                        RHO = RHOUP(L, K) - RHODOWN(L, K)
-                       
+
                        IF (.NOT. PATH) THEN
-                                                
+
                           ! Unroll loops and pre-compute                          
 
                           MYDFDA = DFDA(I, J, LBRA, LKET, MBRA, &
@@ -359,7 +359,7 @@ SUBROUTINE FSPINNONO
                           FTMP(2) = FTMP(2) + RHO * &
                                (RIJ(1)/ MAGRP2 * MYDFDA)
 
-                                                   !                                                       
+                          !                                                       
                           ! d/d_beta                                              
                           !                                                       
 
@@ -375,7 +375,7 @@ SUBROUTINE FSPINNONO
                                (((ONE - ((RIJ(3) * RIJ(3)) / &
                                MAGR2)) / MAGRP) * MYDFDB)
 
-                                                   !                                                       
+                          !                                                       
                           ! d/dR                                                  
                           !                                                       
 
@@ -388,7 +388,7 @@ SUBROUTINE FSPINNONO
                           FTMP(3) = FTMP(3) - RHO * DC(3) * &
                                MYDFDR
 
-                                                    
+
                        ELSE
 
                           ! pathological configuration in which beta=0            
@@ -397,7 +397,7 @@ SUBROUTINE FSPINNONO
                           ! fixed: MJC 12/17/13                                   
 
                           MYDFDB = DFDB(I, J, LBRA, LKET, &
-                              MBRA, MKET, MAGR, ZERO, COSBETA, "S") / MAGR
+                               MBRA, MKET, MAGR, ZERO, COSBETA, "S") / MAGR
 
                           MYDFDB = MYDFDB * (WSPINI + WSPINJ)
 
@@ -418,46 +418,46 @@ SUBROUTINE FSPINNONO
                           FTMP(3) = FTMP(3) - RHO * COSBETA * MYDFDR
 
                        ENDIF
-                       
+
                     ENDDO
                  ENDDO
               ENDDO
            ENDDO
 
-!           FTMP = FTMP * ( HUBBARDU(ELEMPOINTER(J))*DELTAQ(J) + COULOMBV(J) &
-!                +HUBBARDU(ELEMPOINTER(I))*DELTAQ(I) + COULOMBV(I))
+           !           FTMP = FTMP * ( HUBBARDU(ELEMPOINTER(J))*DELTAQ(J) + COULOMBV(J) &
+           !                +HUBBARDU(ELEMPOINTER(I))*DELTAQ(I) + COULOMBV(I))
 
-           
+
            FSSPIN(1,I) = FSSPIN(1,I) + FTMP(1)
            FSSPIN(2,I) = FSSPIN(2,I) + FTMP(2)
            FSSPIN(3,I) = FSSPIN(3,I) + FTMP(3)
-           
+
            ! with the factor of 2...                                               
-           
+
            VIRSSPIN(1) = VIRSSPIN(1) + RIJ(1)*FTMP(1)
            VIRSSPIN(2) = VIRSSPIN(2) + RIJ(2)*FTMP(2)
            VIRSSPIN(3) = VIRSSPIN(3) + RIJ(3)*FTMP(3)
            VIRSSPIN(4) = VIRSSPIN(4) + RIJ(1)*FTMP(2)
            VIRSSPIN(5) = VIRSSPIN(5) + RIJ(2)*FTMP(3)
            VIRSSPIN(6) = VIRSSPIN(6) + RIJ(3)*FTMP(1)
-          
+
 
         ENDIF
      ENDDO
-        
+
   ENDDO
 
-!$OMP END PARALLEL DO
+  !$OMP END PARALLEL DO
 
   VIRSSPIN = VIRSSPIN/TWO
 
-!  PRINT*, FSSPIN(1,1)
+  !  PRINT*, FSSPIN(1,1)
 
-!  DO I = 1, NATS
-!     WRITE(6,10) I, FSSPIN(1,I), FSSPIN(2,I), FSSPIN(3,I)
-!  ENDDO
+  !  DO I = 1, NATS
+  !     WRITE(6,10) I, FSSPIN(1,I), FSSPIN(2,I), FSSPIN(3,I)
+  !  ENDDO
 
-!10 FORMAT(I4, 3F12.6)
+  !10 FORMAT(I4, 3F12.6)
 
   RETURN
 

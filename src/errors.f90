@@ -19,40 +19,36 @@
 ! Public License for more details.                                         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-FUNCTION DFDA(I, J, L1, L2, M1, M2, R, ALPHA, COSBETA, WHICHINT)
+!> Soubroutine to handle errors.
+!! \brief This will decide what to do if the program has to stop for some
+!! reason. It will either stop the program or send an error flag up.
+!! \param SUB Subroutine where the program would stop.
+!! \param TAG Error message to be passed.
+!!
+SUBROUTINE ERRORS(SUB,TAG)
+  USE CONSTANTS_MOD, ONLY: LIBRUN, EXISTERROR
+  USE TIMER_MOD, ONLY: TIMEDATE_TAG
+  CHARACTER(*), INTENT(IN) :: SUB,TAG
 
-  ! Build derivative defined in PRB 72 165107 eq. (13)
+  WRITE(*,*)"LIBRUN",LIBRUN
+  IF(LIBRUN)THEN
+     WRITE(*,*) "# *************ERROR**************"
+     WRITE(*,*) "# LATTE stop due to the following error at subroutine ",SUB,":"
+     WRITE(*,*) "# ",TAG
+     CALL TIMEDATE_TAG("The error occurred at: ")
+     WRITE(*,*) "# This error will be reported back to the hosting code"
+     WRITE(*,*) "# ********************************"
+     EXISTERROR = .TRUE.
+     STOP
+  ELSE
+     WRITE(*,*) ""
+     WRITE(*,*) "# *************ERROR**************"
+     WRITE(*,*) "# LATTE stopped due to the following error at subroutine ",SUB,":"
+     WRITE(*,*) "# ",TAG
+     CALL TIMEDATE_TAG("The error occurred at: ")
+     WRITE(*,*) "# ********************************"
+     WRITE(*,*) ""
+     STOP
+  ENDIF
 
-  USE MYPRECISION
-
-  IMPLICIT NONE
-
-  INTEGER :: I, J, L1, L2, M1, M2, MP
-  REAL(LATTEPREC) :: ALPHA, COSBETA, R, DFDA
-  REAL(LATTEPREC), EXTERNAL :: SLMMP, TLMMP, AM, BM, WIGNERD, UNIVSCALE
-  REAL(LATTEPREC), EXTERNAL :: DSLMMPDA, DTLMMPDA
-  CHARACTER(LEN=1) :: WHICHINT
-
-  DFDA = TWO * WIGNERD(L1, ABS(M1), 0, COSBETA) * &
-       WIGNERD(L2, ABS(M2), 0, COSBETA) * &
-       UNIVSCALE(I, J, L1, L2, 0, R, WHICHINT) * &
-       (ABS(M1) * BM(M1, ALPHA) * AM(M2, ALPHA) + ABS(M2) * &
-       AM(M1, ALPHA) * BM(M2, ALPHA))
-
-  DO MP = 1, MIN(L1, L2)
-
-     DFDA = DFDA + (DSLMMPDA(L1, M1, MP, ALPHA, COSBETA) * &
-          SLMMP(L2, M2, MP, ALPHA, COSBETA) + &
-          SLMMP(L1, M1, MP, ALPHA, COSBETA) * &
-          DSLMMPDA(L2, M2, MP, ALPHA, COSBETA) + &
-          DTLMMPDA(L1, M1, MP, ALPHA, COSBETA) * &
-          TLMMP(L2, M2, MP, ALPHA, COSBETA) + &
-          TLMMP(L1, M1, MP, ALPHA, COSBETA) * &
-          DTLMMPDA(L2, M2, MP, ALPHA, COSBETA)) * &
-          UNIVSCALE(I, J, L1, L2, MP, R, WHICHINT)
-
-  ENDDO
-
-  RETURN 
-
-END FUNCTION DFDA
+END SUBROUTINE ERRORS

@@ -37,7 +37,7 @@ SUBROUTINE VELVERLET(CURRITER)
   ! Half timestep advance in V
   !
 
-  
+
   DO I = 1, NATS
 
      PREFACTOR = PREPREFACT/MASS(ELEMPOINTER(I))
@@ -53,7 +53,7 @@ SUBROUTINE VELVERLET(CURRITER)
   !
   ! Get new force to complete advance in V
   !
-  
+
   CALL GETMDF(1, CURRITER)
 
   !
@@ -67,10 +67,10 @@ SUBROUTINE VELVERLET(CURRITER)
      V(1,I) = V(1,I) + PREFACTOR*FTOT(1,I)
      V(2,I) = V(2,I) + PREFACTOR*FTOT(2,I)
      V(3,I) = V(3,I) + PREFACTOR*FTOT(3,I)
- 
+
   ENDDO
 
   RETURN
 
 END SUBROUTINE VELVERLET
-        
+
