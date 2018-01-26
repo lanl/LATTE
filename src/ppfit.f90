@@ -30,21 +30,21 @@ SUBROUTINE PPFIT
   USE UNIVARRAY
   USE PPOTARRAY
   USE MYPRECISION
-!  USE MPI
+  !  USE MPI
 
   IMPLICIT NONE
 
   INTEGER :: I, J, K, Z, NSNAP, ATMOL, TOTAT, COUNT, II, COUNT2, ACC
   INTEGER :: PICK, PARAMPICK, COUNTSTART
-!  INTEGER, PARAMETER :: NMOL = 32, NGEOM = 200
+  !  INTEGER, PARAMETER :: NMOL = 32, NGEOM = 200
   INTEGER, ALLOCATABLE :: ATINMOL(:), NC(:), NH(:)
-!  INTEGER :: PP2FIT
+  !  INTEGER :: PP2FIT
   REAL(LATTEPREC), ALLOCATABLE :: COORDS(:,:), FORCES(:,:)
   REAL(LATTEPREC), ALLOCATABLE :: BONDFORCES(:,:), FPAIR(:,:)
   REAL(LATTEPREC), ALLOCATABLE :: DFTENERGY(:)
   REAL(LATTEPREC) :: Y, ENERGY, MYERR, MYERRINIT, MINERR, PREVERR
   REAL(LATTEPREC) :: RN, TMPERR, ENERR
-!  REAL(LATTEPREC) :: MCBETA
+  !  REAL(LATTEPREC) :: MCBETA
   REAL(LATTEPREC), ALLOCATABLE :: PPBEST(:,:), PPOLD(:,:)
   REAL(LATTEPREC) :: DFTCE, DFTHE, TBCE, TBHE
   CHARACTER(LEN=2) :: X
@@ -55,21 +55,21 @@ SUBROUTINE PPFIT
 
   TBCE = -1.242
   TBHE = -0.89685
-  
+
 
   ! Fit the atomization energies too
-  
+
   CALL INITRNG
 
   ! Read the xyz files and gradients
-  
+
   OPEN(UNIT=60, STATUS="OLD", FILE="forces")
 
   NSNAP = PPNMOL*PPNGEOM
 
   TOTAT = 0
   DO I = 1, NSNAP
-!     print*, I
+     !     print*, I
      READ(60,*) ATMOL
      TOTAT = TOTAT+ATMOL
      READ(60,*) ENERGY
@@ -89,7 +89,7 @@ SUBROUTINE PPFIT
   DO I = 1, NSNAP
      READ(60,*) ATINMOL(I)
      READ(60,*) DFTENERGY(I)
-     
+
      DO J = 1, ATINMOL(I)
         COUNT = COUNT + 1
         READ(60,*) SPEC(COUNT), COORDS(1,COUNT), COORDS(2,COUNT), &
@@ -111,20 +111,20 @@ SUBROUTINE PPFIT
   DO I = 1, NSNAP
 
      DO J = 1, ATINMOL(I)
-        
+
         COUNT = COUNT + 1
         IF (SPEC(COUNT) .EQ. "C") NC(I) = NC(I) + 1
         IF (SPEC(COUNT) .EQ. "H") NH(I) = NH(I) + 1
-        
+
      ENDDO
 
      DFTENERGY(I) = DFTENERGY(I) - REAL(NC(I))*DFTCE - REAL(NH(I))*DFTHE
 
   ENDDO
 
-!  DO I = 1, NSNAP
-!     PRINT*, I, NC(I), NH(I), DFTENERGY(I)
-!  ENDDO
+  !  DO I = 1, NSNAP
+  !     PRINT*, I, NC(I), NH(I), DFTENERGY(I)
+  !  ENDDO
 
 
   ! First get the forces from the bond part and electrostatics
@@ -133,7 +133,7 @@ SUBROUTINE PPFIT
 
   DO II = 1, NSNAP
 
-!     IF (MOD(II, NUMPROCS) .EQ. MYID) THEN
+     !     IF (MOD(II, NUMPROCS) .EQ. MYID) THEN
 
      DEALLOCATE(CR, ATELE, F, FPP, FTOT)
      DEALLOCATE(DELTAQ, MYCHARGE)
@@ -155,14 +155,14 @@ SUBROUTINE PPFIT
      ALLOCATE(CR(3,NATS), ATELE(NATS), F(3,NATS), FPP(3,NATS), FTOT(3,NATS))
      ALLOCATE(DELTAQ(NATS), MYCHARGE(NATS))
      ALLOCATE(ELEMPOINTER(NATS))
-     
+
      IF (ELECTRO .EQ. 0) THEN
         ALLOCATE(LCNSHIFT(NATS))
         LCNSHIFT = ZERO
      ENDIF
-     
+
      IF (KON .EQ. 1) ALLOCATE(KF(3,NATS))
-     
+
      IF (BASISTYPE .EQ. "NONORTHO") THEN
         IF (SPINON .EQ. 0) THEN
            ALLOCATE(FPUL(3,NATS), FSCOUL(3,NATS))
@@ -175,7 +175,7 @@ SUBROUTINE PPFIT
      DO I = 1, II-1
         COUNTSTART = COUNTSTART + ATINMOL(I)
      ENDDO
-     
+
      COUNT = COUNTSTART
 
      DO J = 1, NATS
@@ -186,7 +186,7 @@ SUBROUTINE PPFIT
         CR(3,J) = COORDS(3,COUNT)
      ENDDO
 
-       ! Set up pointer to the data in TBparam/electrons.dat                                  
+     ! Set up pointer to the data in TBparam/electrons.dat                                  
 
      DO I = 1, NATS
         DO J = 1, NOELEM
@@ -194,51 +194,51 @@ SUBROUTINE PPFIT
         ENDDO
      ENDDO
 
-       ! For use when getting the partial charges                                             
-     
+     ! For use when getting the partial charges                                             
+
      DEALLOCATE(QLIST)
-     
+
      ! Allocate the Hamiltonian matrix                                                      
-     
+
      IF (KON .EQ. 0) THEN
-        
+
         ! Real space         
         DEALLOCATE(H, HDIAG)
-        
+
      ELSE ! k-space  
-        
+
         DEALLOCATE(HK, HKDIAG)
-        
+
      ENDIF
 
      IF (BASISTYPE .EQ. "NONORTHO") DEALLOCATE(H0)
 
      IF (SPINON .EQ. 0) THEN
-        
+
         ! No spins: allocate 1 double-occupied bond order matrix 
 
         IF (KON .EQ. 0) THEN
-           
+
            DEALLOCATE(BO)
-           
+
         ELSE
-           
+
            DEALLOCATE(KBO)
 
         ENDIF
-        
+
      ELSEIF (SPINON .EQ. 1) THEN
-        
+
         DEALLOCATE(HUP, HDOWN)
         DEALLOCATE(RHOUP, RHODOWN)
         DEALLOCATE(H2VECT)
-        
+
         IF (BASISTYPE .EQ. "NONORTHO") DEALLOCATE(SPINLIST)
-        
+
         DEALLOCATE(DELTASPIN, OLDDELTASPIN)
-        
+
      ENDIF
-     
+
      CALL GETHDIM
 
      DEALLOCATE(MATINDLIST)
@@ -267,7 +267,7 @@ SUBROUTINE PPFIT
      ENDIF
 
 
-     
+
      IF (II .EQ. 1) THEN
 
         CALL ALLOCATECOULOMB
@@ -302,7 +302,7 @@ SUBROUTINE PPFIT
 
      ! Now we have the arrays set up we can get the energy and forces
 
-         ! Build the charge independent H matrix                                             
+     ! Build the charge independent H matrix                                             
 
      IF (KON .EQ. 0) THEN
 
@@ -337,30 +337,30 @@ SUBROUTINE PPFIT
         CALL SP2FERMIINIT
 
      ENDIF
-     
+
      IF (ELECTRO .EQ. 0) CALL QNEUTRAL(0,1) ! Local charge neutrality
 
      IF (ELECTRO .EQ. 1) CALL QCONSISTENCY(0,1) ! Self-consistent charges     
 
 
      IF (KON .EQ. 0) THEN
-        
+
         IF (SPONLY .EQ. 0) THEN
            CALL GRADHSP
         ELSE
            CALL GRADH
         ENDIF
-        
+
      ELSE
         CALL KGRADH
      ENDIF
-     
+
      FTOT = TWO * F
 
      IF (ELECTRO .EQ. 1) FTOT = FTOT + FCOUL
 
      IF (BASISTYPE .EQ. "NONORTHO") THEN
-        
+
         CALL PULAY
 
         CALL FCOULNONO
@@ -390,7 +390,7 @@ SUBROUTINE PPFIT
 
      DFTENERGY(II) = DFTENERGY(II) - (TOTE - REAL(NC(II))*TBCE &
           - REAL(NH(II))*TBHE)
-     
+
      DO I = 1, NATS
         COUNT2 = COUNT2 + 1
         BONDFORCES(1,COUNT2) = FTOT(1,I)
@@ -405,40 +405,40 @@ SUBROUTINE PPFIT
      ELSEIF (CONTROL .EQ. 3) THEN
         CALL FERMIDEALLOCATE
      ENDIF
-     
-  !ENDIF
-     
+
+     !ENDIF
+
   ENDDO
 
-!  CALL MPI_BARRIER(MPI_COMM_WORLD, IERR)
+  !  CALL MPI_BARRIER(MPI_COMM_WORLD, IERR)
 
-!  IF (MYID .NE. 0) THEN
+  !  IF (MYID .NE. 0) THEN
 
-!     CALL MPI_SEND(BONDFORCES(1,1), 3*TOTAT, MPI_DOUBLE_PRECISION, &
-!          0, MYID, MPI_COMM_WORLD, IERR)
-  
-!  ELSE
+  !     CALL MPI_SEND(BONDFORCES(1,1), 3*TOTAT, MPI_DOUBLE_PRECISION, &
+  !          0, MYID, MPI_COMM_WORLD, IERR)
 
-!     DO I = 1, NUMPROCS
+  !  ELSE
 
-!        CALL MPI_RECV(TMPBUFF(1,1), 3*TOTAT, MPI_DOUBLE_PRECISION, &
-!             MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, STATUS, IERR)
+  !     DO I = 1, NUMPROCS
+
+  !        CALL MPI_RECV(TMPBUFF(1,1), 3*TOTAT, MPI_DOUBLE_PRECISION, &
+  !             MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, STATUS, IERR)
 
 
-!        BONDFORCES = BONDFORCE + TMPBUFF
+  !        BONDFORCES = BONDFORCE + TMPBUFF
 
-!     ENDDO
+  !     ENDDO
 
-!  ENDIF
+  !  ENDIF
 
-!  CALL MPI_BARRIER(MPI_COMM_WORLD, IERR)
+  !  CALL MPI_BARRIER(MPI_COMM_WORLD, IERR)
 
-!  CALL MPI_BCAST(BONDFORCES, 3*TOTAT, MPI_DOUBLE_PRECISION, 0, &
-!       MPI_COMM_WORLD, IERR)
+  !  CALL MPI_BCAST(BONDFORCES, 3*TOTAT, MPI_DOUBLE_PRECISION, 0, &
+  !       MPI_COMM_WORLD, IERR)
 
   FORCES = FORCES - BONDFORCES
 
-  
+
   ! Now for the optimization
 
   ! Initial error
@@ -449,13 +449,13 @@ SUBROUTINE PPFIT
   ENERR = ZERO
 
   DO II = 1, NSNAP
-     
+
      DEALLOCATE(CR, ATELE, FPP)
-     
+
      NATS = ATINMOL(II)
-     
+
      ALLOCATE(CR(3,NATS), ATELE(NATS), FPP(3,NATS))
-     
+
      DO I = 1, NATS
         COUNT = COUNT+1
         CR(1,I) = COORDS(1,COUNT)
@@ -463,9 +463,9 @@ SUBROUTINE PPFIT
         CR(3,I) = COORDS(3,COUNT)
         ATELE(I) = SPEC(COUNT)
      ENDDO
-     
+
      CALL PAIRPOTNONEB
-     
+
      ENERR = ENERR + (DFTENERGY(II) - EREP)*(DFTENERGY(II) - EREP)/REAL(ATINMOL(II))
 
      DO I = 1, NATS
@@ -474,31 +474,31 @@ SUBROUTINE PPFIT
         FPAIR(2,COUNT2) = FPP(2,I)
         FPAIR(3,COUNT2) = FPP(3,I)
      ENDDO
-     
+
   ENDDO
-  
+
   MYERRINIT = ZERO
   DO I = 1, NSNAP
-     
+
      TMPERR = ZERO
      DO J = 1, ATINMOL(I)
-        
+
         TMPERR = TMPERR + (FORCES(1,J) - FPAIR(1,J))*(FORCES(1,J) - FPAIR(1,J)) + &
              (FORCES(2,J) - FPAIR(2,J))*(FORCES(2,J) - FPAIR(2,J)) + &
              (FORCES(3,J) - FPAIR(3,J))*(FORCES(3,J) - FPAIR(3,J))
-        
+
      ENDDO
-     
+
      MYERRINIT = MYERRINIT + TMPERR/REAL(ATINMOL(I))
 
   ENDDO
-  
+
   ENERR = ENERR/REAL(NSNAP)
   MYERRINIT = MYERRINIT/REAL(NSNAP)
-!  PRINT*, MYERRINIT
+  !  PRINT*, MYERRINIT
 
   MYERRINIT = MYERRINIT + ENERR
-  
+
   ALLOCATE(PPBEST(5,PP2FIT), PPOLD(5,PP2FIT))
 
   DO I = 1, PP2FIT
@@ -511,7 +511,7 @@ SUBROUTINE PPFIT
   DO Z = 1, PPNFITSTEP
 
      ! Change the pair potential and the cut-offs too
-     
+
      DO I = 1, PP2FIT
         DO J = 1, 5
            PPOLD(J,I) = POTCOEF(J,I)
@@ -551,7 +551,7 @@ SUBROUTINE PPFIT
         NATS = ATINMOL(II)
 
         ALLOCATE(CR(3,NATS), ATELE(NATS), FPP(3,NATS))
-        
+
         DO I = 1, NATS 
            COUNT = COUNT+1
            CR(1,I) = COORDS(1,COUNT)
@@ -561,7 +561,7 @@ SUBROUTINE PPFIT
         ENDDO
 
         CALL PAIRPOTNONEB
-        
+
         ENERR = ENERR + (DFTENERGY(II) - EREP)*(DFTENERGY(II) - EREP)/REAL(ATINMOL(II))
 
         DO I = 1, NATS
@@ -572,18 +572,18 @@ SUBROUTINE PPFIT
         ENDDO
 
      ENDDO
-        
+
      MYERR = ZERO
      DO I = 1, NSNAP
-        
+
         TMPERR = ZERO
 
         DO J = 1, ATINMOL(I)
-           
+
            TMPERR = TMPERR + (FORCES(1,J) - FPAIR(1,J))*(FORCES(1,J) - FPAIR(1,J)) + &
                 (FORCES(2,J) - FPAIR(2,J))*(FORCES(2,J) - FPAIR(2,J)) + &
                 (FORCES(3,J) - FPAIR(3,J))*(FORCES(3,J) - FPAIR(3,J))
-           
+
         ENDDO
 
         MYERR = MYERR + TMPERR/REAL(ATINMOL(I))
@@ -594,11 +594,11 @@ SUBROUTINE PPFIT
      MYERR = MYERR/REAL(NSNAP)
 
      MYERR = MYERR  + ENERR
-     
- !     PRINT*, MYERR
+
+     !     PRINT*, MYERR
 
      IF (MYERR .LT. PREVERR) THEN
-        
+
         ACC = ACC + 1
         PREVERR = MYERR
 
@@ -652,7 +652,7 @@ SUBROUTINE PPFIT
 
 20 FORMAT(A2, 1X, A2, 1X, 10F16.8)
 
-        
+
   DEALLOCATE(PPBEST, PPOLD)
 
   RETURN

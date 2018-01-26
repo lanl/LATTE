@@ -75,10 +75,10 @@ SUBROUTINE MASSES2SYMBOLS(TYPES,NTYPES,MASSES_IN,NATSIN,SYMBOLS)
         ENDIF
      ENDDO
      IF(TYPE_SYMBOLS(I) == "")THEN
-        WRITE(*,*)"ERROR: Mass of element",I,"cannot be identified. Please verify that"
-        WRITE(*,*)"masses in electrons.dat coincide with the masses in the input file."
-        WRITE(*,*)"NOTE: In this version ptable.dat is not used anymore."
-        STOP
+        WRITE(*,*)"ERROR: Mass of element",I,"cannot be identified."
+        CALL ERRORS("masses2symbols","The mass of an element in the &
+             & coordinates file cannot be identified. Please verify that &
+             & masses in electrons.dat coincide with the masses in the input file")
      ENDIF
   ENDDO
 

@@ -31,10 +31,10 @@ SUBROUTINE READPPOTSPLINE
   REAL(LATTEPREC), ALLOCATABLE :: U(:)
   CHARACTER(LEN=20) :: HD, HD1, HD2
 
-  OPEN(UNIT=14, STATUS="OLD", FILE=trim(PARAMPATH)//"/ppots.spline")
+  OPEN(UNIT=14, STATUS="OLD", FILE=TRIM(PARAMPATH)//"/ppots.spline")
 
   READ(14,*) NOPPS
-  
+
   ! Figure out array dimensions for allocation
 
   MAXENTRY = 0
@@ -51,15 +51,15 @@ SUBROUTINE READPPOTSPLINE
 
   REWIND(14)
 
-!  print*, MAXENTRY
+  !  print*, MAXENTRY
   ! Now we can allocate
-  
+
   ALLOCATE(PPELE1(NOPPS), PPELE2(NOPPS), PPRK(MAXENTRY,NOPPS), &
        PPAK(MAXENTRY,NOPPS), PPNK(NOPPS))
 
   PPRK = ZERO
   PPAK = ZERO
-  
+
   READ(14,*) NOPPS
   DO I = 1, NOPPS
      READ(14,*) PPELE1(I), PPELE2(I)
@@ -69,9 +69,9 @@ SUBROUTINE READPPOTSPLINE
      ENDDO
   ENDDO
 
-!  print *, ppak(1,1)
+  !  print *, ppak(1,1)
   CLOSE(14)
 
   RETURN
-  
+
 END SUBROUTINE READPPOTSPLINE

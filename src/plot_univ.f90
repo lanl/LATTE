@@ -22,14 +22,14 @@
 SUBROUTINE PLOTUNIV
 
   USE CONSTANTS_MOD
-!  USE GSPARRAY
+  !  USE GSPARRAY
   USE UNIVARRAY
   USE PPOTARRAY
   USE SETUPARRAY
   USE MYPRECISION
 
   IMPLICIT NONE
-  
+
   INTEGER :: IGS, I, J
   INTEGER, PARAMETER :: NOSAMPLES = 1001
   REAL(LATTEPREC), ALLOCATABLE :: INTVALUE(:), DINTVALUE(:)
@@ -40,7 +40,7 @@ SUBROUTINE PLOTUNIV
 
   OPEN(UNIT=40, STATUS="UNKNOWN", FILE="H_scaling.dat")
   OPEN(UNIT=41, STATUS="UNKNOWN", FILE="dH_scaling.dat")
-  
+
   MAXCUT = ZERO
   DO I = 1, NOINT
      IF (BOND(8,I) .GT. MAXCUT) MAXCUT = BOND(8,I)
@@ -58,7 +58,7 @@ SUBROUTINE PLOTUNIV
 
            POLYNOM = RMOD*(BOND(2,J) + RMOD*(BOND(3,J) + &
                 RMOD*(BOND(4,J) + BOND(5,J)*RMOD)))
-           
+
            DPOLYNOM =  BOND(2,J) + RMOD*(TWO*BOND(3,J) + &
                 RMOD*(THREE*BOND(4,J) + FOUR*BOND(5,J)*RMOD))
 
@@ -67,17 +67,17 @@ SUBROUTINE PLOTUNIV
            DTMP = DPOLYNOM*TMP
 
         ELSEIF (MAGR .GT. BOND(7,J) .AND. MAGR .LE. BOND(8,J)) THEN
-           
+
            RMINUSR1 = MAGR - BOND(7,J)
-           
+
            TMP = BOND(9,J) + RMINUSR1*(BOND(10,J) + &
                 RMINUSR1*(BOND(11,J)+ RMINUSR1*(BOND(12,J) + &
                 RMINUSR1*(BOND(13,J) + RMINUSR1*BOND(14,J)))))
-           
+
            DTMP = BOND(10,J) + RMINUSR1*(TWO*BOND(11,J) + &
                 RMINUSR1*(THREE*BOND(12,J) + RMINUSR1*(FOUR*BOND(13,J) + &
                 RMINUSR1*FIVE*BOND(14,J))))
-           
+
         ELSE
 
            TMP = ZERO
@@ -108,48 +108,48 @@ SUBROUTINE PLOTUNIV
      OPEN(UNIT=40, STATUS="UNKNOWN", FILE="S_scaling.dat")
 
      DO I = 1, NOSAMPLES
-        
+
         MAGR = HALF + (MAXCUT - HALF)*REAL(I-1)/REAL(NOSAMPLES-1)
-     
+
         DO J = 1, NOINT
-           
+
            IF (MAGR .LE. OVERL(7,J)) THEN
-              
+
               RMOD = MAGR - OVERL(6,J)
               POLYNOM = RMOD*(OVERL(2,J) + RMOD*(OVERL(3,J) + &
                    RMOD*(OVERL(4,J) + OVERL(5,J)*RMOD)))
-              
+
               TMP = EXP(POLYNOM)
-              
+
            ELSEIF (MAGR .GT. OVERL(7,J) .AND. MAGR .LE. OVERL(8,J)) THEN
-              
+
               RMINUSR1 = MAGR - OVERL(7,J)
-              
+
               TMP = OVERL(9,J) + RMINUSR1*(OVERL(10,J) + &
                    RMINUSR1*(OVERL(11,J)+ RMINUSR1*(OVERL(12,J) + &
                    RMINUSR1*(OVERL(13,J) + RMINUSR1*OVERL(14,J)))))
-              
+
            ELSE 
 
               TMP = ZERO
-              
+
            ENDIF
-           
+
            INTVALUE(J) = OVERL(1,J)*TMP
-           
+
         ENDDO
-        
+
         WRITE(40,10) MAGR, (INTVALUE(J), J = 1, NOINT)
-        
+
      ENDDO
-     
+
      CLOSE(40)
-     
+
   ENDIF
 
 10 FORMAT(F12.6, 1X, 500(G12.6, 1X))
   DEALLOCATE(INTVALUE, DINTVALUE)
-  
+
   RETURN
-  
+
 END SUBROUTINE PLOTUNIV

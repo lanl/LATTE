@@ -20,13 +20,13 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SUBROUTINE SP2PURE_SPARSE_PARALLEL_SIMPLE(MDITER)
-  
+
   !
   ! PARALLEL SHARED MEMORY OPENMP VERSION
   ! This subroutine implements Niklasson's SP2 density matrix purification
   ! algorithm. 
   !
-  
+
   USE CONSTANTS_MOD
   USE TIMER_MOD
   USE SETUPARRAY
@@ -93,10 +93,10 @@ SUBROUTINE SP2PURE_SPARSE_PARALLEL_SIMPLE(MDITER)
 
   ! Write out input and output matrix
   IF (DEBUGON .GE. 2) THEN
-    CALL WRITEHMATRIX(HDIM, MSPARSE, H, NR_SP2_ITER, PP)  
+     CALL WRITEHMATRIX(HDIM, MSPARSE, H, NR_SP2_ITER, PP)  
   ENDIF
   IF (DEBUGON .EQ. 3) THEN
-    CALL WRITEDMATRIX(HDIM, BO)
+     CALL WRITEDMATRIX(HDIM, BO)
   ENDIF
 
   ! Deallocate for sparse format

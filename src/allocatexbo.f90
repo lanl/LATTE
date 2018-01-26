@@ -40,7 +40,7 @@ SUBROUTINE ALLOCATEXBO
 
   IF (ELECTRO .EQ. 0) THEN
      ARRAYDIM = NATS
-!     ARRAYDIM = HDIM
+     !     ARRAYDIM = HDIM
   ELSE
      ARRAYDIM = NATS
   ENDIF
@@ -55,7 +55,7 @@ SUBROUTINE ALLOCATEXBO
 
      IF (CONTROL .EQ. 1 .OR. CONTROL .EQ. 3 &
           .OR. CONTROL .EQ. 5) ALLOCATE( CHEMPOT_PNK(2) )
- 
+
 
      !
      ! If we need to propagate the spin difference 
@@ -63,7 +63,7 @@ SUBROUTINE ALLOCATEXBO
      !
 
      IF (SPINON .EQ. 1) ALLOCATE( SPIN_PNK(2, DELTADIM) )
-     
+
   ELSE
 
      ALLOCATE( PNK(XBODISORDER + 1, ARRAYDIM) )

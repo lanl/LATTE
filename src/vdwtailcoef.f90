@@ -44,7 +44,7 @@ SUBROUTINE VDWTAILCOEF
 
   ! Phi A0*EXP(A1*(X - A5) + A2*(X - A5)^2 + A3*(X-A5)^3 + A4*(X-A5)^4)
 
-  
+
 
   !
   ! The cut-offs and joining functions look like this:
@@ -54,42 +54,42 @@ SUBROUTINE VDWTAILCOEF
   !
 
   DO PPID = 1, NOPPS
-  
+
      ! Join first : need values for pair potential at R1
 
      R1 = POTCOEF(9,PPID) - POTCOEF(6,PPID)
      RCUT = POTCOEF(10,PPID)
      R1SQ = R1*R1
-!     R6 = R1SQ * R1SQ * R1SQ
+     !     R6 = R1SQ * R1SQ * R1SQ
 
-!     CALL UNIVSCALE(R1, POTCOEF(:,PPID), SCL_R1)
+     !     CALL UNIVSCALE(R1, POTCOEF(:,PPID), SCL_R1)
 
      POLY = R1*(POTCOEF(2,PPID) + R1*(POTCOEF(3,PPID) + &
           R1*(POTCOEF(4,PPID) + R1*POTCOEF(5,PPID))))
-     
+
      SCL_R1 = POTCOEF(1,PPID)*EXP(POLY)     
 
-!     EXPTMP = POTCOEF(6,PPID)*EXP(POTCOEF(7,PPID)*(R1 - POTCOEF(8,PPID)))
-     
+     !     EXPTMP = POTCOEF(6,PPID)*EXP(POTCOEF(7,PPID)*(R1 - POTCOEF(8,PPID)))
+
      EXPTMP = ZERO
-     
+
      POTCOEF(11,PPID) = SCL_R1 + EXPTMP ! - POTCOEF(8,PPID)/R6
-     
+
      DPOLY = POTCOEF(2,PPID) + TWO*POTCOEF(3,PPID)*R1 + &
           THREE*POTCOEF(4,PPID)*R1SQ + &
           FOUR*POTCOEF(5,PPID)*R1*R1SQ 
-!- POTCOEF(6,PPID)/R1SQ
-     
+     !- POTCOEF(6,PPID)/R1SQ
+
      POTCOEF(12,PPID) = DPOLY*SCL_R1 + POTCOEF(7,PPID)*EXPTMP !+ &
-         ! SIX*POTCOEF(8,PPID)/(R1*R6)
+     ! SIX*POTCOEF(8,PPID)/(R1*R6)
 
      DDPOLY = TWO*POTCOEF(3,PPID) + SIX*POTCOEF(4,PPID)*R1 + &
           TWELVE*POTCOEF(5,PPID)*R1SQ 
-!+ TWO*POTCOEF(6,PPID)/(R1*R1SQ)
-     
+     !+ TWO*POTCOEF(6,PPID)/(R1*R1SQ)
+
      POTCOEF(13,PPID) = HALF*( (DPOLY*DPOLY + DDPOLY)*SCL_R1 + &
           POTCOEF(7,PPID)*POTCOEF(7,PPID)*EXPTMP) ! - &
-          !SIX*SEVEN*POTCOEF(8,PPID)/(R1SQ*R6) )
+     !SIX*SEVEN*POTCOEF(8,PPID)/(R1SQ*R6) )
 
      ! At the end of the join function:
 
@@ -107,9 +107,9 @@ SUBROUTINE VDWTAILCOEF
 
      POTCOEF(16,PPID) = (MINUSONE/(TEN*DELTA3))*(SIX*POTCOEF(15,PPID)*DELTA2 + &
           THREE*POTCOEF(14,PPID)*DELTA + POTCOEF(13,PPID))
-     
+
   ENDDO
-     
+
   RETURN
 
 END SUBROUTINE VDWTAILCOEF

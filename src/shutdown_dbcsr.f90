@@ -27,11 +27,11 @@ SUBROUTINE SHUTDOWN_DBCSR
   USE dbcsr_methods
   USE dbcsr_error_handling
   USE array_types,                     ONLY: array_data,&
-                                             array_i1d_obj,&
-                                             array_new,&
-                                             array_nullify,&
-                                             array_release,&
-                                             array_size
+       array_i1d_obj,&
+       array_new,&
+       array_nullify,&
+       array_release,&
+       array_size
   USE dbcsr_io
   USE dbcsr_operations
   USE dbcsr_ptr_util
@@ -42,23 +42,23 @@ SUBROUTINE SHUTDOWN_DBCSR
 
   USE dbcsr_block_access
   USE dbcsr_iterator_operations,       ONLY: dbcsr_iterator_blocks_left,&
-                                               dbcsr_iterator_next_block,&
-                                               dbcsr_iterator_start,&
-                                               dbcsr_iterator_stop
+       dbcsr_iterator_next_block,&
+       dbcsr_iterator_start,&
+       dbcsr_iterator_stop
 
   USE dbcsr_dist_operations,           ONLY: create_bl_distribution,&
-                                               dbcsr_get_stored_coordinates
+       dbcsr_get_stored_coordinates
 
- 
+
   CALL dbcsr_distribution_release(dist_a)
   CALL dbcsr_mp_release(mp_env)
   CALL array_release(row_dist_a)
   CALL array_release(col_dist_a)	
   CALL array_release(row_blk_sizes)
   CALL array_release(col_blk_sizes)
-  
-  
+
+
   CALL mp_world_finalize()
-  
+
 
 END SUBROUTINE SHUTDOWN_DBCSR

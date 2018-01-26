@@ -27,11 +27,11 @@ MODULE DBCSR_VAR_MOD
   USE dbcsr_methods
   USE dbcsr_error_handling
   USE array_types,                     ONLY: array_data,&
-                                             array_i1d_obj,&
-                                             array_new,&
-                                             array_nullify,&
-                                             array_release,&
-                                             array_size
+       array_i1d_obj,&
+       array_new,&
+       array_nullify,&
+       array_release,&
+       array_size
   USE dbcsr_io
   USE dbcsr_operations
   USE dbcsr_ptr_util
@@ -42,17 +42,17 @@ MODULE DBCSR_VAR_MOD
 
   USE dbcsr_block_access
   USE dbcsr_iterator_operations,       ONLY: dbcsr_iterator_blocks_left,&
-                                               dbcsr_iterator_next_block,&
-                                               dbcsr_iterator_start,&
-                                               dbcsr_iterator_stop
+       dbcsr_iterator_next_block,&
+       dbcsr_iterator_start,&
+       dbcsr_iterator_stop
 
   USE dbcsr_dist_operations,           ONLY: create_bl_distribution,&
-                                               dbcsr_get_stored_coordinates
+       dbcsr_get_stored_coordinates
   IMPLICIT NONE
   SAVE
 
-!*****************************************************************
-!sets up dbcsr/mpi variables
+  !*****************************************************************
+  !sets up dbcsr/mpi variables
 
   TYPE(dbcsr_obj)                          :: matrix_a, matrix_b
   !labels as standard error, necessary dbcsr declaration
@@ -67,16 +67,16 @@ MODULE DBCSR_VAR_MOD
   TYPE(dbcsr_mp_obj)                       :: mp_env
   INTEGER                                  :: group, mynode, numnodes, myploc(2), N
   TYPE(dbcsr_distribution_obj)             :: dist_a, dist_b, dist_c
-  real(8), DIMENSION(:), ALLOCATABLE       :: diag
-  real(8)                                  :: my_block(2:2)
-  logical                                  :: tr, found
+  REAL(8), DIMENSION(:), ALLOCATABLE       :: diag
+  REAL(8)                                  :: my_block(2:2)
+  LOGICAL                                  :: tr, found
   INTEGER, ALLOCATABLE, DIMENSION(:)       :: grid_dist
   TYPE(dbcsr_iterator)                     :: iter
   REAL(8)                                  :: chksum, chksum2
   INTEGER                                  :: TEMP
 
-!*****************************************************************
-!sets distribution to processors
+  !*****************************************************************
+  !sets distribution to processors
 
 CONTAINS
 
@@ -101,7 +101,7 @@ CONTAINS
 
 
 
-!*****************************************************************
+  !*****************************************************************
 
 END MODULE DBCSR_VAR_MOD
 

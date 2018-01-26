@@ -26,56 +26,56 @@ SUBROUTINE GETFORCE
   USE MYPRECISION
 
   IMPLICIT NONE
-  
+
   FTOT = ZERO
-  
+
   IF (KON .EQ. 0) THEN
-     
+
      IF (SPONLY .EQ. 0) THEN
         CALL GRADHSP
      ELSE
         CALL GRADH
      ENDIF
-     
+
      FTOT = TWO * F
 
      IF (BASISTYPE .EQ. "NONORTHO") THEN
-        
+
         IF (SPONLY .EQ. 0) THEN
-           
+
            ! s/sp orbitals only so we can use the analytic code
 
            CALL PULAY_SP
            IF (ELECTRO .EQ. 1) CALL FCOULNONO_SP
            IF (SPINON .EQ. 1) CALL FSPINNONO_SP
-           
+
         ELSE
 
            ! Otherwise use the complex but general expansions Josh Coe implemented 
            CALL PULAY
            IF (ELECTRO .EQ. 1) CALL FCOULNONO
            IF (SPINON .EQ. 1) CALL FSPINNONO
-           
+
         ENDIF
-        
+
         FTOT = FTOT - TWO*FPUL
-        
+
         IF (ELECTRO .EQ. 1) FTOT = FTOT + FSCOUL
-        
+
         IF (SPINON .EQ. 1) FTOT = FTOT + FSSPIN
-        
+
      ENDIF
-     
+
   ELSEIF (KON .EQ. 1) THEN
-     
+
      CALL KGRADH
-     
+
      FTOT = TWO*F
-     
+
      IF (BASISTYPE .EQ. "NONORTHO") THEN
-        
+
         CALL KPULAY
-        
+
         FTOT = FTOT - TWO*FPUL
 
         IF (ELECTRO .EQ. 1) THEN
@@ -84,14 +84,14 @@ SUBROUTINE GETFORCE
         ENDIF
 
      ENDIF
-     
+
   ENDIF
-  
+
   IF (PPOTON .EQ. 1) THEN
      CALL PAIRPOT
      FTOT = FTOT + FPP
   ENDIF
-  
+
   IF (PPOTON .EQ. 2) THEN
      CALL PAIRPOTTAB
      FTOT = FTOT + FPP
@@ -102,9 +102,9 @@ SUBROUTINE GETFORCE
      FTOT = FTOT + FPP
   ENDIF
 
-  
+
   IF (ELECTRO .EQ. 1) FTOT = FTOT + FCOUL
-  
+
   RETURN
 
 END SUBROUTINE GETFORCE

@@ -39,15 +39,15 @@ SUBROUTINE UNIVSCALE_SUB(R, A, X)
   USE MYPRECISION
 
   IMPLICIT NONE
-  
+
   REAL(LATTEPREC) :: A(14), X, R, RMINUSR1, POLYNOM, RMOD
 
   IF (R .LE. A(7)) THEN
 
      RMOD = R - A(6)
-     
+
      POLYNOM = RMOD*(A(2) + RMOD*(A(3) + RMOD*(A(4) + A(5)*RMOD)))
-     
+
      X = EXP(POLYNOM)
 
   ELSEIF (R .GT. A(7) .AND. R .LT. A(8)) THEN
@@ -61,11 +61,11 @@ SUBROUTINE UNIVSCALE_SUB(R, A, X)
   ELSE
 
      X = ZERO
-     
+
   END IF
 
   X = A(1)*X
 
   RETURN
-  
+
 END SUBROUTINE UNIVSCALE_SUB

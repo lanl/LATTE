@@ -55,13 +55,13 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
 #ifdef PROGRESSON
-             IF (LATTEINEXISTS) THEN  !orthogonalize from progress lib if latte.in exists
-               CALL ORTHOMYHPRG
-             ELSE
-               CALL ORTHOMYH
-             ENDIF
+              IF (LATTEINEXISTS) THEN  !orthogonalize from progress lib if latte.in exists
+                 CALL ORTHOMYHPRG
+              ELSE
+                 CALL ORTHOMYH
+              ENDIF
 #else
-             CALL ORTHOMYH
+              CALL ORTHOMYH
 #endif
            ELSEIF (KON .EQ. 1) THEN
               CALL KORTHOMYH
@@ -79,7 +79,7 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
         ! If we used diagonalization, we can compute the response function
         ! for updating the charges
 
-!        IF (CONTROL .EQ. 1) CALL GETRESPF
+        !        IF (CONTROL .EQ. 1) CALL GETRESPF
 
 
         !
@@ -93,13 +93,13 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
 #ifdef PROGRESSON
-            IF (LATTEINEXISTS) THEN  !deorthogonalize from progress lib if latte.in exists
-              CALL DEORTHOMYRHOPRG
-            ELSE
-              CALL DEORTHOMYRHO
-            ENDIF
+              IF (LATTEINEXISTS) THEN  !deorthogonalize from progress lib if latte.in exists
+                 CALL DEORTHOMYRHOPRG
+              ELSE
+                 CALL DEORTHOMYRHO
+              ENDIF
 #else
-            CALL DEORTHOMYRHO
+              CALL DEORTHOMYRHO
 #endif
            ELSEIF (KON .EQ. 1) THEN
               CALL KDEORTHOMYRHO
@@ -140,13 +140,13 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
 #ifdef PROGRESSON
-            IF (LATTEINEXISTS) THEN  !orthogonalize from progress lib if latte.in exists
-              CALL ORTHOMYHPRG
-            ELSE
-              CALL ORTHOMYH
-            ENDIF
+              IF (LATTEINEXISTS) THEN  !orthogonalize from progress lib if latte.in exists
+                 CALL ORTHOMYHPRG
+              ELSE
+                 CALL ORTHOMYH
+              ENDIF
 #else
-           CALL ORTHOMYH
+              CALL ORTHOMYH
 #endif
            ELSEIF (KON .EQ. 1) THEN
               CALL KORTHOMYH
@@ -160,18 +160,18 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
            CALL KGETRHO
         ENDIF
 
-!        IF (CONTROL .EQ. 1) CALL GETRESPF
+        !        IF (CONTROL .EQ. 1) CALL GETRESPF
 
         IF (BASISTYPE.EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
 #ifdef PROGRESSON
-            IF (LATTEINEXISTS) THEN  !deorthogonalize from progress lib if latte.in exists
-              CALL DEORTHOMYRHOPRG
-            ELSE
-              CALL DEORTHOMYRHO
-            ENDIF
+              IF (LATTEINEXISTS) THEN  !deorthogonalize from progress lib if latte.in exists
+                 CALL DEORTHOMYRHOPRG
+              ELSE
+                 CALL DEORTHOMYRHO
+              ENDIF
 #else
-            CALL DEORTHOMYRHO
+              CALL DEORTHOMYRHO
 #endif
            ELSEIF (KON .EQ. 1) THEN
               CALL KDEORTHOMYRHO
@@ -230,13 +230,13 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
 #ifdef PROGRESSON
-           IF (LATTEINEXISTS) THEN  !orthogonalize from progress lib if latte.in exists
-             CALL ORTHOMYHPRG
-           ELSE
-             CALL ORTHOMYH
-           ENDIF
+              IF (LATTEINEXISTS) THEN  !orthogonalize from progress lib if latte.in exists
+                 CALL ORTHOMYHPRG
+              ELSE
+                 CALL ORTHOMYH
+              ENDIF
 #else
-           CALL ORTHOMYH
+              CALL ORTHOMYH
 #endif
            ELSEIF (KON .EQ. 1) THEN
               CALL KORTHOMYH
@@ -260,20 +260,20 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
 #ifdef PROGRESSON
-           IF (LATTEINEXISTS) THEN  !deorthogonalize from progress lib if latte.in exists
-             CALL DEORTHOMYRHOPRG
-           ELSE
-             CALL DEORTHOMYRHO
-           ENDIF
+              IF (LATTEINEXISTS) THEN  !deorthogonalize from progress lib if latte.in exists
+                 CALL DEORTHOMYRHOPRG
+              ELSE
+                 CALL DEORTHOMYRHO
+              ENDIF
 #else
-           CALL DEORTHOMYRHO
+              CALL DEORTHOMYRHO
 #endif
            ELSEIF (KON .EQ. 1) THEN
               CALL KDEORTHOMYRHO
            ENDIF
         ENDIF
 
-!        IF (CONTROL .EQ. 1) CALL GETRESPF
+        !        IF (CONTROL .EQ. 1) CALL GETRESPF
 
         CALL GETDELTAQ
 

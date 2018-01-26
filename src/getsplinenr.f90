@@ -25,7 +25,7 @@ PROGRAM SPLINE
      U(I) = (6.0*((Y(I+1) - Y(I))/(X(I+1) - X(I)) - (Y(I) - Y(I-1)) &
           /(X(I) - X(I-1)))/(X(I+1)-X(I-1)) - SIG*U(I-1))/P
   ENDDO
-  
+
   QN = 0.0
   UN = 0.0
 
@@ -39,9 +39,9 @@ PROGRAM SPLINE
 
      R = 0.5 + 0.5*REAL(I-1)/1000.0
 
-     
+
      CALL SPLINT(X, Y, Y2, R, NEWY, GRAD)
-     
+
      WRITE(12,*) R, NEWY, GRAD
   ENDDO
 

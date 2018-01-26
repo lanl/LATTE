@@ -69,21 +69,21 @@ SUBROUTINE GETMATINDLIST
         CASE("spdf")
            INDI = INDI + 16
         END SELECT
-        
+
      ENDDO
-  
+
      MATINDLIST(I) = INDI
 
   ENDDO
 
   IF (SPINON .EQ. 1) THEN
-     
+
      ALLOCATE(SPININDLIST(NATS))
-     
+
      DO I = 1, NATS
         INDI = 0
         DO J = 1, I - 1
-           
+
            ! The number of spins = number of orbitals
 
            SELECT CASE(BASIS(ELEMPOINTER(J)))
@@ -118,15 +118,15 @@ SUBROUTINE GETMATINDLIST
            CASE("spdf")
               INDI = INDI + 4
            END SELECT
-           
+
         ENDDO
-        
+
         SPININDLIST(I) = INDI
 
      ENDDO
-     
+
   ENDIF
-              
+
   RETURN
-  
+
 END SUBROUTINE GETMATINDLIST

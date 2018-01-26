@@ -42,7 +42,7 @@ FUNCTION UNIVSCALE(I, J, L1, L2, MP, R, WHICHINT)
   USE MYPRECISION
 
   IMPLICIT NONE
-  
+
   INTEGER :: I, J, L1, L2, IP1, IP2, MP, IC
   INTEGER :: BREAKLOOP
   REAL(LATTEPREC) :: UNIVSCALE
@@ -94,7 +94,7 @@ FUNCTION UNIVSCALE(I, J, L1, L2, MP, R, WHICHINT)
      IGLTYPE = TRIM(IGLTYPE)//"d"
   CASE(3)
      IGLTYPE = TRIM(IGLTYPE)//"f"
-  END SELECT  
+  END SELECT
 
   ! It makes a difference if our atoms are of the species or not...
 
@@ -109,7 +109,7 @@ FUNCTION UNIVSCALE(I, J, L1, L2, MP, R, WHICHINT)
         IC = IC + 1
         IF (ATELE(I) .EQ. ELE1(IC) .AND. ATELE(J) .EQ. ELE2(IC) .AND. &
              IGLTYPE .EQ. BTYPE(IC)) THEN
-          
+
            ! Now we've ID'ed our bond integral
 
            SELECT CASE(WHICHINT)
@@ -118,7 +118,7 @@ FUNCTION UNIVSCALE(I, J, L1, L2, MP, R, WHICHINT)
            CASE("S") ! We're doing the S matrix build
               A = OVERL(:,IC)
            END SELECT
-           
+
            BREAKLOOP = 1
 
         ENDIF
@@ -137,9 +137,9 @@ FUNCTION UNIVSCALE(I, J, L1, L2, MP, R, WHICHINT)
            IF (((ATELE(I) .EQ. ELE1(IC) .AND. ATELE(J) .EQ. ELE2(IC)) .OR. &
                 (ATELE(I) .EQ. ELE2(IC) .AND. ATELE(J) .EQ. ELE1(IC))) .AND. &
                 IGLTYPE .EQ. BTYPE(IC)) THEN
-          
+
               ! Now we've ID'ed our bond integral
-              
+
               SELECT CASE(WHICHINT)
               CASE("H") ! We're doing the H matrix build
                  A = BOND(:,IC)
@@ -160,72 +160,72 @@ FUNCTION UNIVSCALE(I, J, L1, L2, MP, R, WHICHINT)
 
               IF ((ATELE(I) .EQ. ELE1(IC) .AND. ATELE(J) .EQ. ELE2(IC)) .AND. &
                    IGLTYPE .EQ. BTYPE(IC)) THEN
-                 
+
                  ! Now we've ID'ed our bond integral
-                 
+
                  SELECT CASE(WHICHINT)
                  CASE("H") ! We're doing the H matrix build
                     A = BOND(:,IC)
                  CASE("S") ! We're doing the S matrix build
                     A = OVERL(:,IC)
                  END SELECT
-                 
+
               ENDIF
            ENDDO
-           
+
         ELSE
 
            DO IC = 1, NOINT
 
               IF ((ATELE(I) .EQ. ELE2(IC) .AND. ATELE(J) .EQ. ELE1(IC)) .AND. &
                    IGLTYPE .EQ. BTYPE(IC)) THEN
-                 
+
                  ! Now we've ID'ed our bond integral
-                 
+
                  SELECT CASE(WHICHINT)
                  CASE("H") ! We're doing the H matrix build
                     A = BOND(:,IC)
                  CASE("S") ! We're doing the S matrix build
                     A = OVERL(:,IC)
                  END SELECT
-                 
+
               ENDIF
            ENDDO
-        
+
         ENDIF
      ENDIF
 
   ENDIF
-     
+
   IF (R .LE. A(7)) THEN
-     
+
      RMOD = R - A(6)
-     
+
      UNIVSCALE = EXP(RMOD*(A(2) + RMOD*(A(3) + RMOD*(A(4) + A(5)*RMOD))))
-     
+
   ELSEIF (R .GT. A(7) .AND. R .LT. A(8)) THEN
-     
+
      RMINUSR1 = R - A(7)
-     
+
      UNIVSCALE = A(9) + RMINUSR1*(A(10) + &
           RMINUSR1*(A(11) + RMINUSR1*(A(12) + &
           RMINUSR1*(A(13) + RMINUSR1*A(14)))))
-     
+
   ELSE
-     
+
      UNIVSCALE = ZERO
-     
+
   END IF
-  
+
   UNIVSCALE = A(1)*UNIVSCALE
-  
+
   ! permutation symmetry
-  
+
   IF (L1 .GT. L2 .AND. MOD(L1 + L2, 2) .NE. 0) UNIVSCALE = -UNIVSCALE
-  
-!  PRINT*, UNIVSCALE
-    
+
+  !  PRINT*, UNIVSCALE
+
   RETURN
-  
+
 END FUNCTION UNIVSCALE
 

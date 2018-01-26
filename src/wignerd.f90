@@ -33,16 +33,16 @@ FUNCTION WIGNERD(L, M, MP, COSBETA)
   INTEGER, EXTERNAL :: FACTORIAL
   INTEGER :: K, L, M, MP
 
-!  PREF = TWO ** (-L) * REAL( (-1)**(L - MP)) * &
-!       SQRT( REAL(FACTORIAL(L + M) * FACTORIAL(L - M) * &
-!       FACTORIAL(L + MP) * FACTORIAL(L - MP)) )
+  !  PREF = TWO ** (-L) * REAL( (-1)**(L - MP)) * &
+  !       SQRT( REAL(FACTORIAL(L + M) * FACTORIAL(L - M) * &
+  !       FACTORIAL(L + MP) * FACTORIAL(L - MP)) )
 
   PREF =  REAL( (-1)**(L - MP)) * &
        SQRT( REAL(FACTORIAL(L + M) * FACTORIAL(L - M) * &
        FACTORIAL(L + MP) * FACTORIAL(L - MP)) ) / REAL(2**L)
 
   SUM = ZERO
-  
+
   DO K = MAX(0, - M - MP), MIN(L - M, L - MP)
 
      NUMER = REAL( (-1)**K ) * &
@@ -59,5 +59,5 @@ FUNCTION WIGNERD(L, M, MP, COSBETA)
   WIGNERD = PREF * SUM
 
   RETURN 
- 
+
 END FUNCTION WIGNERD
