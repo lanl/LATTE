@@ -35,3 +35,4 @@ script:
 
 after_success:
   - echo "success"
+  - bash <(curl -s https://codecov.io/bash)
