@@ -33,23 +33,25 @@ SUBROUTINE ERRORS(SUB,TAG)
   CHARACTER(*), INTENT(IN) :: SUB,TAG
 
   IF(LIBRUN)THEN
-    WRITE(*,*) "# *************ERROR**************"
-    WRITE(*,*) "# LATTE stopped due to the following error at subroutine ",SUB,":"
-    WRITE(*,*) "# ",TAG
-    CALL TIMEDATE_TAG("The error occurred at: ")
-    WRITE(*,*) "# The error will be reported back to the host code"
-    WRITE(*,*) "# ********************************"
-    CALL FLUSH(6)
-    EXISTERROR = .true.
+     WRITE(*,*) ""
+     WRITE(*,*) "# *************ERROR**************"
+     WRITE(*,*) "# LATTE stopped due to the following error at subroutine ",SUB,":"
+     WRITE(*,*) "# ",TAG
+     CALL TIMEDATE_TAG("The error occurred at: ")
+     WRITE(*,*) "# The error will be reported back to the host code"
+     WRITE(*,*) "# ********************************"
+     WRITE(*,*) ""
+     CALL FLUSH(6)
+     EXISTERROR = .TRUE.
   ELSE
-    WRITE(*,*) ""
-    WRITE(*,*) "# *************ERROR**************"
-    WRITE(*,*) "# LATTE stopped due to the following error at subroutine ",SUB,":"
-    WRITE(*,*) "# ",TAG
-    CALL TIMEDATE_TAG("The error occurred at: ")
-    WRITE(*,*) "# ********************************"
-    WRITE(*,*) ""
-    STOP
+     WRITE(*,*) ""
+     WRITE(*,*) "# *************ERROR**************"
+     WRITE(*,*) "# LATTE stopped due to the following error at subroutine ",SUB,":"
+     WRITE(*,*) "# ",TAG
+     CALL TIMEDATE_TAG("The error occurred at: ")
+     WRITE(*,*) "# ********************************"
+     WRITE(*,*) ""
+     STOP
   ENDIF
 
 END SUBROUTINE ERRORS

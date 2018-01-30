@@ -54,7 +54,7 @@ SUBROUTINE PANIC
 
   OPEN(UNIT=24, STATUS="UNKNOWN", FILE="myPANICfile.dat")
 
-  WRITE(6,'("PANIC: SOMETHING BAD HAS HAPPENED! Check myPANICfile.dat")')
+  WRITE(6,'("# PANIC: SOMETHING BAD HAS HAPPENED! Check myPANICfile.dat")')
   WRITE(24,'("PANIC: SOMETHING BAD HAS HAPPENED! SOME CLUES TO DIAGNOSE THE PROBLEM FOLLOW")')
 
   IF (MDON .EQ. 1) THEN
@@ -63,7 +63,7 @@ SUBROUTINE PANIC
 
 
   IF (ELECTRO .EQ. 1) THEN
-     WRITE(24,'("Self-consistent charge transfer: on")')    
+     WRITE(24,'("Self-consistent charge transfer: on")')
      WRITE(24,'("SCF tolerance = ", G8.3)') ELEC_QTOL
      IF (ELECMETH .EQ. 0) THEN
         WRITE(24,'("Using Ewald summation")')
@@ -122,7 +122,7 @@ SUBROUTINE PANIC
   ELSEIF (ENTROPYKIND .EQ. 3) THEN
      WRITE(24,'("Using 4th order approximation for entropy")')
   ELSEIF (ENTROPYKIND .EQ. 4) THEN
-     WRITE(24,'("Using 8th order approximation for entropy")') 
+     WRITE(24,'("Using 8th order approximation for entropy")')
   ENDIF
 
   WRITE(24,'("Tr[ rho*H ] = ", F16.8)') TRRHOH

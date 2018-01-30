@@ -129,7 +129,7 @@ CONTAINS
     CALL MPI_COMM_SIZE( MPI_COMM_WORLD, NUMPROCS, IERR )
 #endif
 
-    EXISTERROR = .false. !We assume we start the lib call without errors
+    EXISTERROR = .FALSE. !We assume we start the lib call without errors
 
     !INITIALIZATION
     IF(.NOT. LIBINIT)THEN
@@ -140,8 +140,11 @@ CONTAINS
 
        OPEN(UNIT=6, FILE="log.latte", FORM="formatted")
 
-       WRITE(*,*)"The log file for latte_lib"
-       WRITE(*,*)""
+       IF(VERBOSE >= 1)THEN
+          WRITE(*,*)"# The log file for latte_lib"
+          WRITE(*,*)""
+          CALL TIMEDATE_TAG("LATTE started at : ")
+       ENDIF
 
        INQUIRE( FILE="animate/.", exist=LATTEINEXISTS)
        IF (.NOT. LATTEINEXISTS) CALL SYSTEM("mkdir animate")
@@ -592,7 +595,7 @@ CONTAINS
           IF (ELECTRO .EQ. 1) CALL GETCOULE
        ENDIF
 
-       WRITE(*,*)"LIBCALLS",LIBCALLS
+       IF(VERBOSE >= 1) WRITE(*,*)"LIBCALLS",LIBCALLS
 
        IF(LIBCALLS > 0) CALL GETMDF(1, LIBCALLS)
 
@@ -636,11 +639,11 @@ CONTAINS
           CALL READRESTARTLIB(LIBCALLS)
        ENDIF
 
-       WRITE(*,*)"Energy Components (TRRHOH, EREP, ENTE, ECOUL)",TRRHOH, EREP, ENTE, ECOUL
+       IF(VERBOSE >= 1) WRITE(*,*)"Energy Components (TRRHOH, EREP, ENTE, ECOUL)",TRRHOH, EREP, ENTE, ECOUL
 
        IF(MAXVAL(FTOT_OUT) .NE. 0.0d0)THEN
-          IF(VERBOSE >= 2)WRITE(*,*)"Adding force components and energies from applicacion code ..."
-          WRITE(*,*)"APPCODE,LATTE",VENERG,TRRHOH + EREP - ENTE - ECOUL + ESPIN
+          IF(VERBOSE >= 1) WRITE(*,*)"Adding force components and energies from applicacion code ..."
+          IF(VERBOSE >= 1) WRITE(*,*)"APPCODE,LATTE",VENERG,TRRHOH + EREP - ENTE - ECOUL + ESPIN
           VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
           FTOT_OUT = FTOT_OUT +  FTOT
        ELSE
