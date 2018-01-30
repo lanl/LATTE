@@ -49,6 +49,7 @@ FUNCTION UNIVSCALE(I, J, L1, L2, MP, R, WHICHINT)
   REAL(LATTEPREC) :: A(14), R, RMINUSR1, RMOD
   CHARACTER(LEN=1) :: WHICHINT
   CHARACTER(LEN=3) :: IGLTYPE
+  IF (EXISTERROR) RETURN
 
   ! can't test directly on L values because basis strings always list
   ! lower L values first

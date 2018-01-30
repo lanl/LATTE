@@ -27,6 +27,7 @@ SUBROUTINE GETMATINDLIST
   IMPLICIT NONE
 
   INTEGER :: I, J, INDI
+  IF (EXISTERROR) RETURN
 
   ! This arrays contains and index for the position of atoms
   ! in the Hamiltonian matrix. We only need to compute this once

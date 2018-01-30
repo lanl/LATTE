@@ -42,6 +42,7 @@ SUBROUTINE SETUPTBMD
   REAL(LATTEPREC) :: THETIME, NEWESPIN, NEWECOUL
   REAL(LATTEPREC) :: RN, MYVOL
   INTEGER :: FLAGAND
+  IF (EXISTERROR) RETURN
 
   !
   ! Read MDcontroller to determine what kind of MD simulation to do

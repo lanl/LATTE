@@ -29,6 +29,7 @@ SUBROUTINE PROPCHEMPOT(ITER)
   IMPLICIT NONE
 
   INTEGER :: I, ITER  
+  IF (EXISTERROR) RETURN
 
   ! If iter = 1, then we just set up our arrays of previous guesses
 

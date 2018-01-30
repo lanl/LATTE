@@ -4,7 +4,7 @@
 #	sudo apt-get install emacs
 #
 # Get the indentation emacs script as follows: 
-#  	wget https://raw.github.com/Glavin001/atom-beautify/master/src/beautifiers/fortran-beautifier/emacs-fortran-formating-script.lisp#L44
+#  	wget https://raw.github.com/Glavin001/atom-beautify/master/src/beautifiers/fortran-beautifier/emacs-fortran-formating-script.lisp
 #
 # To use it just call this script from the main LATTE folder. 
 # 	./tools/indent.sh

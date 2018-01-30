@@ -36,6 +36,7 @@ SUBROUTINE PLOTPPOT
   REAL(LATTEPREC) :: DC(3), DPHI(3), EXPTMP
   REAL(LATTEPREC) :: POLYNOM, DPOLYNOM
   CHARACTER(LEN=50) :: FLNM
+  IF (EXISTERROR) RETURN
 
   ! There are 4 different parts to the pair potential:
   !

@@ -26,29 +26,30 @@
 !! \param TAG Error message to be passed.
 !!
 SUBROUTINE ERRORS(SUB,TAG)
-  USE CONSTANTS_MOD, ONLY: LIBRUN, EXISTERROR
+  USE CONSTANTS_MOD, ONLY: LIBRUN, EXISTERROR, LIBCALLS
   USE TIMER_MOD, ONLY: TIMEDATE_TAG
+  USE MYPRECISION, ONLY: LATTEPREC
+  USE LATTE_LIB, ONLY: LATTE
   CHARACTER(*), INTENT(IN) :: SUB,TAG
 
-  WRITE(*,*)"LIBRUN",LIBRUN
   IF(LIBRUN)THEN
-     WRITE(*,*) "# *************ERROR**************"
-     WRITE(*,*) "# LATTE stop due to the following error at subroutine ",SUB,":"
-     WRITE(*,*) "# ",TAG
-     CALL TIMEDATE_TAG("The error occurred at: ")
-     WRITE(*,*) "# This error will be reported back to the hosting code"
-     WRITE(*,*) "# ********************************"
-     EXISTERROR = .TRUE.
-     STOP
+    WRITE(*,*) "# *************ERROR**************"
+    WRITE(*,*) "# LATTE stopped due to the following error at subroutine ",SUB,":"
+    WRITE(*,*) "# ",TAG
+    CALL TIMEDATE_TAG("The error occurred at: ")
+    WRITE(*,*) "# The error will be reported back to the host code"
+    WRITE(*,*) "# ********************************"
+    CALL FLUSH(6)
+    EXISTERROR = .true.
   ELSE
-     WRITE(*,*) ""
-     WRITE(*,*) "# *************ERROR**************"
-     WRITE(*,*) "# LATTE stopped due to the following error at subroutine ",SUB,":"
-     WRITE(*,*) "# ",TAG
-     CALL TIMEDATE_TAG("The error occurred at: ")
-     WRITE(*,*) "# ********************************"
-     WRITE(*,*) ""
-     STOP
+    WRITE(*,*) ""
+    WRITE(*,*) "# *************ERROR**************"
+    WRITE(*,*) "# LATTE stopped due to the following error at subroutine ",SUB,":"
+    WRITE(*,*) "# ",TAG
+    CALL TIMEDATE_TAG("The error occurred at: ")
+    WRITE(*,*) "# ********************************"
+    WRITE(*,*) ""
+    STOP
   ENDIF
 
 END SUBROUTINE ERRORS
