@@ -16,6 +16,7 @@ keyword. Example: #MyCommentedKeyword=
 #General controls
 CONTROL{
   JobName= MyJob
+  VERBOSE= 0 
   PARAMPATH= "./TBparam"
   COORDSFILE= "./bl/inputblock.dat"
   xControl= 1
