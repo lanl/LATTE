@@ -28,6 +28,7 @@ SUBROUTINE IFRESTART
   USE MYPRECISION
 
   IMPLICIT NONE
+  IF (EXISTERROR) RETURN
 
   !
   ! Now we've got to get the Hamiltonian(s) consistent with 

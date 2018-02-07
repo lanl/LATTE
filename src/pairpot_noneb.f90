@@ -40,6 +40,7 @@ SUBROUTINE PAIRPOTNONEB
   REAL(LATTEPREC) :: FUNIV(3), FJOIN(3), FVDW(3), FCUT(3)
   REAL(LATTEPREC) :: PHI, DPHI(3), EXPTMP, R6, FTMP(3)
   REAL(LATTEPREC) :: POLYNOM, DPOLYNOM
+  IF (EXISTERROR) RETURN
 
   ! 
   ! In this subroutine we add contributions in a strange way to ensure

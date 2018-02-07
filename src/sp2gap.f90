@@ -39,6 +39,7 @@ SUBROUTINE SP2GAP
 
   INTEGER :: I, J, ITER
   REAL(LATTEPREC) :: TRX, TRX2, TRXT, GERSHFACT
+  IF (EXISTERROR) RETURN
 
   ! Estimate the largest and smallest eigenvalues
 

@@ -37,6 +37,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   REAL(4) :: TIMEACC
   REAL(LATTEPREC) :: MAXDQ
   REAL(LATTEPREC), ALLOCATABLE :: QDIFF(:), SPINDIFF(:)
+  IF (EXISTERROR) RETURN
 
   !
   ! If FULLQCONV = 1, then we're going to iterate until all charges are within
