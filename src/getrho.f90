@@ -31,6 +31,7 @@ SUBROUTINE GETRHO(MDITER)
   IMPLICIT NONE
 
   INTEGER :: MDITER
+  IF (EXISTERROR) RETURN
 
   ! This subroutine selects and calls the subroutines used to
   ! compute the density matrix based on the value of CONTROL

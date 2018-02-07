@@ -4,6 +4,7 @@ SUBROUTINE INITSHOCKCOMP
   USE MDARRAY
 
   IMPLICIT NONE
+  IF (EXISTERROR) RETURN
 
   ! First convert units of Up and Us from m/s to A/fs
 
