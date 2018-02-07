@@ -41,6 +41,8 @@ SUBROUTINE BOEVECS
   REAL(LATTEPREC) :: EBAND, QMIXORIG
   REAL(LATTEPREC) :: S, OCCLOGOCC_ELECTRONS, OCCLOGOCC_HOLES
 
+  IF (EXISTERROR) RETURN
+
   BO = ZERO
 
   OCCTARGET = BNDFIL*REAL(HDIM)
@@ -108,6 +110,7 @@ SUBROUTINE BOEVECS
 
      IF (ITER .EQ. 100) THEN
         CALL ERRORS("bodirect","Newton-Raphson scheme to find the Chemical potential does not converge")
+        IF (EXISTERROR) RETURN
      ENDIF
 
      ! Now we have the chemical potential we can build the density matrix

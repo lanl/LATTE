@@ -11,6 +11,7 @@ SUBROUTINE CONJGRADIENT(ITER, DELTAENERGY)
   REAL(LATTEPREC) :: DELTAENERGY
   REAL(LATTEPREC) :: MAXSHIFT = 0.1D0, KAPPA = 0.01D0
   REAL(LATTEPREC) :: BETA, BETA1, BETA2, MYSHIFT
+  IF (EXISTERROR) RETURN
 
   ! On the first step, or every so often because
   ! of a loss of conjugacy we do a molecular statics step

@@ -52,6 +52,7 @@ SUBROUTINE KPULAY
   COMPLEX(LATTEPREC), PARAMETER :: ZONE=CMPLX(ONE), ZZERO=CMPLX(ZERO), ZHALF=CMPLX(HALF)
 
   LOGICAL PATH
+  IF (EXISTERROR) RETURN
 
   ! These were allocated elsewhere. We'll use them to accumulate the complex forces
 

@@ -98,7 +98,9 @@ CONTAINS
   !! \brief Note: All units are LATTE units by default. See https://github.com/losalamos/LATTE/blob/master/Manual/LATTE_manual.pdf
   !!
   SUBROUTINE LATTE(NTYPES,TYPES,CR_IN,MASSES_IN,XLO,XHI,XY,XZ,YZ,FTOT_OUT, &
-       MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIALINOUT)
+       MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIALINOUT, EXISTERROR_INOUT)
+
+    USE CONSTANTS_MOD, ONLY: EXISTERROR
 
     IMPLICIT NONE
 
@@ -113,7 +115,7 @@ CONTAINS
     REAL(LATTEPREC), INTENT(OUT) :: FTOT_OUT(:,:), VENERG
     REAL(LATTEPREC), INTENT(OUT) :: VIRIALINOUT(6)
     INTEGER, INTENT(IN) ::  NTYPES, TYPES(:), MAXITER_IN
-    LOGICAL :: EXISTERROR
+    LOGICAL(1), INTENT(INOUT) :: EXISTERROR_INOUT
 
 #ifdef PROGRESSON
     TYPE(SYSTEM_TYPE) :: SY
@@ -127,18 +129,22 @@ CONTAINS
     CALL MPI_COMM_SIZE( MPI_COMM_WORLD, NUMPROCS, IERR )
 #endif
 
-    LIBRUN = .TRUE.
-    IF(EXISTERROR) RETURN
+    EXISTERROR = .FALSE. !We assume we start the lib call without errors
 
     !INITIALIZATION
     IF(.NOT. LIBINIT)THEN
+
+       LIBRUN = .TRUE.
 
        LIBCALLS = 0 ; MAXITER = -10
 
        OPEN(UNIT=6, FILE="log.latte", FORM="formatted")
 
-       WRITE(*,*)"The log file for latte_lib"
-       WRITE(*,*)""
+       IF(VERBOSE >= 1)THEN
+          WRITE(*,*)"# The log file for latte_lib"
+          WRITE(*,*)""
+          CALL TIMEDATE_TAG("LATTE started at : ")
+       ENDIF
 
        INQUIRE( FILE="animate/.", exist=LATTEINEXISTS)
        IF (.NOT. LATTEINEXISTS) CALL SYSTEM("mkdir animate")
@@ -528,6 +534,7 @@ CONTAINS
 
        CALL DEALLOCATEALL
 
+       EXISTERROR_INOUT = EXISTERROR
        RETURN
 
     ELSEIF (MDON .EQ. 1 .AND. RELAXME .EQ. 0 .AND. MAXITER_IN < 0 ) THEN
@@ -588,7 +595,7 @@ CONTAINS
           IF (ELECTRO .EQ. 1) CALL GETCOULE
        ENDIF
 
-       WRITE(*,*)"LIBCALLS",LIBCALLS
+       IF(VERBOSE >= 1) WRITE(*,*)"LIBCALLS",LIBCALLS
 
        IF(LIBCALLS > 0) CALL GETMDF(1, LIBCALLS)
 
@@ -632,11 +639,11 @@ CONTAINS
           CALL READRESTARTLIB(LIBCALLS)
        ENDIF
 
-       WRITE(*,*)"Energy Components (TRRHOH, EREP, ENTE, ECOUL)",TRRHOH, EREP, ENTE, ECOUL
+       IF(VERBOSE >= 1) WRITE(*,*)"Energy Components (TRRHOH, EREP, ENTE, ECOUL)",TRRHOH, EREP, ENTE, ECOUL
 
        IF(MAXVAL(FTOT_OUT) .NE. 0.0d0)THEN
-          IF(VERBOSE >= 2)WRITE(*,*)"Adding force components and energies from applicacion code ..."
-          WRITE(*,*)"APPCODE,LATTE",VENERG,TRRHOH + EREP - ENTE - ECOUL + ESPIN
+          IF(VERBOSE >= 1) WRITE(*,*)"Adding force components and energies from applicacion code ..."
+          IF(VERBOSE >= 1) WRITE(*,*)"APPCODE,LATTE",VENERG,TRRHOH + EREP - ENTE - ECOUL + ESPIN
           VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
           FTOT_OUT = FTOT_OUT +  FTOT
        ELSE
@@ -683,6 +690,7 @@ CONTAINS
 
        CALL FLUSH(6) !To force writing to file at every call
 
+       EXISTERROR_INOUT = EXISTERROR
        RETURN
 
     ELSEIF (MDON .EQ. 1 .AND. RELAXME .EQ. 0 .AND. MAXITER_IN >= 0) THEN
@@ -824,6 +832,7 @@ CONTAINS
 #endif
 
     LIBINIT = .TRUE.
+    EXISTERROR_INOUT = EXISTERROR
 
   END SUBROUTINE LATTE
 

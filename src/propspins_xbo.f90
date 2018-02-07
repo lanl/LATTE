@@ -30,6 +30,7 @@ SUBROUTINE PROPSPINS(ITER)
   IMPLICIT NONE
 
   INTEGER :: I, J, ITER  
+  IF (EXISTERROR) RETURN
 
   ! If iter = 1, then we just set up our arrays of previous guesses
 

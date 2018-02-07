@@ -50,6 +50,7 @@ SUBROUTINE KFCOULNONO
   REAL(LATTEPREC), EXTERNAL :: DFDA, DFDB, DFDR
   COMPLEX(LATTEPREC) :: FTMP(3), RHO, CONJGBLOCH
   LOGICAL PATH
+  IF (EXISTERROR) RETURN
 
   ! These were allocated elsewhere. We'll use them to accumulate the complex forces
 

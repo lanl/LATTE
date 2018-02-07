@@ -26,20 +26,23 @@
 !! \param TAG Error message to be passed.
 !!
 SUBROUTINE ERRORS(SUB,TAG)
-  USE CONSTANTS_MOD, ONLY: LIBRUN, EXISTERROR
+  USE CONSTANTS_MOD, ONLY: LIBRUN, EXISTERROR, LIBCALLS
   USE TIMER_MOD, ONLY: TIMEDATE_TAG
+  USE MYPRECISION, ONLY: LATTEPREC
+  USE LATTE_LIB, ONLY: LATTE
   CHARACTER(*), INTENT(IN) :: SUB,TAG
 
-  WRITE(*,*)"LIBRUN",LIBRUN
   IF(LIBRUN)THEN
+     WRITE(*,*) ""
      WRITE(*,*) "# *************ERROR**************"
-     WRITE(*,*) "# LATTE stop due to the following error at subroutine ",SUB,":"
+     WRITE(*,*) "# LATTE stopped due to the following error at subroutine ",SUB,":"
      WRITE(*,*) "# ",TAG
      CALL TIMEDATE_TAG("The error occurred at: ")
-     WRITE(*,*) "# This error will be reported back to the hosting code"
+     WRITE(*,*) "# The error will be reported back to the host code"
      WRITE(*,*) "# ********************************"
+     WRITE(*,*) ""
+     CALL FLUSH(6)
      EXISTERROR = .TRUE.
-     STOP
   ELSE
      WRITE(*,*) ""
      WRITE(*,*) "# *************ERROR**************"

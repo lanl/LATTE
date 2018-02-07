@@ -29,6 +29,7 @@ SUBROUTINE PBC
 
   INTEGER :: I, IPIV(3), INFO
   REAL(LATTEPREC) :: WORK(3), BOXINV(3,3), S(3)
+  IF (EXISTERROR) RETURN
 
   ! reduced coordinates s = box^-1 X real coordinates
 
