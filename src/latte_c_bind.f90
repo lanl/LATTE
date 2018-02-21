@@ -82,3 +82,20 @@ SUBROUTINE LATTE_C_BIND (FLAGS,NATS,COORDS,TYPES,NTYPES,MASSES,XLO &
   RETURN
 
 END SUBROUTINE LATTE_C_BIND
+
+!> Function for Latte-C++ interfacing.
+!! \return ABIVERSION integer representing the date of the last change
+!!          to the C/C++ interface (e.g. 20180221)
+!!
+!! \brief This function will be used prior to calling the LATTE library
+!!        to allow the calling code to ensure the linked library version is compatible.
+!!
+INTEGER(C_INT) FUNCTION LATTE_C_ABIVERSION()  BIND (C, NAME="latte_abiversion") 
+  USE ISO_C_BINDING, ONLY: C_INT
+
+  IMPLICIT NONE
+
+  LATTE_C_ABIVERSION = 20180207
+  RETURN
+
+END FUNCTION LATTE_C_ABIVERSION
