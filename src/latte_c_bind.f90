@@ -90,12 +90,12 @@ END SUBROUTINE LATTE_C_BIND
 !! \brief This function will be used prior to calling the LATTE library
 !!        to allow the calling code to ensure the linked library version is compatible.
 !!
-INTEGER(C_INT) FUNCTION LATTE_C_ABIVERSION()  BIND (C, NAME="latte_abiversion") 
+INTEGER(C_INT) FUNCTION LATTE_C_ABIVERSION()  BIND (C, NAME="latte_abiversion")
   USE ISO_C_BINDING, ONLY: C_INT
-
+  USE LATTE_LIB,     ONLY: LATTE_ABIVERSION
   IMPLICIT NONE
 
-  LATTE_C_ABIVERSION = 20180207
+  LATTE_C_ABIVERSION = LATTE_ABIVERSION
   RETURN
 
 END FUNCTION LATTE_C_ABIVERSION

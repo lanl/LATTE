@@ -56,7 +56,13 @@ MODULE LATTE_LIB
 
   PRIVATE
 
-  PUBLIC :: LATTE
+  ! Defines the version of the binary interface.
+  ! Adjust if non-backward compatible changes are made to the interface.
+  ! Use in codes using the library interface to make certain a compatible
+  ! version of the LATTE library is used.
+  INTEGER, PARAMETER :: LATTE_ABIVERSION = 20180207
+
+  PUBLIC :: LATTE, LATTE_ABIVERSION
 
 CONTAINS
 
