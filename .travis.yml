@@ -28,7 +28,7 @@ before_script:
 
 env:
   - CMAKE_BUILD_TYPE=Release FC=gfortran CC=gcc CXX=g++ CVR=ON CHOICES=gfort.lapack
-  - CMAKE_BUILD_TYPE=Release FC=gfortran CC=gcc CXX=g++ CHOICES=gfort.lapack.progress
+  - CMAKE_BUILD_TYPE=Release FC=gfortran CC=gcc CXX=g++ CVR=ON CHOICES=gfort.lapack.progress
 
 script:
   -  cp -f -v ./makefiles/makefile.CHOICES.${CHOICES} makefile.CHOICES
