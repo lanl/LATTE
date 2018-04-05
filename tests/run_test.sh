@@ -2,7 +2,6 @@
 
 # Script to test the LATTE program.
 
-set -e                                          # This will exit the script if there is any error
 MY_PATH=`pwd`                                   # Capturing the local path of the folder where we are running.
 
 RUN="./LATTE_DOUBLE"  # LATTE program executable
@@ -10,6 +9,33 @@ RUN="./LATTE_DOUBLE"  # LATTE program executable
 echo -e "\nTesting LATTE with new (latte.in) input files \n"
 
 mv latte.in latte.in.tmp
+
+set -e                                          # This will exit the script if there is any error
+
+
+# Testing for single point calculations:
+
+for name in single.point; do  \
+
+  INLATTEFILE="latte."$name".in"
+  REF="energy."$name".out"
+  COORDS=$name".dat"
+
+  cp  ./tests/$INLATTEFILE latte.in
+  cp  ./tests/$REF .
+  cp  ./tests/$COORDS ./bl/inputblock.dat
+
+  echo -e "\nTesting for "$name" \n"
+
+  time $RUN > out
+  ENERG=`grep "FREE" out | awk 'NF>1{print $5}'`
+  echo "1 "$ENERG > energy.out
+
+  python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.0000001
+
+done 
+
+# Testing for MD simulations:
 
 for name in 0scf 2scf fullscf fullscf.etemp sp2 fullscf.nvt \
        	fullscf.npt fullscf.vdw fullscf.spin fullscf.kon ; do
@@ -28,11 +54,9 @@ for name in 0scf 2scf fullscf fullscf.etemp sp2 fullscf.nvt \
   grep "Data" out | sed 's/Data/ /g' | awk 'NF>1{print $2}' > energy.out
   echo ""
 
-#  grep Energy out | sed -e s/"PAR"/$STRR/g  >  input_tmp.in
   python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.0000001
 
 done
-
 
 # Testing geometry optimizations:
 
@@ -53,7 +77,6 @@ for name in opt ; do
   python ./tests/test-optim.py --reference $REF --current monitorrelax.xyz --reltol 0.0000001
 
 done
-
 
 # Testing with the usual latte input method:
 
