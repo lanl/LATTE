@@ -226,6 +226,7 @@ SUBROUTINE SPINRHOEVECS
      ! Works with O and O2.
 
      BREAKLOOP = 0
+     IF ( UPNE + DOWNNE .EQ. TOTNE ) BREAKLOOP = 1
 
      DO WHILE ( BREAKLOOP .EQ. 0 )
 
@@ -245,8 +246,6 @@ SUBROUTINE SPINRHOEVECS
         ENDIF
 
         IF ( UPNE + DOWNNE .EQ. TOTNE ) BREAKLOOP = 1
-
-        !        print*, UPNE, DOWNNE
 
      ENDDO
 
