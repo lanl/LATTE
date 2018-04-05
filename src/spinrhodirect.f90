@@ -30,7 +30,7 @@ SUBROUTINE SPINRHOEVECS
 
   IMPLICIT NONE
 
-  INTEGER :: I, J, K
+  INTEGER :: I, J, K, CONT
   INTEGER :: ITER, BREAKLOOP
   INTEGER :: UPNE, DOWNNE
   REAL(LATTEPREC) :: OCCERROR , OCCUP, OCCDOWN
@@ -227,7 +227,11 @@ SUBROUTINE SPINRHOEVECS
 
      BREAKLOOP = 0
 
+     CONT = 0
+
      DO WHILE ( BREAKLOOP .EQ. 0 )
+
+        CONT = CONT + 1
 
         IF ( UPEVALS(UPNE + 1) .GE. CHEMPOT .AND. &
              UPEVALS(UPNE + 1) .LE. DOWNEVALS(DOWNNE + 1)) THEN
@@ -246,7 +250,16 @@ SUBROUTINE SPINRHOEVECS
 
         IF ( UPNE + DOWNNE .EQ. TOTNE ) BREAKLOOP = 1
 
-        !        print*, UPNE, DOWNNE
+        IF ( VERBOSE >= 2 ) THEN
+          write(*,*)"UPNE, DOWNNE", UPNE, DOWNNE
+          write(*,*)"CHEMPOT", CHEMPOT
+        ENDIF
+
+        IF ( CONT > 2*HDIM ) THEN
+          WRITE(*,*)""
+          CALL ERRORS("SPINRHOEVECS","Maximum iterations reached while filling up &
+                    & orbitals")
+        ENDIF
 
      ENDDO
 
