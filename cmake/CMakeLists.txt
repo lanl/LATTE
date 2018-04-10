@@ -113,7 +113,8 @@ mofit_plato.f90 ppfit.f90 pairpot_noneb.f90 allfit.f90
 readppottab.f90 pairpottab.f90 hugrescale.f90 avesforhug.f90 getdipole.f90
 fittingoutput.f90 tabtest.f90 kgenX.f90 korthomyH.f90 kdeorthomyrho.f90
 kfcoulnono.f90 kpulay.f90 getforce.f90 masses2symbols.f90 setuptbmd.f90
-wrtrestartlib.f90 readrestartlib.f90) 
+wrtrestartlib.f90 readrestartlib.f90 readppotspline.f90 pairpotspline.f90 
+errors.f90) 
 
 foreach(_m MYMODULES MYSUBS DBCSR)
   set(${_m}_SOURCES)
