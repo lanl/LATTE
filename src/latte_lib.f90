@@ -748,19 +748,17 @@ CONTAINS
 
     ELSEIF (MDON .EQ. 0 .AND. RELAXME .EQ. 1) THEN
 
-       WRITE(*,*)""
-       WRITE(*,*)"WARNING: RELAXME= 1"
-       WRITE(*,*)"The geometry optimization is being performed by LATTE"
-       WRITE(*,*)""
+       CALL ERRORS("latte_lib","This option was not tested for the &
+            &library version of LATTE: RELAXME= 1")
+       RETURN
 
        CALL MSRELAX
 
     ELSEIF (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. DOSFITON .EQ. 1) THEN
 
-       WRITE(*,*)""
-       WRITE(*,*)"WARNING: DOSFITON= 1"
-       WRITE(*,*)"This option was not tested for the library version of LATTE"
-       WRITE(*,*)""
+       CALL ERRORS("latte_lib","This option was not tested for the &
+            &library version of LATTE: DOSFITON= 1")
+       RETURN
 
        CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
 
@@ -773,37 +771,33 @@ CONTAINS
 
     ELSEIF  (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. DOSFITON .EQ. 2) THEN
 
-       WRITE(*,*)""
-       WRITE(*,*)"WARNING: DOSFITON= 2"
-       WRITE(*,*)"This option was not tested for the library version of LATTE"
-       WRITE(*,*)""
+       CALL ERRORS("latte_lib","This option was not tested for the &
+            &library version of LATTE: DOSFITON= 3")
+       RETURN
 
        CALL MOFIT
 
     ELSEIF (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. DOSFITON .EQ. 3) THEN
 
-       WRITE(*,*)""
-       WRITE(*,*)"WARNING: DOSFITON= 3"
-       WRITE(*,*)"This option was not tested for the library version of LATTE"
-       WRITE(*,*)""
+       CALL ERRORS("latte_lib","This option was not tested for the &
+            &library version of LATTE: DOSFITON= 3")
+       RETURN
 
        CALL MOFITPLATO
 
     ELSEIF (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. PPFITON .EQ. 1) THEN
 
-       WRITE(*,*)""
-       WRITE(*,*)"WARNING: PPFITON= 2"
-       WRITE(*,*)"This option was not tested for the library version of LATTE"
-       WRITE(*,*)""
+       CALL ERRORS("latte_lib","This option was not tested for the &
+            &library version of LATTE: PPFITON= 1")
+       RETURN
 
        CALL PPFIT
 
     ELSEIF (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. ALLFITON .EQ. 1) THEN
 
-       WRITE(*,*)""
-       WRITE(*,*)"WARNING: ALLFITON= 2"
-       WRITE(*,*)"This option was not tested for the library version of LATTE"
-       WRITE(*,*)""
+       CALL ERRORS("latte_lib","This option was not tested for the &
+            &library version of LATTE: ALLFITON= 1")
+       RETURN
 
        CALL ALLFIT
 
