@@ -601,25 +601,25 @@ CONTAINS
 
        ELSE
 
-          ! Reinitiating Coulombic contribution if Kpoints are used
-          IF (ELECTRO .EQ. 1) THEN
-             IF (ELECMETH == 0) THEN
-                CALL INITCOULOMB
+          DBOX = SQRT((BOX(1,1)-BOX_OLD(1,1))**2 + &
+               & (BOX(2,2)-BOX_OLD(2,2))**2 + (BOX(3,3)-BOX_OLD(3,3))**2)
+
+          ! Reinitializing Coulombic contribution if Kpoints are used
+          IF ((ELECTRO .EQ. 1 .AND. ELECMETH .EQ. 0) .OR. DBOX .GT. 0.0d0) THEN
+             CALL INITCOULOMB
+          ENDIF
+
+          IF (MOD(LIBCALLS, UDNEIGH) .EQ. 0) THEN
+             !If box is changing
+             IF (DBOX .GT. 0.0d0) THEN
+                CALL NEBLISTS(0)
+             ELSE
+                CALL NEBLISTS(1)
              ENDIF
           ENDIF
 
-       ENDIF
+          BOX_OLD = BOX
 
-       IF (MOD(LIBCALLS, UDNEIGH) .EQ. 0) THEN
-          !IF BOX IS CHANGING
-          DBOX = SQRT((BOX(1,1)-BOX_OLD(1,1))**2 + &
-          & (BOX(2,2)-BOX_OLD(2,2))**2 + (BOX(3,3)-BOX_OLD(3,3))**2)
-          IF (DBOX .GT. 0.0d0) THEN
-             CALL NEBLISTS(0)
-             BOX_OLD = BOX
-          ELSE
-             CALL NEBLISTS(1)
-          ENDIF
        ENDIF
 
        IF (QITER .NE. 0) THEN
