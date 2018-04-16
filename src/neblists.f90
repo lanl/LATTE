@@ -345,6 +345,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
 
                           IF (TOTNEBTB(MYATOMI) .GT. MAXDIMTB) THEN
                              CALL ERRORS("neblists","NUMBER OF NEIGHBORS EXCEEDS ARRAY DIMENSION (TB)")
+                             RETURN
                           ENDIF
 
                           NEBTB( 1, TOTNEBTB(MYATOMI), MYATOMI ) = MYATOMJ
@@ -362,6 +363,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
 
                              IF (TOTNEBPP(MYATOMI) .GT. MAXDIMPP) THEN
                                 CALL ERRORS("neblists","NUMBER OF NEIGHBORS EXCEEDS ARRAY DIMENSION (PP)")
+                                RETURN
                              ENDIF
 
                              NEBPP( 1, TOTNEBPP(MYATOMI), MYATOMI ) = MYATOMJ
@@ -381,6 +383,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
 
                              IF (TOTNEBCOUL(MYATOMI) .GT. MAXDIMCOUL) THEN
                                 CALL ERRORS("neblists","NUMBER OF NEIGHBORS EXCEEDS ARRAY DIMENSION (COUL)")
+                                RETURN
                              ENDIF
 
                              NEBCOUL( 1, TOTNEBCOUL(MYATOMI), MYATOMI ) = MYATOMJ
