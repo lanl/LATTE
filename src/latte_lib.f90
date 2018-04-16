@@ -114,6 +114,7 @@ CONTAINS
     INTEGER :: START_CLOCK, STOP_CLOCK, CLOCK_RATE, CLOCK_MAX
     INTEGER :: MYID = 0
     REAL :: TARRAY(2), RESULT, SYSTDIAG, SYSTPURE
+    REAL(LATTEPREC) :: DBOX
     CHARACTER(LEN=50) :: FLNM
 
     REAL(LATTEPREC), INTENT(IN)  :: CR_IN(:,:),VEL_IN(:,:), MASSES_IN(:),XLO(3),XHI(3)
@@ -165,14 +166,14 @@ CONTAINS
        INQUIRE( FILE="latte.in", exist=LATTEINEXISTS )
 
        IF (LATTEINEXISTS) THEN
-          IF(.NOT. LIBINIT) CALL PARSE_CONTROL("latte.in")
+          CALL PARSE_CONTROL("latte.in")
 
 #ifdef PROGRESSON
-          IF(.NOT.LIBINIT) CALL PRG_PARSE_MIXER(MX,"latte.in")
+          CALL PRG_PARSE_MIXER(MX,"latte.in")
 #endif
 
        ELSE
-          IF(.NOT. LIBINIT) CALL READCONTROLS
+          CALL READCONTROLS
        ENDIF
 
        CALL READTB
@@ -195,16 +196,16 @@ CONTAINS
              WRITE(*,*)""
           ENDIF
 
+          BOX_OLD = BOX
+
           NATS = SIZE(CR_IN,DIM=2)
 
-          IF(.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
+          IF (.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
           CR = CR_IN
 
-          IF(.NOT.LIBINIT)THEN
-             IF(VERBOSE >= 1)WRITE(*,*)"Converting masses to symbols ..."
-             ALLOCATE(ATELE(NATS))
-             CALL MASSES2SYMBOLS(TYPES,NTYPES,MASSES_IN,NATS,ATELE)
-          ENDIF
+          IF(VERBOSE >= 1)WRITE(*,*)"Converting masses to symbols ..."
+          ALLOCATE(ATELE(NATS))
+          CALL MASSES2SYMBOLS(TYPES,NTYPES,MASSES_IN,NATS,ATELE)
 
           !Forces, charges and element pointers are allocated in readcr
           CALL READCR
@@ -239,7 +240,7 @@ CONTAINS
 
 #ifdef GPUON
 
-       CALL initialize( NGPU )
+       CALL INITIALIZE( NGPU )
 
 #endif
 
@@ -251,9 +252,9 @@ CONTAINS
 
        IF (KBT .LT. 0.0000001 .OR. CONTROL .EQ. 2) ENTE = ZERO
 
-    ELSE
+       IF(VERBOSE >= 1)WRITE(*,*)"End of INITIALIZATION"
 
-       LIBCALLS = LIBCALLS + 1
+    ELSE
 
        BOX = 0.0d0
        BOX(1,1) = xhi(1) - xlo(1)
@@ -271,6 +272,8 @@ CONTAINS
           WRITE(*,*)""
        ENDIF
 
+       LIBCALLS = LIBCALLS + 1
+
        NATS = SIZE(CR_IN,DIM=2)
 
        IF(.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
@@ -280,75 +283,86 @@ CONTAINS
 
     ENDIF
 
-    IF(VERBOSE >= 1)WRITE(*,*)"End of INITIALIZATION";
 
     !END OF INITIALIZATION
 
     IF (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. DOSFITON .EQ. 0 &
          .AND. PPFITON .EQ. 0 .AND. ALLFITON .EQ. 0) THEN
 
+       !  IF (LIBINIT) THEN
+       !    CALL ERRORS("latte_lib","MDON .EQ. 0 .AND. RELAXME .EQ. 0 can be done &
+       !    &for only one geometry (A single call to the library). Please reduce &
+       !    &the number of steps (md of relaxation) at the host code")
+       !    EXISTERROR_INOUT = EXISTERROR
+       !    RETURN
+       !  ENDIF
+
        !
        ! Start the timers
        !
 
-       CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
-       CALL DTIME(TARRAY, RESULT)
+       IF (LIBINIT) THEN
 
-       ! Set up neighbor lists for building the H and pair potentials
+          CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
+          CALL DTIME(TARRAY, RESULT)
 
-       CALL ALLOCATENEBARRAYS
+          ! Set up neighbor lists for building the H and pair potentials
 
-       IF (ELECTRO .EQ. 1) THEN
+          CALL ALLOCATENEBARRAYS
 
-          CALL ALLOCATECOULOMB
+          IF (ELECTRO .EQ. 1) THEN
 
-          CALL INITCOULOMB
+             CALL ALLOCATECOULOMB
 
-       ENDIF
+             CALL INITCOULOMB
 
-       IF (BASISTYPE .EQ. "NONORTHO") CALL ALLOCATENONO
-
-       CALL NEBLISTS(0)
-
-       ! Build the charge independent H matrix
-
-       IF (KON .EQ. 0) THEN
-
-          IF (SPONLY .EQ. 0) THEN
-             CALL BLDNEWHS_SP
-          ELSE
-             CALL BLDNEWHS
           ENDIF
 
-       ELSE
+          IF (BASISTYPE .EQ. "NONORTHO") CALL ALLOCATENONO
 
-          CALL KBLDNEWH
+          CALL NEBLISTS(0)
 
-       ENDIF
+          ! Build the charge independent H matrix
 
-       !
-       ! If we're starting from a restart file, we need to modify H such
-       ! that it agrees with the density matrix elements read from file
-       !
+          IF (KON .EQ. 0) THEN
 
-       IF (RESTART .EQ. 1) CALL IFRESTART
+             IF (SPONLY .EQ. 0) THEN
+                CALL BLDNEWHS_SP
+             ELSE
+                CALL BLDNEWHS
+             ENDIF
+
+          ELSE
+
+             CALL KBLDNEWH
+
+          ENDIF
+
+          !
+          ! If we're starting from a restart file, we need to modify H such
+          ! that it agrees with the density matrix elements read from file
+          !
+
+          IF (RESTART .EQ. 1) CALL IFRESTART
 
 
-       !
-       ! See whether we need spin-dependence too
-       !
+          !
+          ! See whether we need spin-dependence too
+          !
 
-       IF (SPINON .EQ. 1) THEN
-          CALL GETDELTASPIN
-          CALL BLDSPINH
-       ENDIF
+          IF (SPINON .EQ. 1) THEN
+             CALL GETDELTASPIN
+             CALL BLDSPINH
+          ENDIF
 
-       IF (CONTROL .EQ. 1) THEN
-          CALL ALLOCATEDIAG
-       ELSEIF (CONTROL .EQ. 2 .OR. CONTROL .EQ. 4 .OR. CONTROL .EQ. 5) THEN
-          CALL ALLOCATEPURE
-       ELSEIF (CONTROL .EQ. 3) THEN
-          CALL FERMIALLOCATE
+          IF (CONTROL .EQ. 1) THEN
+             CALL ALLOCATEDIAG
+          ELSEIF (CONTROL .EQ. 2 .OR. CONTROL .EQ. 4 .OR. CONTROL .EQ. 5) THEN
+             CALL ALLOCATEPURE
+          ELSEIF (CONTROL .EQ. 3) THEN
+             CALL FERMIALLOCATE
+          ENDIF
+
        ENDIF
 
        IF (CONTROL .EQ. 5) THEN
@@ -458,6 +472,7 @@ CONTAINS
 
        ENDIF
 
+
        CALL TOTENG
 
        ECOUL = ZERO
@@ -540,6 +555,7 @@ CONTAINS
 
        CALL DEALLOCATEALL
 
+       LIBINIT = .TRUE.
        EXISTERROR_INOUT = EXISTERROR
        RETURN
 
@@ -594,7 +610,17 @@ CONTAINS
 
        ENDIF
 
-       IF (MOD(LIBCALLS, UDNEIGH) .EQ. 0) CALL NEBLISTS(1)
+       IF (MOD(LIBCALLS, UDNEIGH) .EQ. 0) THEN
+          !IF BOX IS CHANGING
+          DBOX = SQRT((BOX(1,1)-BOX_OLD(1,1))**2 + &
+          & (BOX(2,2)-BOX_OLD(2,2))**2 + (BOX(3,3)-BOX_OLD(3,3))**2)
+          IF (DBOX .GT. 0.0d0) THEN
+             CALL NEBLISTS(0)
+             BOX_OLD = BOX
+          ELSE
+             CALL NEBLISTS(1)
+          ENDIF
+       ENDIF
 
        IF (QITER .NE. 0) THEN
           ECOUL = ZERO
@@ -809,7 +835,7 @@ CONTAINS
 
 #ifdef GPUON
 
-    CALL shutdown()
+    CALL SHUTDOWN()
 
 #endif
 
