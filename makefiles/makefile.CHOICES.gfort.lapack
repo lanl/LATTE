@@ -10,12 +10,13 @@ PRECISION = DOUBLE
 # Make the latte library
 # AR and RUNLIB executable default path to compile 
 # latte as a library (change accordingly)
-MAKELIB = OFF
+MAKELIB := OFF
 AR = /usr/bin/ar cq
 RANLIB = /usr/bin/ranlib
 
+
 # Use the PROGRESS and BML libraries
-PROGRESS = OFF
+PROGRESS := OFF
 PROGRESS_PATH= $(HOME)/qmd-progress/install/lib
 BML_PATH= $(HOME)/bml/install/lib
 
@@ -51,14 +52,14 @@ LIB = -llapack -lblas
  -lmkl_gnu_thread -lmkl_core -ldl -lpthread -lm
 
 # Uncomment for coverage
-CVR = ON
+CVR := OFF
 ifeq ($(CVR), ON)
 	FFLAGS += -fprofile-arcs -ftest-coverage -O0
 	LINKFLAG += -fprofile-arcs -ftest-coverage -O0
 endif
 
 ifeq ($(PROGRESS), ON)
-	LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml
+	LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml_fortran -lbml
         FFLAGS += -I$(BML_PATH)/../include -I$(PROGRESS_PATH)/../include
 endif
 
