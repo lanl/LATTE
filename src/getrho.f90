@@ -80,7 +80,7 @@ SUBROUTINE GETRHO(MDITER)
 #ifdef PROGRESSON
 
         CALL SP2PRG
-
+        
 #else
 
         IF (MDITER .LE. 10) THEN

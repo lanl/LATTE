@@ -37,7 +37,7 @@ done
 
 # Testing for MD simulations:
 
-for name in 0scf 2scf fullscf fullscf.etemp sp2 fullscf.nvt \
+for name in 0scf 2scf fullscf fullscf.etemp sp2 sp2.sparse fullscf.nvt \
        	fullscf.npt fullscf.vdw fullscf.spin fullscf.kon ; do
 
   INLATTEFILE="latte."$name".in"
