@@ -35,7 +35,7 @@ before_script:
 env:
   - OPTIONS="CVR=ON" TEST="" CHOICES=gfort.lapack
   - OPTIONS="CVR=ON PROGRESS=ON" TEST="" CHOICES=gfort.lapack
-  - OPTIONS="CVR=ON MAKELIB=ON lammps" TEST="_lmp" CHOICES=gfort.lapack
+  - OPTIONS="CVR=OFF MAKELIB=ON lammps" TEST="_lmp" CHOICES=gfort.lapack
 
 script:
   -  cp -f -v ./makefiles/makefile.CHOICES.${CHOICES} makefile.CHOICES
