@@ -79,15 +79,7 @@ SUBROUTINE GETRHO(MDITER)
 
 #ifdef PROGRESSON
 
-        IF (LATTEINEXISTS) THEN  !SP2 from progress lib if latte.in exists
-           CALL SP2PRG
-        ELSE
-           IF (MDITER .LE. 10) THEN
-              CALL SP2PURE_SPARSE_PARALLEL(MDITER)
-           ELSE
-              CALL SP2PURE_SPARSE_PARALLEL_SIMPLE(MDITER)
-           ENDIF
-        ENDIF
+        CALL SP2PRG
 
 #else
 
