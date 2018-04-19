@@ -31,13 +31,13 @@ for name in single.point; do  \
   ENERG=`grep "FREE" out | awk 'NF>1{print $5}'`
   echo "1 "$ENERG > energy.out
 
-  python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.0000001
+  python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.00001
 
 done 
 
 # Testing for MD simulations:
 
-for name in 0scf 2scf fullscf fullscf.etemp sp2 fullscf.nvt \
+for name in 0scf 2scf fullscf fullscf.etemp sp2 sp2.sparse fullscf.nvt \
        	fullscf.npt fullscf.vdw fullscf.spin fullscf.kon ; do
 
   INLATTEFILE="latte."$name".in"
@@ -54,7 +54,7 @@ for name in 0scf 2scf fullscf fullscf.etemp sp2 fullscf.nvt \
   grep "Data" out | sed 's/Data/ /g' | awk 'NF>1{print $2}' > energy.out
   echo ""
 
-  python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.0000001
+  python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.00001
 
 done
 
@@ -74,7 +74,7 @@ for name in opt ; do
 
   time $RUN > out
 
-  python ./tests/test-optim.py --reference $REF --current monitorrelax.xyz --reltol 0.0000001
+  python ./tests/test-optim.py --reference $REF --current monitorrelax.xyz --reltol 0.00001
 
 done
 
@@ -103,7 +103,7 @@ echo -e "\nTesting LATTE with original input files \n"
    echo ""
 
    grep Energy out | sed -e s/"PAR"/$STRR/g  >  input_tmp.in
-   python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.0000001
+   python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.00001
  
  done
 

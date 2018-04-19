@@ -41,7 +41,7 @@ SUBROUTINE NVTNH
   DO I = 1, NATS
 
      KEV = KEV + MASS(ELEMPOINTER(I)) * & 
-          (V(1,I)*V(1,I) + V(2,I)*V(2,I) + V(3,I)*V(3,I))
+         & (V(1,I)*V(1,I) + V(2,I)*V(2,I) + V(3,I)*V(3,I))
 
   ENDDO
 
@@ -88,7 +88,7 @@ SUBROUTINE NVTNH
   KEV = ZERO
   DO I = 1, NATS
      KEV = KEV + MASS(ELEMPOINTER(I)) * & 
-          (V(1,I)*V(1,I) + V(2,I)*V(2,I) + V(3,I)*V(3,I))      
+        &  (V(1,I)*V(1,I) + V(2,I)*V(2,I) + V(3,I)*V(3,I))      
   ENDDO
 
   KEV = MVV2KE*KEV/TWO
