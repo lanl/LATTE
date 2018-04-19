@@ -67,12 +67,12 @@ MODULE DBCSR_VAR_MOD
   TYPE(dbcsr_mp_obj)                       :: mp_env
   INTEGER                                  :: group, mynode, numnodes, myploc(2), N
   TYPE(dbcsr_distribution_obj)             :: dist_a, dist_b, dist_c
-  REAL(8), DIMENSION(:), ALLOCATABLE       :: diag
-  REAL(8)                                  :: my_block(2:2)
+  REAL(LATTEPREC), DIMENSION(:), ALLOCATABLE       :: diag
+  REAL(LATTEPREC)                                  :: my_block(2:2)
   LOGICAL                                  :: tr, found
   INTEGER, ALLOCATABLE, DIMENSION(:)       :: grid_dist
   TYPE(dbcsr_iterator)                     :: iter
-  REAL(8)                                  :: chksum, chksum2
+  REAL(LATTEPREC)                                  :: chksum, chksum2
   INTEGER                                  :: TEMP
 
   !*****************************************************************

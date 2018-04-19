@@ -31,7 +31,7 @@ for name in single.point; do  \
   ENERG=`grep "FREE" out | awk 'NF>1{print $5}'`
   echo "1 "$ENERG > energy.out
 
-  python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.0000001
+  python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.00001
 
 done 
 

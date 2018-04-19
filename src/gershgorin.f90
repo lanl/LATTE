@@ -30,7 +30,7 @@ SUBROUTINE GERSHGORIN
 
   IMPLICIT NONE
 
-  INTEGER :: I, J 
+  INTEGER :: I, J
   REAL(LATTEPREC) :: RADIUS, DOWNRAD, UPRAD, ABSHAM
   IF (EXISTERROR) RETURN
 
@@ -119,7 +119,7 @@ SUBROUTINE GERSHGORIN
 
         ENDDO
 
-     ELSE 
+     ELSE
 
         ! Spin-polarized, non-orthogonal
 

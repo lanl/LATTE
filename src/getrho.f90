@@ -42,15 +42,22 @@ SUBROUTINE GETRHO(MDITER)
   ! CONTROL = 4, 5 : EXPERIMENTAL FINITE T SP2
 
   IF (CONTROL .EQ. 1) THEN
-
+#ifdef PROGRESSON
+    IF (SPINON .EQ. 0) THEN
+      CALL BOEVECSPRG()
+    ELSE
+      CALL DIAGMYH()
+      CALL SPINRHOEVECS
+      WRITE(*,*)"This is using the original LATTE routine. Spin-polarized non yet with PROGRESS/BML"
+    ENDIF
+#else
      CALL DIAGMYH()
-
      IF (SPINON .EQ. 0) THEN
         CALL BOEVECS()
      ELSE
         CALL SPINRHOEVECS
      ENDIF
-
+#endif
 
   ELSEIF (CONTROL .EQ. 2) THEN
 
