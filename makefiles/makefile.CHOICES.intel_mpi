@@ -25,8 +25,8 @@ FCL = $(FC) -mkl=sequential -openmp
 FFLAGS =  -O3 -openmp
 LINKFLAG = 
 LIB =  
-DBCSR_LIB = -L/home/$(USER)/cp2k/lib/$(USER)/popt -lcp2k_dbcsr_lib
-DBCSR_MOD = -I/home/$(USER)/cp2k/obj/$(USER)/popt
+DBCSR_LIB = -L$(HOME)/cp2k/lib/$(USER)/popt -lcp2k_dbcsr_lib
+DBCSR_MOD = -I$(HOME)/cp2k/obj/$(USER)/popt
 
 #
 # GPU options

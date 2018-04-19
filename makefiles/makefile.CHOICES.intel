@@ -25,8 +25,8 @@ FCL = $(FC)  -openmp
 FFLAGS =  -O3 -openmp
 LINKFLAG = 
 LIB =  -L/usr/projects/hpcsoft/toss2.1/common/intel/2011.11.339/composer_xe_2011.11.339/mkl/lib/intel64 -lmkl_core -lmkl_intel_thread -lmkl_intel_lp64
-DBCSR_LIB = -L/home/$(USER)/cp2k/lib/$(USER)/popt -lcp2k_dbcsr_lib
-DBCSR_MOD = -I/home/$(USER)/cp2k/obj/$(USER)/popt
+DBCSR_LIB = -L$(HOME)/cp2k/lib/$(USER)/popt -lcp2k_dbcsr_lib
+DBCSR_MOD = -I$(HOME)/cp2k/obj/$(USER)/popt
 
 #
 # GPU options
