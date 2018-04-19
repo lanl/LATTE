@@ -30,8 +30,8 @@ FFLAGS =  -O3 -fopenmp
 LINKFLAG = 
 #LIB = -L/usr/projects/hpcsoft/toss2/common/acml/5.3.1/gfortran64_mp/lib -lacml_mp
 LIB = -L/usr/projects/hpcsoft/toss2/common/acml/5.3.1/gfortran64_mp/lib -lacml_mp
-#DBCSR_LIB = -L/home/cawkwell/cp2k/lib/cawkwell/popt -lcp2k_dbcsr_lib
-#DBCSR_MOD = -I/home/cawkwell/cp2k/obj/cawkwell/popt
+#DBCSR_LIB = -L/home/$(USER)/cp2k/lib/$(USER)/popt -lcp2k_dbcsr_lib
+#DBCSR_MOD = -I/home/$(USER)/cp2k/obj/$(USER)/popt
 
 #
 # GPU options
