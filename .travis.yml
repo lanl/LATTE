@@ -11,29 +11,35 @@ os:
   - linux
 
 before_install:
+  - export LATTEPATH=`pwd`
   - sudo apt-get install gfortran libblas-dev liblapack-dev
   - sudo apt-get install cmake python gcc cmake-data g++ curl
   - cd; git clone https://github.com/lanl/qmd-progress.git
   - cd; git clone https://github.com/lanl/bml.git
+  - cd; git clone https://github.com/lammps/lammps.git
   - pip install --user codecov
 
   # Install BML, PROGRESS and LAMMPS
-  - cd bml; CC=gcc FC=gfortran CMAKE_BUILD_TYPE=Release BLAS_VENDOR=GNU BML_OPENMP=yes BML_TESTING=no ./build.sh configure
-  - cd build; make; make install; cd
-  - cd qmd-progress; CC=gcc FC=gfortran PROGRESS_MPI=no PROGRESS_TESTING=yes BLAS_VENDOR=GNU PKG_CONFIG_PATH=~/bml/install/lib/pkgconfig PROGRESS_OPENMP=yes ./build.sh configure
-  - cd build; make; make install; cd 
-  
+  - cd; cd bml; CC=gcc FC=gfortran CMAKE_BUILD_TYPE=Release BLAS_VENDOR=GNU BML_OPENMP=yes BML_TESTING=no ./build.sh configure
+  - cd; cd bml/build; make; make install
+  - cd; cd qmd-progress; CC=gcc FC=gfortran PROGRESS_MPI=no PROGRESS_TESTING=yes BLAS_VENDOR=GNU PKG_CONFIG_PATH=~/bml/install/lib/pkgconfig PROGRESS_OPENMP=yes ./build.sh configure
+  - cd; cd qmd-progress/build; make; make install
+  # Lammps installation
+  - cd; cd lammps/lib/latte; ln -s $LATTEPATH/src/latte_c_bind.o filelink.o ; ln -s $LATTEPATH/src includelink ; ln -s $LATTEPATH liblink
+  - cd; cd lammps/lib/latte; cp Makefile.lammps.gfortran Makefile.lammps
+  - cd; cd lammps/src/; make yes-latte; make yes-molecule
+
 before_script:
-  - cd ~/build/lanl/LATTE/
+  - cd; cd $LATTEPATH
 
 env:
-  - CMAKE_BUILD_TYPE=Release FC=gfortran CC=gcc CXX=g++ CVR=ON CHOICES=gfort.lapack
-  - CMAKE_BUILD_TYPE=Release FC=gfortran CC=gcc CXX=g++ CVR=ON CHOICES=gfort.lapack.progress
+  - OPTIONS="CVR=ON" TEST="" CHOICES=gfort.lapack
+  - OPTIONS="CVR=ON PROGRESS=ON" TEST="" CHOICES=gfort.lapack
+  - OPTIONS="CVR=OFF MAKELIB=ON lammps" TEST="_lmp" CHOICES=gfort.lapack
 
 script:
   -  cp -f -v ./makefiles/makefile.CHOICES.${CHOICES} makefile.CHOICES
-  -  make; make test
-    # -  gcov -a -b -c  $(find ./src/ -name '*.gcda')
+  -  make ${OPTIONS}; make test${TEST}
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -v -X gcov
