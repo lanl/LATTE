@@ -60,6 +60,8 @@ CONTAINS
 
 #ifdef PROGRESSON
 
+    IF(VERBOSE .GE. 1) WRITE(*,*) "In SP2PRG ..."
+
     !> Parsing sp2 input paramenters. this will read the variables in the input file.
     !  sp2 is the "SP2DATA_TYPE".
     IF(.NOT.SP2INIT)THEN

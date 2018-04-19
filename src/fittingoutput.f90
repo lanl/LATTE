@@ -56,7 +56,7 @@ SUBROUTINE FITTINGOUTPUT(BECLEAN)
      CALL GETDIPOLE(MYDIPOLE)
 
      WRITE(66,12) MYDIPOLE
-     
+
      WRITE(66,12) EGAP
 
   ELSEIF (BECLEAN .EQ. 1) THEN ! There was a problem with the calculation
