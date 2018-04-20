@@ -27,6 +27,7 @@ before_install:
   # Lammps installation
   - cd; cd lammps/lib/latte; ln -s $LATTEPATH/src/latte_c_bind.o filelink.o ; ln -s $LATTEPATH/src includelink ; ln -s $LATTEPATH liblink
   - cd; cd lammps/lib/latte; cp Makefile.lammps.gfortran Makefile.lammps
+  - cd; cd lammps/lib/latte; echo "latte_SYSLIB  += -fprofile-arcs -ftest-coverage -O0" >> Makefile.lammps  
   - cd; cd lammps/src/; make yes-latte; make yes-molecule
 
 before_script:
@@ -35,7 +36,7 @@ before_script:
 env:
   - OPTIONS="CVR=ON" TEST="" CHOICES=gfort.lapack
   - OPTIONS="CVR=ON PROGRESS=ON" TEST="" CHOICES=gfort.lapack
-  - OPTIONS="CVR=OFF MAKELIB=ON lammps" TEST="_lmp" CHOICES=gfort.lapack
+  - OPTIONS="CVR=ON MAKELIB=ON lammps" TEST="_lmp" CHOICES=gfort.lapack
 
 script:
   -  cp -f -v ./makefiles/makefile.CHOICES.${CHOICES} makefile.CHOICES
