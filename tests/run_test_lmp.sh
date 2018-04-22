@@ -9,12 +9,16 @@ MY_PATH=`pwd`                                   # Capturing the local path of th
 
 RUN=$HOME"/lammps/src/lmp_serial"  #EXAALT version of Lammps program
 
-for name in 0scf 2scf fullscf ; do
+for name in 0scf 2scf fullscf 0scf.wrtrestart 0scf.rdrestart ; do
 
   INLATTEFILE="latte."$name".in"
   INLAMMPSFILE="in."$name
   REF="energy."$name".out"
   COORDS="data."$name".lmp"
+
+  if [ "$name" == "0scf.rdrestart" ] ; then  
+	cp restart.latte.10.dat restart.latte.dat	
+  fi
 
   cp  ./tests/tests_lmp/$INLATTEFILE latte.in
   cp  ./tests/tests_lmp/$INLAMMPSFILE .
