@@ -205,7 +205,7 @@ CONTAINS
           CR = CR_IN
 
           IF(VERBOSE >= 1)WRITE(*,*)"Converting masses to symbols ..."
-          ALLOCATE(ATELE(NATS))
+          IF(.NOT. ALLOCATED(ATELE)) ALLOCATE(ATELE(NATS))
           CALL MASSES2SYMBOLS(TYPES,NTYPES,MASSES_IN,NATS,ATELE)
 
           !Forces, charges and element pointers are allocated in readcr
@@ -214,8 +214,10 @@ CONTAINS
           CALL FLUSH(6)
 
        ELSE
+
           IF(VERBOSE >= 1)WRITE(*,*)"Restarting calculation from file ..."
           CALL READRESTART
+
        ENDIF
 
        IF (VERBOSE >= 1) WRITE(*,*)"Reading ppots from file (if PPOTON >= 1) ..."
@@ -280,14 +282,9 @@ CONTAINS
        IF(.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
        CR = CR_IN
 
-       IF(RESTARTLIB == 1 .AND. .NOT.LIBINIT)THEN
-          CALL READRESTARTLIB(LIBCALLS)
-       ENDIF
-
        CALL FLUSH(6)
 
     ENDIF
-
 
     !END OF INITIALIZATION
 
@@ -350,7 +347,6 @@ CONTAINS
 
           IF (RESTART .EQ. 1) CALL IFRESTART
 
-
           !
           ! See whether we need spin-dependence too
           !
@@ -376,7 +372,6 @@ CONTAINS
           CALL SP2FERMIINIT
 
        ENDIF
-
 
        IF (ELECTRO .EQ. 0) CALL QNEUTRAL(0,1) ! Local charge neutrality
 
@@ -476,7 +471,6 @@ CONTAINS
           IF (SPINON .EQ. 1) FTOT = FTOT + FSSPIN
 
        ENDIF
-
 
        CALL TOTENG
 
@@ -580,7 +574,8 @@ CONTAINS
           CALL FLUSH(6)
        ENDIF
 
-       IF(LIBCALLS == 0)THEN
+       WRITE(*,*)"LIBCALLS",LIBCALLS
+       IF (LIBCALLS == 0) THEN
 
           IF (VERBOSE >= 1)WRITE(*,*)"Allocating nonorthogonal arrays ..."
           IF (BASISTYPE .EQ. "NONORTHO") CALL ALLOCATENONO
@@ -604,7 +599,7 @@ CONTAINS
 
           CALL FLUSH(6)
 
-       ELSE
+       ELSEIF (LIBCALLS > 0 .AND. RESTARTLIB == 0) THEN
 
           DBOX = SQRT((BOX(1,1)-BOX_OLD(1,1))**2 + &
                & (BOX(2,2)-BOX_OLD(2,2))**2 + (BOX(3,3)-BOX_OLD(3,3))**2)
@@ -647,7 +642,6 @@ CONTAINS
        ELSEIF (PPOTON .EQ. 3) THEN
           CALL PAIRPOTSPLINE
        ENDIF
-
 
        IF (QITER .NE. 0) THEN
           ECOUL = ZERO
@@ -712,7 +706,6 @@ CONTAINS
        ENDIF
 #endif
 
-
        IF(VERBOSE >= 1  .AND. CONTROL == 1)THEN
          IF(SPINON == 0) THEN
            HOMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM)))
@@ -729,6 +722,10 @@ CONTAINS
 
        IF (MOD(LIBCALLS, RSFREQ) .EQ. 0)THEN
           CALL WRTRESTARTLIB(LIBCALLS)
+       ENDIF
+
+       IF(RESTARTLIB == 1 .AND. LIBCALLS == 0)THEN
+          CALL READRESTARTLIB(LIBCALLS)
        ENDIF
 
        CALL FLUSH(6) !To force writing to file at every call
