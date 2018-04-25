@@ -28,7 +28,7 @@ MYSUBS = allocatediag.f90 allocatenono.f90 allocatepure.f90 bodirect.f90 \
 deallocatediag.f90 deallocatepure.f90 deorthomyrho.f90 deallocatenono.f90 \
 diagmyh.f90 entropy.f90 fermiexpans.f90 genX.f90  latte.f90 orthomyH.f90 \
  orthomyrho.f90  pulay.f90 pulay_sp.f90 solvematcg.f90 solvematlapack.f90 \
-sp2T.f90 \
+sp2T.f90 pulay_spprogress.f90 \
 sp2fermi.f90 sp2fermi_init.f90 sp2pure.f90 sp2pure_sparse.f90 kdiagmyh.f90 \
  kbodirect.f90 sp2gap.f90 sp2gap_setup.f90 readrestart.f90 initrng.f90 \
 parawrite.f90 parafileopen.f90 wrtcfgs.f90 wrtrestart.f90 pbc.f90 \
