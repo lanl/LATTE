@@ -1,4 +1,4 @@
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Copyright 2010.  Los Alamos National Security, LLC. This material was    !
 ! produced under U.S. Government contract DE-AC52-06NA25396 for Los Alamos !
 ! National Laboratory (LANL), which is operated by Los Alamos National     !
@@ -33,6 +33,7 @@ SUBROUTINE READCONTROLS
   IMPLICIT NONE
 
   CHARACTER(LEN=20) :: HD
+
   IF (EXISTERROR) RETURN
 
   OPEN(UNIT=13, STATUS="OLD", FILE=TRIM(PARAMPATH)//"/control.in")
@@ -319,7 +320,6 @@ SUBROUTINE READCONTROLS
   !        WRITE(99,*) "Sparse matrix conjugate gradient scheme to solve AX=B"
   !     ENDIF
   !  ENDIF
-
 
   RETURN
 
