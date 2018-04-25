@@ -30,9 +30,15 @@ SUBROUTINE READCONTROLS
   USE SPARSEARRAY
   USE RELAXCOMMON
 
+#ifdef PROGRESSON
+  USE BML
+  USE LATTEPARSER_LATTE_MOD
+#endif
+
   IMPLICIT NONE
 
   CHARACTER(LEN=20) :: HD
+  
   IF (EXISTERROR) RETURN
 
   OPEN(UNIT=13, STATUS="OLD", FILE=TRIM(PARAMPATH)//"/control.in")
@@ -319,6 +325,39 @@ SUBROUTINE READCONTROLS
   !        WRITE(99,*) "Sparse matrix conjugate gradient scheme to solve AX=B"
   !     ENDIF
   !  ENDIF
+
+
+
+#ifdef PROGRESSON
+
+    IF(SPARSEON == 0)THEN
+       LT%BML_TYPE = BML_MATRIX_DENSE
+       WRITE(*,*)"AAA", LT%BML_TYPE
+    ELSEIF(SPARSEON == 1)THEN
+       LT%BML_TYPE = BML_MATRIX_ELLPACK
+    ELSE
+       CALL ERRORS("readcontrols","SPARSEON > 1 yet not implemented")
+    ENDIF
+
+    IF(THRESHOLDON == 0)THEN
+       LT%THRESHOLD = 0.0D0
+    ELSEIF(THRESHOLDON == 1)THEN
+       LT%THRESHOLD = NUMTHRESH
+    ELSE
+       CALL ERRORS("readcontrols","THRESHOLDON > 1 yet not implemented")
+    ENDIF
+
+    IF(MSPARSE == 0)THEN
+       LT%MDIM = -1  !Defaults to N
+    ELSEIF(MSPARSE > 0)THEN
+       LT%MDIM = MSPARSE
+    ELSE
+       CALL ERRORS("readcontrols","MSPARSE cannot be negative")
+    ENDIF
+
+#endif    
+
+
 
 
   RETURN
