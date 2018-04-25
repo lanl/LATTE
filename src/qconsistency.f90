@@ -63,7 +63,11 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            IF (KON .EQ. 0) THEN
 
 #ifdef PROGRESSON
-              CALL ORTHOMYHPRG
+              IF (LATTEINEXISTS) THEN  !orthogonalize from progress lib if latte.in exists
+                 CALL ORTHOMYHPRG
+              ELSE
+                 CALL ORTHOMYH
+              ENDIF
 #else
               CALL ORTHOMYH
 #endif
@@ -96,7 +100,11 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
 #ifdef PROGRESSON
-              CALL DEORTHOMYRHOPRG
+              IF (LATTEINEXISTS) THEN  !deorthogonalize from progress lib if latte.in exists
+                 CALL DEORTHOMYRHOPRG
+              ELSE
+                 CALL DEORTHOMYRHO
+              ENDIF
 #else
               CALL DEORTHOMYRHO
 #endif
@@ -211,7 +219,11 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         IF (BASISTYPE.EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
 #ifdef PROGRESSON
-              CALL DEORTHOMYRHOPRG
+              IF (LATTEINEXISTS) THEN  !deorthogonalize from progress lib if latte.in exists
+                 CALL DEORTHOMYRHOPRG
+              ELSE
+                 CALL DEORTHOMYRHO
+              ENDIF
 #else
               CALL DEORTHOMYRHO
 #endif
@@ -343,7 +355,11 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            IF (KON .EQ. 0) THEN
 
 #ifdef PROGRESSON
-              CALL ORTHOMYHPRG
+              IF (LATTEINEXISTS) THEN  !orthogonalize from progress lib if latte.in exists
+                 CALL ORTHOMYHPRG
+              ELSE
+                 CALL ORTHOMYH
+              ENDIF
 #else
               CALL ORTHOMYH
 #endif
@@ -376,7 +392,11 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
 #ifdef PROGRESSON
-              CALL DEORTHOMYRHOPRG
+              IF (LATTEINEXISTS) THEN  !deorthogonalize from progress lib if latte.in exists
+                 CALL DEORTHOMYRHOPRG
+              ELSE
+                 CALL DEORTHOMYRHO
+              ENDIF
 #else
               CALL DEORTHOMYRHO
 #endif
@@ -430,7 +450,11 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         IF (KON .EQ. 0) THEN
 
 #ifdef PROGRESSON
-           CALL ORTHOMYHPRG
+           IF (LATTEINEXISTS) THEN  !orthogonalize from progress lib if latte.in exists
+              CALL ORTHOMYHPRG
+           ELSE
+              CALL ORTHOMYH
+           ENDIF
 #else
            CALL ORTHOMYH
 #endif
@@ -457,7 +481,11 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
      IF (BASISTYPE .EQ. "NONORTHO") THEN
         IF (KON .EQ. 0) THEN
 #ifdef PROGRESSON
-           CALL DEORTHOMYRHOPRG
+           IF (LATTEINEXISTS) THEN  !deorthogonalize from progress lib if latte.in exists
+              CALL DEORTHOMYRHOPRG
+           ELSE
+              CALL DEORTHOMYRHO
+           ENDIF
 #else
            CALL DEORTHOMYRHO
 #endif
