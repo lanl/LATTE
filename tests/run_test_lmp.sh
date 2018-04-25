@@ -2,7 +2,7 @@
 
 # Script to test the LAMMPS-LATTE interface program.
 
-cp latte.in latte.in.tmp
+cp latte.in latte.tmp
 
 set -e                                          # This will exit the script if there is any error
 MY_PATH=`pwd`                                   # Capturing the local path of the folder where we are running.
@@ -60,6 +60,7 @@ for name in opt ; do
 
 done
 
-cp latte.in.tmp latte.in
+cp latte.tmp latte.in
+rm *.in *.out out *.lmp in.* log.* restart.* latte.tmp
 
 echo -e "\nEnd of run and test"

@@ -15,3 +15,6 @@ in.*
 log.*
 log.*
 *.pdb
+*.gcda
+*.gcno
+
