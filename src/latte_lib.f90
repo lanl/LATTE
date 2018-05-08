@@ -41,7 +41,7 @@ MODULE LATTE_LIB
 #ifdef PROGRESSON
   USE PRG_SYSTEM_MOD ! FROM PROGRESS
   USE PRG_PULAYMIXER_MOD
-  USE PRG_EXTRAS_MOD 
+  USE PRG_EXTRAS_MOD
   USE MIXER_MOD
   USE BML
 #endif
@@ -256,6 +256,7 @@ CONTAINS
 
        IF (KBT .LT. 0.0000001 .OR. CONTROL .EQ. 2) ENTE = ZERO
 
+       IF (.NOT. ALLOCATED(V)) ALLOCATE(V(3,NATS))
        IF(VERBOSE >= 1)WRITE(*,*)"End of INITIALIZATION"
 
     ELSE
@@ -286,6 +287,7 @@ CONTAINS
        CALL FLUSH(6)
 
     ENDIF
+
 
     !END OF INITIALIZATION
 
@@ -511,12 +513,12 @@ CONTAINS
 
        CALL GETPRESSURE
 
-       !     WRITE(6,*) "Force ", FPP(1,1), FPP(2,1), FPP(3,1)
-       !     PRINT*, "PCHECK ", (1.0/3.0)*(VIRBOND(1)+VIRBOND(2) + VIRBOND(3)), &
-       !          (1.0/3.0)*(VIRCOUL(1)+VIRCOUL(2) + VIRCOUL(3)), &
-       !          (1.0/3.0)*(VIRPAIR(1)+VIRPAIR(2) + VIRPAIR(3)), &
-       !          (1.0/3.0)*(VIRPUL(1)+VIRPUL(2) + VIRPUL(3)), &
-       !          (1.0/3.0)*(VIRSCOUL(1)+VIRSCOUL(2) + VIRSCOUL(3))
+       !  WRITE(*,*) "Force", FPP(1,1), FPP(2,1), FPP(3,1), PRESSURE
+       !  PRINT*, "PCHECK ", (1.0/3.0)*(VIRBOND(1)+VIRBOND(2) + VIRBOND(3)), &
+       !       (1.0/3.0)*(VIRCOUL(1)+VIRCOUL(2) + VIRCOUL(3)), &
+       !       (1.0/3.0)*(VIRPAIR(1)+VIRPAIR(2) + VIRPAIR(3)), &
+       !       (1.0/3.0)*(VIRPUL(1)+VIRPUL(2) + VIRPUL(3)), &
+       !       (1.0/3.0)*(VIRSCOUL(1)+VIRSCOUL(2) + VIRSCOUL(3))
 
 #ifdef DBCSR_ON
 
@@ -564,6 +566,8 @@ CONTAINS
        IF(VERBOSE >= 1)WRITE(*,*)"Insie MDON= 1 and RELAXME= 0 ..."
 
        DT = DT_IN ! Get the integration step from the hosting code.
+
+       V = VEL_IN/1000.0d0  !Convert from Ang/ps to Ang/fs
 
        !Control for implicit geometry optimization.
        !This will need to be replaced by a proper flag.
@@ -653,7 +657,7 @@ CONTAINS
        ESPIN = ZERO
        IF (SPINON .EQ. 1) CALL GETSPINE
 
-       !      CALL GETPRESSURE
+       !       CALL GETPRESSURE
 
        IF (CONTROL .NE. 1 .AND. CONTROL .NE. 2 .AND. KBT .GT. 0.000001 ) THEN
 
@@ -680,8 +684,8 @@ CONTAINS
           FTOT_OUT = FTOT
        ENDIF
 
-
        ! Get the seccond virial coefficient to pass it to the application program
+       IF (ELECTRO .EQ. 0) VIRCOUL = ZERO
        VIRIAL = VIRBOND + VIRPAIR + VIRCOUL
 
        IF (SPINON .EQ. 1) VIRIAL = VIRIAL + VIRSSPIN
@@ -689,6 +693,8 @@ CONTAINS
        IF (BASISTYPE .EQ. "NONORTHO") THEN
           VIRIAL = VIRIAL - VIRPUL + VIRSCOUL
        ENDIF
+
+       !       CALL GETPRESSURE
 
        VIRIALINOUT = -VIRIAL
 
@@ -709,17 +715,17 @@ CONTAINS
 #endif
 
        IF(VERBOSE >= 1  .AND. CONTROL == 1)THEN
-         IF(SPINON == 0) THEN
-           HOMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM)))
-           LUMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1)
-           WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
-           WRITE(*,*)"EGAP=",LUMO - HOMO
-         ELSE
-           HOMO = MAX(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))))
-           LUMO = MIN(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1))
-           WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
-           WRITE(*,*)"EGAP=",LUMO - HOMO
-         ENDIF
+          IF(SPINON == 0) THEN
+             HOMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM)))
+             LUMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1)
+             WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
+             WRITE(*,*)"EGAP=",LUMO - HOMO
+          ELSE
+             HOMO = MAX(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))))
+             LUMO = MIN(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1))
+             WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
+             WRITE(*,*)"EGAP=",LUMO - HOMO
+          ENDIF
        ENDIF
 
        IF (MOD(LIBCALLS, RSFREQ) .EQ. 0)THEN
