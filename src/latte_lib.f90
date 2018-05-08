@@ -513,7 +513,7 @@ CONTAINS
 
        CALL GETPRESSURE
 
-       !  WRITE(*,*) "Force", FPP(1,1), FPP(2,1), FPP(3,1), PRESSURE
+       !  WRITE(*,*) "Force", FPP(1,1), FPP(2,1), FPP(3,1)
        !  PRINT*, "PCHECK ", (1.0/3.0)*(VIRBOND(1)+VIRBOND(2) + VIRBOND(3)), &
        !       (1.0/3.0)*(VIRCOUL(1)+VIRCOUL(2) + VIRCOUL(3)), &
        !       (1.0/3.0)*(VIRPAIR(1)+VIRPAIR(2) + VIRPAIR(3)), &
@@ -656,8 +656,6 @@ CONTAINS
 
        ESPIN = ZERO
        IF (SPINON .EQ. 1) CALL GETSPINE
-
-       !       CALL GETPRESSURE
 
        IF (CONTROL .NE. 1 .AND. CONTROL .NE. 2 .AND. KBT .GT. 0.000001 ) THEN
 
