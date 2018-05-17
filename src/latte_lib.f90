@@ -718,14 +718,14 @@ CONTAINS
           ELSE
              OPEN(UNIT=20,FILE="trajectory.xyz",ACCESS='append',STATUS='old')
           ENDIF
-          !Extended xyz file. 
+          !Extended xyz file.
           WRITE(20,*)NATS
           WRITE(20,*) 'Lattice="',BOX(1,1),BOX(1,2),BOX(1,3),&
                &BOX(2,1),BOX(2,2),BOX(2,3),BOX(3,1),BOX(3,2),BOX(3,3),'"',&
                &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT_IN
           DO I=1,NATS
              WRITE(20,*)ATELE(I),CR(1,I),CR(2,I),CR(3,I),V(1,I),V(2,I),V(3,I),&
-                  &FTOT(1,I),FTOT(2,I),FTOT(3,I),DELTAQ(I)
+                  &FTOT(1,I),FTOT(2,I),FTOT(3,I),-DELTAQ(I)
           ENDDO
           CLOSE(20)
        ENDIF
