@@ -28,7 +28,7 @@ for name in single.point single.point.noelec single.point.rspace ; do
   echo -e "\nTesting for "$name" \n"
 
   time $RUN > out
-  ENERG=`grep "FREE" out | awk 'NF>1{print $5}'`
+  ENERG=`grep -e "FREE ENERGY" out | awk 'NF>1{print $5}'`
   echo $ENERG > energy.out
 
   python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.00001
@@ -39,7 +39,7 @@ done
 
 # Testing geometry optimizations:
 
-for name in opt opt.cg ; do
+for name in opt opt.cg opt_cons ; do
 
   INLATTEFILE="latte."$name".in"
   REF="monitorrelax."$name".xyz"
@@ -48,6 +48,9 @@ for name in opt opt.cg ; do
   cp  ./tests/$INLATTEFILE latte.in
   cp  ./tests/$REF .
   cp  ./tests/$COORDS ./bl/inputblock.dat
+  if [ $name == "opt_cons" ]; then 
+    cp ./tests/freeze.in .
+  fi
 
   echo -e "\nTesting for "$name" \n"
 
@@ -55,7 +58,7 @@ for name in opt opt.cg ; do
 
   python ./tests/test-optim.py --reference $REF --current monitorrelax.xyz --reltol 0.00001
 
-  rm $REF monitorrelax.xyz out
+  #rm $REF monitorrelax.xyz out
 done
 
 # Testing for MD simulations:
