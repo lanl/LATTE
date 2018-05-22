@@ -37,6 +37,7 @@ MODULE LATTE_LIB
   USE LATTEPARSER_LATTE_MOD
   USE NEBLISTARRAY
   USE NONOARRAY
+  USE CONSTRAINTS_MOD
 
 #ifdef PROGRESSON
   USE PRG_SYSTEM_MOD ! FROM PROGRESS
@@ -672,6 +673,8 @@ CONTAINS
 
        IF(VERBOSE >= 1) WRITE(*,*)"Energy Components (TRRHOH, EREP, ENTE, ECOUL)",TRRHOH, EREP, ENTE, ECOUL
 
+       IF (FREEZE .EQ. 1) CALL FREEZE_ATOMS(FTOT,V)
+
        IF(MAXVAL(FTOT_OUT) .NE. 0.0d0)THEN
           IF(VERBOSE >= 1) WRITE(*,*)"Adding force components and energies from applicacion code ..."
           IF(VERBOSE >= 1) WRITE(*,*)"APPCODE,LATTE",VENERG,TRRHOH + EREP - ENTE - ECOUL + ESPIN
@@ -681,6 +684,7 @@ CONTAINS
           VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
           FTOT_OUT = FTOT
        ENDIF
+
 
        ! Get the seccond virial coefficient to pass it to the application program
        IF (ELECTRO .EQ. 0) VIRCOUL = ZERO
