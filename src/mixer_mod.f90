@@ -50,7 +50,6 @@ CONTAINS
        CALL PRG_LINEARMIXER(DELTAQ,OLDDELTAQS,SCFERROR,MX%MIXCOEFF,MX%VERBOSE)
     ELSEIF(MX%MIXERTYPE == "Pulay")THEN
        CALL PRG_QMIXER(DELTAQ,OLDDELTAQS,DQIN,DQOUT,SCFERROR,PITER,MX%MIXCOEFF,MX%MPULAY,MX%VERBOSE)
-       write(*,*)"SCF",SCFERROR,PITER, MX%VERBOSE
     ELSE
        CALL ERRORS("mixer_mod:qmixprg","Mixing scheme not implemented. &
             & Check MixerType keyword in the input file")
