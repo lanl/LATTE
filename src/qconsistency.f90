@@ -264,7 +264,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         IF (MDITER .LE. 10) THEN
 #ifdef PROGRESSON
            IF(MX%MIXERON)THEN
-              CALL QMIXPRG     !Alternative mixing scheme from PROGRESS
+              CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
            ELSE
               DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
            ENDIF
@@ -276,7 +276,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
 #ifdef PROGRESSON
            IF(MX%MIXERON)THEN
-              CALL QMIXPRG     !Alternative mixing scheme from PROGRESS
+              CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
            ELSE
               DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
            ENDIF
