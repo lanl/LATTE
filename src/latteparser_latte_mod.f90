@@ -123,24 +123,24 @@ CONTAINS
     USE FERMICOMMON
 
     IMPLICIT NONE
-    INTEGER, PARAMETER :: NKEY_CHAR = 6, NKEY_INT = 52, NKEY_RE = 21, NKEY_LOG = 1
+    INTEGER, PARAMETER :: NKEY_CHAR = 6, NKEY_INT = 53, NKEY_RE = 21, NKEY_LOG = 1
     CHARACTER(LEN=*) :: FILENAME
 
     !Library of keywords with the respective defaults.
     CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_CHAR(NKEY_CHAR) = [CHARACTER(LEN=100) :: &
-         'JobName=','BASISTYPE=','SP2CONV=','RELAXTYPE=','PARAMPATH=','COORDSFILE=']
+         'JOBNAME=','BASISTYPE=','SP2CONV=','RELAXTYPE=','PARAMPATH=','COORDSFILE=']
     CHARACTER(LEN=100) :: VALVECTOR_CHAR(NKEY_CHAR) = [CHARACTER(LEN=100) :: &
          'MyJob','NONORTHO','REL','SD','./TBparam','./bl/inputblock.dat']
 
     CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_INT(NKEY_INT) = [CHARACTER(LEN=50) :: &
-         'xControl=', 'DEBUGON=', 'FERMIM=', 'CGORLIB=', 'NORECS=', 'ENTROPYKIND=',&
-         'PPOTON=', 'VDWON=', 'SPINON=', 'ELECTRO=', 'ELECMETH=', 'MAXSCF=',& !12
+         'XCONTROL=','DEBUGON=','FERMIM=','CGORLIB=','NORECS=','ENTROPYKIND=',&
+         'PPOTON=','VDWON=','SPINON=','ELECTRO=', 'ELECMETH=','MAXSCF=',& !12
          'MINSP2ITER=','FULLQCONV=','QITER=','ORDERNMOL=','SPARSEON=','THRESHOLDON=',& !18
          'FILLINSTOP=','BLKSZ=','MSPARSE=','LCNON=','LCNITER=','RELAX=','MAXITER=',& !25
          'MDON=','PBCON=','RESTART=','CHARGE=','XBO=','XBODISON=','XBODISORDER=','NGPU=',& !33
          'KON=','COMPFORCE=','DOSFIT=','INTS2FIT=','NFITSTEP=','QFIT=',& !39
          'PPFITON=','ALLFITON=','PPSTEP=','BISTEP=','PP2FIT=','BINT2FIT=','PPNMOL=',& !46
-         'PPNGEOM=','PARREP=','VERBOSE=','MIXER=','RESTARTLIB=','FREEZE=']
+         'PPNGEOM=','PARREP=','VERBOSE=','MIXER=','RESTARTLIB=','FREEZE=','xControl='] 
     INTEGER :: VALVECTOR_INT(NKEY_INT) = (/ &
          1,0,6,1,1,1, &
          1,0,0,1,0,250, &
@@ -149,7 +149,7 @@ CONTAINS
          1,1,0,0,1,1,5,2, &
          0,1,0,1,5000,0,&
          0,0,500,500,2,6,10,&
-         200,0,1,0,0,0 /)
+         200,0,1,0,0,0,-1 /)
 
     CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_RE(NKEY_RE) = [CHARACTER(LEN=50) :: &
          'CGTOL=','KBT=','SPINTOL=','ELEC_ETOL=','ELEC_QTOL=','COULACC=','COULCUT=', 'COULR1=',& !8
@@ -183,6 +183,10 @@ CONTAINS
     !
 
     CONTROL = VALVECTOR_INT(1)
+    IF (VALVECTOR_INT(53) > 0) THEN !Someone is using xControl=
+        CALL ERRORS("latteparser_latte_mod","xControl= is not longer in use. Please use XCONTROL= instead.")
+    ENDIF        
+
 
     !
     ! BASISTYPE can equal "ORTHO" OR "NONORTHO",
