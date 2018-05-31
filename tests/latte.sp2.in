@@ -7,7 +7,7 @@ LATTE INPUT FILE
 
 #General controls
 CONTROL{
-  xControl= 2
+  XCONTROL= 2
   BASISTYPE= NONORTHO
   DEBUGON= 0
   FERMIM= 6

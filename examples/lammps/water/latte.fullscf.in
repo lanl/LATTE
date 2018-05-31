@@ -1,6 +1,6 @@
 #General controls
 CONTROL{
-  xControl= 1
+  XCONTROL= 1
   BASISTYPE= NONORTHO
   DEBUGON= 0
   FERMIM= 6
