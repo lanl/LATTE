@@ -140,7 +140,7 @@ CONTAINS
          'MDON=','PBCON=','RESTART=','CHARGE=','XBO=','XBODISON=','XBODISORDER=','NGPU=',& !33
          'KON=','COMPFORCE=','DOSFIT=','INTS2FIT=','NFITSTEP=','QFIT=',& !39
          'PPFITON=','ALLFITON=','PPSTEP=','BISTEP=','PP2FIT=','BINT2FIT=','PPNMOL=',& !46
-         'PPNGEOM=','PARREP=','VERBOSE=','MIXER=','RESTARTLIB=','FREEZE=','xControl='] 
+         'PPNGEOM=','PARREP=','VERBOSE=','MIXER=','RESTARTLIB=','FREEZE=','xControl=']
     INTEGER :: VALVECTOR_INT(NKEY_INT) = (/ &
          1,0,6,1,1,1, &
          1,0,0,1,0,250, &
@@ -185,7 +185,7 @@ CONTAINS
     CONTROL = VALVECTOR_INT(1)
     IF (VALVECTOR_INT(53) > 0) THEN !Someone is using xControl=
         CALL ERRORS("latteparser_latte_mod","xControl= is not longer in use. Please use XCONTROL= instead.")
-    ENDIF        
+    ENDIF
 
 
     !
@@ -495,10 +495,15 @@ CONTAINS
     ! If latte_lib has to be restarted
 
     RESTARTLIB = VALVECTOR_INT(51)
-    
+
     ! Freeze atoms
 
     FREEZE = VALVECTOR_INT(52)
+
+    IF (ELECTRO == 1 .AND. ELECMETH == 1 .AND. PBCON == 1) THEN
+      CALL ERRORS("latteparser_latte_mod","If CONTROL{ELECTRO= 1 ELECMETH= 1} &
+      &then CONTROL{PBCON= 0}")
+    END IF
 
   END SUBROUTINE PARSE_CONTROL
 
