@@ -27,7 +27,7 @@ MODULE COULOMBARRAY
   IMPLICIT NONE
   SAVE
 
-  INTEGER :: LMAX, MMAX, NMAX
+  INTEGER :: LMAX, MMAX, NMAX, NK
   REAL(LATTEPREC) :: COULCUT ! Input - cutoff for the real space part
   REAL(LATTEPREC) :: COULACC ! Input - accuracy for the k-space part
   REAL(LATTEPREC) :: COULR1 ! Start of the cut off tail for real space

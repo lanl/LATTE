@@ -38,6 +38,7 @@
 !! \param LMAX (global input) Number of point in the b1 direction.
 !! \param MMAX (global input) Number of point in the b2 direction.
 !! \param NMAX (global input) Number of point in the b3 direction.
+!! \param NK (global output) Number of total points in the reciprocal space.
 !!
 SUBROUTINE GET_K_LISTS(RECIP_VECTORS)
 
@@ -46,15 +47,12 @@ SUBROUTINE GET_K_LISTS(RECIP_VECTORS)
   USE MYPRECISION
 
   IMPLICIT NONE
-  INTEGER                                     ::  I, L, M, N
-  INTEGER                                     ::  LMIN, MMIN, NMIN
-  REAL(LATTEPREC)                             ::  L11, L12, L13, M21
-  REAL(LATTEPREC)                             ::  M22, M23
-  REAL(LATTEPREC)                             ::  K(3), K2
-  ! REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) ::  K1_LIST(:),K2_LIST(:)
-  ! REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) ::  K3_LIST(:),KSQ_LIST(:)
-  INTEGER                                     ::  NK
-  REAL(LATTEPREC), INTENT(IN)                 ::  RECIP_VECTORS(3,3)
+  INTEGER                            ::  I, L, M, N
+  INTEGER                            ::  LMIN, MMIN, NMIN
+  REAL(LATTEPREC)                    ::  L11, L12, L13, M21
+  REAL(LATTEPREC)                    ::  M22, M23
+  REAL(LATTEPREC)                    ::  K(3), K2
+  REAL(LATTEPREC), INTENT(IN)        ::  RECIP_VECTORS(3,3)
 
   IF (EXISTERROR) RETURN
 
@@ -106,7 +104,7 @@ SUBROUTINE GET_K_LISTS(RECIP_VECTORS)
 
            K2 = K(1)*K(1) + K(2)*K(2) + K(3)*K(3)
 
-            IF (K2 .LE. KCUTOFF2) THEN
+           IF (K2 .LE. KCUTOFF2) THEN
 
               K1_LIST(I) = K(1)
               K2_LIST(I) = K(2)
@@ -114,7 +112,7 @@ SUBROUTINE GET_K_LISTS(RECIP_VECTORS)
               KSQ_LIST(I) = K2
               I = I + 1
 
-            END IF
+           END IF
 
         END DO
 

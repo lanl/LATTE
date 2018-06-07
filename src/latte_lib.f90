@@ -618,6 +618,7 @@ CONTAINS
              !If box is changing
              IF (DBOX .GT. 0.0d0) THEN
                 CALL NEBLISTS(0)
+                CALL INITCOULOMB !If the box is changing we need to recompute the kspace list
              ELSE
                 CALL NEBLISTS(1)
              ENDIF
@@ -756,6 +757,15 @@ CONTAINS
        IF(RESTARTLIB == 1 .AND. LIBCALLS == 0)THEN
           CALL READRESTARTLIB(LIBCALLS)
        ENDIF
+
+#ifdef PROGRESSON
+      !  IF(VERBOSE >= 1)THEN
+      !    CALL GETDIPOLE(DIPOLEMAG,DIPOLEVECOUT=DIPOLEVECOUT)
+      !    WRITE(*,*)"Dipole Magnitude = DIPOLEMAG"
+      !    WRITE(*,*)"Dipole Vector:"
+      !    WRITE(*,*)DIPOLEVECOUT(1),DIPOLEVECOUT(2),DIPOLEVECOUT(3)
+      !  ENDIF
+#endif
 
        CALL FLUSH(6) !To force writing to file at every call
 
