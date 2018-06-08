@@ -15,7 +15,7 @@ set -e                                          # This will exit the script if t
 
 # Testing for single point calculations:
 
-for name in single.point single.point.noelec single.point.rspace ; do  
+for name in single.point single.point.noelec single.point.rspace ; do
 
   INLATTEFILE="latte."$name".in"
   REF="energy."$name".out"
@@ -35,7 +35,7 @@ for name in single.point single.point.noelec single.point.rspace ; do
 
   rm $REF out
 
-done 
+done
 
 # Testing geometry optimizations:
 
@@ -48,7 +48,7 @@ for name in opt opt.cg opt_cons dorbitals; do
   cp  ./tests/$INLATTEFILE latte.in
   cp  ./tests/$REF .
   cp  ./tests/$COORDS ./bl/inputblock.dat
-  if [ $name == "opt_cons" ]; then 
+  if [ $name == "opt_cons" ]; then
     cp ./tests/freeze.in .
   fi
 
@@ -64,7 +64,7 @@ done
 # Testing for MD simulations:
 
 for name in 0scf 2scf fullscf fullscf.etemp sp2 sp2.sparse fullscf.nvt \
-       	fullscf.npt fullscf.vdw fullscf.spin fullscf.kon ; do
+       	fullscf.npt fullscf.vdw fullscf.spin fullscf.kon fullscf.rspace ; do
 
   INLATTEFILE="latte."$name".in"
   REF="energy."$name".out"
@@ -82,7 +82,7 @@ for name in 0scf 2scf fullscf fullscf.etemp sp2 sp2.sparse fullscf.nvt \
 
   python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.00001
 
-  rm $REF energy.out out  
+  rm $REF energy.out out
 
 done
 
@@ -113,8 +113,8 @@ for name in 0scf fullscf sp2 ; do
 
   grep Energy out | sed -e s/"PAR"/$STRR/g  >  input_tmp.in
   python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.00001
- 
-  rm $REF energy.out input_tmp.in 
+
+  rm $REF energy.out input_tmp.in
 
 done
 

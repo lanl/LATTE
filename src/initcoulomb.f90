@@ -48,7 +48,6 @@ SUBROUTINE INITCOULOMB
 
   ELSE
 
-
      TWOPI = TWO*PI
      PI2 = PI*PI
      SQRTPI = SQRT(PI)
@@ -58,57 +57,53 @@ SUBROUTINE INITCOULOMB
 
      LATTICEVECS = BOX
 
-     !  LATTICEVECS(1,1) = BOX(2,1) - BOX(1,1)
-     !  LATTICEVECS(2,2) = BOX(2,2) - BOX(1,2)
-     !  LATTICEVECS(3,3) = BOX(2,3) - BOX(1,3)
-
      ! Ed's bit:
 
-     A2XA3(1) = latticevecs(2,2)*latticevecs(3,3) - &
-          latticevecs(2,3)*latticevecs(3,2)
-     A2XA3(2) = latticevecs(2,3)*latticevecs(3,1) - &
-          latticevecs(2,1)*latticevecs(3,3)
-     A2XA3(3) = latticevecs(2,1)*latticevecs(3,2) - & 
-          latticevecs(2,2)*latticevecs(3,1)
+     A2XA3(1) = LATTICEVECS(2,2)*LATTICEVECS(3,3) - &
+          LATTICEVECS(2,3)*LATTICEVECS(3,2)
+     A2XA3(2) = LATTICEVECS(2,3)*LATTICEVECS(3,1) - &
+          LATTICEVECS(2,1)*LATTICEVECS(3,3)
+     A2XA3(3) = LATTICEVECS(2,1)*LATTICEVECS(3,2) - &
+          LATTICEVECS(2,2)*LATTICEVECS(3,1)
 
-     dot = latticevecs(1,1)*A2XA3(1) + latticevecs(1,2)*A2XA3(2) + &
-          latticevecs(1,3)*A2XA3(3)
+     DOT = LATTICEVECS(1,1)*A2XA3(1) + LATTICEVECS(1,2)*A2XA3(2) + &
+          LATTICEVECS(1,3)*A2XA3(3)
 
-     recipvecs(1,1) = TWOPI*A2XA3(1)/dot
-     recipvecs(1,2) = TWOPI*A2XA3(2)/dot
-     recipvecs(1,3) = TWOPI*A2XA3(3)/dot
+     RECIPVECS(1,1) = TWOPI*A2XA3(1)/DOT
+     RECIPVECS(1,2) = TWOPI*A2XA3(2)/DOT
+     RECIPVECS(1,3) = TWOPI*A2XA3(3)/DOT
 
-     A3XA1(1) = latticevecs(3,2)*latticevecs(1,3) - &
-          latticevecs(3,3)*latticevecs(1,2)
-     A3XA1(2) = latticevecs(3,3)*latticevecs(1,1) - &
-          latticevecs(3,1)*latticevecs(1,3)
-     A3XA1(3) = latticevecs(3,1)*latticevecs(1,2) - &
-          latticevecs(3,2)*latticevecs(1,1)
+     A3XA1(1) = LATTICEVECS(3,2)*LATTICEVECS(1,3) - &
+          LATTICEVECS(3,3)*LATTICEVECS(1,2)
+     A3XA1(2) = LATTICEVECS(3,3)*LATTICEVECS(1,1) - &
+          LATTICEVECS(3,1)*LATTICEVECS(1,3)
+     A3XA1(3) = LATTICEVECS(3,1)*LATTICEVECS(1,2) - &
+          LATTICEVECS(3,2)*LATTICEVECS(1,1)
 
-     dot = latticevecs(2,1)*A3XA1(1) + latticevecs(2,2)*A3XA1(2) + &
-          latticevecs(2,3)*A3XA1(3)
+     DOT = LATTICEVECS(2,1)*A3XA1(1) + LATTICEVECS(2,2)*A3XA1(2) + &
+          LATTICEVECS(2,3)*A3XA1(3)
 
-     recipvecs(2,1) = TWOPI*A3XA1(1)/dot
-     recipvecs(2,2) = TWOPI*A3XA1(2)/dot
-     recipvecs(2,3) = TWOPI*A3XA1(3)/dot
+     RECIPVECS(2,1) = TWOPI*A3XA1(1)/DOT
+     RECIPVECS(2,2) = TWOPI*A3XA1(2)/DOT
+     RECIPVECS(2,3) = TWOPI*A3XA1(3)/DOT
 
-     A1XA2(1) = latticevecs(1,2)*latticevecs(2,3) - &
-          latticevecs(1,3)*latticevecs(2,2)
-     A1XA2(2) = latticevecs(1,3)*latticevecs(2,1) - & 
-          latticevecs(1,1)*latticevecs(2,3)
-     A1XA2(3) = latticevecs(1,1)*latticevecs(2,2) - &
-          latticevecs(1,2)*latticevecs(2,1)
+     A1XA2(1) = LATTICEVECS(1,2)*LATTICEVECS(2,3) - &
+          LATTICEVECS(1,3)*LATTICEVECS(2,2)
+     A1XA2(2) = LATTICEVECS(1,3)*LATTICEVECS(2,1) - &
+          LATTICEVECS(1,1)*LATTICEVECS(2,3)
+     A1XA2(3) = LATTICEVECS(1,1)*LATTICEVECS(2,2) - &
+          LATTICEVECS(1,2)*LATTICEVECS(2,1)
 
-     dot = latticevecs(3,1)*A1XA2(1) + latticevecs(3,2)*A1XA2(2) + &
-          latticevecs(3,3)*A1XA2(3)
+     DOT = LATTICEVECS(3,1)*A1XA2(1) + LATTICEVECS(3,2)*A1XA2(2) + &
+          LATTICEVECS(3,3)*A1XA2(3)
 
-     recipvecs(3,1) = TWOPI*A1XA2(1)/dot
-     recipvecs(3,2) = TWOPI*A1XA2(2)/dot
-     recipvecs(3,3) = TWOPI*A1XA2(3)/dot
+     RECIPVECS(3,1) = TWOPI*A1XA2(1)/DOT
+     RECIPVECS(3,2) = TWOPI*A1XA2(2)/DOT
+     RECIPVECS(3,3) = TWOPI*A1XA2(3)/DOT
 
      ! Calculate the cell volume
 
-     COULVOL = dot
+     COULVOL = DOT
 
      P = -LOG(COULACC)
      SQRTP = SQRT(P)
@@ -117,9 +112,9 @@ SUBROUTINE INITCOULOMB
 
         CALPHA = SQRTP/COULCUT
         COULCUT2 = COULCUT*COULCUT
-        kcutoff = TWO*CALPHA*SQRTP
-        kcutoff2 = kcutoff*kcutoff
-        CALPHA2 = CALPHA*CALPHA  
+        KCUTOFF = TWO*CALPHA*SQRTP
+        KCUTOFF2 = KCUTOFF*KCUTOFF
+        CALPHA2 = CALPHA*CALPHA
         FOURCALPHA2 = FOUR*CALPHA2
 
      ELSE
@@ -144,12 +139,12 @@ SUBROUTINE INITCOULOMB
         ENDIF
 
         COULCUT2 = COULCUT*COULCUT
-        kcutoff = TWO*CALPHA*SQRTP
-        kcutoff2 = kcutoff*kcutoff
+        KCUTOFF = TWO*CALPHA*SQRTP
+        KCUTOFF2 = KCUTOFF*KCUTOFF
         CALPHA2 = CALPHA*CALPHA
         FOURCALPHA2 = FOUR*CALPHA2
 
-        ! Taking this bit from Coulomb Ewald so we don't have to 
+        ! Taking this bit from Coulomb Ewald so we don't have to
         ! recompute every time:
 
      ENDIF
@@ -166,5 +161,6 @@ SUBROUTINE INITCOULOMB
 
   ENDIF
 
-END SUBROUTINE INITCOULOMB
+  CALL GET_K_LISTS(RECIPVECS)
 
+END SUBROUTINE INITCOULOMB

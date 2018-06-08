@@ -38,7 +38,7 @@ done
 
 # Tests for geometry optimizations 
 
-for name in opt ; do
+for name in opt opt.boxrel ; do
 
   INLATTEFILE="latte."$name".in"
   INLAMMPSFILE="in."$name
