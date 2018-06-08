@@ -1,6 +1,6 @@
 !> LATTE parser.
 !! \ingroup LATTE
-!! This module is used to parse all the necessary input variables for a LATTE TB run (SCF/OPT/MD)
+!! \brief This module is used to parse all the necessary input variables for a LATTE TB run (SCF/OPT/MD)
 !! Adding a new input keyword to the parser:
 !! - If the variable is real, we have to increase nkey_re.
 !! - Add the keyword (character type) in the keyvector_re vector.
