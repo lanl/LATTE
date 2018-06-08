@@ -1,0 +1,4 @@
+Noelem=  2
+Element   basis  Numel          Es        Ep        Ed   Ef   Mass  HubbardU   Wss  Wpp  Wdd  Wff
+ O        sp       6.0   -23.91426  -9.03777   0.00000  0.0  16.01  14.23986   0.0  0.0  0.0  0.0
+Ti        sd       4.0    -4.42437  -1.48135  -4.41686  0.0  47.88   9.65950   0.0  0.0  0.0  0.0
