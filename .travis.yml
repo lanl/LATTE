@@ -14,9 +14,9 @@ before_install:
   - export LATTEPATH=`pwd`
   - sudo apt-get install gfortran libblas-dev liblapack-dev
   - sudo apt-get install cmake python gcc cmake-data g++ curl
-  - cd; git clone https://github.com/lanl/qmd-progress.git
-  - cd; git clone https://github.com/lanl/bml.git
-  - cd; git clone https://github.com/lammps/lammps.git
+  - cd; git clone --depth=1 https://github.com/lanl/qmd-progress.git
+  - cd; git clone --depth=1 https://github.com/lanl/bml.git
+  - cd; git clone --depth=1 https://github.com/lammps/lammps.git
   - pip install --user codecov
 
   # Install BML, PROGRESS and LAMMPS
@@ -37,11 +37,23 @@ env:
   - OPTIONS="CVR=ON" TEST="" CHOICES=gfort.lapack
   - OPTIONS="CVR=ON PROGRESS=ON" TEST="" CHOICES=gfort.lapack
   - OPTIONS="CVR=ON MAKELIB=ON lammps" TEST="_lmp" CHOICES=gfort.lapack
+  - LATTE_CMAKE=yes CMAKE_WITH_PROGRESS=yes
+  - LATTE_CMAKE=yes LAMMPS_CMAKE=yes
 
 script:
-  -  cp -f -v ./makefiles/makefile.CHOICES.${CHOICES} makefile.CHOICES
-  -  make ${OPTIONS}; make test${TEST}
+  -  cp -f -v ./makefiles/makefile.CHOICES.${CHOICES:-gfort.lapack} makefile.CHOICES
+  -  if [[ ! ${LATTE_CMAKE} ]]; then
+       make ${OPTIONS} && make test${TEST}; 
+     else
+       mkdir build && cd build && cmake ../cmake -DCMAKE_INSTALL_PREFIX=$HOME/latte/install -DPROGRESS=${CMAKE_WITH_PROGRESS} -DCMAKE_PREFIX_PATH="$HOME/bml/install;$HOME/qmd-progress/install" && make && make install; 
+       if [[ ${LAMMPS_CMAKE} ]]; then
+         cd $HOME/lammps && mkdir build && cd build && cmake ../cmake -DPKG_LATTE=ON -DCMAKE_PREFIX_PATH=$HOME/latte/install && make;
+       fi
+     fi
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -v -X gcov
   - codecov
+
+cache:
+  - ccache
