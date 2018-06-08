@@ -39,7 +39,7 @@ done
 
 # Testing geometry optimizations:
 
-for name in opt opt.cg opt_cons ; do
+for name in opt opt.cg opt_cons dorbitals; do
 
   INLATTEFILE="latte."$name".in"
   REF="monitorrelax."$name".xyz"
