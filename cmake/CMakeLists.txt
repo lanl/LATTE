@@ -72,7 +72,8 @@ nonoarray.f90 ppotarray.f90 purearray.f90 relaxcommon.f90 restartarray.f90
 sparsearray.f90 spinarray.f90 univarray.f90 virialarray.f90 xboarray.f90
 kspacearray.f90 timer_mod.f90 subgraph.f90 matrixio.f90 sparsemath.f90
 sparsesp2.f90 subgraphsp2.f90 homolumo.f90 openfiles_mod.f90 kernelparser_mod.f90
-latteparser_latte_mod.f90 mixer_mod.f90 genXprogress.f90 latte_lib.f90)
+latteparser_latte_mod.f90 mixer_mod.f90 genXprogress.f90 bodirectprogress.f90
+constraints_mod.f90 latte_lib.f90)
 
 set(DBCSRMODS dbcsr_var_mod.f90 init_dbcsr.f90 shutdown_dbcsr.f90)
 
@@ -114,7 +115,7 @@ readppottab.f90 pairpottab.f90 hugrescale.f90 avesforhug.f90 getdipole.f90
 fittingoutput.f90 tabtest.f90 kgenX.f90 korthomyH.f90 kdeorthomyrho.f90
 kfcoulnono.f90 kpulay.f90 getforce.f90 masses2symbols.f90 setuptbmd.f90
 wrtrestartlib.f90 readrestartlib.f90 readppotspline.f90 pairpotspline.f90 
-errors.f90) 
+errors.f90 initcoulombklist.f90) 
 
 foreach(_m MYMODULES MYSUBS DBCSR)
   set(${_m}_SOURCES)
