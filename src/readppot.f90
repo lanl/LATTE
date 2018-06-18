@@ -28,13 +28,27 @@ SUBROUTINE READPPOT()
 
   INTEGER :: I, J, K
   CHARACTER(LEN=20) :: HD
+  LOGICAL :: FILEEXISTS
+
   IF (EXISTERROR) RETURN
 
   IF (BASISTYPE .EQ. "ORTHO") THEN
-     OPEN(UNIT=14,STATUS="OLD", FILE=TRIM(PARAMPATH)//"/ppots.ortho")
+     INQUIRE( FILE=TRIM(PARAMPATH)//"/ppots.ortho", exist=FILEEXISTS)
+     IF (.NOT. FILEEXISTS) THEN
+        CALL ERRORS("readppot","ppot.ortho file does not exist. &
+             & Please either set PPOTON= 0 or add a file for the pair potentials.")
+     ELSE
+        OPEN(UNIT=14,STATUS="OLD", FILE=TRIM(PARAMPATH)//"/ppots.ortho")
+     END IF
   ELSEIF (BASISTYPE .EQ. "NONORTHO") THEN
-     OPEN(UNIT=14, STATUS="OLD", FILE=TRIM(PARAMPATH)//"/ppots.nonortho")
-  ENDIF
+     INQUIRE( FILE=TRIM(PARAMPATH)//"/ppots.nonortho", exist=FILEEXISTS)
+     IF (.NOT. FILEEXISTS) THEN
+        CALL ERRORS("readppot","ppot.ortho file does not exist. &
+             & Please either set PPOTON= 0 or add a file for the pair potentials.")
+     ELSE
+        OPEN(UNIT=14, STATUS="OLD", FILE=TRIM(PARAMPATH)//"/ppots.nonortho")
+     END IF
+  END IF
 
   READ(14,*) HD, NOPPS
 
