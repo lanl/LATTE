@@ -22,21 +22,21 @@
 SUBROUTINE READRESTARTLIB(ITER)
 
   USE CONSTANTS_MOD
-  USE kspacearray
-  USE neblistarray
-  USE ppotarray
-  USE restartarray
-  USE sparsearray
-  USE univarray
-  USE xboarray
-  USE coulombarray
-  USE diagarray
-  USE mdarray
-  USE nonoarray
-  USE purearray
-  USE setuparray
-  USE spinarray
-  USE virialarray
+  USE KSPACEARRAY
+  USE NEBLISTARRAY
+  USE PPOTARRAY
+  USE RESTARTARRAY
+  USE SPARSEARRAY
+  USE UNIVARRAY
+  USE XBOARRAY
+  USE COULOMBARRAY
+  USE DIAGARRAY
+  USE MDARRAY
+  USE NONOARRAY
+  USE PUREARRAY
+  USE SETUPARRAY
+  USE SPINARRAY
+  USE VIRIALARRAY
 #ifdef MPI_ON
   USE MPI
 #endif

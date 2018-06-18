@@ -295,80 +295,87 @@ CONTAINS
     IF (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. DOSFITON .EQ. 0 &
          .AND. PPFITON .EQ. 0 .AND. ALLFITON .EQ. 0) THEN
 
-       !  IF (LIBINIT) THEN
-       !    CALL ERRORS("latte_lib","MDON .EQ. 0 .AND. RELAXME .EQ. 0 can be done &
-       !    &for only one geometry (A single call to the library). Please reduce &
-       !    &the number of steps (md of relaxation) at the host code")
-       !    EXISTERROR_INOUT = EXISTERROR
-       !    RETURN
-       !  ENDIF
+
+       ! IF (.NOT. LIBINIT) THEN
 
        !
        ! Start the timers
        !
 
-       IF (LIBINIT) THEN
+       CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
+       CALL DTIME(TARRAY, RESULT)
 
-          CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
-          CALL DTIME(TARRAY, RESULT)
 
-          ! Set up neighbor lists for building the H and pair potentials
 
-          CALL ALLOCATENEBARRAYS
+       ! Set up neighbor lists for building the H and pair potentials
 
-          IF (ELECTRO .EQ. 1) THEN
+       CALL ALLOCATENEBARRAYS
 
-             CALL ALLOCATECOULOMB
 
-             CALL INITCOULOMB
+       IF (ELECTRO .EQ. 1) THEN
 
-          ENDIF
+          CALL ALLOCATECOULOMB
 
-          IF (BASISTYPE .EQ. "NONORTHO") CALL ALLOCATENONO
-
-          CALL NEBLISTS(0)
-
-          ! Build the charge independent H matrix
-
-          IF (KON .EQ. 0) THEN
-
-             IF (SPONLY .EQ. 0) THEN
-                CALL BLDNEWHS_SP
-             ELSE
-                CALL BLDNEWHS
-             ENDIF
-
-          ELSE
-
-             CALL KBLDNEWH
-
-          ENDIF
-
-          !
-          ! If we're starting from a restart file, we need to modify H such
-          ! that it agrees with the density matrix elements read from file
-          !
-
-          IF (RESTART .EQ. 1) CALL IFRESTART
-
-          !
-          ! See whether we need spin-dependence too
-          !
-
-          IF (SPINON .EQ. 1) THEN
-             CALL GETDELTASPIN
-             CALL BLDSPINH
-          ENDIF
-
-          IF (CONTROL .EQ. 1) THEN
-             CALL ALLOCATEDIAG
-          ELSEIF (CONTROL .EQ. 2 .OR. CONTROL .EQ. 4 .OR. CONTROL .EQ. 5) THEN
-             CALL ALLOCATEPURE
-          ELSEIF (CONTROL .EQ. 3) THEN
-             CALL FERMIALLOCATE
-          ENDIF
+          CALL INITCOULOMB
 
        ENDIF
+
+
+       IF (BASISTYPE .EQ. "NONORTHO") CALL ALLOCATENONO
+
+
+
+       CALL NEBLISTS(0)
+
+
+       ! Build the charge independent H matrix
+
+       IF (KON .EQ. 0) THEN
+
+          IF (SPONLY .EQ. 0) THEN
+             CALL BLDNEWHS_SP
+          ELSE
+             CALL BLDNEWHS
+          ENDIF
+
+       ELSE
+
+          CALL KBLDNEWH
+
+       ENDIF
+
+       !
+       ! If we're starting from a restart file, we need to modify H such
+       ! that it agrees with the density matrix elements read from file
+       !
+
+       IF (RESTART .EQ. 1) CALL IFRESTART
+
+       !
+       ! See whether we need spin-dependence too
+       !
+
+       IF (SPINON .EQ. 1) THEN
+          CALL GETDELTASPIN
+          CALL BLDSPINH
+       ENDIF
+
+       IF (CONTROL .EQ. 1) THEN
+          CALL ALLOCATEDIAG
+       ELSEIF (CONTROL .EQ. 2 .OR. CONTROL .EQ. 4 .OR. CONTROL .EQ. 5) THEN
+          CALL ALLOCATEPURE
+       ELSEIF (CONTROL .EQ. 3) THEN
+          CALL FERMIALLOCATE
+       ENDIF
+
+       !  ELSE
+       !     CALL ERRORS("latte_lib","Attemting to perform multiple single point calculations. &
+       !          & MDON .EQ. 0 .AND. RELAXME .EQ. 0 can be done &
+       !          &for only one geometry (A single call to the library). Please reduce &
+       !          &the number of steps (md of relaxation) at the host code")
+       !     EXISTERROR_INOUT = EXISTERROR
+       !     RETURN
+       !  ENDIF
 
        IF (CONTROL .EQ. 5) THEN
 
@@ -558,8 +565,8 @@ CONTAINS
 
        CALL DEALLOCATEALL
 
-       LIBINIT = .TRUE.
-       EXISTERROR_INOUT = EXISTERROR
+       LIBINIT = .FALSE.
+
        RETURN
 
     ELSEIF (MDON .EQ. 1 .AND. RELAXME .EQ. 0 .AND. MAXITER_IN < 0 ) THEN
@@ -759,12 +766,12 @@ CONTAINS
        ENDIF
 
 #ifdef PROGRESSON
-      !  IF(VERBOSE >= 1)THEN
-      !    CALL GETDIPOLE(DIPOLEMAG,DIPOLEVECOUT=DIPOLEVECOUT)
-      !    WRITE(*,*)"Dipole Magnitude = DIPOLEMAG"
-      !    WRITE(*,*)"Dipole Vector:"
-      !    WRITE(*,*)DIPOLEVECOUT(1),DIPOLEVECOUT(2),DIPOLEVECOUT(3)
-      !  ENDIF
+       !  IF(VERBOSE >= 1)THEN
+       !    CALL GETDIPOLE(DIPOLEMAG,DIPOLEVECOUT=DIPOLEVECOUT)
+       !    WRITE(*,*)"Dipole Magnitude = DIPOLEMAG"
+       !    WRITE(*,*)"Dipole Vector:"
+       !    WRITE(*,*)DIPOLEVECOUT(1),DIPOLEVECOUT(2),DIPOLEVECOUT(3)
+       !  ENDIF
 #endif
 
        CALL FLUSH(6) !To force writing to file at every call
