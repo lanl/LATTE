@@ -40,7 +40,8 @@
 !! \param VEL Velocities passed to latte.
 !! \param DT integration step passed to latte.
 !! \param DT integration step passed to latte.
-!! \param VIRIALINOUT Components of the second virial coefficient
+!! \param VIRIAL_INOUT Components of the second virial coefficient
+!! \param NEWSYSTEM Tells LATTE if a new system is passed.
 !! \param EXISTERROR Returns an error flag (.true.) to the hosting code.
 !!
 !! \brief This routine will be used load call latte_lib from a C/C++ program:
@@ -58,9 +59,9 @@
 !! \brief Note: All units are LATTE units by default.
 !! See https://github.com/losalamos/LATTE/blob/master/Manual/LATTE_manual.pdf
 !!
-SUBROUTINE LATTE_C_BIND (FLAGS,NATS,COORDS,TYPES,NTYPES,MASSES,XLO &
-     ,XHI,XY,XZ,YZ,FORCES,MAXITER,VENERG, &
-     VEL,DT,VIRIALINOUT,EXISTERROR) BIND (C, NAME="latte")
+SUBROUTINE LATTE_C_BIND (FLAGS, NATS, COORDS, TYPES, NTYPES, MASSES, XLO &
+     , XHI, XY, XZ, YZ, FORCES, MAXITER, VENERG, &
+     VEL, DT, VIRIAL_INOUT, EXISTERROR) BIND (C, NAME="latte")
 
   USE ISO_C_BINDING, ONLY: C_CHAR, C_NULL_CHAR, C_DOUBLE, C_INT, C_BOOL
   USE LATTE_LIB
@@ -73,11 +74,11 @@ SUBROUTINE LATTE_C_BIND (FLAGS,NATS,COORDS,TYPES,NTYPES,MASSES,XLO &
   REAL(C_DOUBLE)                 ::  XLO(3), EKIN, VENERG, DT
   REAL(C_DOUBLE)                 ::  XY, XZ, YZ
   REAL(C_DOUBLE), INTENT(INOUT)  ::  FORCES(3, NATS), VEL(3, NATS)
-  REAL(C_DOUBLE), INTENT(INOUT)  ::  VIRIALINOUT(6)
-  LOGICAL(C_BOOL)                ::  EXISTERROR
+  REAL(C_DOUBLE), INTENT(INOUT)  ::  VIRIAL_INOUT(6)
+  LOGICAL(C_BOOL)                ::  EXISTERROR, NEWSYSTEM
 
   CALL LATTE(NTYPES, TYPES, COORDS, MASSES, XLO, XHI, XY, XZ, YZ, FORCES, &
-       MAXITER, VENERG, VEL, DT, VIRIALINOUT, EXISTERROR)
+       MAXITER, VENERG, VEL, DT, VIRIAL_INOUT, NEWSYSTEM, EXISTERROR)
 
   RETURN
 
