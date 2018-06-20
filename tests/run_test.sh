@@ -86,6 +86,59 @@ for name in 0scf 2scf fullscf fullscf.etemp sp2 sp2.sparse fullscf.nvt \
 
 done
 
+# Testing exact output files
+
+for name in fittingoutput.dat ; do
+
+  INLATTEFILE="latte."$name".in"
+  REF="ref."$name
+  COORDS=$name".dat"
+
+  cp  ./tests/$INLATTEFILE latte.in
+  cp  ./tests/$REF .
+  cp  ./tests/$COORDS ./bl/inputblock.dat
+
+  echo -e "\nTesting for "$name" \n"
+
+  time $RUN > out
+  
+  tol=0.000001
+  
+  check=`
+    awk '
+      BEGIN{
+        loc=0
+      }
+      {
+        getline value < "'$name'"
+        split(value,arr)
+        
+        for(i=1;i<=NF;i++){
+          # Here is possible to include a filter to compare only numbers in case the files are more complex
+          if( sqrt((arr[i]-$i)**2)>'$tol' ){
+            print 1
+            loc=1
+            exit
+          }
+        }
+      }
+      END{
+        if(loc==0)
+          print 0
+      }
+    ' $REF`
+  
+  if [ "$check" -eq 0 ]
+  then
+    echo "Diff test passed without failure ..."
+  else
+    diff $REF $name
+    exit -1
+  fi
+
+  rm $REF out
+
+done
 
 # Testing with the usual latte input method:
 
