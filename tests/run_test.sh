@@ -102,7 +102,7 @@ for name in fittingoutput.dat ; do
 
   time $RUN > out
   
-  tol=0.000001
+  tol=0.0001
   
   check=`
     awk '
