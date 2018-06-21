@@ -88,8 +88,9 @@ CONTAINS
   !! \param VENERG This is the potential Energy that is given back from latte to the hosting code.
   !! \param VEL Velocities passed to latte.
   !! \param DT integration step passed to latte.
-  !! \param VIRIALINOUT Components of the second virial coefficient
-  !! \param EXISTERROR Returns an error flag (.true.) to the hosting code.
+  !! \param VIRIAL_INOUT Components of the second virial coefficient.
+  !! \param NEWSYSTEM Tells LATTE if a new system is passed.
+  !! \param EXISTERROR_INOUT Returns an error flag (.true.) to the hosting code.
   !!
   !! \brief This routine will be used load call latte_lib from a C/C++ program:
   !!
@@ -105,8 +106,8 @@ CONTAINS
   !!
   !! \brief Note: All units are LATTE units by default. See https://github.com/losalamos/LATTE/blob/master/Manual/LATTE_manual.pdf
   !!
-  SUBROUTINE LATTE(NTYPES,TYPES,CR_IN,MASSES_IN,XLO,XHI,XY,XZ,YZ,FTOT_OUT, &
-       MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIALINOUT, EXISTERROR_INOUT)
+  SUBROUTINE LATTE(NTYPES, TYPES, CR_IN, MASSES_IN, XLO, XHI, XY, XZ, YZ, FTOT_OUT, &
+       MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIAL_INOUT, NEWSYSTEM, EXISTERROR_INOUT)
 
     USE CONSTANTS_MOD, ONLY: EXISTERROR
 
@@ -122,10 +123,11 @@ CONTAINS
     REAL(LATTEPREC), INTENT(IN)  :: CR_IN(:,:),VEL_IN(:,:), MASSES_IN(:),XLO(3),XHI(3)
     REAL(LATTEPREC), INTENT(IN)  :: DT_IN, XY, XZ, YZ
     REAL(LATTEPREC), INTENT(OUT) :: FTOT_OUT(:,:), VENERG
-    REAL(LATTEPREC), INTENT(OUT) :: VIRIALINOUT(6)
+    REAL(LATTEPREC), INTENT(OUT) :: VIRIAL_INOUT(6)
     INTEGER, INTENT(IN) ::  NTYPES, TYPES(:), MAXITER_IN
     LOGICAL(1), INTENT(INOUT) :: EXISTERROR_INOUT
     REAL(LATTEPREC) :: MLSI, LUMO, HOMO
+    INTEGER, INTENT(INOUT) :: NEWSYSTEM
 
 #ifdef PROGRESSON
     TYPE(SYSTEM_TYPE) :: SY
@@ -133,7 +135,6 @@ CONTAINS
 
 #ifdef MPI_ON
     INTEGER :: IERR, STATUS(MPI_STATUS_SIZE), NUMPROCS
-
     CALL MPI_INIT( IERR )
     CALL MPI_COMM_RANK( MPI_COMM_WORLD, MYID, IERR )
     CALL MPI_COMM_SIZE( MPI_COMM_WORLD, NUMPROCS, IERR )
@@ -141,8 +142,9 @@ CONTAINS
 
     EXISTERROR = .FALSE. !We assume we start the lib call without errors
 
-    !INITIALIZATION
-    IF(.NOT. LIBINIT)THEN
+    IF(.NOT. LIBINIT .OR. NEWSYSTEM == 1)THEN
+
+       CALL DEALLOCATEALL()
 
        LIBRUN = .TRUE.
 
@@ -288,9 +290,8 @@ CONTAINS
        CALL FLUSH(6)
 
     ENDIF
+    !End of initialization
 
-
-    !END OF INITIALIZATION
 
     IF (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. DOSFITON .EQ. 0 &
          .AND. PPFITON .EQ. 0 .AND. ALLFITON .EQ. 0) THEN
@@ -607,7 +608,7 @@ CONTAINS
           CALL DTIME(TARRAY, RESULT)
 
           IF (VERBOSE >= 1)WRITE(*,*)"Setting up TBMD ..."
-          CALL SETUPTBMD
+          CALL SETUPTBMD(NEWSYSTEM)
 
           CALL FLUSH(6)
 
@@ -706,9 +707,10 @@ CONTAINS
 
        !       CALL GETPRESSURE
 
-       VIRIALINOUT = -VIRIAL
+       VIRIAL_INOUT = -VIRIAL
 
        LIBINIT = .TRUE.
+       NEWSYSTEM = 0 !Setting newsystem back to 0.
 
 #ifdef PROGRESSON
        IF(MOD(LIBCALLS,WRTFREQ) == 0)THEN
@@ -777,6 +779,7 @@ CONTAINS
        CALL FLUSH(6) !To force writing to file at every call
 
        EXISTERROR_INOUT = EXISTERROR
+
        RETURN
 
     ELSEIF (MDON .EQ. 1 .AND. RELAXME .EQ. 0 .AND. MAXITER_IN >= 0) THEN
@@ -912,6 +915,7 @@ CONTAINS
 #endif
 
     LIBINIT = .TRUE.
+    NEWSYSTEM = 0 !Setting newsystem back to 0.
     EXISTERROR_INOUT = EXISTERROR
 
   END SUBROUTINE LATTE
