@@ -52,6 +52,7 @@ SUBROUTINE GETRHO(MDITER)
     ENDIF
 #else
      CALL DIAGMYH()
+
      IF (SPINON .EQ. 0) THEN
         CALL BOEVECS()
      ELSE
@@ -80,7 +81,7 @@ SUBROUTINE GETRHO(MDITER)
 #ifdef PROGRESSON
 
         CALL SP2PRG
-        
+
 #else
 
         IF (MDITER .LE. 10) THEN
