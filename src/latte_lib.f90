@@ -125,8 +125,9 @@ CONTAINS
     REAL(LATTEPREC), INTENT(OUT) :: FTOT_OUT(:,:), VENERG
     REAL(LATTEPREC), INTENT(OUT) :: VIRIAL_INOUT(6)
     INTEGER, INTENT(IN) ::  NTYPES, TYPES(:), MAXITER_IN
-    LOGICAL(1), INTENT(INOUT) :: EXISTERROR_INOUT, NEWSYSTEM
+    LOGICAL(1), INTENT(INOUT) :: EXISTERROR_INOUT
     REAL(LATTEPREC) :: MLSI, LUMO, HOMO
+    INTEGER, INTENT(INOUT) :: NEWSYSTEM
 
 #ifdef PROGRESSON
     TYPE(SYSTEM_TYPE) :: SY
@@ -141,8 +142,7 @@ CONTAINS
 
     EXISTERROR = .FALSE. !We assume we start the lib call without errors
 
-    !Initialization
-    IF(.NOT. LIBINIT .OR. NEWSYSTEM)THEN
+    IF(.NOT. LIBINIT .OR. NEWSYSTEM == 1)THEN
 
        CALL DEALLOCATEALL()
 
@@ -608,7 +608,7 @@ CONTAINS
           CALL DTIME(TARRAY, RESULT)
 
           IF (VERBOSE >= 1)WRITE(*,*)"Setting up TBMD ..."
-          CALL SETUPTBMD
+          CALL SETUPTBMD(NEWSYSTEM)
 
           CALL FLUSH(6)
 
@@ -710,6 +710,7 @@ CONTAINS
        VIRIAL_INOUT = -VIRIAL
 
        LIBINIT = .TRUE.
+       NEWSYSTEM = 0 !Setting newsystem back to 0.
 
 #ifdef PROGRESSON
        IF(MOD(LIBCALLS,WRTFREQ) == 0)THEN
@@ -778,6 +779,7 @@ CONTAINS
        CALL FLUSH(6) !To force writing to file at every call
 
        EXISTERROR_INOUT = EXISTERROR
+
        RETURN
 
     ELSEIF (MDON .EQ. 1 .AND. RELAXME .EQ. 0 .AND. MAXITER_IN >= 0) THEN
@@ -913,6 +915,7 @@ CONTAINS
 #endif
 
     LIBINIT = .TRUE.
+    NEWSYSTEM = 0 !Setting newsystem back to 0.
     EXISTERROR_INOUT = EXISTERROR
 
   END SUBROUTINE LATTE

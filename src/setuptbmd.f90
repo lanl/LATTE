@@ -19,7 +19,7 @@
 ! Public License for more details.                                         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SUBROUTINE SETUPTBMD
+SUBROUTINE SETUPTBMD(NEWSYSTEM)
 
   USE CONSTANTS_MOD
   USE SETUPARRAY
@@ -41,14 +41,15 @@ SUBROUTINE SETUPTBMD
   INTEGER :: START_CLOCK, STOP_CLOCK, CLOCK_RATE, CLOCK_MAX
   REAL(LATTEPREC) :: THETIME, NEWESPIN, NEWECOUL
   REAL(LATTEPREC) :: RN, MYVOL
-  INTEGER :: FLAGAND
+  INTEGER :: FLAGAND, NEWSYSTEM
+
   IF (EXISTERROR) RETURN
 
   !
   ! Read MDcontroller to determine what kind of MD simulation to do
   !
 
-  IF(.NOT.LIBINIT)THEN
+  IF(NEWSYSTEM == 1 .OR. (.NOT.LIBINIT))THEN
 
      IF (LATTEINEXISTS) THEN
         CALL PARSE_MD("latte.in")
