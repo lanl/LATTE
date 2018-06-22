@@ -17,7 +17,6 @@ before_install:
   - cd; git clone --depth=1 https://github.com/lanl/qmd-progress.git
   - cd; git clone --depth=1 https://github.com/lanl/bml.git
   - cd; git clone --depth=1 https://github.com/lammps/lammps.git
-  - cd lammps; git fetch origin pull/955/head; git checkout FETCH_HEAD
   - pip install --user codecov
 
   # Install BML, PROGRESS and LAMMPS
