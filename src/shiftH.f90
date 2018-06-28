@@ -35,21 +35,20 @@ SUBROUTINE SHIFTH(CHI)
   REAL(LATTEPREC) :: ES, EP, ED, EF
   REAL(LATTEPREC) :: HMOD, CHI
   COMPLEX(LATTEPREC) :: ZHMOD
-  IF (EXISTERROR) RETURN
-
+  
 
   INDEX = 0
 
   IF (KON .EQ. 0) THEN
 
      IF ( BASISTYPE .EQ. "ORTHO") THEN
-
+        
         DO I = 1, NATS
-
+           
            ! Using a constant
-
+           
            LCNSHIFT(I) = LCNSHIFT(I) + CHI * DELTAQ(I)
-
+           
            SELECT CASE(BASIS(ELEMPOINTER(I)))
 
            CASE("s")
@@ -88,22 +87,17 @@ SUBROUTINE SHIFTH(CHI)
               INDEX = INDEX + 1
               H(INDEX, INDEX) = HDIAG(INDEX) + LCNSHIFT(I)
            ENDDO
-
+ 
         ENDDO
-
+        
      ELSEIF ( BASISTYPE .EQ. "NONORTHO" ) THEN
-
-        !
-        ! When we have a non-orthogonal basis, the electrostatic
-        ! potential enters as SH_1 
-        !
-
+        
         DO I = 1, NATS
-
+           
            LCNSHIFT(I) = LCNSHIFT(I) + CHI * DELTAQ(I)
-
+           
            SELECT CASE(BASIS(ELEMPOINTER(I)))
-
+              
            CASE("s")
               NUMORB = 1
            CASE("p")
@@ -135,43 +129,53 @@ SUBROUTINE SHIFTH(CHI)
            CASE("spdf") 
               NUMORB = 16
            END SELECT
-
+           
            DO J = 1, NUMORB
-
+              
               INDEX = INDEX + 1
-              H(INDEX, INDEX) = HDIAG(INDEX) + LCNSHIFT(I)
+              HJJ(INDEX) = LCNSHIFT(I)
+!              H(INDEX, INDEX) = HDIAG(INDEX) + LCNSHIFT(I)
+                           
+           ENDDO
+           
+        ENDDO
+        
+        DO I = 1, HDIM
+           DO J = 1, HDIM
+
+              H(J,I) = H0(J,I) + SMAT(J,I)*(HJJ(I) + HJJ(J))/TWO
 
            ENDDO
-
         ENDDO
 
+        
      ENDIF
-
+     
   ELSE
 
      !  IF (KON .EQ. 1) THEN 
      ! k-space - we have to add the potential to all NKTOT Hamiltonians
-
+     
      ! Orthogonal basis only at the moment
-
+     
      IF ( BASISTYPE .EQ. "ORTHO") THEN
-
+        
         DO I = 1, NATS           
 
-           !           IF (CONTROL .EQ. 1) THEN
+!           IF (CONTROL .EQ. 1) THEN
 
-           !Using the response function calculated in GETRESPF               
+              !Using the response function calculated in GETRESPF               
 
-           !              LCNSHIFT(I) = LCNSHIFT(I) + RESPCHI(I)*DELTAQ(I)
+!              LCNSHIFT(I) = LCNSHIFT(I) + RESPCHI(I)*DELTAQ(I)
 
-           !           ELSE
+!           ELSE
 
-           ! Using a constant                                                
+              ! Using a constant                                                
 
-           LCNSHIFT(I) = LCNSHIFT(I) + CHI * DELTAQ(I)
+              LCNSHIFT(I) = LCNSHIFT(I) + CHI * DELTAQ(I)
 
-           !           ENDIf
-
+!           ENDIf
+           
         ENDDO
 
         DO K = 1, NKTOT
@@ -179,9 +183,9 @@ SUBROUTINE SHIFTH(CHI)
            INDEX = 0
 
            DO I = 1, NATS
-
+              
               SELECT CASE(BASIS(ELEMPOINTER(I)))
-
+                 
               CASE("s")
                  NUMORB = 1
               CASE("p")
@@ -213,31 +217,95 @@ SUBROUTINE SHIFTH(CHI)
               CASE("spdf") 
                  NUMORB = 16
               END SELECT
-
+           
               DO J = 1, NUMORB              
                  INDEX = INDEX + 1                 
                  HK(INDEX, INDEX, K) = HKDIAG(INDEX, K) + CMPLX(LCNSHIFT(I))
               ENDDO
-
+           
            ENDDO
 
         ENDDO
 
+     ELSEIF (BASISTYPE .EQ. "NONORTHO") THEN
+
+         DO I = 1, NATS
+
+           LCNSHIFT(I) = LCNSHIFT(I) + CHI * DELTAQ(I)
+ 
+           SELECT CASE(BASIS(ELEMPOINTER(I)))
+
+           CASE("s")
+              NUMORB = 1
+           CASE("p")
+              NUMORB = 3
+           CASE("d")
+              NUMORB = 5
+           CASE("f")
+              NUMORB = 7
+           CASE("sp")
+              NUMORB = 4
+           CASE("sd")
+              NUMORB = 6
+           CASE("sf")
+              NUMORB = 8
+           CASE("pd")
+              NUMORB = 8
+           CASE("pf")
+              NUMORB = 10
+           CASE("df")
+              NUMORB = 12
+           CASE("spd")
+              NUMORB = 9
+           CASE("spf")
+              NUMORB = 11
+           CASE("sdf")
+              NUMORB = 13
+           CASE("pdf")
+              NUMORB = 15
+           CASE("spdf")
+              NUMORB = 16
+           END SELECT
+
+           DO J = 1, NUMORB
+
+              INDEX = INDEX + 1
+              ZHJJ(INDEX) = CMPLX(LCNSHIFT(I))
+
+           ENDDO
+
+        ENDDO
+        
+        ! H = H_0 + S*H_1                                                     \
+                                                                               
+
+        DO K = 1, NKTOT
+           DO I = 1, HDIM
+              DO J = 1, HDIM
+
+                 HK(J,I,K) = HK0(J,I,K) + SK(J,I,K)*(ZHJJ(I) + ZHJJ(J))/TWO
+
+              ENDDO
+           ENDDO
+        ENDDO
+        
      ENDIF
+
+        
   ENDIF
 
   IF (DEBUGON .EQ. 1) THEN
-
+     
      OPEN(UNIT=31, STATUS="UNKNOWN", FILE="myH.dat")
-
+     
      PRINT*, "Caution - the H0+H1 matrix is being written to file"
-
+     
      IF (KON .EQ. 0) THEN
-
+        
         DO I = 1, HDIM
            WRITE(31,10) (H(I,J), J = 1, HDIM)
         ENDDO
-
+        
      ELSE
 
         DO K = 1, NKTOT
@@ -250,17 +318,17 @@ SUBROUTINE SHIFTH(CHI)
      ENDIF
 
      CLOSE(31)
-
+     
   ENDIF
-
-  !  PRINT*, LCNSHIFT(1)
+  
+!  PRINT*, LCNSHIFT(1)
 
 
 10 FORMAT(100G18.9)  
 11 FORMAT(I5,100G18.9)  
-
+  
   RETURN
 
 END SUBROUTINE SHIFTH
 
-
+     
