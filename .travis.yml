@@ -45,7 +45,7 @@ script:
   -  if [[ ! ${LATTE_CMAKE} ]]; then
        make ${OPTIONS} && make test${TEST}; 
      else
-       mkdir build && cd build && cmake ../cmake -DCMAKE_INSTALL_PREFIX=$HOME/latte/install -DPROGRESS=${CMAKE_WITH_PROGRESS} -DCMAKE_PREFIX_PATH="$HOME/bml/install;$HOME/qmd-progress/install" && make && make install && 
+       mkdir build && cd build && cmake ../cmake -DCMAKE_INSTALL_PREFIX=$HOME/latte/install -DPROGRESS=${CMAKE_WITH_PROGRESS} -DOPENMP=${CMAKE_WITH_PROGRESS} -DCMAKE_PREFIX_PATH="$HOME/bml/install;$HOME/qmd-progress/install" && make && make install && 
        if [[ ${LAMMPS_CMAKE} ]]; then
          cd $HOME/lammps && mkdir build && cd build && cmake ../cmake -DPKG_LATTE=ON -DCMAKE_PREFIX_PATH=$HOME/latte/install && make;
        fi
