@@ -17,4 +17,4 @@ log.*
 *.pdb
 *.gcda
 *.gcno
-
+*~
