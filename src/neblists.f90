@@ -88,10 +88,10 @@ SUBROUTINE NEBLISTS(AMIALLO)
 
      DO K = 1, NOINT
 
-        IF (BOND(8,K) .GT. RCUTTB ) RCUTTB = BOND(8,K)
+        IF (HCUT(K) .GT. RCUTTB ) RCUTTB = HCUT(K)
 
         IF (BASISTYPE .EQ. "NONORTHO") THEN
-           IF (OVERL(8,K) .GT. RCUTTB ) RCUTTB = OVERL(8,K)
+           IF (SCUT(K) .GT. RCUTTB ) RCUTTB = SCUT(K)
         ENDIF
 
      ENDDO

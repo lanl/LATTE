@@ -205,16 +205,16 @@ SUBROUTINE PULAY_SP
 
   ENDIF
 
-  !$OMP PARALLEL DO DEFAULT (NONE) &                                            
-  !$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &                     
-  !$OMP SHARED(CR, BOX, X2HRHO, NOINT, ATELE, ELE1, ELE2) &         
-  !$OMP SHARED(BOND, OVERL, MATINDLIST, BTYPE, BASISTYPE) &             
-  !$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &  
-  !$OMP PRIVATE(RIJ, DC, MAGR, INVR, FTMP) &                    
-  !$OMP PRIVATE(DSSSDR, DSPSDR, DPSSDR, DPPSDR, DPPPDR, PPSMPPP, PPSUBINVR)&    
-  !$OMP PRIVATE( L, M, N, L2, M2, N2, LM, LN, MN, LMN) &                        
-  !$OMP PRIVATE(HSSS, HSPS, HPSS, HPPS, HPPP)&                                  
-  !$OMP REDUCTION(+:FPUL, VIRPUL)  
+!$OMP PARALLEL DO DEFAULT (NONE) &                                            
+!$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &                     
+!$OMP SHARED(CR, BOX, X2HRHO, NOINT, ATELE, ELE1, ELE2) &         
+!$OMP SHARED(BOND, OVERL, MATINDLIST, BTYPE, BASISTYPE) &             
+!$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &  
+!$OMP PRIVATE(RIJ, DC, MAGR, INVR, FTMP) &                    
+!$OMP PRIVATE(DSSSDR, DSPSDR, DPSSDR, DPPSDR, DPPPDR, PPSMPPP, PPSUBINVR)&    
+!$OMP PRIVATE( L, M, N, L2, M2, N2, LM, LN, MN, LMN) &                        
+!$OMP PRIVATE(HSSS, HSPS, HPSS, HPPS, HPPP)&                                  
+!$OMP REDUCTION(+:FPUL, VIRPUL)  
 
   DO I = 1, NATS
 
@@ -732,7 +732,7 @@ SUBROUTINE PULAY_SP
 
   ENDDO
 
-  !$OMP END PARALLEL DO
+!$OMP END PARALLEL DO
 
   RETURN
 
