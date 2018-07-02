@@ -11,6 +11,29 @@ This material was produced under U.S. Government contract DE-AC52-06NA25396 for 
 
 Additionally, this program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 2.0 of the License. Accordingly, this program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
+
+#Compiling LATTE (Makefile):
+
+In order to compile the LATTE code we
+proceed as following. We enter the LATTE directory (`cd ~/LATTE`) and
+modify the `makefile.CHOICES` file according to the operative system,
+libraries, compiler, etc. There are several examples of
+`makefile.CHOICES` files inside the makefiles directory
+(`~/LATTE/makefiles`) that could be used as a template to replace the
+`makefile.CHOICES` that is located in the main directory.
+
+To build the code just type make inside the main directory as follows:
+
+          $ cd; cd ~/LATTE
+          $ make; make test
+
+
+The latter should build the code and test it with some examples that are
+located in `~/LATTE/tests`.
+
+#Compiling LATTE (Cmake):
+
+
 # Authors
 
 Nicolas Bock (T-1)
