@@ -256,14 +256,14 @@ SUBROUTINE BLDNEWHS
 
   ENDDO
 
-  !$OMP PARALLEL DO DEFAULT (NONE) &
-  !$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &
-  !$OMP SHARED(CR, BOX, H, SMAT, NOINT, ATELE, ELE1, ELE2) &
-  !$OMP SHARED(BOND, OVERL, MATINDLIST, BASISTYPE) &
-  !$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &
-  !$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP, PHI, ALPHA, BETA, COSBETA) &
-  !$OMP PRIVATE(LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET) &
-  !$OMP PRIVATE(RCUTTB, IBRA, IKET, AMMBRA, WIGLBRAMBRA, ANGFACTOR, MP)
+!$OMP PARALLEL DO DEFAULT (NONE) &
+!$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &
+!$OMP SHARED(CR, BOX, H, SMAT, NOINT, ATELE, ELE1, ELE2) &
+!$OMP SHARED(HCUT, SCUT, MATINDLIST, BASISTYPE) &
+!$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &
+!$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP, PHI, ALPHA, BETA, COSBETA) &
+!$OMP PRIVATE(LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET) &
+!$OMP PRIVATE(RCUTTB, IBRA, IKET, AMMBRA, WIGLBRAMBRA, ANGFACTOR, MP)
 
   ! open loop over atoms I in system
   DO I = 1, NATS
@@ -343,249 +343,238 @@ SUBROUTINE BLDNEWHS
 
         J = NEBTB(1, NEWJ, I)
 
-        IF ( J .GE. I ) THEN
-
-           PBCI = NEBTB(2, NEWJ, I)
-           PBCJ = NEBTB(3, NEWJ, I)
-           PBCK = NEBTB(4, NEWJ, I)
-
-           RIJ(1) = CR(1,J) + REAL(PBCI)*BOX(1,1) + REAL(PBCJ)*BOX(2,1) + &
-                REAL(PBCK)*BOX(3,1) - CR(1,I)
-
-           RIJ(2) = CR(2,J) + REAL(PBCI)*BOX(1,2) + REAL(PBCJ)*BOX(2,2) + &
-                REAL(PBCK)*BOX(3,2) - CR(2,I)
-
-           RIJ(3) = CR(3,J) + REAL(PBCI)*BOX(1,3) + REAL(PBCJ)*BOX(2,3) + &
-                REAL(PBCK)*BOX(3,3) - CR(3,I)
-
-           MAGR2 = RIJ(1)*RIJ(1) + RIJ(2)*RIJ(2) + RIJ(3)*RIJ(3)
-
-           RCUTTB = ZERO
-           DO K = 1, NOINT
-
-              IF ( (ATELE(I) .EQ. ELE1(K) .AND. &
-                   ATELE(J) .EQ. ELE2(K)) .OR. &
-                   (ATELE(J) .EQ. ELE1(K) .AND. &
-                   ATELE(I) .EQ. ELE2(K) )) THEN
-
-                 IF (BOND(8,K) .GT. RCUTTB ) RCUTTB = BOND(8,K)
-
-                 IF (BASISTYPE .EQ. "NONORTHO") THEN
-                    IF (OVERL(8,K) .GT. RCUTTB ) RCUTTB = OVERL(8,K)
-                 ENDIF
-
+        PBCI = NEBTB(2, NEWJ, I)
+        PBCJ = NEBTB(3, NEWJ, I)
+        PBCK = NEBTB(4, NEWJ, I)
+        
+        RIJ(1) = CR(1,J) + REAL(PBCI)*BOX(1,1) + REAL(PBCJ)*BOX(2,1) + &
+             REAL(PBCK)*BOX(3,1) - CR(1,I)
+        
+        RIJ(2) = CR(2,J) + REAL(PBCI)*BOX(1,2) + REAL(PBCJ)*BOX(2,2) + &
+             REAL(PBCK)*BOX(3,2) - CR(2,I)
+        
+        RIJ(3) = CR(3,J) + REAL(PBCI)*BOX(1,3) + REAL(PBCJ)*BOX(2,3) + &
+             REAL(PBCK)*BOX(3,3) - CR(3,I)
+        
+        MAGR2 = RIJ(1)*RIJ(1) + RIJ(2)*RIJ(2) + RIJ(3)*RIJ(3)
+        
+        RCUTTB = ZERO
+        DO K = 1, NOINT
+           
+           IF ( (ATELE(I) .EQ. ELE1(K) .AND. &
+                ATELE(J) .EQ. ELE2(K)) .OR. &
+                (ATELE(J) .EQ. ELE1(K) .AND. &
+                ATELE(I) .EQ. ELE2(K) )) THEN
+              
+              IF (HCUT(K) .GT. RCUTTB ) RCUTTB = HCUT(K)
+              
+              IF (BASISTYPE .EQ. "NONORTHO") THEN
+                 IF (SCUT(K) .GT. RCUTTB ) RCUTTB = SCUT(K)
               ENDIF
-
-           ENDDO
-
-           IF (MAGR2 .LT. RCUTTB*RCUTTB) THEN
-
-              MAGR = SQRT(MAGR2)
-
-              SELECT CASE(BASIS(ELEMPOINTER(J)))
-              CASE("s")
-                 BASISJ(1) = 0
-                 BASISJ(2) = -1
-              CASE("p")
-                 BASISJ(1) = 1
-                 BASISJ(2) = -1
-              CASE("d")
-                 BASISJ(1) = 2
-                 BASISJ(2) = -1
-              CASE("f")
-                 BASISJ(1) = 3
-                 BASISJ(2) = -1
-              CASE("sp")
-                 BASISJ(1) = 0
-                 BASISJ(2) = 1
-                 BASISJ(3) = -1
-              CASE("sd")
-                 BASISJ(1) = 0
-                 BASISJ(2) = 2
-                 BASISJ(3) = -1
-              CASE("sf")
-                 BASISJ(1) = 0
-                 BASISJ(2) = 3
-                 BASISJ(3) = -1
-              CASE("pd")
-                 BASISJ(1) = 1
-                 BASISJ(2) = 2
-                 BASISJ(3) = -1
-              CASE("pf")
-                 BASISJ(1) = 1
-                 BASISJ(2) = 3
-                 BASISJ(3) = -1
-              CASE("df")
-                 BASISJ(1) = 2
-                 BASISJ(2) = 3
-                 BASISJ(3) = -1
-              CASE("spd")
-                 BASISJ(1) = 0
-                 BASISJ(2) = 1
-                 BASISJ(3) = 2
-                 BASISJ(4) = -1
-              CASE("spf")
-                 BASISJ(1) = 0
-                 BASISJ(2) = 1
-                 BASISJ(3) = 3
-                 BASISJ(4) = -1
-              CASE("sdf")
-                 BASISJ(1) = 0
-                 BASISJ(2) = 2
-                 BASISJ(3) = 3
-                 BASISJ(4) = -1
-              CASE("pdf")
-                 BASISJ(1) = 1
-                 BASISJ(2) = 2
-                 BASISJ(3) = 3
-                 BASISJ(4) = -1
-              CASE("spdf")
-                 BASISJ(1) = 0
-                 BASISJ(2) = 1
-                 BASISJ(3) = 2
-                 BASISJ(4) = 3
-                 BASISJ(5) = -1
-              END SELECT
-
-              INDJ = MATINDLIST(J)
-
-              MAGRP = SQRT(RIJ(1) * RIJ(1) + RIJ(2) * RIJ(2))
-
-              ! transform to system in which z-axis is aligned with RIJ,
-              IF (ABS(RIJ(1)) .GT. 1.0E-12) THEN
-
-                 IF (RIJ(1) .GT. ZERO .AND. RIJ(2) .GE. ZERO) THEN
-                    PHI = ZERO
-                 ELSEIF (RIJ(1) .GT. ZERO .AND. RIJ(2) .LT. ZERO) THEN
-                    PHI = TWO * PI
-                 ELSE
-                    PHI = PI
-                 ENDIF
-                 ALPHA = ATAN(RIJ(2) / RIJ(1)) + PHI
-
-              ELSEIF (ABS(RIJ(2)) .GT. 1.0E-12) THEN
-
-                 IF (RIJ(2) .GT. 1.0E-12) THEN
-                    ALPHA = PI / TWO
-                 ELSE
-                    ALPHA = THREE * PI / TWO
-                 ENDIF
-
+              
+           ENDIF
+           
+        ENDDO
+        
+        IF (MAGR2 .LT. RCUTTB*RCUTTB) THEN
+           
+           MAGR = SQRT(MAGR2)
+           
+           SELECT CASE(BASIS(ELEMPOINTER(J)))
+           CASE("s")
+              BASISJ(1) = 0
+              BASISJ(2) = -1
+           CASE("p")
+              BASISJ(1) = 1
+              BASISJ(2) = -1
+           CASE("d")
+              BASISJ(1) = 2
+              BASISJ(2) = -1
+           CASE("f")
+              BASISJ(1) = 3
+              BASISJ(2) = -1
+           CASE("sp")
+              BASISJ(1) = 0
+              BASISJ(2) = 1
+              BASISJ(3) = -1
+           CASE("sd")
+              BASISJ(1) = 0
+              BASISJ(2) = 2
+              BASISJ(3) = -1
+           CASE("sf")
+              BASISJ(1) = 0
+              BASISJ(2) = 3
+              BASISJ(3) = -1
+           CASE("pd")
+              BASISJ(1) = 1
+              BASISJ(2) = 2
+              BASISJ(3) = -1
+           CASE("pf")
+              BASISJ(1) = 1
+              BASISJ(2) = 3
+              BASISJ(3) = -1
+           CASE("df")
+              BASISJ(1) = 2
+              BASISJ(2) = 3
+              BASISJ(3) = -1
+           CASE("spd")
+              BASISJ(1) = 0
+              BASISJ(2) = 1
+              BASISJ(3) = 2
+              BASISJ(4) = -1
+           CASE("spf")
+              BASISJ(1) = 0
+              BASISJ(2) = 1
+              BASISJ(3) = 3
+              BASISJ(4) = -1
+           CASE("sdf")
+              BASISJ(1) = 0
+              BASISJ(2) = 2
+              BASISJ(3) = 3
+              BASISJ(4) = -1
+           CASE("pdf")
+              BASISJ(1) = 1
+              BASISJ(2) = 2
+              BASISJ(3) = 3
+              BASISJ(4) = -1
+           CASE("spdf")
+              BASISJ(1) = 0
+              BASISJ(2) = 1
+              BASISJ(3) = 2
+              BASISJ(4) = 3
+              BASISJ(5) = -1
+           END SELECT
+           
+           INDJ = MATINDLIST(J)
+           
+           MAGRP = SQRT(RIJ(1) * RIJ(1) + RIJ(2) * RIJ(2))
+           
+           ! transform to system in which z-axis is aligned with RIJ,
+           IF (ABS(RIJ(1)) .GT. 1.0E-12) THEN
+              
+              IF (RIJ(1) .GT. ZERO .AND. RIJ(2) .GE. ZERO) THEN
+                 PHI = ZERO
+              ELSEIF (RIJ(1) .GT. ZERO .AND. RIJ(2) .LT. ZERO) THEN
+                 PHI = TWO * PI
               ELSE
-                 ! pathological case: beta=0 and alpha undefined, but
-                 ! this doesn't matter for matrix elements
-
-                 ALPHA = ZERO
-
+                 PHI = PI
               ENDIF
-
-              COSBETA = RIJ(3)/MAGR
-              BETA = ACOS(RIJ(3) / MAGR)
-
-              ! Build matrix elements using eqns (1)-(9) in PRB 72 165107
-
-              ! The loops over LBRA and LKET need to take into account
-              ! the orbitals assigned to each atom, e.g., sd rather than
-              ! spd...
-
-              IBRA = INDI + 1
-
-              LBRAINC = 1
-              DO WHILE (BASISI(LBRAINC) .NE. -1)
-
-                 LBRA = BASISI(LBRAINC)
-                 LBRAINC = LBRAINC + 1
-
-                 DO MBRA = -LBRA, LBRA
-
-                    ! We can calculate these two outside the
-                    ! MKET loop...
-
-                    AMMBRA = AM(MBRA, ALPHA)
-                    WIGLBRAMBRA = WIGNERD(LBRA, ABS(MBRA), 0, COSBETA)
-
-                    IKET = INDJ + 1
-
-                    LKETINC = 1
-                    DO WHILE (BASISJ(LKETINC) .NE. -1)
-
-                       LKET = BASISJ(LKETINC)
-                       LKETINC = LKETINC + 1
-
-                       DO MKET = -LKET, LKET
-
-                          ! This is the sigma bonds (mp = 0)
-
-                          ! Hamiltonian build
-
-                          ! Pre-compute the angular part so we can use it
+              ALPHA = ATAN(RIJ(2) / RIJ(1)) + PHI
+              
+           ELSEIF (ABS(RIJ(2)) .GT. 1.0E-12) THEN
+              
+              IF (RIJ(2) .GT. 1.0E-12) THEN
+                 ALPHA = PI / TWO
+              ELSE
+                 ALPHA = THREE * PI / TWO
+              ENDIF
+              
+           ELSE
+              ! pathological case: beta=0 and alpha undefined, but
+              ! this doesn't matter for matrix elements
+              
+              ALPHA = ZERO
+              
+           ENDIF
+           
+           COSBETA = RIJ(3)/MAGR
+           BETA = ACOS(RIJ(3) / MAGR)
+           
+           ! Build matrix elements using eqns (1)-(9) in PRB 72 165107
+           
+           ! The loops over LBRA and LKET need to take into account
+           ! the orbitals assigned to each atom, e.g., sd rather than
+           ! spd...
+           
+           IBRA = INDI + 1
+           
+           LBRAINC = 1
+           DO WHILE (BASISI(LBRAINC) .NE. -1)
+              
+              LBRA = BASISI(LBRAINC)
+              LBRAINC = LBRAINC + 1
+              
+              DO MBRA = -LBRA, LBRA
+                 
+                 ! We can calculate these two outside the
+                 ! MKET loop...
+                 
+                 AMMBRA = AM(MBRA, ALPHA)
+                 WIGLBRAMBRA = WIGNERD(LBRA, ABS(MBRA), 0, COSBETA)
+                 
+                 IKET = INDJ + 1
+                 
+                 LKETINC = 1
+                 DO WHILE (BASISJ(LKETINC) .NE. -1)
+                    
+                    LKET = BASISJ(LKETINC)
+                    LKETINC = LKETINC + 1
+                    
+                    DO MKET = -LKET, LKET
+                       
+                       ! This is the sigma bonds (mp = 0)
+                       
+                       ! Hamiltonian build
+                       
+                       ! Pre-compute the angular part so we can use it
                           ! again later if we're building the S matrix too
-
-                          ANGFACTOR = TWO * AMMBRA * &
-                               AM(MKET, ALPHA) * &
-                               WIGLBRAMBRA  * &
-                               WIGNERD(LKET, ABS(MKET), 0, COSBETA)
-
+                       
+                       ANGFACTOR = TWO * AMMBRA * &
+                            AM(MKET, ALPHA) * &
+                            WIGLBRAMBRA  * &
+                            WIGNERD(LKET, ABS(MKET), 0, COSBETA)
+                       
+                       H(IBRA, IKET) = H(IBRA, IKET) + ANGFACTOR * &
+                            UNIVSCALE(I, J, LBRA, LKET, 0, MAGR, "H")
+                       
+                       ! Overlap matrix build
+                       
+                       IF (BASISTYPE .EQ. "NONORTHO") THEN
+                          
+                          SMAT(IBRA, IKET) = SMAT(IBRA, IKET) + ANGFACTOR * &
+                               UNIVSCALE(I, J, LBRA, LKET, 0, MAGR, "S")
+                          
+                       ENDIF
+                       
+                       ! everything else
+                       
+                       DO MP = 1, MIN(LBRA, LKET)
+                          
+                          ANGFACTOR = SLMMP(LBRA, MBRA, MP, ALPHA, COSBETA) * &
+                               SLMMP(LKET, MKET, MP, ALPHA, COSBETA) + &
+                               TLMMP(LBRA, MBRA, MP, ALPHA, COSBETA) * &
+                               TLMMP(LKET, MKET, MP, ALPHA, COSBETA)
+                          
                           H(IBRA, IKET) = H(IBRA, IKET) + ANGFACTOR * &
-                                !                          H(IKET, IBRA) = H(IKET, IBRA) + ANGFACTOR * &
-                               UNIVSCALE(I, J, LBRA, LKET, 0, MAGR, "H")
-
-                          ! Overlap matrix build
-
+                               UNIVSCALE(I, J, LBRA, LKET, MP, MAGR, "H")
+                          
                           IF (BASISTYPE .EQ. "NONORTHO") THEN
-
-                             SMAT(IBRA, IKET) = SMAT(IBRA, IKET) + ANGFACTOR * &
-                                  UNIVSCALE(I, J, LBRA, LKET, 0, MAGR, "S")
-
+                             
+                             SMAT(IBRA, IKET) = SMAT(IBRA, IKET) + &
+                                  ANGFACTOR * &
+                                  UNIVSCALE(I, J, LBRA, LKET, MP, MAGR, "S")
+                             
                           ENDIF
 
-                          ! everything else
-
-                          DO MP = 1, MIN(LBRA, LKET)
-
-                             ANGFACTOR = SLMMP(LBRA, MBRA, MP, ALPHA, COSBETA) * &
-                                  SLMMP(LKET, MKET, MP, ALPHA, COSBETA) + &
-                                  TLMMP(LBRA, MBRA, MP, ALPHA, COSBETA) * &
-                                  TLMMP(LKET, MKET, MP, ALPHA, COSBETA)
-
-                             H(IBRA, IKET) = H(IBRA, IKET) + ANGFACTOR * &
-                                !H(IKET, IBRA) = H(IKET, IBRA) + ANGFACTOR * &
-                                  UNIVSCALE(I, J, LBRA, LKET, MP, MAGR, "H")
-
-                             IF (BASISTYPE .EQ. "NONORTHO") THEN
-
-                                SMAT(IBRA, IKET) = SMAT(IBRA, IKET) + &
-                                     ANGFACTOR * &
-                                     UNIVSCALE(I, J, LBRA, LKET, MP, MAGR, "S")
-
-                             ENDIF
-
-                          ENDDO
-
-                          H(IKET, IBRA) = H(IBRA, IKET)
-                          !H(IBRA, IKET) = H(IKET, IBRA)
-                          IF (BASISTYPE .EQ. "NONORTHO") &
-                               SMAT(IKET, IBRA) = SMAT(IBRA, IKET)
-
-                          IKET = IKET + 1
-
                        ENDDO
+                       
+                       
+                       IKET = IKET + 1
 
                     ENDDO
-
-                    IBRA = IBRA + 1
-
+                    
                  ENDDO
+                 
+                 IBRA = IBRA + 1
+                 
               ENDDO
-           ENDIF
+           ENDDO
         ENDIF
      ENDDO
 
-     !     INDI = INDI + NORBI
-
   ENDDO
 
-  !$OMP END PARALLEL DO
+!$OMP END PARALLEL DO
 
   DO I = 1, HDIM
      HDIAG(I) = H(I,I)
