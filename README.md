@@ -12,7 +12,7 @@ This material was produced under U.S. Government contract DE-AC52-06NA25396 for 
 Additionally, this program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 2.0 of the License. Accordingly, this program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 
-#Compiling LATTE (Makefile):
+# Compiling LATTE (Makefile):
 
 In order to compile the LATTE code we
 proceed as following. We enter the LATTE directory (`cd ~/LATTE`) and
@@ -31,7 +31,7 @@ To build the code just type make inside the main directory as follows:
 The latter should build the code and test it with some examples that are
 located in `~/LATTE/tests`.
 
-#Compiling LATTE (Cmake):
+# Compiling LATTE (Cmake):
 
 
 # Authors
