@@ -121,6 +121,11 @@ SUBROUTINE READCR
      IF (BASIS(ELEMPOINTER(I)) .NE. "s" .AND. &
           BASIS(ELEMPOINTER(I)) .NE. "sp") SPONLY = 1
   ENDDO
+
+  ! At the moment we must run Josh's implementation if we do tabulated integrals
+
+  IF (SCLTYPE .EQ. "TABLE") SPONLY = 1
+
   ! Print a warning
 
   IF (SPONLY .EQ. 1) THEN

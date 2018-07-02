@@ -93,7 +93,7 @@ SUBROUTINE KFLCNNONO
 !$OMP PARALLEL DO DEFAULT (NONE) &                                              
 !$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &                      
 !$OMP SHARED(CR, BOX, KBO, RHOUP, RHODOWN, SPINON, NOINT, ATELE, ELE1, ELE2) &   
-!$OMP SHARED(BOND, OVERL, MATINDLIST, BASISTYPE) &                              
+!$OMP SHARED(HCUT, SCUT, MATINDLIST, BASISTYPE) &                              
 !$OMP SHARED(LCNSHIFT) &
 !$OMP SHARED(K0, B1, B2, B3, NKX, NKY, NKZ, KF) &
 !$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &    
@@ -201,10 +201,10 @@ SUBROUTINE KFLCNNONO
                 (ATELE(J) .EQ. ELE1(K) .AND. &
                 ATELE(I) .EQ. ELE2(K) )) THEN
 
-              IF (BOND(8,K) .GT. RCUTTB ) RCUTTB = BOND(8,K)
+              IF (HCUT(K) .GT. RCUTTB ) RCUTTB = HCUT(K)
 
               IF (BASISTYPE .EQ. "NONORTHO") THEN
-                 IF (OVERL(8,K) .GT. RCUTTB ) RCUTTB = OVERL(8,K)
+                 IF (SCUT(K) .GT. RCUTTB ) RCUTTB = SCUT(K)
               ENDIF
 
            ENDIF

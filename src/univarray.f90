@@ -25,9 +25,21 @@ MODULE UNIVARRAY
 
   IMPLICIT NONE
   SAVE
+  
+  ! These are for the analytic forms
 
   REAL(LATTEPREC), ALLOCATABLE :: BOND(:,:), OVERL(:,:), PAIR(:,:)
 
+  ! and these for the tabular forms                                              
+
+  INTEGER, ALLOCATABLE :: LENTABINT(:)
+  REAL(LATTEPREC), ALLOCATABLE :: TABR(:,:), TABH(:,:), TABS(:,:)
+  REAL(LATTEPREC), ALLOCATABLE :: HSPL(:,:), SSPL(:,:)
+
+  ! The cut-offs (for both forms)                                                
+
+  REAL(LATTEPREC), ALLOCATABLE :: HCUT(:), SCUT(:)
+  
 END MODULE UNIVARRAY
 
 

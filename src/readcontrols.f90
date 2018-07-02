@@ -57,6 +57,8 @@ SUBROUTINE READCONTROLS
      CALL ERRORS("readcontrols","Error defining basis type (ortho/nonortho)")
   ENDIF
 
+  READ(13,*) HD, SCLTYPE ! Choose whether to use the analytic forms or tables
+
   READ(13,*) HD, DEBUGON
 
 
