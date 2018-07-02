@@ -15,11 +15,12 @@ keyword. Example: #MyCommentedKeyword=
 
 #General controls
 CONTROL{
+  XCONTROL= 1
   VERBOSE= 0 
   PARAMPATH= "./TBparam"
   COORDSFILE= "./bl/inputblock.dat"
-  XCONTROL= 1
   BASISTYPE= NONORTHO
+  SCLTYPE= EXP #To read from tables change this to TABLE
   DEBUGON= 0
   FERMIM= 6
   CGORLIB= 1 CGTOL= 1.0e-6

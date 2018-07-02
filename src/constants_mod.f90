@@ -74,7 +74,7 @@ MODULE CONSTANTS_MOD
   REAL(LATTEPREC) :: MCBETA, MCSIGMA ! Temperature in simulated annealing
   REAL(LATTEPREC) :: PPBETA, PPSIGMA
   CHARACTER(LEN = 3) :: SP2CONV
-  CHARACTER(LEN = 20) :: BASISTYPE
+  CHARACTER(LEN = 20) :: BASISTYPE, SCLTYPE !scltype controls whether we do exp or tabular integrals
 
   CHARACTER(LEN = 100) :: PARAMPATH = "./TBparam"
   CHARACTER(LEN = 100) :: COORDSFILE = "./bl/inputblock.dat"

@@ -63,7 +63,7 @@ fittingoutput.f90 tabtest.f90 kgenX.f90 korthomyH.f90 kdeorthomyrho.f90 \
 kfcoulnono.f90 kpulay.f90 getforce.f90 masses2symbols.f90 setuptbmd.f90 \
 wrtrestartlib.f90 deorthomyrhoprogress.f90 orthomyHprogress.f90 readrestartlib.f90 \
 readppotspline.f90 pairpotspline.f90 errors.f90 initcoulombklist.f90 \
-flcnnono.f90 flcnnono_sp.f90 kflcnnono.f90 
+flcnnono.f90 flcnnono_sp.f90 kflcnnono.f90 dosfittab.f90
 
 # dependencies
 # DEP_FILE = makefile.dep

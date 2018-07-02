@@ -53,7 +53,7 @@ SUBROUTINE FLCNNONO
 !$OMP PARALLEL DO DEFAULT (NONE) &                                              
 !$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &                      
 !$OMP SHARED(CR, BOX, BO, RHOUP, RHODOWN, SPINON, NOINT, ATELE, ELE1, ELE2) &   
-!$OMP SHARED(BOND, OVERL, MATINDLIST, BASISTYPE) &                              
+!$OMP SHARED(HCUT, SCUT, MATINDLIST, BASISTYPE) &                              
 !$OMP SHARED(LCNSHIFT) &
 !$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &    
 !$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP2, MAGRP, PATH, PHI, ALPHA, BETA, COSBETA, FTMP) &
@@ -150,7 +150,7 @@ SUBROUTINE FLCNNONO
 
         MAGR2 = RIJ(1)*RIJ(1) + RIJ(2)*RIJ(2) + RIJ(3)*RIJ(3)
 
-                RCUTTB = ZERO
+        RCUTTB = ZERO
         DO K = 1, NOINT
 
            IF ( (ATELE(I) .EQ. ELE1(K) .AND. &
@@ -158,10 +158,10 @@ SUBROUTINE FLCNNONO
                 (ATELE(J) .EQ. ELE1(K) .AND. &
                 ATELE(I) .EQ. ELE2(K) )) THEN
 
-              IF (BOND(8,K) .GT. RCUTTB ) RCUTTB = BOND(8,K)
+              IF (HCUT(K) .GT. RCUTTB ) RCUTTB = HCUT(K)
 
               IF (BASISTYPE .EQ. "NONORTHO") THEN
-                 IF (OVERL(8,K) .GT. RCUTTB ) RCUTTB = OVERL(8,K)
+                 IF (SCUT(K) .GT. RCUTTB ) RCUTTB = SCUT(K)
               ENDIF
 
            ENDIF
@@ -270,7 +270,7 @@ SUBROUTINE FLCNNONO
            COSBETA = RIJ(3)/MAGR
            BETA = ACOS(RIJ(3) / MAGR)
 
-                     DC = RIJ/MAGR
+           DC = RIJ/MAGR
 
            ! build forces using PRB 72 165107 eq. (12) - the sign of the          
            ! dfda contribution seems to be wrong, but gives the right             

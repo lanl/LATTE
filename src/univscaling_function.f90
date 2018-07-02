@@ -42,10 +42,12 @@ FUNCTION UNIVSCALE(I, J, L1, L2, MP, R, WHICHINT)
   USE MYPRECISION
 
   IMPLICIT NONE
-
-  INTEGER :: I, J, L1, L2, IP1, IP2, MP, IC
+  
+  INTEGER :: I, J, K, L1, L2, IP1, IP2, MP, IC, MYINTEGRAL
   INTEGER :: BREAKLOOP
+  INTEGER :: KLO, KHI
   REAL(LATTEPREC) :: UNIVSCALE
+  REAL(LATTEPREC) :: SA, SB, DX
   REAL(LATTEPREC) :: A(14), R, RMINUSR1, RMOD
   CHARACTER(LEN=1) :: WHICHINT
   CHARACTER(LEN=3) :: IGLTYPE
@@ -95,11 +97,14 @@ FUNCTION UNIVSCALE(I, J, L1, L2, MP, R, WHICHINT)
      IGLTYPE = TRIM(IGLTYPE)//"d"
   CASE(3)
      IGLTYPE = TRIM(IGLTYPE)//"f"
-  END SELECT
+  END SELECT  
+
 
   ! It makes a difference if our atoms are of the species or not...
 
   ! Easier case first ATELE(I) = ATELE(J)
+
+  MYINTEGRAL = 0
 
   IF (ATELE(I) .EQ. ATELE(J)) THEN
 
@@ -110,15 +115,11 @@ FUNCTION UNIVSCALE(I, J, L1, L2, MP, R, WHICHINT)
         IC = IC + 1
         IF (ATELE(I) .EQ. ELE1(IC) .AND. ATELE(J) .EQ. ELE2(IC) .AND. &
              IGLTYPE .EQ. BTYPE(IC)) THEN
-
+          
            ! Now we've ID'ed our bond integral
 
-           SELECT CASE(WHICHINT)
-           CASE("H") ! We're doing the H matrix build
-              A = BOND(:,IC)
-           CASE("S") ! We're doing the S matrix build
-              A = OVERL(:,IC)
-           END SELECT
+
+           MYINTEGRAL = IC
 
            BREAKLOOP = 1
 
@@ -138,16 +139,11 @@ FUNCTION UNIVSCALE(I, J, L1, L2, MP, R, WHICHINT)
            IF (((ATELE(I) .EQ. ELE1(IC) .AND. ATELE(J) .EQ. ELE2(IC)) .OR. &
                 (ATELE(I) .EQ. ELE2(IC) .AND. ATELE(J) .EQ. ELE1(IC))) .AND. &
                 IGLTYPE .EQ. BTYPE(IC)) THEN
-
+          
               ! Now we've ID'ed our bond integral
-
-              SELECT CASE(WHICHINT)
-              CASE("H") ! We're doing the H matrix build
-                 A = BOND(:,IC)
-              CASE("S") ! We're doing the S matrix build
-                 A = OVERL(:,IC)
-              END SELECT
-
+              
+              MYINTEGRAL = IC
+              
               BREAKLOOP = 1
 
            ENDIF
@@ -161,72 +157,113 @@ FUNCTION UNIVSCALE(I, J, L1, L2, MP, R, WHICHINT)
 
               IF ((ATELE(I) .EQ. ELE1(IC) .AND. ATELE(J) .EQ. ELE2(IC)) .AND. &
                    IGLTYPE .EQ. BTYPE(IC)) THEN
-
+                 
                  ! Now we've ID'ed our bond integral
-
-                 SELECT CASE(WHICHINT)
-                 CASE("H") ! We're doing the H matrix build
-                    A = BOND(:,IC)
-                 CASE("S") ! We're doing the S matrix build
-                    A = OVERL(:,IC)
-                 END SELECT
-
+              
+                 MYINTEGRAL = IC
+                    
               ENDIF
            ENDDO
-
+           
         ELSE
 
            DO IC = 1, NOINT
 
               IF ((ATELE(I) .EQ. ELE2(IC) .AND. ATELE(J) .EQ. ELE1(IC)) .AND. &
                    IGLTYPE .EQ. BTYPE(IC)) THEN
-
+                 
                  ! Now we've ID'ed our bond integral
-
-                 SELECT CASE(WHICHINT)
-                 CASE("H") ! We're doing the H matrix build
-                    A = BOND(:,IC)
-                 CASE("S") ! We're doing the S matrix build
-                    A = OVERL(:,IC)
-                 END SELECT
-
+   
+                 MYINTEGRAL = IC
+                               
               ENDIF
            ENDDO
-
+        
         ENDIF
      ENDIF
 
   ENDIF
+     
+  IF (SCLTYPE .EQ. "EXP") THEN
 
-  IF (R .LE. A(7)) THEN
+      SELECT CASE(WHICHINT)
+      CASE("H") ! We're doing the H matrix build                           
+         A = BOND(:,MYINTEGRAL)
+      CASE("S") ! We're doing the S matrix build                           
+         A = OVERL(:,MYINTEGRAL)
+      END SELECT
+      
+      IF (R .LE. A(7)) THEN
+         
+         RMOD = R - A(6)
+         
+         UNIVSCALE = EXP(RMOD*(A(2) + RMOD*(A(3) + RMOD*(A(4) + A(5)*RMOD))))
+         
+      ELSEIF (R .GT. A(7) .AND. R .LT. A(8)) THEN
+         
+         RMINUSR1 = R - A(7)
+         
+         UNIVSCALE = A(9) + RMINUSR1*(A(10) + &
+              RMINUSR1*(A(11) + RMINUSR1*(A(12) + &
+              RMINUSR1*(A(13) + RMINUSR1*A(14)))))
+         
+      ELSE
+         
+         UNIVSCALE = ZERO
+     
+      END IF
+      
+      UNIVSCALE = A(1)*UNIVSCALE
 
-     RMOD = R - A(6)
+   ELSEIF (SCLTYPE .EQ. "TABLE") THEN
 
-     UNIVSCALE = EXP(RMOD*(A(2) + RMOD*(A(3) + RMOD*(A(4) + A(5)*RMOD))))
+      KLO = 1
+      KHI = LENTABINT(MYINTEGRAL)
+      
+      DO WHILE (KHI - KLO .GT. 1)
+         
+         K = (KHI + KLO)/2
+         
+         IF (TABR(K,MYINTEGRAL) .GT. R) THEN
+            KHI = K
+         ELSE
+            KLO = K
+         ENDIF
+         
+      ENDDO
 
-  ELSEIF (R .GT. A(7) .AND. R .LT. A(8)) THEN
+      DX = TABR(KHI, MYINTEGRAL) - TABR(KLO,MYINTEGRAL)
 
-     RMINUSR1 = R - A(7)
+      SA = (TABR(KHI, MYINTEGRAL) - R)/DX
+      SB = (R - TABR(KLO, MYINTEGRAL))/DX
 
-     UNIVSCALE = A(9) + RMINUSR1*(A(10) + &
-          RMINUSR1*(A(11) + RMINUSR1*(A(12) + &
-          RMINUSR1*(A(13) + RMINUSR1*A(14)))))
+      IF (WHICHINT .EQ. "H") THEN 
+         UNIVSCALE = SA*TABH(KLO, MYINTEGRAL) + SB*TABH(KHI, MYINTEGRAL) + &
+              ((SA*SA*SA - SA)*HSPL(KLO,MYINTEGRAL) + &
+              (SB*SB*SB - SB)*HSPL(KHI,MYINTEGRAL))*(DX*DX/SIX)
+       
+         IF (R .GT. HCUT(MYINTEGRAL)) UNIVSCALE = ZERO
+  
+      ELSE
+         UNIVSCALE = SA*TABS(KLO, MYINTEGRAL) + SB*TABS(KHI, MYINTEGRAL) + &
+              ((SA*SA*SA - SA)*SSPL(KLO,MYINTEGRAL) + &
+              (SB*SB*SB - SB)*SSPL(KHI,MYINTEGRAL))*(DX*DX/SIX)
+         
+         IF (R .GT. SCUT(MYINTEGRAL)) UNIVSCALE = ZERO
 
-  ELSE
+      ENDIF
 
-     UNIVSCALE = ZERO
+      
 
-  END IF
-
-  UNIVSCALE = A(1)*UNIVSCALE
-
+   ENDIF
+         
   ! permutation symmetry
-
+  
   IF (L1 .GT. L2 .AND. MOD(L1 + L2, 2) .NE. 0) UNIVSCALE = -UNIVSCALE
-
-  !  PRINT*, UNIVSCALE
+  
+!  PRINT*, UNIVSCALE
 
   RETURN
-
+  
 END FUNCTION UNIVSCALE
 
