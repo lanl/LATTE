@@ -14,9 +14,8 @@ Additionally, this program is free software; you can redistribute it and/or modi
 
 # Compiling LATTE (Makefile):
 
-In order to compile the LATTE code we
-proceed as following. We enter the LATTE directory (`cd ~/LATTE`) and
-modify the `makefile.CHOICES` file according to the operative system,
+Enter in the LATTE directory (`cd ~/LATTE`) and
+modify the `makefile.CHOICES` file according to your operative system,
 libraries, compiler, etc. There are several examples of
 `makefile.CHOICES` files inside the makefiles directory
 (`~/LATTE/makefiles`) that could be used as a template to replace the
