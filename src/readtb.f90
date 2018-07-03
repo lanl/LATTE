@@ -32,9 +32,12 @@ SUBROUTINE READTB
 
   IMPLICIT NONE
 
-  INTEGER :: I, J, K
+  INTEGER :: I, J, K, MAXENTRY, N, NUMENTRY
   CHARACTER(LEN=20) :: HD
   REAL(LATTEPREC) :: TAILPARAMS(6)
+  REAL(LATTEPREC) :: JUNK, P, QN, SIG, UN
+  REAL(LATTEPREC), ALLOCATABLE :: U(:)
+
   IF (EXISTERROR) RETURN
 
   OPEN(UNIT=22,STATUS="OLD", FILE=TRIM(PARAMPATH)//"/electrons.dat")
@@ -58,41 +61,171 @@ SUBROUTINE READTB
 
   CLOSE(22)
 
-  IF (BASISTYPE .EQ. "ORTHO") THEN
-     OPEN(UNIT=11,STATUS="OLD", FILE=TRIM(PARAMPATH)//"/bondints.ortho")
-  ELSE
-     OPEN(UNIT=11,STATUS="OLD", FILE=TRIM(PARAMPATH)//"/bondints.nonortho")
+  IF (SCLTYPE .EQ. "EXP") THEN
+
+     IF (BASISTYPE .EQ. "ORTHO") THEN
+        OPEN(UNIT=11,STATUS="OLD", FILE=TRIM(PARAMPATH)//"/bondints.ortho")
+     ELSE
+        OPEN(UNIT=11,STATUS="OLD", FILE=TRIM(PARAMPATH)//"/bondints.nonortho")
+     ENDIF
+
+  ELSEIF (SCLTYPE .EQ. "TABLE") THEN
+
+     OPEN(UNIT=11,STATUS="OLD", FILE=TRIM(PARAMPATH)//"/bondints.table")
+
+  ELSE 
+     print*, "Choose SCLTYPE either EXP or TABLE"
+     STOP
   ENDIF
+
 
   READ(11,*) HD, NOINT
 
-  ALLOCATE(ELE1(NOINT), ELE2(NOINT), BTYPE(NOINT),&
-       BOND(14, NOINT))
+  ALLOCATE(ELE1(NOINT), ELE2(NOINT), BTYPE(NOINT))
 
 
-  IF (BASISTYPE .EQ. "ORTHO") THEN
+  IF (SCLTYPE .EQ. "EXP") THEN
 
-     READ(11,*) HD, HD, HD, HD, HD, HD, HD, HD, HD, HD, HD
+     IF (BASISTYPE .EQ. "ORTHO") THEN
+        
+        ALLOCATE(BOND(14, NOINT), HCUT(NOINT))
 
+        READ(11,*) HD, HD, HD, HD, HD, HD, HD, HD, HD, HD, HD
+        
+        DO I = 1, NOINT
+           
+           READ(11,*) ELE1(I), ELE2(I), BTYPE(I), (BOND(J,I), J = 1, 8)
+           HCUT(I) = BOND(8,I)
+
+        ENDDO
+        
+     ELSEIF (BASISTYPE .EQ. "NONORTHO") THEN
+
+        ALLOCATE( BOND(14,NOINT), HCUT(NOINT), OVERL(14,NOINT), SCUT(NOINT) )
+        
+        READ(11,*) HD, HD, HD, HD, HD, HD, HD, HD, HD, HD, HD, &
+             HD, HD, HD, HD, HD, HD, HD, HD
+        
+        DO I = 1, NOINT
+
+           READ(11,*) ELE1(I), ELE2(I), BTYPE(I), (BOND(J,I), J = 1, 8), &
+                (OVERL(K,I), K = 1, 8)
+           HCUT(I) = BOND(8,I)
+           SCUT(I) = OVERL(8,I)
+           
+        ENDDO
+        
+     ENDIF
+     
+  ELSEIF (SCLTYPE .EQ. "TABLE") THEN
+
+     ! Read in the tables derived from Plato                                     
+
+     MAXENTRY = 0
      DO I = 1, NOINT
+        READ(11,*) HD, HD, HD
+        READ(11,*) NUMENTRY
 
-        READ(11,*) ELE1(I), ELE2(I), BTYPE(I), (BOND(J,I), J = 1, 8)
+        IF (NUMENTRY .GT. MAXENTRY) MAXENTRY = NUMENTRY
+
+        DO J = 1, NUMENTRY
+           READ(11,*) JUNK, JUNK, JUNK
+        ENDDO
+     ENDDO
+
+     REWIND(11)
+
+     ALLOCATE(TABR(MAXENTRY,NOINT), TABH(MAXENTRY, NOINT), TABS(MAXENTRY, NOINT), &
+          LENTABINT(NOINT), HSPL(MAXENTRY, NOINT), SSPL(MAXENTRY, NOINT), &
+          HCUT(NOINT), SCUT(NOINT))
+
+
+     TABR = ZERO
+     TABH = ZERO
+     TABS = ZERO
+
+     HCUT = ZERO
+     SCUT = ZERO
+
+     
+     READ(11,*) HD, NOINT
+     DO I = 1, NOINT
+        READ(11,*) ELE1(I), ELE2(I), BTYPE(I)
+        READ(11,*) LENTABINT(I)
+        DO J = 1, LENTABINT(I)
+           READ(11,*) TABR(J,I), TABS(J,I), TABH(J,I)
+        ENDDO
+
+        DO J = 1, LENTABINT(I)
+           IF (TABR(J,I) .GT. HCUT(I)) HCUT(I) = TABR(J,I)
+        ENDDO
+        SCUT(I) = HCUT(I)
 
      ENDDO
 
-  ELSE
+     ALLOCATE(U(MAXENTRY))
 
-     ALLOCATE( OVERL(14,NOINT) )
-
-     READ(11,*) HD, HD, HD, HD, HD, HD, HD, HD, HD, HD, HD, &
-          HD, HD, HD, HD, HD, HD, HD, HD
+     ! H first                                                                   
 
      DO I = 1, NOINT
 
-        READ(11,*) ELE1(I), ELE2(I), BTYPE(I), (BOND(J,I), J = 1, 8), &
-             (OVERL(K,I), K = 1, 8)
+        N = LENTABINT(I)
+
+        HSPL(1,I) = ZERO
+        U(1) = ZERO
+
+        DO J = 2, N-1
+           SIG = (TABR(J,I) - TABR(J-1,I))/(TABR(J+1,I) - TABR(J-1,I))
+           P = SIG*HSPL(J-1,I) + TWO
+           HSPL(J,I) = (SIG - ONE)/P
+           U(J) = (SIX*((TABH(J+1,I) - TABH(J,I)) / &
+                (TABR(J+1,I) - TABR(J,I)) - (TABH(J,I) - TABH(J-1,I)) &
+                /(TABR(J,I) - TABR(J-1,I)))/(TABR(J+1,I)-TABR(J-1,I)) &
+                - SIG*U(J-1))/P
+        ENDDO
+
+        QN = ZERO
+        UN = ZERO
+
+        HSPL(N,I) = (UN - QN*U(N-1))/(QN*HSPL(N-1, I) + ONE)
+        
+        DO K = N-1, 1, -1
+           HSPL(K,I) = HSPL(K,I)*HSPL(K+1,I) + U(K)
+        ENDDO
 
      ENDDO
+
+          ! Now the overlap                                                           
+
+     DO I = 1, NOINT
+
+        N = LENTABINT(I)
+
+        SSPL(1,I) = ZERO
+        U(1) = ZERO
+
+        DO J = 2, N-1
+           SIG = (TABR(J,I) - TABR(J-1,I))/(TABR(J+1,I) - TABR(J-1,I))
+           P = SIG*SSPL(J-1,I) + TWO
+           SSPL(J,I) = (SIG - ONE)/P
+           U(J) = (SIX*((TABS(J+1,I) - TABS(J,I)) / &
+                (TABR(J+1,I) - TABR(J,I)) - (TABS(J,I) - TABS(J-1,I)) &
+                /(TABR(J,I) - TABR(J-1,I)))/(TABR(J+1,I)-TABR(J-1,I)) &
+                - SIG*U(J-1))/P
+        ENDDO
+
+        QN = ZERO
+        UN = ZERO
+
+        SSPL(N,I) = (UN - QN*U(N-1))/(QN*SSPL(N-1, I) + ONE)
+
+        DO K = N-1, 1, -1
+           SSPL(K,I) = SSPL(K,I)*SSPL(K+1,I) + U(K)
+        ENDDO
+
+     ENDDO
+
+     DEALLOCATE(U)
 
   ENDIF
 
@@ -114,13 +247,17 @@ SUBROUTINE READTB
 
   ENDIF
 
-  DO I = 1, NOINT
+  IF (SCLTYPE .EQ. "EXP") THEN
 
-     CALL UNIVTAILCOEF(BOND(:,I))
-
-     IF (BASISTYPE .EQ. "NONORTHO") CALL UNIVTAILCOEF(OVERL(:,I))
-
-  ENDDO
+     DO I = 1, NOINT
+        
+        CALL UNIVTAILCOEF(BOND(:,I))
+        
+        IF (BASISTYPE .EQ. "NONORTHO") CALL UNIVTAILCOEF(OVERL(:,I))
+        
+     ENDDO
+     
+  ENDIF
 
   RETURN
 

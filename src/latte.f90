@@ -168,6 +168,7 @@ PROGRAM LATTE
 
      ENDIF
 
+
      !
      ! If we're starting from a restart file, we need to modify H such
      ! that it agrees with the density matrix elements read from file
@@ -243,7 +244,7 @@ PROGRAM LATTE
      ENDIF
 
      CALL TOTENG
-
+     
      ECOUL = ZERO
      IF (ELECTRO .EQ. 1) CALL GETCOULE
 
@@ -279,6 +280,12 @@ PROGRAM LATTE
      CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
 
      CALL GETPRESSURE
+
+!     WRITE(6,*) F(1,1), F(2,1), F(3,1)
+!     WRITE(6,*) FPP(1,1), FPP(2,1), FPP(3,1)
+!     WRITE(6,*) FSLCN(1,1), FSLCN(2,1), FSLCN(3,1)
+!     WRITE(6,*) FPUL(1,1), FPUL(2,1), FPUL(3,1)
+
 
      !     WRITE(6,*) "Force ", FPP(1,1), FPP(2,1), FPP(3,1)
      !     PRINT*, "PCHECK ", (1.0/3.0)*(VIRBOND(1)+VIRBOND(2) + VIRBOND(3)), &
@@ -377,14 +384,13 @@ PROGRAM LATTE
 
   ELSEIF (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. DOSFITON .EQ. 1) THEN
 
-     CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
+     IF (SCLTYPE .EQ. "EXP") THEN
+        CALL DOSFIT
+     ELSE
+        CALL DOSFITTAB
+     ENDIF
 
-     CALL DOSFIT
-
-     CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
-
-     WRITE(6,'("# Wall time = ", F12.2, " s")') &
-          FLOAT(STOP_CLOCK - START_CLOCK)/FLOAT(CLOCK_RATE)
+     IF (KON .EQ. 1) CALL KGETDOS
 
   ELSEIF  (MDON .EQ. 0 .AND. RELAXME .EQ. 0 .AND. DOSFITON .EQ. 2) THEN
 

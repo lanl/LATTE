@@ -95,6 +95,35 @@ SUBROUTINE BOEVECSPRG
 
   OCC =  BNDFIL*FLOAT(HDIM)
 
+
+     S = ZERO
+
+     IF (MDON .EQ. 0 .OR. &
+          (MDON .EQ. 1 .AND. MOD(ENTROPYITER, WRTFREQ) .EQ. 0 )) THEN
+
+        DO I = 1, HDIM
+
+           FDIRACARG = (EVALS(I) - CHEMPOT)/KBT
+
+           FDIRACARG = MAX(FDIRACARG, -EXPTOL)
+           FDIRACARG = MIN(FDIRACARG, EXPTOL)
+
+           FDIRAC = ONE/(ONE + EXP(FDIRACARG))
+
+           OCCLOGOCC_ELECTRONS = FDIRAC * LOG(FDIRAC)
+
+           OCCLOGOCC_HOLES = (ONE - FDIRAC) * LOG(ONE - FDIRAC)
+
+           S = S + TWO*(OCCLOGOCC_ELECTRONS + OCCLOGOCC_HOLES)
+
+        ENDDO
+
+      ENDIF
+
+      ENTE = -KBT*S
+
+        ! Compute the gap only when we have to...
+
   IF (MOD(INT(TOTNE),2) .EQ. 0) THEN
      EGAP = EVALS(INT(OCC) + 1) - EVALS(INT(OCC))
   ELSE

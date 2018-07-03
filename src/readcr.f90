@@ -53,11 +53,10 @@ SUBROUTINE READCR
      IF (KON .EQ. 1) ALLOCATE(KF(3,NATS))
 
      IF (BASISTYPE .EQ. "NONORTHO") THEN
-        IF (SPINON .EQ. 0) THEN
-           ALLOCATE(FPUL(3,NATS), FSCOUL(3,NATS))
-        ELSE
-           ALLOCATE(FPUL(3,NATS), FSCOUL(3,NATS), FSSPIN(3,NATS))
-        ENDIF
+        ALLOCATE(FPUL(3,NATS))
+        IF (ELECTRO .EQ. 0) ALLOCATE(FSLCN(3,NATS))
+        IF (ELECTRO .EQ. 1) ALLOCATE(FSCOUL(3,NATS))
+        IF (SPINON .EQ. 1) ALLOCATE(FSSPIN(3,NATS))
      ENDIF
 
      READ(12,*) BOX(1,1), BOX(1,2), BOX(1,3)
@@ -122,6 +121,11 @@ SUBROUTINE READCR
      IF (BASIS(ELEMPOINTER(I)) .NE. "s" .AND. &
           BASIS(ELEMPOINTER(I)) .NE. "sp") SPONLY = 1
   ENDDO
+
+  ! At the moment we must run Josh's implementation if we do tabulated integrals
+
+  IF (SCLTYPE .EQ. "TABLE") SPONLY = 1
+
   ! Print a warning
 
   IF (SPONLY .EQ. 1) THEN

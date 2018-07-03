@@ -56,6 +56,7 @@ SUBROUTINE GETFORCE
            CALL PULAY_SP
 #endif
 
+           IF (ELECTRO .EQ. 0) CALL FLCNNONO_SP
            IF (ELECTRO .EQ. 1) CALL FCOULNONO_SP
            IF (SPINON .EQ. 1) CALL FSPINNONO_SP
 
@@ -63,21 +64,21 @@ SUBROUTINE GETFORCE
 
            ! Otherwise use the complex but general expansions Josh Coe implemented
            CALL PULAY
+           IF (ELECTRO .EQ. 0) CALL FLCNNONO
            IF (ELECTRO .EQ. 1) CALL FCOULNONO
            IF (SPINON .EQ. 1) CALL FSPINNONO
 
         ENDIF
 
         FTOT = FTOT - TWO*FPUL
-
+        
+        IF (ELECTRO .EQ. 0) FTOT = FTOT + FSLCN
         IF (ELECTRO .EQ. 1) FTOT = FTOT + FSCOUL
-
         IF (SPINON .EQ. 1) FTOT = FTOT + FSSPIN
 
      ENDIF
 
   ELSEIF (KON .EQ. 1) THEN
-
 
      CALL KGRADH
 
@@ -86,13 +87,13 @@ SUBROUTINE GETFORCE
      IF (BASISTYPE .EQ. "NONORTHO") THEN
 
         CALL KPULAY
+        IF (ELECTRO .EQ. 0) CALL KFLCNNONO
+        IF (ELECTRO .EQ. 1) CALL KFCOULNONO
 
         FTOT = FTOT - TWO*FPUL
 
-        IF (ELECTRO .EQ. 1) THEN
-           CALL KFCOULNONO
-           FTOT = FTOT + FSCOUL
-        ENDIF
+        IF (ELECTRO .EQ. 0) FTOT = FTOT + FSLCN
+        IF (ELECTRO .EQ. 1) FTOT = FTOT + FSCOUL
 
      ENDIF
 
@@ -112,7 +113,6 @@ SUBROUTINE GETFORCE
      CALL PAIRPOTSPLINE
      FTOT = FTOT + FPP
   ENDIF
-
 
   IF (ELECTRO .EQ. 1) FTOT = FTOT + FCOUL
 
