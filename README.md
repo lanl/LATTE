@@ -30,7 +30,20 @@ To build the code just type make inside the main directory as follows:
 The latter should build the code and test it with some examples that are
 located in `~/LATTE/tests`.
 
-# Compiling LATTE (Cmake):
+# Compiling LATTE (CMake):
+
+To build LATTE with CMake:
+
+```
+$ cd; cd ~/LATTE
+$ mkdir build
+$ cd build
+$ cmake ../cmake -D<OPTIONS>=<VALUE>
+$ make
+```
+
+Some useful options are `OPENMP` (`ON` or `OFF`), `DO_MPI` and `PROGRESS`.
+For a full list of options use a CMake GUI, e.g. `ccache` or `cache-gui`.
 
 
 # Authors
