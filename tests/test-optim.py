@@ -70,7 +70,7 @@ def compare_coordinates(reference, current, reltol):
         raise Exception(("[error] when comparing '%s' with '%s'" % (reference, current))
                         + "structures do not agree")
         
-    print("optim test passed without failure ...")  
+    print("PASSED")
 
 def main():
     """The main function.
