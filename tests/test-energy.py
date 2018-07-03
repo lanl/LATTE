@@ -44,7 +44,7 @@ def compare_MD(reference, current, reltol):
         raise Exception(("[error] when comparing '%s' with '%s'" % (reference, current))
                         + "energies do not agree")
 
-    print("Energy test passed without failure ...")  
+    print("PASSED") 
 
 def main():
     """The main function.
