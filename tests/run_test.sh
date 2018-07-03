@@ -25,12 +25,13 @@ for name in single.point single.point.noelec single.point.rspace ; do
   cp  ./tests/$REF .
   cp  ./tests/$COORDS ./bl/inputblock.dat
 
-  echo -e "\nTesting for "$name" \n"
+  echo -en "   Testing for "$name" ... "
 
-  time $RUN > out
+  time=`( /usr/bin/time -f "%S" $RUN > out ) 2>&1 > /dev/null`
   ENERG=`grep -e "FREE ENERGY" out | awk 'NF>1{print $5}'`
   echo $ENERG > energy.out
 
+  echo -n "($time s) "
   python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.00001
 
   rm $REF out
@@ -52,10 +53,11 @@ for name in opt opt.cg opt_cons dorbitals; do
     cp ./tests/freeze.in .
   fi
 
-  echo -e "\nTesting for "$name" \n"
+  echo -en "   Testing for "$name" ... "
 
-  time $RUN > out
+  time=`( /usr/bin/time -f "%S" $RUN > out ) 2>&1 > /dev/null`
 
+  echo -n "($time s) "
   python ./tests/test-optim.py --reference $REF --current monitorrelax.xyz --reltol 0.00001
 
   #rm $REF monitorrelax.xyz out
@@ -74,12 +76,13 @@ for name in tableread 0scf 2scf fullscf fullscf.etemp sp2 sp2.sparse fullscf.nvt
   cp  ./tests/$REF .
   cp  ./tests/$COORDS ./bl/inputblock.dat
 
-  echo -e "\nTesting for "$name" \n"
+  echo -en "   Testing for "$name" ... "
 
-  time $RUN > out
+  time=`( /usr/bin/time -f "%S" $RUN > out ) 2>&1 > /dev/null`
+  
   grep "Data" out | sed 's/Data/ /g' | awk 'NF>1{print $2}' > energy.out
-  echo ""
 
+  echo -n "($time s) "
   python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.00001
 
   rm $REF energy.out out
@@ -98,9 +101,9 @@ for name in fittingoutput.dat ; do
   cp  ./tests/$REF .
   cp  ./tests/$COORDS ./bl/inputblock.dat
 
-  echo -e "\nTesting for "$name" \n"
+  echo -en "   Testing for "$name" ... "
 
-  time $RUN > out
+  time=`( /usr/bin/time -f "%S" $RUN > out ) 2>&1 > /dev/null`
   
   tol=0.0001
   
@@ -128,10 +131,12 @@ for name in fittingoutput.dat ; do
       }
     ' $REF`
   
+  echo -n "($time s) "
   if [ "$check" -eq 0 ]
   then
-    echo "Diff test passed without failure ..."
+    echo "PASSED"
   else
+    echo ""
     diff $REF $name
     exit -1
   fi
@@ -158,13 +163,14 @@ for name in 0scf fullscf sp2 ; do
   cp  ./tests/$REF .
   cp  ./tests/$COORDS ./bl/inputblock.dat
 
-  echo -e "\nTesting for "$name" \n"
+  echo -en "   Testing for "$name" ... "
 
-  time $RUN > out
+  time=`( /usr/bin/time -f "%S" $RUN > out ) 2>&1 > /dev/null`
+  
   grep "Data" out | sed 's/Data/ /g' | awk 'NF>1{print $2}' > energy.out
-  echo ""
-
   grep Energy out | sed -e s/"PAR"/$STRR/g  >  input_tmp.in
+  
+  echo -n "($time s) "
   python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.00001
 
   rm $REF energy.out input_tmp.in
