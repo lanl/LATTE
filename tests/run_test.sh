@@ -4,6 +4,32 @@
 
 MY_PATH=`pwd`                                   # Capturing the local path of the folder where we are running.
 
+declare -A performanceExpectedTimes
+performanceExpectedTimes["single.point"]=0.014
+performanceExpectedTimes["single.point.noelec"]=0.027
+performanceExpectedTimes["single.point.rspace"]=0.036
+performanceExpectedTimes["opt"]=0.127
+performanceExpectedTimes["opt.cg"]=0.129
+performanceExpectedTimes["opt_cons"]=0.127
+performanceExpectedTimes["dorbitals"]=0.412
+performanceExpectedTimes["tableread"]=1.700
+performanceExpectedTimes["0scf"]=0.127
+performanceExpectedTimes["2scf"]=0.120
+performanceExpectedTimes["fullscf"]=0.158
+performanceExpectedTimes["fullscf.etemp"]=0.160
+performanceExpectedTimes["sp2"]=0.161
+performanceExpectedTimes["sp2.sparse"]=0.579
+performanceExpectedTimes["fullscf.nvt"]=0.158
+performanceExpectedTimes["fullscf.npt"]=0.157
+performanceExpectedTimes["fullscf.vdw"]=0.158
+performanceExpectedTimes["fullscf.spin"]=0.231
+performanceExpectedTimes["fullscf.kon"]=0.973
+performanceExpectedTimes["fullscf.rspace"]=0.014
+performanceExpectedTimes["fittingoutput.dat"]=0.002
+performanceExpectedTimes["0scf"]=0.127
+performanceExpectedTimes["fullscf"]=0.158
+performanceExpectedTimes["sp2"]=0.161
+
 RUN="./LATTE_DOUBLE"  # LATTE program executable
 
 echo ""
@@ -49,6 +75,12 @@ for name in single.point single.point.noelec single.point.rspace ; do
   relativeTime=`echo "$time/$timeRef" | bc -l | awk '{printf("%.3f",$1)}'`
   echo -n "(${time}s,$relativeTime) "
   python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.00001
+  
+  if [ "$LATTE_PERFORMANCE" = "yes" ]
+  then
+	test=`echo "sqrt($relativeTime-${performanceExpectedTimes[$name]})^2/${performanceExpectedTimes[$name]} < 0.1" | bc -l`
+	[ "$test" -eq 0 ] && exit -1
+  fi
 
   rm $REF out
 
@@ -76,6 +108,12 @@ for name in opt opt.cg opt_cons dorbitals; do
   relativeTime=`echo "$time/$timeRef" | bc -l | awk '{printf("%.3f",$1)}'`
   echo -n "(${time}s,$relativeTime) "
   python ./tests/test-optim.py --reference $REF --current monitorrelax.xyz --reltol 0.00001
+  
+  if [ "$LATTE_PERFORMANCE" = "yes" ]
+  then
+	test=`echo "sqrt($relativeTime-${performanceExpectedTimes[$name]})^2/${performanceExpectedTimes[$name]} < 0.1" | bc -l`
+	[ "$test" -eq 0 ] && exit -1
+  fi
 
   #rm $REF monitorrelax.xyz out
 done
@@ -103,6 +141,12 @@ for name in tableread 0scf 2scf fullscf fullscf.etemp sp2 sp2.sparse fullscf.nvt
   echo -n "(${time}s,$relativeTime) "
   python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.00001
 
+  if [ "$LATTE_PERFORMANCE" = "yes" ]
+  then
+	test=`echo "sqrt($relativeTime-${performanceExpectedTimes[$name]})^2/${performanceExpectedTimes[$name]} < 0.1" | bc -l`
+	[ "$test" -eq 0 ] && exit -1
+  fi
+  
   rm $REF energy.out out
 
 done
@@ -159,6 +203,12 @@ for name in fittingoutput.dat ; do
     diff $REF $name
     exit -1
   fi
+  
+  if [ "$LATTE_PERFORMANCE" = "yes" ]
+  then
+	test=`echo "sqrt($relativeTime-${performanceExpectedTimes[$name]})^2/${performanceExpectedTimes[$name]} < 0.1" | bc -l`
+	[ "$test" -eq 0 ] && exit -1
+  fi
 
   rm $REF out
 
@@ -195,6 +245,12 @@ for name in 0scf fullscf sp2 ; do
   relativeTime=`echo "$time/$timeRef" | bc -l | awk '{printf("%.3f",$1)}'`
   echo -n "(${time}s,$relativeTime) "
   python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.00001
+  
+  if [ "$LATTE_PERFORMANCE" = "yes" ]
+  then
+	test=`echo "sqrt($relativeTime-${performanceExpectedTimes[$name]})^2/${performanceExpectedTimes[$name]} < 0.1" | bc -l`
+	[ "$test" -eq 0 ] && exit -1
+  fi
 
   rm $REF energy.out input_tmp.in
 
