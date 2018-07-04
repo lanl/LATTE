@@ -78,7 +78,7 @@ for name in single.point single.point.noelec single.point.rspace ; do
   
   if [ "$LATTE_PERFORMANCE" = "yes" ]
   then
-	test=`echo "sqrt($relativeTime-${performanceExpectedTimes[$name]})^2/${performanceExpectedTimes[$name]} < 0.1" | bc -l`
+	test=`echo "($relativeTime-${performanceExpectedTimes[$name]})/${performanceExpectedTimes[$name]} < 0.1" | bc -l`
 	[ "$test" -eq 0 ] && exit -1
   fi
 
@@ -111,7 +111,7 @@ for name in opt opt.cg opt_cons dorbitals; do
   
   if [ "$LATTE_PERFORMANCE" = "yes" ]
   then
-	test=`echo "sqrt($relativeTime-${performanceExpectedTimes[$name]})^2/${performanceExpectedTimes[$name]} < 0.1" | bc -l`
+	test=`echo "($relativeTime-${performanceExpectedTimes[$name]})/${performanceExpectedTimes[$name]} < 0.1" | bc -l`
 	[ "$test" -eq 0 ] && exit -1
   fi
 
@@ -143,7 +143,7 @@ for name in tableread 0scf 2scf fullscf fullscf.etemp sp2 sp2.sparse fullscf.nvt
 
   if [ "$LATTE_PERFORMANCE" = "yes" ]
   then
-	test=`echo "sqrt($relativeTime-${performanceExpectedTimes[$name]})^2/${performanceExpectedTimes[$name]} < 0.1" | bc -l`
+	test=`echo "($relativeTime-${performanceExpectedTimes[$name]})/${performanceExpectedTimes[$name]} < 0.1" | bc -l`
 	[ "$test" -eq 0 ] && exit -1
   fi
   
@@ -206,7 +206,7 @@ for name in fittingoutput.dat ; do
   
   if [ "$LATTE_PERFORMANCE" = "yes" ]
   then
-	test=`echo "sqrt($relativeTime-${performanceExpectedTimes[$name]})^2/${performanceExpectedTimes[$name]} < 0.1" | bc -l`
+	test=`echo "($relativeTime-${performanceExpectedTimes[$name]})/${performanceExpectedTimes[$name]} < 0.1" | bc -l`
 	[ "$test" -eq 0 ] && exit -1
   fi
 
@@ -248,7 +248,7 @@ for name in 0scf fullscf sp2 ; do
   
   if [ "$LATTE_PERFORMANCE" = "yes" ]
   then
-	test=`echo "sqrt($relativeTime-${performanceExpectedTimes[$name]})^2/${performanceExpectedTimes[$name]} < 0.1" | bc -l`
+	test=`echo "($relativeTime-${performanceExpectedTimes[$name]})/${performanceExpectedTimes[$name]} < 0.1" | bc -l`
 	[ "$test" -eq 0 ] && exit -1
   fi
 
