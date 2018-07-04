@@ -45,6 +45,11 @@ timeRef=`( /usr/bin/time -f "%U" ./tests/timer_cpu_time > out ) 2>&1 > /dev/null
 relativeTime=`echo "$timeRef/$timeRef" | bc -l | awk '{printf("%.3f",$1)}'`
 echo "(${timeRef}s,$relativeTime) PASSED"
 
+if [ "$LATTE_PERFORMANCE" = "yes" ]
+then
+	echo ">> If performance goes lower than 10% the test will fail"
+fi
+
 echo ""
 echo "Testing LATTE with new (latte.in) input files"
 echo "============================================="
