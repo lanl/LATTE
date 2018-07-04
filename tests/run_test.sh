@@ -14,7 +14,7 @@ echo ""
 ( cd tests; make; cd .. ) &> /dev/null
 
 echo -en "   Testing for reference ... "
-timeRef=`( /usr/bin/time -f "%S" ./tests/timer_cpu_time > out ) 2>&1 > /dev/null`
+timeRef=`( /usr/bin/time -f "%U" ./tests/timer_cpu_time > out ) 2>&1 > /dev/null`
 
 relativeTime=`echo "$timeRef/$timeRef" | bc -l | awk '{printf("%.3f",$1)}'`
 echo "(${timeRef}s,$relativeTime) PASSED"
@@ -42,7 +42,7 @@ for name in single.point single.point.noelec single.point.rspace ; do
 
   echo -en "   Testing for "$name" ... "
 
-  time=`( /usr/bin/time -f "%S" $RUN > out ) 2>&1 > /dev/null`
+  time=`( /usr/bin/time -f "%U" $RUN > out ) 2>&1 > /dev/null`
   ENERG=`grep -e "FREE ENERGY" out | awk 'NF>1{print $5}'`
   echo $ENERG > energy.out
 
@@ -71,7 +71,7 @@ for name in opt opt.cg opt_cons dorbitals; do
 
   echo -en "   Testing for "$name" ... "
 
-  time=`( /usr/bin/time -f "%S" $RUN > out ) 2>&1 > /dev/null`
+  time=`( /usr/bin/time -f "%U" $RUN > out ) 2>&1 > /dev/null`
 
   relativeTime=`echo "$time/$timeRef" | bc -l | awk '{printf("%.3f",$1)}'`
   echo -n "(${time}s,$relativeTime) "
@@ -95,7 +95,7 @@ for name in tableread 0scf 2scf fullscf fullscf.etemp sp2 sp2.sparse fullscf.nvt
 
   echo -en "   Testing for "$name" ... "
 
-  time=`( /usr/bin/time -f "%S" $RUN > out ) 2>&1 > /dev/null`
+  time=`( /usr/bin/time -f "%U" $RUN > out ) 2>&1 > /dev/null`
   
   grep "Data" out | sed 's/Data/ /g' | awk 'NF>1{print $2}' > energy.out
 
@@ -121,7 +121,7 @@ for name in fittingoutput.dat ; do
 
   echo -en "   Testing for "$name" ... "
 
-  time=`( /usr/bin/time -f "%S" $RUN > out ) 2>&1 > /dev/null`
+  time=`( /usr/bin/time -f "%U" $RUN > out ) 2>&1 > /dev/null`
   
   tol=0.0001
   
@@ -187,7 +187,7 @@ for name in 0scf fullscf sp2 ; do
 
   echo -en "   Testing for "$name" ... "
 
-  time=`( /usr/bin/time -f "%S" $RUN > out ) 2>&1 > /dev/null`
+  time=`( /usr/bin/time -f "%U" $RUN > out ) 2>&1 > /dev/null`
   
   grep "Data" out | sed 's/Data/ /g' | awk 'NF>1{print $2}' > energy.out
   grep Energy out | sed -e s/"PAR"/$STRR/g  >  input_tmp.in
