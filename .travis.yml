@@ -20,9 +20,9 @@ before_install:
   - pip install --user codecov
 
   # Install BML, PROGRESS and LAMMPS
-  - cd; cd bml; CC=gcc FC=gfortran CMAKE_BUILD_TYPE=Release BLAS_VENDOR=GNU BML_OPENMP=yes BML_TESTING=no ./build.sh configure
+  - cd; cd bml; CC=gcc FC=gfortran CMAKE_BUILD_TYPE=Release BLAS_VENDOR=GNU BML_OPENMP=yes BML_TESTING=no BUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} ./build.sh configure
   - cd; cd bml/build; make; make install
-  - cd; cd qmd-progress; CC=gcc FC=gfortran PROGRESS_MPI=no PROGRESS_TESTING=yes BLAS_VENDOR=GNU PKG_CONFIG_PATH=~/bml/install/lib/pkgconfig PROGRESS_OPENMP=yes ./build.sh configure
+  - cd; cd qmd-progress; CC=gcc FC=gfortran PROGRESS_MPI=no PROGRESS_TESTING=yes BLAS_VENDOR=GNU PKG_CONFIG_PATH=~/bml/install/lib/pkgconfig PROGRESS_OPENMP=yes BUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} ./build.sh configure
   - cd; cd qmd-progress/build; make; make install
   # Lammps installation
   - cd; cd lammps/lib/latte; ln -s $LATTEPATH/src/latte_c_bind.o filelink.o ; ln -s $LATTEPATH/src includelink ; ln -s $LATTEPATH liblink
@@ -36,8 +36,10 @@ before_script:
 env:
   - OPTIONS="CVR=ON" TEST="" CHOICES=gfort.lapack
   - OPTIONS="CVR=ON PROGRESS=ON" TEST="" CHOICES=gfort.lapack
+  - OPTIONS="CVR=ON PROGRESS=ON" TEST="" CHOICES=gfort.lapack BUILD_SHARED_LIBS=ON
   - OPTIONS="CVR=ON MAKELIB=ON lammps" TEST="_lmp" CHOICES=gfort.lapack
   - LATTE_CMAKE=yes CMAKE_WITH_PROGRESS=yes
+  - LATTE_CMAKE=yes CMAKE_WITH_PROGRESS=yes BUILD_SHARED_LIBS=ON
   - LATTE_CMAKE=yes LAMMPS_CMAKE=yes
   - LATTE_PERFORMANCE=yes TEST="" CHOICES=gfort.lapack
 #  - LATTE_PERFORMANCE=yes OPTIONS="CVR=ON PROGRESS=ON" TEST="" CHOICES=gfort.lapack
@@ -47,7 +49,7 @@ script:
   -  if [[ ! ${LATTE_CMAKE} ]]; then
        make ${OPTIONS} && make test${TEST}; 
      else
-       mkdir build && cd build && cmake ../cmake -DCMAKE_INSTALL_PREFIX=$HOME/latte/install -DPROGRESS=${CMAKE_WITH_PROGRESS} -DOPENMP=${CMAKE_WITH_PROGRESS} -DCMAKE_PREFIX_PATH="$HOME/bml/install;$HOME/qmd-progress/install" && make && make install && 
+       mkdir build && cd build && cmake ../cmake -DCMAKE_INSTALL_PREFIX=$HOME/latte/install -DPROGRESS=${CMAKE_WITH_PROGRESS} -DOPENMP=${CMAKE_WITH_PROGRESS} -DCMAKE_PREFIX_PATH="$HOME/bml/install;$HOME/qmd-progress/install" -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} && make && make install && 
        if [[ ${LAMMPS_CMAKE} ]]; then
          cd $HOME/lammps && mkdir build && cd build && cmake ../cmake -DPKG_LATTE=ON -DCMAKE_PREFIX_PATH=$HOME/latte/install && make;
        fi
