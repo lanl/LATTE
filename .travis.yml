@@ -40,7 +40,7 @@ env:
   - LATTE_CMAKE=yes CMAKE_WITH_PROGRESS=yes
   - LATTE_CMAKE=yes LAMMPS_CMAKE=yes
   - LATTE_PERFORMANCE=yes TEST="_lmp" CHOICES=gfort.lapack
-  - LATTE_PERFORMANCE=yes OPTIONS="CVR=ON PROGRESS=ON" TEST="_lmp" CHOICES=gfort.lapack
+  - LATTE_PERFORMANCE=yes OPTIONS="CVR=ON PROGRESS=ON" TEST="" CHOICES=gfort.lapack
 
 script:
   -  cp -f -v ./makefiles/makefile.CHOICES.${CHOICES:-gfort.lapack} makefile.CHOICES
