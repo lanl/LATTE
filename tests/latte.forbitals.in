@@ -41,3 +41,14 @@ CONTROL{
   PARREP= 0
   ER= 1.0
 }
+
+#Pulay Mixer. This options are available when LATTE is compiled with
+#PROGRESS/BML
+MIXER{
+   MixerType= Pulay  #Will use the Pulay mixer (Linear is an other option)
+   Verbose= 10 
+   MPulay= 5  #Number of pulay vectors/matrices
+   MixCoeff= 0.1  #Coefficient for mixing charges
+   MixerON= T    #This variable is equivalent to commenting the whole lines in MIXER
+}
+ 
