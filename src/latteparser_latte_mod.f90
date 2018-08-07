@@ -585,7 +585,11 @@ CONTAINS
     !
 
     WRTFREQ = VALVECTOR_INT(5)
-    !   write(*,*)"WRTFREQ",WRTFREQ
+    IF ( WRTFREQ <= 0 ) THEN 
+      CALL ERRORS("latteparser_latte_mod","You cannot have WRTFREQ <= 0.& 
+                   &Set this variable to a very high value to avoid frequent printing")
+    ENDIF
+   !   write(*,*)"WRTFREQ",WRTFREQ
     !
     ! TOINITTEMP: Whether or not we are going to initialize velocities
     ! using a random number generator (sometimes during a restart we
