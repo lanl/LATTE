@@ -79,3 +79,8 @@ with the following `bibtex` citation:
       author = {N. Bock and M. J. Cawkwell and J. D. Coe and A. Krishnapriyan and M. P. Kroonblawd and A. Lang and E. Martinez Saez and S. M. Mniszewski and C. F. A. Negre and A. M. N. Niklasson and E. Sanville and M. A. Wood and P. Yang},
       year = {2008}
     }
+
+# Contacts
+
+Please subscribe to our [mailing list](https://lanl.github.io/LATTE/) to
+request information or send us feedback.
