@@ -27,9 +27,10 @@ SUBROUTINE INITCOULOMB
   USE MYPRECISION
 
   IMPLICIT NONE
-  
+
   REAL(LATTEPREC) :: A2XA3(3), A3XA1(3), A1XA2(3)
   REAL(LATTEPREC) :: DOT, P, TIMERATIO, SQRTP
+  IF (EXISTERROR) RETURN
 
   KECONST = 14.3996437701414*RELPERM
   TFACT  = 16.0/(5.0 * KECONST)
@@ -46,129 +47,121 @@ SUBROUTINE INITCOULOMB
      COULCUT2 = COULCUT*COULCUT
 
   ELSE
-     
-     
+
      TWOPI = TWO*PI
      PI2 = PI*PI
      SQRTPI = SQRT(PI)
      EIGHTPI = EIGHT*PI
-     
+
      ! First let's set up Ed's lattice_vecs
-     
+
      LATTICEVECS = BOX
-     
-     !  LATTICEVECS(1,1) = BOX(2,1) - BOX(1,1)
-     !  LATTICEVECS(2,2) = BOX(2,2) - BOX(1,2)
-     !  LATTICEVECS(3,3) = BOX(2,3) - BOX(1,3)
-     
+
      ! Ed's bit:
-     
-     A2XA3(1) = latticevecs(2,2)*latticevecs(3,3) - &
-          latticevecs(2,3)*latticevecs(3,2)
-     A2XA3(2) = latticevecs(2,3)*latticevecs(3,1) - &
-          latticevecs(2,1)*latticevecs(3,3)
-     A2XA3(3) = latticevecs(2,1)*latticevecs(3,2) - & 
-          latticevecs(2,2)*latticevecs(3,1)
-     
-     dot = latticevecs(1,1)*A2XA3(1) + latticevecs(1,2)*A2XA3(2) + &
-          latticevecs(1,3)*A2XA3(3)
-     
-     recipvecs(1,1) = TWOPI*A2XA3(1)/dot
-     recipvecs(1,2) = TWOPI*A2XA3(2)/dot
-     recipvecs(1,3) = TWOPI*A2XA3(3)/dot
-     
-     A3XA1(1) = latticevecs(3,2)*latticevecs(1,3) - &
-          latticevecs(3,3)*latticevecs(1,2)
-     A3XA1(2) = latticevecs(3,3)*latticevecs(1,1) - &
-          latticevecs(3,1)*latticevecs(1,3)
-     A3XA1(3) = latticevecs(3,1)*latticevecs(1,2) - &
-          latticevecs(3,2)*latticevecs(1,1)
-     
-     dot = latticevecs(2,1)*A3XA1(1) + latticevecs(2,2)*A3XA1(2) + &
-          latticevecs(2,3)*A3XA1(3)
-     
-     recipvecs(2,1) = TWOPI*A3XA1(1)/dot
-     recipvecs(2,2) = TWOPI*A3XA1(2)/dot
-     recipvecs(2,3) = TWOPI*A3XA1(3)/dot
-     
-     A1XA2(1) = latticevecs(1,2)*latticevecs(2,3) - &
-          latticevecs(1,3)*latticevecs(2,2)
-     A1XA2(2) = latticevecs(1,3)*latticevecs(2,1) - & 
-          latticevecs(1,1)*latticevecs(2,3)
-     A1XA2(3) = latticevecs(1,1)*latticevecs(2,2) - &
-          latticevecs(1,2)*latticevecs(2,1)
-     
-     dot = latticevecs(3,1)*A1XA2(1) + latticevecs(3,2)*A1XA2(2) + &
-          latticevecs(3,3)*A1XA2(3)
-     
-     recipvecs(3,1) = TWOPI*A1XA2(1)/dot
-     recipvecs(3,2) = TWOPI*A1XA2(2)/dot
-     recipvecs(3,3) = TWOPI*A1XA2(3)/dot
-     
+
+     A2XA3(1) = LATTICEVECS(2,2)*LATTICEVECS(3,3) - &
+          LATTICEVECS(2,3)*LATTICEVECS(3,2)
+     A2XA3(2) = LATTICEVECS(2,3)*LATTICEVECS(3,1) - &
+          LATTICEVECS(2,1)*LATTICEVECS(3,3)
+     A2XA3(3) = LATTICEVECS(2,1)*LATTICEVECS(3,2) - &
+          LATTICEVECS(2,2)*LATTICEVECS(3,1)
+
+     DOT = LATTICEVECS(1,1)*A2XA3(1) + LATTICEVECS(1,2)*A2XA3(2) + &
+          LATTICEVECS(1,3)*A2XA3(3)
+
+     RECIPVECS(1,1) = TWOPI*A2XA3(1)/DOT
+     RECIPVECS(1,2) = TWOPI*A2XA3(2)/DOT
+     RECIPVECS(1,3) = TWOPI*A2XA3(3)/DOT
+
+     A3XA1(1) = LATTICEVECS(3,2)*LATTICEVECS(1,3) - &
+          LATTICEVECS(3,3)*LATTICEVECS(1,2)
+     A3XA1(2) = LATTICEVECS(3,3)*LATTICEVECS(1,1) - &
+          LATTICEVECS(3,1)*LATTICEVECS(1,3)
+     A3XA1(3) = LATTICEVECS(3,1)*LATTICEVECS(1,2) - &
+          LATTICEVECS(3,2)*LATTICEVECS(1,1)
+
+     DOT = LATTICEVECS(2,1)*A3XA1(1) + LATTICEVECS(2,2)*A3XA1(2) + &
+          LATTICEVECS(2,3)*A3XA1(3)
+
+     RECIPVECS(2,1) = TWOPI*A3XA1(1)/DOT
+     RECIPVECS(2,2) = TWOPI*A3XA1(2)/DOT
+     RECIPVECS(2,3) = TWOPI*A3XA1(3)/DOT
+
+     A1XA2(1) = LATTICEVECS(1,2)*LATTICEVECS(2,3) - &
+          LATTICEVECS(1,3)*LATTICEVECS(2,2)
+     A1XA2(2) = LATTICEVECS(1,3)*LATTICEVECS(2,1) - &
+          LATTICEVECS(1,1)*LATTICEVECS(2,3)
+     A1XA2(3) = LATTICEVECS(1,1)*LATTICEVECS(2,2) - &
+          LATTICEVECS(1,2)*LATTICEVECS(2,1)
+
+     DOT = LATTICEVECS(3,1)*A1XA2(1) + LATTICEVECS(3,2)*A1XA2(2) + &
+          LATTICEVECS(3,3)*A1XA2(3)
+
+     RECIPVECS(3,1) = TWOPI*A1XA2(1)/DOT
+     RECIPVECS(3,2) = TWOPI*A1XA2(2)/DOT
+     RECIPVECS(3,3) = TWOPI*A1XA2(3)/DOT
+
      ! Calculate the cell volume
-     
-     COULVOL = dot
-     
+
+     COULVOL = DOT
+
      P = -LOG(COULACC)
      SQRTP = SQRT(P)
 
-
      IF (COULCUT .GT. ZERO) THEN
-        
+
         CALPHA = SQRTP/COULCUT
         COULCUT2 = COULCUT*COULCUT
-        kcutoff = TWO*CALPHA*SQRTP
-        kcutoff2 = kcutoff*kcutoff
-        CALPHA2 = CALPHA*CALPHA  
+        KCUTOFF = TWO*CALPHA*SQRTP
+        KCUTOFF2 = KCUTOFF*KCUTOFF
+        CALPHA2 = CALPHA*CALPHA
         FOURCALPHA2 = FOUR*CALPHA2
 
      ELSE
-        
+
         !
         ! Automatically determining the optimal real space
         ! cut-off if on input COUTCUT < 0. This is Sanville's code
         !
- 
-!        TIMERATIO = 50.0
-        TIMERATIO = 1.0D0
-        
+
+        !   TIMERATIO = 50.0
+        !   TIMERATIO = 1.00D0
+        TIMERATIO = 3.50D0 
+
         CALPHA = SQRTPI*((TIMERATIO * REAL(NATS) / (COULVOL*COULVOL))**(ONE/SIX))
         COULCUT = SQRTP/CALPHA
 
-!        PRINT*, "COULCUT =", COULCUT
+        !        PRINT*, "COULCUT =", COULCUT
         IF (COULCUT .GT. FIVE*TEN) THEN
-           
+
            COULCUT = FIVE*TEN
            CALPHA = SQRTP/COULCUT
-           
+
         ENDIF
-        
+
         COULCUT2 = COULCUT*COULCUT
-        kcutoff = TWO*CALPHA*SQRTP
-        kcutoff2 = kcutoff*kcutoff
+        KCUTOFF = TWO*CALPHA*SQRTP
+        KCUTOFF2 = KCUTOFF*KCUTOFF
         CALPHA2 = CALPHA*CALPHA
         FOURCALPHA2 = FOUR*CALPHA2
 
+        ! Taking this bit from Coulomb Ewald so we don't have to
+        ! recompute every time:
+
      ENDIF
 
-        
-     ! Taking this bit from Coulomb Ewald so we don't have to 
-     ! recompute every time:
-     
      LMAX = INT(KCUTOFF / SQRT(RECIPVECS(1,1)*RECIPVECS(1,1) + &
           RECIPVECS(1,2)*RECIPVECS(1,2) + RECIPVECS(1,3)*RECIPVECS(1,3)))
-     
+
      MMAX = INT(KCUTOFF / SQRT(RECIPVECS(2,1)*RECIPVECS(2,1) + &
           RECIPVECS(2,2)*RECIPVECS(2,2) + RECIPVECS(2,3)*RECIPVECS(2,3)))
-     
+
      NMAX = INT(KCUTOFF / SQRT(RECIPVECS(3,1)*RECIPVECS(3,1) + &
           RECIPVECS(3,2)*RECIPVECS(3,2) + RECIPVECS(3,3)*RECIPVECS(3,3)))
-     
-     
-        
-!     PRINT*, "# Automatic real space cut-off = ", COULCUT
-        
+
+
   ENDIF
-  
+
+  CALL GET_K_LISTS(RECIPVECS)
+
 END SUBROUTINE INITCOULOMB
-  
