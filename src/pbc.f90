@@ -63,13 +63,13 @@ SUBROUTINE PBC
 
      ! If we're outside the box, add or subtract the corresponding vector accordingly
 
-     IF (S(1) .GT. ONE) CR(:,I) = CR(:,I) - BOX(1,:) 
+     IF (S(1) .GE. ONE) CR(:,I) = CR(:,I) - BOX(1,:) 
      IF (S(1) .LT. ZERO) CR(:,I) = CR(:,I) + BOX(1,:)
 
-     IF (S(2) .GT. ONE) CR(:,I) = CR(:,I) - BOX(2,:)
+     IF (S(2) .GE. ONE) CR(:,I) = CR(:,I) - BOX(2,:)
      IF (S(2) .LT. ZERO) CR(:,I) = CR(:,I) + BOX(2,:)
 
-     IF (S(3) .GT. ONE) CR(:,I) = CR(:,I) - BOX(3,:)
+     IF (S(3) .GE. ONE) CR(:,I) = CR(:,I) - BOX(3,:)
      IF (S(3) .LT. ZERO) CR(:,I) = CR(:,I) + BOX(3,:)
 
   ENDDO

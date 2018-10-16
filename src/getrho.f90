@@ -50,7 +50,7 @@ SUBROUTINE GETRHO(MDITER)
       CALL SPINRHOEVECS
       WRITE(*,*)"This is using the original LATTE routine. Spin-polarized non yet with PROGRESS/BML"
     ENDIF
-#else
+#elif defined(PROGRESSOFF)
      CALL DIAGMYH()
 
      IF (SPINON .EQ. 0) THEN
@@ -82,7 +82,7 @@ SUBROUTINE GETRHO(MDITER)
 
         CALL SP2PRG
 
-#else
+#elif defined(PROGRESSOFF)
 
         IF (MDITER .LE. 10) THEN
            CALL SP2PURE_SPARSE_PARALLEL(MDITER)

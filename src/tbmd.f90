@@ -343,6 +343,8 @@ SUBROUTINE TBMD
            CALL PAIRPOTSPLINE
         ENDIF
 
+        IF (PLUSDON .EQ. 1) CALL PAIRPOTPLUSD
+
         CALL GETKE
 
         CALL TOTENG
@@ -372,7 +374,7 @@ SUBROUTINE TBMD
 
         ENDIF
 
-        TOTE = TRRHOH + EREP + KEE - ENTE - ECOUL + ESPIN
+        TOTE = TRRHOH + EREP + KEE - ENTE - ECOUL + ESPIN + EPLUSD
 
         !         write(*,*)"Ekin", KEE
         !         write(*,*)"Epot", TRRHOH + EREP - ENTE - ECOUL + ESPIN
@@ -394,13 +396,13 @@ SUBROUTINE TBMD
 
               IF (NVTON .NE. 4) THEN
 
-                 WRITE(6,99)"Data", THETIME, TOTE, TEMPERATURE, PRESSURE, EGAP, &
+                 WRITE(6,99) THETIME, TOTE, TEMPERATURE, PRESSURE, EGAP, &
                       CHEMPOT !, TRRHOH, EREP, KEE, ECOUL, REAL(NUMSCF)
 
               ELSE
 
                  ! Special case for Nose Hoover
-                 WRITE(6,99)"Data", THETIME, TOTE, TOTE+CONSMOT, TEMPERATURE, PRESSURE, &
+                 WRITE(6,99) THETIME, TOTE, TOTE+CONSMOT, TEMPERATURE, PRESSURE, &
                       EGAP, CHEMPOT !, STRTEN(1), STRTEN(2), STRTEN(3), STRTEN(4), &
                  !STRTEN(5), STRTEN(6)
 
@@ -410,14 +412,14 @@ SUBROUTINE TBMD
 
            IF (NVTON .EQ. 0 .AND. NPTON .EQ. 0 .AND. GETHUG .EQ. 0) THEN
 
-              WRITE(6,99)"Data", THETIME, TOTE, TEMPERATURE, PRESSURE, EGAP, &
+              WRITE(6,99) THETIME, TOTE, TEMPERATURE, PRESSURE, EGAP, &
                    CHEMPOT
 
            ENDIF
 
            IF (NPTON .NE. 0 .AND. NVTON .EQ. 0 .AND. GETHUG .EQ. 0) THEN
 
-              WRITE(6,99)"Data", THETIME, TOTE, TEMPERATURE, PRESSURE, &
+              WRITE(6,99) THETIME, TOTE, TEMPERATURE, PRESSURE, &
                    EGAP, MASSDEN, BOX(1,1), BOX(2,2), BOX(3,3), &
                    SYSVOL
 
@@ -425,7 +427,7 @@ SUBROUTINE TBMD
 
            IF (GETHUG .EQ. 1 .AND. NVTON .EQ. 0 .AND. NPTON .EQ. 0) THEN
 
-              WRITE(6,99)"Data", THETIME, TOTE, TEMPERATURE, PRESSURE, &
+              WRITE(6,99) THETIME, TOTE, TEMPERATURE, PRESSURE, &
                    EGAP, MASSDEN, HG, TTARGET, BOX(1,1), BOX(2,2), BOX(3,3), &
                    SYSVOL
 
@@ -440,7 +442,7 @@ SUBROUTINE TBMD
         ENDIF
 
 
-99      FORMAT(A4,20G18.9)
+99      FORMAT(20G18.9)
 
 16      FORMAT(F12.5, F20.8, 1X, F9.1, 1X, F12.3, 1X, G18.9, 1X, G18.9)
 

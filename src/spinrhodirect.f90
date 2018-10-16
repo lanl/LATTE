@@ -226,26 +226,25 @@ SUBROUTINE SPINRHOEVECS
      ! Works with O and O2.
 
      BREAKLOOP = 0
-     IF ( UPNE + DOWNNE .EQ. TOTNE ) BREAKLOOP = 1
 
      DO WHILE ( BREAKLOOP .EQ. 0 )
 
-        IF ( UPEVALS(UPNE + 1) .GE. CHEMPOT .AND. &
-             UPEVALS(UPNE + 1) .LE. DOWNEVALS(DOWNNE + 1)) THEN
+        IF (UPEVALS(UPNE + 1) .LE. DOWNEVALS(DOWNNE + 1)) THEN
            UPNE = UPNE + 1
            CHEMPOT = UPEVALS(UPNE)
         ENDIF
 
-        IF ( UPNE + DOWNNE .EQ. TOTNE ) BREAKLOOP = 1
+        IF ( UPNE + DOWNNE .EQ. INT(TOTNE) ) BREAKLOOP = 1
 
-        IF ( BREAKLOOP .EQ. 0 .AND. &
-             DOWNEVALS(DOWNNE + 1) .GE. CHEMPOT .AND. &
+        IF (BREAKLOOP .EQ. 0 .AND. &
              DOWNEVALS(DOWNNE + 1) .LE. UPEVALS(UPNE + 1)) THEN
            DOWNNE = DOWNNE + 1
            CHEMPOT = DOWNEVALS(DOWNNE)
         ENDIF
 
-        IF ( UPNE + DOWNNE .EQ. TOTNE ) BREAKLOOP = 1
+        IF ( UPNE + DOWNNE .EQ. INT(TOTNE) ) BREAKLOOP = 1
+
+!        print*, upne, downne, totne
 
      ENDDO
 

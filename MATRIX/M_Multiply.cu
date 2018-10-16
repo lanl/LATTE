@@ -154,6 +154,24 @@ void M_Multiply(REAL *scalar1, Matrix A, Matrix B, REAL *scalar2, Matrix C) {
 
 }
 
+void M_Multiply(int tposea, int tposeb, REAL *alpha, Matrix A, Matrix B, REAL *beta, Matrix C) {
+
+     cudaSetDevice(0);
+
+//     printf("tposea = %d  tposeb  = %d \n", tposea, tposeb);
+     if (tposea == 0 && tposeb == 0 ) {
+       cublasDgemm(handle[0], CUBLAS_OP_N, CUBLAS_OP_N, A.DM, B.DN, A.DN, alpha, 
+		   A.Device[0], A.DM, B.Device[0], B.DM, beta, C.Device[0], C.DM);
+     } else if (tposea == 1 && tposeb == 0 ) {
+       cublasDgemm(handle[0], CUBLAS_OP_T, CUBLAS_OP_N, A.DM, B.DN, A.DN, alpha,
+                   A.Device[0], A.DM, B.Device[0], B.DM, beta, C.Device[0], C.DM);
+     } else if (tposea == 0 && tposeb == 1 ) {
+       cublasDgemm(handle[0], CUBLAS_OP_N, CUBLAS_OP_T, A.DM, B.DN, A.DN, alpha,
+                   A.Device[0], A.DM, B.Device[0], B.DM, beta, C.Device[0], C.DM);
+     }
+
+}     
+
 void M_Multiply(REAL k, Matrix A, Matrix B) {
 
   int msize = A.DM * A.DN;

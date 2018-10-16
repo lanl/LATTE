@@ -1,4 +1,4 @@
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Copyright 2010.  Los Alamos National Security, LLC. This material was    !
 ! produced under U.S. Government contract DE-AC52-06NA25396 for Los Alamos !
 ! National Laboratory (LANL), which is operated by Los Alamos National     !
@@ -17,35 +17,12 @@
 ! useful, but WITHOUT ANY WARRANTY; without even the implied warranty of   !
 ! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General !
 ! Public License for more details.                                         !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
-MODULE NONOARRAY
+#include "Matrix.h"
 
-  USE MYPRECISION 
+extern "C" void mmlatte_(int *hdim, int *tposea, int *tposeb, void *alpha, void *beta, void *amat_pointer, void *bmat_pointer, void *cmat_pointer) {
+  genmatmult(*hdim, *tposea, *tposeb, *((double *)alpha), *((double *)beta), (double *)amat_pointer, (double *)bmat_pointer, (double *)cmat_pointer);
+  }
 
-  IMPLICIT NONE
-  SAVE
-
-  ! Work arrays are for DSYEV when generating s^-1/2
-  ! SMAT contains the overlap matrix S
-  ! UMAT contains eigenvectors of S and NONO_EVALS its eigenvalues
-  ! XMAT contains transformation matrix X^dag S X = 1
-  ! NONOTMP is an array for storing AB in the product ABC...
-  ! HORTHO contains X^dag H X
-
-  INTEGER :: NONO_LWORK, NONO_LIWORK
-  INTEGER :: NONZERO
-  INTEGER, ALLOCATABLE  :: NONO_IWORK(:)
-  REAL(LATTEPREC), ALLOCATABLE :: NONO_WORK(:)
-  REAL(LATTEPREC), ALLOCATABLE :: UMAT(:,:), NONO_EVALS(:)
-  REAL(LATTEPREC), ALLOCATABLE :: XMAT(:,:), SMAT(:,:), NONOTMP(:,:)
-  REAL(LATTEPREC), ALLOCATABLE :: ORTHOH(:,:)
-  REAL(LATTEPREC), ALLOCATABLE :: ORTHOHUP(:,:), ORTHOHDOWN(:,:)
-  REAL(LATTEPREC), ALLOCATABLE :: HJJ(:), SH2(:,:)
-  REAL(LATTEPREC), ALLOCATABLE :: ORTHOBO(:,:)
-
-  ! For the Pulay force = 2Tr[S^-1 H rho dS/dR ]
-
-  REAL(LATTEPREC), ALLOCATABLE :: X2HRHO(:,:), SPINTMP(:,:)
-
-END MODULE NONOARRAY
+ 

@@ -144,11 +144,11 @@ SUBROUTINE MSRELAX
 
         IF (ELECTRO .EQ. 0) THEN
 
-           TOTE = TRRHOH + EREP - ENTE
+           TOTE = TRRHOH + EREP - ENTE + EPLUSD
 
         ELSEIF (ELECTRO .EQ. 1) THEN
 
-           TOTE = TRRHOH + EREP - ECOUL - ENTE
+           TOTE = TRRHOH + EREP - ECOUL - ENTE + EPLUSD
 
         ENDIF
 
@@ -241,12 +241,12 @@ SUBROUTINE MSRELAX
 
            IF (ELECTRO .EQ. 0) THEN
 
-              TOTE = TRRHOH + EREP - ENTE
+              TOTE = TRRHOH + EREP - ENTE + EPLUSD
 
 
            ELSEIF (ELECTRO .EQ. 1) THEN
 
-              TOTE = TRRHOH + EREP - ECOUL - ENTE
+              TOTE = TRRHOH + EREP - ECOUL - ENTE + EPLUSD
 
 
            ENDIF

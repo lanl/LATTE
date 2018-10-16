@@ -25,6 +25,7 @@ SUBROUTINE FERMIEXPANS
   USE SETUPARRAY
   USE FERMICOMMON
   USE SPINARRAY
+  USE NONOARRAY
   USE MYPRECISION
 
   IMPLICIT NONE
@@ -38,7 +39,7 @@ SUBROUTINE FERMIEXPANS
   REAL(LATTEPREC), PARAMETER :: MAXSHIFT = ONE
   IF (EXISTERROR) RETURN
 
-  OCC = BNDFIL*FLOAT(HDIM)
+  OCC = BNDFIL*REAL(HDIM)
 
   ITER = 0
 
@@ -65,8 +66,13 @@ SUBROUTINE FERMIEXPANS
 
      IF (SPINON .EQ. 0) THEN
 
-        BO = -BOVER2M*H
+        IF (BASISTYPE .EQ. "ORTHO") THEN
+           BO = -BOVER2M*H
+        ELSEIF (BASISTYPE .EQ. "NONORTHO") THEN
+           BO = -BOVER2M*ORTHOH
+        ENDIF
 
+           
 	HFACT = HALF + BOVER2M*CHEMPOT
 
 	DO I = 1, HDIM
@@ -118,6 +124,8 @@ SUBROUTINE FERMIEXPANS
 
 #endif
 
+!     print*, BO(1,1), BO(1,2)
+
      ! Modifying chemical potential
 
      TRX = ZERO
@@ -146,11 +154,16 @@ SUBROUTINE FERMIEXPANS
 
         SHIFTCP = KBT*(OCC - TRX)/TRXOMX
 
+!        IF (SHIFTCP .LT. -MAXSHIFT) SHIFTCP = -MAXSHIFT
+!        IF (SHIFTCP .GT. MAXSHIFT) SHIFTCP = MAXSHIFT
+
         PREVERROR3 = PREVERROR2
         PREVERROR2 = PREVERROR
         PREVERROR = OCCERROR
         OCCERROR = ABS(OCC - TRX)
         !        PRINT*, ITER, OCCERROR
+
+!        print*, iter, shiftcp, occerror
 
      ELSE
 
@@ -192,6 +205,8 @@ SUBROUTINE FERMIEXPANS
 
      CHEMPOT = CHEMPOT + SHIFTCP
 
+!     print*, iter, chempot, shiftcp, occerror
+
 #ifdef DOUBLEPREC
 
      IF (ITER .GE. 3 .AND. OCCERROR .LT. BREAKTOL) THEN
@@ -215,8 +230,21 @@ SUBROUTINE FERMIEXPANS
   ENDDO
 
   IF (SPINON .EQ. 0) THEN
+     
      BO = TWO*BO
+
+     IF (BASISTYPE .EQ. "NONORTHO") THEN
+
+        IF ( .NOT. ALLOCATED(ORTHOBO)) ALLOCATE(ORTHOBO(HDIM, HDIM))
+
+        ORTHOBO = BO ! We're going to save this to get the entropy later
+        
+     ENDIF
+
   ENDIF
+
+  
+
 
   RETURN
 

@@ -69,7 +69,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
               ELSE
                  CALL ORTHOMYH
               ENDIF
-#else
+#elif defined(PROGRESSOFF)
+
               CALL ORTHOMYH
 #endif
 
@@ -107,7 +108,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
               ELSE
                  CALL DEORTHOMYRHO
               ENDIF
-#else
+#elif defined(PROGRESSOFF)
               CALL DEORTHOMYRHO
 #endif
            ELSEIF (KON .EQ. 1) THEN
@@ -195,7 +196,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
               ELSE
                  CALL ORTHOMYH
               ENDIF
-#else
+#elif defined(PROGRESSOFF)
               CALL ORTHOMYH
 #endif
            ELSEIF (KON .EQ. 1) THEN
@@ -226,6 +227,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ! Save our old charges/spins so we can mix them later
         !
 
+!        CALL ENTROPY
+
         IF (BASISTYPE.EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
 #ifdef PROGRESSON
@@ -234,7 +237,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
               ELSE
                  CALL DEORTHOMYRHO
               ENDIF
-#else
+#elif defined(PROGRESSOFF)
+
               CALL DEORTHOMYRHO
 #endif
            ELSEIF (KON .EQ. 1) THEN
@@ -270,7 +274,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            ELSE
               DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
            ENDIF
-#else
+#elif defined(PROGRESSOFF)
            DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
 #endif
 
@@ -282,7 +286,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            ELSE
               DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
            ENDIF
-#else
+#elif defined(PROGRESSOFF)
            DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
 #endif
 
@@ -370,7 +374,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
               ELSE
                  CALL ORTHOMYH
               ENDIF
-#else
+#elif defined(PROGRESSOFF)
               CALL ORTHOMYH
 #endif
 
@@ -407,7 +411,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
               ELSE
                  CALL DEORTHOMYRHO
               ENDIF
-#else
+#elif defined(PROGRESSOFF)
               CALL DEORTHOMYRHO
 #endif
            ELSEIF (KON .EQ. 1) THEN
@@ -465,7 +469,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            ELSE
               CALL ORTHOMYH
            ENDIF
-#else
+#elif defined(PROGRESSOFF)
            CALL ORTHOMYH
 #endif
 
@@ -496,7 +500,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            ELSE
               CALL DEORTHOMYRHO
            ENDIF
-#else
+#elif defined(PROGRESSOFF)
            CALL DEORTHOMYRHO
 #endif
         ELSEIF (KON .EQ. 1) THEN
