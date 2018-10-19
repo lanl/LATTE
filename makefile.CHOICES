@@ -9,7 +9,7 @@ PRECISION = DOUBLE
 # Make the latte library
 # AR and RUNLIB executable default path to compile 
 # latte as a library (change accordingly)
-MAKELIB = ON
+MAKELIB = OFF
 AR = /usr/bin/ar cq
 RANLIB = /usr/bin/ranlib
 
@@ -37,11 +37,11 @@ MPIOPT = OFF
 
 #For GNU compiler:
 #FC = mpif90
-FC = gfortran
+FC = xlf90_r
 FCL = $(FC)
-FFLAGS = -O3 -fopenmp -cpp
+FFLAGS = -qsmp -O4
 #FFLAGS =  -fast -Mpreprocess -mp
-LINKFLAG = -fopenmp
+LINKFLAG = -qsmp
 
 #For intel compiler:
 #FC = ifort
@@ -51,7 +51,7 @@ LINKFLAG = -fopenmp
 #LIB = -mkl=parallel
 
 #GNU BLAS/LAPACK libraries:
-LIB = -llapack -lblas
+LIB = -lessl
 
 #Intel MKL BLAS/LAPACK libraries:
 #LIB = -Wl,--no-as-needed -L${MKLROOT}/lib/intel64 \
@@ -89,5 +89,5 @@ endif
 # GPU options
 #
 
-GPU_CUDA_LIB = -L/opt/cudatoolkit-5.5/lib64 -lcublas -lcudart
-GPU_ARCH = sm_20 
+GPU_CUDA_LIB = -L/usr/local/cuda-9.2/lib64 -lcudart -lcublas
+GPU_ARCH = sm_70

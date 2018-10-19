@@ -1,11 +1,11 @@
 #
 # This is the main makefile for the serial version of LATTE
 #
-.SUFFIXES: .fortran90 .f90
+.SUFFIXES: .fortran90 .F
 
 include ../makefile.CHOICES
 
-PPFLAGS = -DXSYEVD -DXHEEVD -D$(PRECISION)PREC -DGPU$(GPUOPT) -DDBCSR_$(DBCSR_OPT) -DMPI_$(MPIOPT)
+PPFLAGS = -WF,-DXSYEVD,-DXHEEVD,-D$(PRECISION)PREC,-DGPU$(GPUOPT),-DDBCSR_$(DBCSR_OPT),-DMPI_$(MPIOPT)
 PPFLAGS += -DPROGRESS$(PROGRESS)
 
 # Flags for linking GPU libraries
@@ -13,66 +13,66 @@ GPU_LINKFLAG = -L../MATRIX -lgfortran -lstdc++
 GPU_LIB = -L../MATRIX -lmatrix_cuda.$(PRECISION) $(GPU_CUDA_LIB)
 
 
-MYMODULES = myprecision.f90 constants_mod.f90 setuparray.f90 coulombarray.f90 \
-diagarray.f90 fermicommon.f90 mdarray.f90 neblistarray.f90 \
-nonoarray.f90 ppotarray.f90 purearray.f90 relaxcommon.f90 restartarray.f90 \
-sparsearray.f90 spinarray.f90 univarray.f90 virialarray.f90 xboarray.f90 \
-kspacearray.f90 timer_mod.f90 subgraph.f90 matrixio.f90 sparsemath.f90 \
-sparsesp2.f90 subgraphsp2.f90 homolumo.f90 openfiles_mod.f90 kernelparser_mod.f90 \
-latteparser_latte_mod.f90 mixer_mod.f90 sp2progress.f90 genXprogress.f90  \
-bodirectprogress.f90 constraints_mod.f90 latte_lib.f90 
+MYMODULES = myprecision.F constants_mod.F setuparray.F coulombarray.F \
+diagarray.F fermicommon.F mdarray.F neblistarray.F \
+nonoarray.F ppotarray.F purearray.F relaxcommon.F restartarray.F \
+sparsearray.F spinarray.F univarray.F virialarray.F xboarray.F \
+kspacearray.F timer_mod.F subgraph.F matrixio.F sparsemath.F \
+sparsesp2.F subgraphsp2.F homolumo.F openfiles_mod.F kernelparser_mod.F \
+latteparser_latte_mod.F mixer_mod.F sp2progress.F genXprogress.F  \
+bodirectprogress.F constraints_mod.F latte_lib.F 
 
-DBCSRMODS = dbcsr_var_mod.f90 init_dbcsr.f90 shutdown_dbcsr.f90
+DBCSRMODS = dbcsr_var_mod.F init_dbcsr.F shutdown_dbcsr.F
 
-MYSUBS = allocatediag.f90 allocatenono.f90 allocatepure.f90 bodirect.f90 \
-deallocatediag.f90 deallocatepure.f90 deorthomyrho.f90 deallocatenono.f90 \
-diagmyh.f90 entropy.f90 fermiexpans.f90 genX.f90  latte.f90 orthomyH.f90 \
- orthomyrho.f90  pulay.f90 pulay_sp.f90 solvematcg.f90 solvematlapack.f90 \
-sp2T.f90 pulay_spprogress.f90 \
-sp2fermi.f90 sp2fermi_init.f90 sp2pure.f90 sp2pure_sparse.f90 kdiagmyh.f90 \
- kbodirect.f90 sp2gap.f90 sp2gap_setup.f90 readrestart.f90 initrng.f90 \
-parawrite.f90 parafileopen.f90 wrtcfgs.f90 wrtrestart.f90 pbc.f90 \
-addqdep.f90 allocatecoulomb.f90 allocatenebarrays.f90  allocatexbo.f90  \
-atomcharge.f90 avepress.f90 avetemp.f90 bldnewH.f90 bldspinH.f90 \
-conjgradient.f90 coulomb_ewald.f90 coulomb_oldskool.f90 coulomb_rspace.f90 \
-coultailcoef.f90 deallocateall.f90 deallocatecoulomb.f90 \
-deallocatenebarrays.f90  deallocatexbo.f90 fcoulnono.f90 fcoulnono_sp.f90 \
-fermiallocate.f90 fermideallocate.f90 \
-fspinnono.f90 fspinnono_sp.f90  gershgorin.f90 getbndfil.f90 \
-getcoule.f90 getdensity.f90 getdeltaq.f90 getdeltaspin.f90 gethdim.f90 \
-getke.f90 getmaxf.f90 getmdf.f90 getpressure.f90 getrho.f90 getspinE.f90  \
- ifrestart.f90 initcoulomb.f90 initialv.f90 initshockcomp.f90 msrelax.f90 \
-neblists.f90 noelec.f90 norms.f90 nptrescale.f90  nvtrescale.f90 \
-pairpot.f90 panic.f90 plot_ppot.f90 plot_univ.f90 printsparse.f90 \
- propchempot_xbo.f90 propspins_xbo.f90 qconsistency.f90 readcontrols.f90 \
-readcr.f90 readmdcontroller.f90 readppot.f90  readtb.f90 resetprodhd.f90 \
-rhozero.f90 shockcomp.f90  spinrhodirect.f90 stdescent.f90 \
-summary.f90 tbmd.f90 toteng.f90 univscaling_function.f90 univtailcoef.f90  \
-vdwtailcoef.f90 velverlet.f90  xbo.f90 am.f90 bm.f90 factorial.f90 \
- slmmp.f90 tlmmp.f90 wignerd.f90 dfda.f90 dfdb.f90 dfdr.f90 \
-dunivscaling_function.f90 dslmmpda.f90 dslmmpdb.f90 dtlmmpda.f90 \
-dtlmmpdb.f90 dwignerddb.f90 gradH.f90 kbldnewh.f90  kgetrho.f90 kgradH.f90  \
-bldnewHS_sp.f90 gradH_sp.f90 univscaling.f90 dunivscaling.f90 kgetdos.f90 \
-qneutral.f90 shiftH.f90 getmatindlist.f90 nvtlangevin.f90 nvtandersen.f90 \
-nvtNH.f90 sp2pure_sparse_parallel.f90 sp2pure_sparse_parallel_simple.f90 \
-sp2pure_subgraph_parallel.f90 gaussrn.f90 nnz.f90 allocatesubgraph.f90 \
-deallocatesubgraph.f90 dosfit.f90 mofit.f90 getrespf.f90 gendiag.f90 \
-mofit_plato.f90 ppfit.f90 pairpot_noneb.f90 allfit.f90 \
-readppottab.f90 pairpottab.f90 hugrescale.f90 avesforhug.f90 getdipole.f90 \
-fittingoutput.f90 tabtest.f90 kgenX.f90 korthomyH.f90 kdeorthomyrho.f90 \
-kfcoulnono.f90 kpulay.f90 getforce.f90 masses2symbols.f90 setuptbmd.f90 \
-wrtrestartlib.f90 deorthomyrhoprogress.f90 orthomyHprogress.f90 readrestartlib.f90 \
-readppotspline.f90 pairpotspline.f90 errors.f90 initcoulombklist.f90 \
-flcnnono.f90 flcnnono_sp.f90 kflcnnono.f90 dosfittab.f90 \
-readppotD.f90 pairpot_plusD.f90
+MYSUBS = allocatediag.F allocatenono.F allocatepure.F bodirect.F \
+deallocatediag.F deallocatepure.F deorthomyrho.F deallocatenono.F \
+diagmyh.F entropy.F fermiexpans.F genX.F  latte.F orthomyH.F \
+ orthomyrho.F  pulay.F pulay_sp.F solvematcg.F solvematlapack.F \
+sp2T.F pulay_spprogress.F \
+sp2fermi.F sp2fermi_init.F sp2pure.F sp2pure_sparse.F kdiagmyh.F \
+ kbodirect.F sp2gap.F sp2gap_setup.F readrestart.F initrng.F \
+parawrite.F parafileopen.F wrtcfgs.F wrtrestart.F pbc.F \
+addqdep.F allocatecoulomb.F allocatenebarrays.F  allocatexbo.F  \
+atomcharge.F avepress.F avetemp.F bldnewH.F bldspinH.F \
+conjgradient.F coulomb_ewald.F coulomb_oldskool.F coulomb_rspace.F \
+coultailcoef.F deallocateall.F deallocatecoulomb.F \
+deallocatenebarrays.F  deallocatexbo.F fcoulnono.F fcoulnono_sp.F \
+fermiallocate.F fermideallocate.F \
+fspinnono.F fspinnono_sp.F  gershgorin.F getbndfil.F \
+getcoule.F getdensity.F getdeltaq.F getdeltaspin.F gethdim.F \
+getke.F getmaxf.F getmdf.F getpressure.F getrho.F getspinE.F  \
+ ifrestart.F initcoulomb.F initialv.F initshockcomp.F msrelax.F \
+neblists.F noelec.F norms.F nptrescale.F  nvtrescale.F \
+pairpot.F panic.F plot_ppot.F plot_univ.F printsparse.F \
+ propchempot_xbo.F propspins_xbo.F qconsistency.F readcontrols.F \
+readcr.F readmdcontroller.F readppot.F  readtb.F resetprodhd.F \
+rhozero.F shockcomp.F  spinrhodirect.F stdescent.F \
+summary.F tbmd.F toteng.F univscaling_function.F univtailcoef.F  \
+vdwtailcoef.F velverlet.F  xbo.F am.F bm.F factorial.F \
+ slmmp.F tlmmp.F wignerd.F dfda.F dfdb.F dfdr.F \
+dunivscaling_function.F dslmmpda.F dslmmpdb.F dtlmmpda.F \
+dtlmmpdb.F dwignerddb.F gradH.F kbldnewh.F  kgetrho.F kgradH.F  \
+bldnewHS_sp.F gradH_sp.F univscaling.F dunivscaling.F kgetdos.F \
+qneutral.F shiftH.F getmatindlist.F nvtlangevin.F nvtandersen.F \
+nvtNH.F sp2pure_sparse_parallel.F sp2pure_sparse_parallel_simple.F \
+sp2pure_subgraph_parallel.F gaussrn.F nnz.F allocatesubgraph.F \
+deallocatesubgraph.F dosfit.F mofit.F getrespf.F gendiag.F \
+mofit_plato.F ppfit.F pairpot_noneb.F allfit.F \
+readppottab.F pairpottab.F hugrescale.F avesforhug.F getdipole.F \
+fittingoutput.F tabtest.F kgenX.F korthomyH.F kdeorthomyrho.F \
+kfcoulnono.F kpulay.F getforce.F masses2symbols.F setuptbmd.F \
+wrtrestartlib.F deorthomyrhoprogress.F orthomyHprogress.F readrestartlib.F \
+readppotspline.F pairpotspline.F errors.F initcoulombklist.F \
+flcnnono.F flcnnono_sp.F kflcnnono.F dosfittab.F \
+readppotD.F pairpot_plusD.F
 
 # dependencies
 # DEP_FILE = makefile.dep
 # include $(DEP_FILE)
 
-XMYMODULES = 		$(MYMODULES:.f90=.o)
-XDBCSRMODS = 		$(DBCSRMODS:.f90=.o)
-XMYSUBS = 		$(MYSUBS:.f90=.o)
+XMYMODULES = 		$(MYMODULES:.F=.o)
+XDBCSRMODS = 		$(DBCSRMODS:.F=.o)
+XMYSUBS = 		$(MYSUBS:.F=.o)
 
 
 ifeq ($(DBCSR_OPT), ON)
@@ -104,7 +104,7 @@ endif
 ifeq ($(MAKELIB), ON)
 		$(AR) ../liblatte.a latte_lib.o $(XMYMODULES) $(XMYSUBS)
 		$(RANLIB) ../liblatte.a
-		$(FC) $(FFLAGS) -c latte_c_bind.f90
+		$(FC) $(FFLAGS) -c latte_c_bind.F
 endif
 
 

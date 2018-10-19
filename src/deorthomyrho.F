@@ -1,0 +1,118 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    
+! Copyright 2010.  Los Alamos National Security, LLC. This material was    !    
+! produced under U.S. Government contract DE-AC52-06NA25396 for Los Alamos !    
+! National Laboratory (LANL), which is operated by Los Alamos National     !    
+! Security, LLC for the U.S. Department of Energy. The U.S. Government has !    
+! rights to use, reproduce, and distribute this software.  NEITHER THE     !    
+! GOVERNMENT NOR LOS ALAMOS NATIONAL SECURITY, LLC MAKES ANY WARRANTY,     !    
+! EXPRESS OR IMPLIED, OR ASSUMES ANY LIABILITY FOR THE USE OF THIS         !    
+! SOFTWARE.  If software is modified to produce derivative works, such     !    
+! modified software should be clearly marked, so as not to confuse it      !    
+! with the version available from LANL.                                    !    
+!                                                                          !    
+! Additionally, this program is free software; you can redistribute it     !    
+! and/or modify it under the terms of the GNU General Public License as    !    
+! published by the Free Software Foundation; version 2.0 of the License.   !    
+! Accordingly, this program is distributed in the hope that it will be     !    
+! useful, but WITHOUT ANY WARRANTY; without even the implied warranty of   !    
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General !    
+! Public License for more details.                                         !    
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    
+
+SUBROUTINE DEORTHOMYRHO
+
+  USE CONSTANTS_MOD
+  USE SETUPARRAY
+  USE NONOARRAY
+  USE SPINARRAY
+  USE MYPRECISION
+
+  IMPLICIT NONE
+  IF (EXISTERROR) RETURN
+
+  !
+  ! RHO = X ORTHORHO X^dag
+  !
+
+  IF (SPINON .EQ. 0) THEN
+
+#ifdef DOUBLEPREC
+
+#ifdef GPUON
+
+     CALL mmlatte(HDIM, 0, 0, ONE, ZERO, XMAT, BO, NONOTMP)
+
+     CALL mmlatte(HDIM, 0, 1, ONE, ZERO, NONOTMP, XMAT, BO)
+
+#elif defined(GPUOFF)
+
+     CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
+          XMAT, HDIM, BO, HDIM, ZERO, NONOTMP, HDIM)
+
+     CALL DGEMM('N', 'T', HDIM, HDIM, HDIM, ONE, &
+          NONOTMP, HDIM, XMAT, HDIM, ZERO, BO, HDIM)
+
+#endif
+
+#elif defined(SINGLEPREC)
+
+     CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
+          XMAT, HDIM, BO, HDIM, ZERO, NONOTMP, HDIM)
+
+     CALL SGEMM('N', 'T', HDIM, HDIM, HDIM, ONE, &
+          NONOTMP, HDIM, XMAT, HDIM, ZERO, BO, HDIM)
+
+#endif
+
+  ELSE
+
+#ifdef DOUBLEPREC
+
+#ifdef GPUON
+
+     CALL mmlatte(HDIM, 0, 0, ONE, ZERO, XMAT, RHOUP, NONOTMP)
+
+     CALL mmlatte(HDIM, 0, 1, ONE, ZERO, NONOTMP, XMAT, RHOUP)
+
+     CALL mmlatte(HDIM, 0, 0, ONE, ZERO, XMAT, RHODOWN, NONOTMP)
+
+     CALL mmlatte(HDIM, 0, 1, ONE, ZERO, NONOTMP, XMAT, RHODOWN)
+
+#elif defined(GPUOFF)
+
+     CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
+          XMAT, HDIM, RHOUP, HDIM, ZERO, NONOTMP, HDIM)
+
+     CALL DGEMM('N', 'T', HDIM, HDIM, HDIM, ONE, &
+          NONOTMP, HDIM, XMAT, HDIM, ZERO, RHOUP, HDIM)
+
+     CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
+          XMAT, HDIM, RHODOWN, HDIM, ZERO, NONOTMP, HDIM)
+
+     CALL DGEMM('N', 'T', HDIM, HDIM, HDIM, ONE, &
+          NONOTMP, HDIM, XMAT, HDIM, ZERO, RHODOWN, HDIM)
+
+#endif
+
+#elif defined(SINGLEPREC)
+
+     CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
+          XMAT, HDIM, RHOUP, HDIM, ZERO, NONOTMP, HDIM)
+
+     CALL SGEMM('N', 'T', HDIM, HDIM, HDIM, ONE, &
+          NONOTMP, HDIM, XMAT, HDIM, ZERO, RHOUP, HDIM)
+
+     CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
+          XMAT, HDIM, RHODOWN, HDIM, ZERO, NONOTMP, HDIM)
+
+     CALL SGEMM('N', 'T', HDIM, HDIM, HDIM, ONE, &
+          NONOTMP, HDIM, XMAT, HDIM, ZERO, RHODOWN, HDIM)     
+
+#endif
+
+  ENDIF
+
+  RETURN
+
+END SUBROUTINE DEORTHOMYRHO
+
