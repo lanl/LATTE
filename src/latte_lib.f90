@@ -215,7 +215,7 @@ CONTAINS
           !Forces, charges and element pointers are allocated in readcr
           CALL READCR
 
-          CALL FLUSH(6)
+          FLUSH(6)
 
        ELSE
 
@@ -243,7 +243,7 @@ CONTAINS
 
        CALL GETBNDFIL()
 
-       CALL FLUSH(6)
+       FLUSH(6)
 
 #ifdef GPUON
 
@@ -287,7 +287,7 @@ CONTAINS
        IF(.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
        CR = CR_IN
 
-       CALL FLUSH(6)
+       FLUSH(6)
 
     ENDIF
     !End of initialization
@@ -585,7 +585,7 @@ CONTAINS
           IF (VERBOSE >= 1) WRITE(*,*)"NOTE: DT = 0 => MDMIX = QMIX"
           FULLQCONV = 1
           MDMIX = QMIX
-          CALL FLUSH(6)
+          FLUSH(6)
        ENDIF
 
        IF (LIBCALLS == 0) THEN
@@ -610,7 +610,7 @@ CONTAINS
           IF (VERBOSE >= 1)WRITE(*,*)"Setting up TBMD ..."
           CALL SETUPTBMD(NEWSYSTEM)
 
-          CALL FLUSH(6)
+          FLUSH(6)
 
        ELSEIF (LIBCALLS > 0 .AND. RESTARTLIB == 0) THEN
 
@@ -776,7 +776,7 @@ CONTAINS
        !  ENDIF
 #endif
 
-       CALL FLUSH(6) !To force writing to file at every call
+       FLUSH(6) !To force writing to file at every call
 
        EXISTERROR_INOUT = EXISTERROR
 

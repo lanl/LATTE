@@ -41,7 +41,7 @@ SUBROUTINE ERRORS(SUB,TAG)
      WRITE(*,*) "# The error will be reported back to the host code"
      WRITE(*,*) "# ********************************"
      WRITE(*,*) ""
-     CALL FLUSH(6)
+     FLUSH(6)
      EXISTERROR = .TRUE.
   ELSE
      WRITE(*,*) ""
