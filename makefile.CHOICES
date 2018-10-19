@@ -38,11 +38,11 @@ MPIOPT = OFF
 #For GNU compiler:
 #FC = mpif90
 FC = xlf90_r
-FCL = $(FC)
-FFLAGS = -qsmp -O4
+FCL = $(FC) 
+FFLAGS = -qsmp=omp -O4
 #FFLAGS =  -fast -Mpreprocess -mp
-LINKFLAG = -qsmp
-
+LINKFLAG = -qsmp=omp
+ 
 #For intel compiler:
 #FC = ifort
 #FCL = $(FC)
@@ -51,7 +51,7 @@ LINKFLAG = -qsmp
 #LIB = -mkl=parallel
 
 #GNU BLAS/LAPACK libraries:
-LIB = -lessl
+LIB = -lesslsmp
 
 #Intel MKL BLAS/LAPACK libraries:
 #LIB = -Wl,--no-as-needed -L${MKLROOT}/lib/intel64 \
