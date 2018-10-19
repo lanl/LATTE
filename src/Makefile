@@ -9,8 +9,8 @@ PPFLAGS = -WF,-DXSYEVD,-DXHEEVD,-D$(PRECISION)PREC,-DGPU$(GPUOPT),-DDBCSR_$(DBCS
 PPFLAGS += -DPROGRESS$(PROGRESS)
 
 # Flags for linking GPU libraries
-GPU_LINKFLAG = -L../MATRIX -lgfortran -lstdc++
-GPU_LIB = -L../MATRIX -lmatrix_cuda.$(PRECISION) $(GPU_CUDA_LIB)
+GPU_LINKFLAG = -L../MATRIX -lxl 
+GPU_LIB =  $(GPU_CUDA_LIB) -L../MATRIX -lmatrix_cuda.$(PRECISION) -lxlopt -lxlf90_r -lxlfmath -lxl -lxlsmp
 
 
 MYMODULES = myprecision.F constants_mod.F setuparray.F coulombarray.F \
