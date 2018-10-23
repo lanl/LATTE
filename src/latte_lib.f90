@@ -150,7 +150,11 @@ CONTAINS
 
        LIBCALLS = 0 ; MAXITER = -10
 
-       OPEN(UNIT=6, FILE="log.latte", FORM="formatted")
+       IF(VERBOSE <= 0)THEN
+         OPEN(UNIT=6, FILE="/dev/null", FORM="formatted")
+       ELSE
+         OPEN(UNIT=6, FILE="log.latte", FORM="formatted")
+       ENDIF
 
        IF(VERBOSE >= 1)THEN
           WRITE(*,*)"# The log file for latte_lib"
