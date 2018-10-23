@@ -150,13 +150,7 @@ CONTAINS
 
        LIBCALLS = 0 ; MAXITER = -10
 
-       OPEN(UNIT=6, FILE="log.latte", FORM="formatted")
-
-       IF(VERBOSE >= 1)THEN
-          WRITE(*,*)"# The log file for latte_lib"
-          WRITE(*,*)""
-          CALL TIMEDATE_TAG("LATTE started at : ")
-       ENDIF
+       OPEN(UNIT=6, FILE="/dev/null", FORM="formatted")
 
        INQUIRE( FILE="animate/.", exist=LATTEINEXISTS)
        IF (.NOT. LATTEINEXISTS) CALL SYSTEM("mkdir animate")
@@ -179,6 +173,17 @@ CONTAINS
 
        ELSE
           CALL READCONTROLS
+       ENDIF
+
+       IF(VERBOSE >= 0)THEN
+          CLOSE(6)
+          OPEN(UNIT=6, FILE="log.latte", FORM="formatted")
+       ENDIF
+
+       IF(VERBOSE >= 1)THEN
+          WRITE(*,*)"# The log file for latte_lib"
+          WRITE(*,*)""
+          CALL TIMEDATE_TAG("LATTE started at : ")
        ENDIF
 
        CALL READTB
