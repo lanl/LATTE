@@ -40,7 +40,7 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
   ! If FULLQCONV = 1, then we're going to iterate until all charges are within
   ! QTOL.
   !
-  ! If FULLQCONV = 0, then we're going to run only a user specified number 
+  ! If FULLQCONV = 0, then we're going to run only a user specified number
   ! of iterations (= QITER)
   !
   ! If SWITCH = 0, then we don't have any partial charges defined yet so
@@ -208,6 +208,8 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
            WRITE(6,*) "Continuing anyway, but be very careful... "
 
            ALLOK = 0
+
+           CALL ERRORS("qneutral","The SCF procedure has not converged")
 
         ENDIF
 
