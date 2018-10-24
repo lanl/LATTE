@@ -209,7 +209,7 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
 
            ALLOK = 0
 
-           CALL ERRORS("qneutral","The SCF procedure has not converged")
+           IF (STOPATMAXSCF) CALL ERRORS("qneutral","The SCF procedure has not converged")
 
         ENDIF
 
