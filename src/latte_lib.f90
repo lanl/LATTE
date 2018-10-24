@@ -150,8 +150,6 @@ CONTAINS
 
        LIBCALLS = 0 ; MAXITER = -10
 
-       OPEN(UNIT=6, FILE="/dev/null", FORM="formatted")
-
        INQUIRE( FILE="animate/.", exist=LATTEINEXISTS)
        IF (.NOT. LATTEINEXISTS) CALL SYSTEM("mkdir animate")
 
@@ -168,15 +166,16 @@ CONTAINS
           CALL PARSE_CONTROL("latte.in")
 
 #ifdef PROGRESSON
-          CALL PRG_PARSE_MIXER(MX,"latte.in")
+       CALL PRG_PARSE_MIXER(MX,"latte.in")
 #endif
 
        ELSE
           CALL READCONTROLS
        ENDIF
 
-       IF(VERBOSE >= 0)THEN
-          CLOSE(6)
+       IF(VERBOSE <= 0)THEN
+          OPEN(UNIT=6, FILE="/dev/null", FORM="formatted")
+       ELSE
           OPEN(UNIT=6, FILE="log.latte", FORM="formatted")
        ENDIF
 
