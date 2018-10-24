@@ -318,6 +318,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
            ALLOK = 0
 
+           IF (STOPATMAXSCF) CALL ERRORS("qconsistency","The SCF procedure has not converged")
+
         ENDIF
 
 

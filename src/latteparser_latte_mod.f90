@@ -123,7 +123,7 @@ CONTAINS
     USE FERMICOMMON
 
     IMPLICIT NONE
-    INTEGER, PARAMETER :: NKEY_CHAR = 7, NKEY_INT = 53, NKEY_RE = 21, NKEY_LOG = 1
+    INTEGER, PARAMETER :: NKEY_CHAR = 7, NKEY_INT = 53, NKEY_RE = 21, NKEY_LOG = 2
     CHARACTER(LEN=*) :: FILENAME
 
     !Library of keywords with the respective defaults.
@@ -163,9 +163,9 @@ CONTAINS
          1.0e-7,1000.0,0.2,1000.0,0.01,1.0/)
 
     CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_LOG(NKEY_LOG) = [CHARACTER(LEN=100) :: &
-         'LIBINIT=']
+         'LIBINIT=','STOPATMAXSCF=']
     LOGICAL :: VALVECTOR_LOG(NKEY_LOG) = (/&
-         .FALSE./)
+         .FALSE.,.FALSE./)
 
     !Start and stop characters
     CHARACTER(LEN=50), PARAMETER :: STARTSTOP(2) = [CHARACTER(LEN=50) :: &
@@ -509,6 +509,8 @@ CONTAINS
 
     SCLTYPE = VALVECTOR_CHAR(7)
 
+    STOPATMAXSCF = VALVECTOR_LOG(2)
+
   END SUBROUTINE PARSE_CONTROL
 
 
@@ -602,8 +604,8 @@ CONTAINS
     !
 
     WRTFREQ = VALVECTOR_INT(5)
-    IF ( WRTFREQ <= 0 ) THEN 
-      CALL ERRORS("latteparser_latte_mod","You cannot have WRTFREQ <= 0.& 
+    IF ( WRTFREQ <= 0 ) THEN
+      CALL ERRORS("latteparser_latte_mod","You cannot have WRTFREQ <= 0.&
                    &Set this variable to a very high value to avoid frequent printing")
     ENDIF
     !   write(*,*)"WRTFREQ",WRTFREQ
