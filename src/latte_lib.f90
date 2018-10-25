@@ -166,7 +166,7 @@ CONTAINS
           CALL PARSE_CONTROL("latte.in")
 
 #ifdef PROGRESSON
-       CALL PRG_PARSE_MIXER(MX,"latte.in")
+          CALL PRG_PARSE_MIXER(MX,"latte.in")
 #endif
 
        ELSE
@@ -718,51 +718,54 @@ CONTAINS
 
 #ifdef PROGRESSON
        IF(MOD(LIBCALLS,WRTFREQ) == 0)THEN
-          IF(VERBOSE >= 1)WRITE(*,*)"Writing trajectory into trajectory.pdb ..."
-          SY%NATS = NATS
-          IF(.NOT. ALLOCATED(SY%COORDINATE))ALLOCATE(SY%COORDINATE(3,NATS))
-          SY%COORDINATE = CR
-          SY%SYMBOL = ATELE
-          SY%LATTICE_VECTOR = BOX
-          SY%NET_CHARGE = DELTAQ
-          CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT_IN,"trajectory","pdb")
+          IF(VERBOSE >= 1) THEN
+             WRITE(*,*)"Writing trajectory into trajectory.pdb ..."
+             SY%NATS = NATS
+             IF(.NOT. ALLOCATED(SY%COORDINATE))ALLOCATE(SY%COORDINATE(3,NATS))
+             SY%COORDINATE = CR
+             SY%SYMBOL = ATELE
+             SY%LATTICE_VECTOR = BOX
+             SY%NET_CHARGE = DELTAQ
+             CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT_IN,"trajectory","pdb")
 
-          IF(VERBOSE >= 1)WRITE(*,*)"Writing trajectory into trajectory.xyz ..."
-          IF(LIBCALLS .EQ. 0)THEN
-             OPEN(UNIT=20,FILE="trajectory.xyz",STATUS='unknown')
-          ELSE
-             OPEN(UNIT=20,FILE="trajectory.xyz",ACCESS='append',STATUS='old')
+             WRITE(*,*)"Writing trajectory into trajectory.xyz ..."
+             IF(LIBCALLS .EQ. 0)THEN
+                OPEN(UNIT=20,FILE="trajectory.xyz",STATUS='unknown')
+             ELSE
+                OPEN(UNIT=20,FILE="trajectory.xyz",ACCESS='append',STATUS='old')
+             ENDIF
+             !Extended xyz file.
+             WRITE(20,*)NATS
+             WRITE(20,*) 'Lattice="',BOX(1,1),BOX(1,2),BOX(1,3),&
+                  &BOX(2,1),BOX(2,2),BOX(2,3),BOX(3,1),BOX(3,2),BOX(3,3),'"',&
+                  &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT_IN
+             DO I=1,NATS
+                WRITE(20,*)ATELE(I),CR(1,I),CR(2,I),CR(3,I),V(1,I),V(2,I),V(3,I),&
+                     &FTOT(1,I),FTOT(2,I),FTOT(3,I),-DELTAQ(I)
+             ENDDO
+             CLOSE(20)
           ENDIF
-          !Extended xyz file.
-          WRITE(20,*)NATS
-          WRITE(20,*) 'Lattice="',BOX(1,1),BOX(1,2),BOX(1,3),&
-               &BOX(2,1),BOX(2,2),BOX(2,3),BOX(3,1),BOX(3,2),BOX(3,3),'"',&
-               &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT_IN
-          DO I=1,NATS
-             WRITE(20,*)ATELE(I),CR(1,I),CR(2,I),CR(3,I),V(1,I),V(2,I),V(3,I),&
-                  &FTOT(1,I),FTOT(2,I),FTOT(3,I),-DELTAQ(I)
-          ENDDO
-          CLOSE(20)
-
        ENDIF
 #else
        IF(MOD(LIBCALLS,WRTFREQ) == 0)THEN
-          IF(VERBOSE >= 1)WRITE(*,*)"Writing trajectory into trajectory.xyz ..."
-          IF(LIBCALLS .EQ. 0)THEN
-             OPEN(UNIT=20,FILE="trajectory.xyz",STATUS='unknown')
-          ELSE
-             OPEN(UNIT=20,FILE="trajectory.xyz",ACCESS='append',STATUS='old')
+          IF(VERBOSE >= 1) THEN
+             WRITE(*,*)"Writing trajectory into trajectory.xyz ..."
+             IF(LIBCALLS .EQ. 0)THEN
+                OPEN(UNIT=20,FILE="trajectory.xyz",STATUS='unknown')
+             ELSE
+                OPEN(UNIT=20,FILE="trajectory.xyz",ACCESS='append',STATUS='old')
+             ENDIF
+             !Extended xyz file.
+             WRITE(20,*)NATS
+             WRITE(20,*) 'Lattice="',BOX(1,1),BOX(1,2),BOX(1,3),&
+                  &BOX(2,1),BOX(2,2),BOX(2,3),BOX(3,1),BOX(3,2),BOX(3,3),'"',&
+                  &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT_IN
+             DO I=1,NATS
+                WRITE(20,*)ATELE(I),CR(1,I),CR(2,I),CR(3,I),V(1,I),V(2,I),V(3,I),&
+                     &FTOT(1,I),FTOT(2,I),FTOT(3,I),-DELTAQ(I)
+             ENDDO
+             CLOSE(20)
           ENDIF
-          !Extended xyz file.
-          WRITE(20,*)NATS
-          WRITE(20,*) 'Lattice="',BOX(1,1),BOX(1,2),BOX(1,3),&
-               &BOX(2,1),BOX(2,2),BOX(2,3),BOX(3,1),BOX(3,2),BOX(3,3),'"',&
-               &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT_IN
-          DO I=1,NATS
-             WRITE(20,*)ATELE(I),CR(1,I),CR(2,I),CR(3,I),V(1,I),V(2,I),V(3,I),&
-                  &FTOT(1,I),FTOT(2,I),FTOT(3,I),-DELTAQ(I)
-          ENDDO
-          CLOSE(20)
        ENDIF
 #endif
 
@@ -781,7 +784,7 @@ CONTAINS
        ENDIF
 
        IF (MOD(LIBCALLS, RSFREQ) .EQ. 0)THEN
-          CALL WRTRESTARTLIB(LIBCALLS)
+          IF(VERBOSE >= 0) CALL WRTRESTARTLIB(LIBCALLS)
        ENDIF
 
        IF(RESTARTLIB == 1 .AND. LIBCALLS == 0)THEN
