@@ -1,0 +1,19 @@
+Dear Mark,
+
+Here is a recent highlight of how XL-BOMD can be used
+in orbital-corrected DFT simulations. I have been able
+to generalize our framework of the "Next generation 
+extended Lagrangian first principles molecular dynamics"
+to DFT+U theory. In this way it will be possible to perform 
+accurate energy conserving molecular dynamics simulations 
+for systems including strong electron correlation, while
+completely avoiding the overhead associated with the
+SCF optimization normally required prior to each force evaluation.
+In orbital-corrected DFT this overhead can be significant.
+I believe this first proof of principle demonstration should 
+be straightforward to extend also to other DFT corrections such 
+as self-interaction corrections or even Gutzwiller theory. 
+Once the first initial and fully relaxed ground state optimization 
+has been performed the subsequent force evaluations in a molecular 
+dynamics simulations can be performed at only a fraction of the
+cost in a regular simulation. 
