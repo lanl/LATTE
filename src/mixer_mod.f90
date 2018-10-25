@@ -53,6 +53,7 @@ CONTAINS
     !Folding back to linear
     IF(PITER >= MAXSCF/2) MYMIXERTYPE = "Linear"
 
+    WRITE(*,*)"MixerType=", MYMIXERTYPE
 
     IF(MYMIXERTYPE == "Linear")THEN
 
