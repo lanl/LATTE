@@ -24,6 +24,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   USE CONSTANTS_MOD
   USE SETUPARRAY
   USE SPINARRAY
+  USE DMARRAY
   USE COULOMBARRAY
   USE TIMER_MOD
   USE MYPRECISION
@@ -88,6 +89,9 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ELSE
            CALL KGETRHO
         ENDIF
+
+        !!! ANDERS CHECK
+        DOrth_old = BO
 
         TX = STOP_TIMER(DMBUILD_TIMER)
 
@@ -174,6 +178,12 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         CALL ADDQDEP
 
+        !!!! ANDERS CHECK
+        !write(*,*) 'a H = ', H(1:3,1)
+        CALL ADDDFTBU_INIT
+        !write(*,*) 'b H = ', H(1:3,1)
+        !!!! ANDERS CHECK
+
         ! Got to add the electrostatic potential to
         ! the Slater-Koster H before adding H_2 to form
         ! H_up and H_down
@@ -216,6 +226,9 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ELSE
            CALL KGETRHO
         ENDIF
+
+        !!! ANDERS CHECK
+        DOrth = BO
 
         TX = STOP_TIMER(DMBUILD_TIMER)
 
@@ -272,6 +285,12 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            ENDIF
 #else
            DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
+           !!! ANDERS CHECK
+           BO = DOrth_old + QMIX*(DOrth - DOrth_old)
+           DOrth_old = BO
+           CALL DEORTHOMYRHO
+           !!! ANDERS CHECK END
+           !WRITE(*,*) 'qconsitency  LINEAR MIX QMIX = ', QMIX
 #endif
 
         ELSE
@@ -352,6 +371,12 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         CALL ADDQDEP
+
+        !!!! ANDERS CHECK
+        !write(*,*) ' qconsistency I H = ', H(1:3,1)
+        CALL ADDDFTBU
+        !write(*,*) ' qconsistency II H = ', H(1:3,1)
+        !!!! ANDERS CHECK
 
         !
         ! Building the spin up and spin down H's after we've
@@ -451,6 +476,12 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
      ENDIF
 
      CALL ADDQDEP
+
+     !!!! ANDERS CHECK
+     !   write(*,*) ' qconsistency V H = ', H(1:3,1)
+     CALL ADDDFTBU
+     !   write(*,*) ' qconsistency VV H = ', H(1:3,1)
+     !!!! ANDERS CHECK
 
      ! This is the right order
 

@@ -126,7 +126,8 @@ SUBROUTINE INITCOULOMB
 
         !   TIMERATIO = 50.0
         !   TIMERATIO = 1.00D0
-        TIMERATIO = 3.50D0 
+        !!!ANDERS CHECK: changed to 10.0 from 3.5 
+        TIMERATIO = 10.00D0 
 
         CALPHA = SQRTPI*((TIMERATIO * REAL(NATS) / (COULVOL*COULVOL))**(ONE/SIX))
         COULCUT = SQRTP/CALPHA

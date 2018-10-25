@@ -32,6 +32,7 @@ SUBROUTINE TBMD
   USE NONOARRAY
   USE MYPRECISION
   USE LATTEPARSER_LATTE_MOD
+  USE DMARRAY
 
   IMPLICIT NONE
 
@@ -42,6 +43,7 @@ SUBROUTINE TBMD
   REAL(LATTEPREC) :: THETIME, NEWESPIN, NEWECOUL
   REAL(LATTEPREC) :: RN, MYVOL
   INTEGER :: FLAGAND
+
 
   IF (EXISTERROR) RETURN
 
@@ -345,7 +347,7 @@ SUBROUTINE TBMD
 
         CALL GETKE
 
-        CALL TOTENG
+        CALL TOTENG   !!! ANDERS CHECK Now also for TRRHOH0 = tr[D*H0]
 
         ! For the 0 SCF MD the coulomb energy is calculated in GETMDF
 
@@ -372,9 +374,15 @@ SUBROUTINE TBMD
 
         ENDIF
 
-        TOTE = TRRHOH + EREP + KEE - ENTE - ECOUL + ESPIN
+        write(*,*) ' TBMD HUBBARD ENERGY'
+        call HUBBARDFORCE
+        write(*,*) ' TBMD HUBBARD ENERGY = ', EHub
 
-        !         write(*,*)"Ekin", KEE
+        TOTE = TRRHOH + EREP + KEE - ENTE - ECOUL + ESPIN + 2.D0*Ehub
+        
+        !!! ANDERS NEW ENERGY EXPRESSION !!!
+        write(*,*) 'tbmd TOTE A = ', TOTE
+        write(*,*) 'tbmd TOTE B = ', TRRHOH0 + ECOUL + EREP + KEE - ENTE + ESPIN + 2.D0*Ehub
         !         write(*,*)"Epot", TRRHOH + EREP - ENTE - ECOUL + ESPIN
         !         write(*,*)"components",TRRHOH, EREP, ENTE, ECOUL
 
@@ -413,6 +421,7 @@ SUBROUTINE TBMD
               WRITE(6,99)"Data", THETIME, TOTE, TEMPERATURE, PRESSURE, EGAP, &
                    CHEMPOT
 
+
            ENDIF
 
            IF (NPTON .NE. 0 .AND. NVTON .EQ. 0 .AND. GETHUG .EQ. 0) THEN
@@ -420,6 +429,7 @@ SUBROUTINE TBMD
               WRITE(6,99)"Data", THETIME, TOTE, TEMPERATURE, PRESSURE, &
                    EGAP, MASSDEN, BOX(1,1), BOX(2,2), BOX(3,3), &
                    SYSVOL
+        
 
            ENDIF
 

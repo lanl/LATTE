@@ -31,7 +31,7 @@ SUBROUTINE DIAGMYH()
 
   IMPLICIT NONE
 
-  INTEGER :: INFO
+  INTEGER :: INFO, OCC
   INTEGER :: I, J, K, M
   !  REAL(8), ALLOCATABLE :: TMPHMAT(:,:), TMPEVALS(:), DWORK(:)
   CHARACTER(LEN=1), PARAMETER :: JOBZ = "V",  UPLO = "U"
@@ -165,6 +165,14 @@ SUBROUTINE DIAGMYH()
 #endif
 
   ENDIF
+
+  !! ANDERS CHECK
+  OCC = BNDFIL*FLOAT(HDIM)
+  write(*,*) ' DIAGMYH E = '
+  !DO I = 1,HDIM
+  !  write(*,*) I, EVALS(I)
+  !ENDDO
+  write(*,*) ' GAP = ', EVALS(OCC+1)-EVALS(OCC)
 
 
   RETURN

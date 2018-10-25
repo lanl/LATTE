@@ -252,7 +252,7 @@ PROGRAM LATTE
 
      IF (CONTROL .NE. 1 .AND. CONTROL .NE. 2 .AND. KBT .GT. 0.000001 ) THEN
 
- 	! We get the entropy automatically when using diagonalization.
+        ! We get the entropy automatically when using diagonalization.
         ! This is only required when employing the recursive expansion
         ! of the Fermi-operator at finite electronic temperature
 
@@ -333,7 +333,13 @@ PROGRAM LATTE
 
      IF (BASISTYPE .EQ. "NONORTHO") CALL ALLOCATENONO
 
-     IF (XBOON .EQ. 1) CALL ALLOCATEXBO
+     IF (XBOON .EQ. 1) THEN
+             CALL ALLOCATEXBO
+            ! ANDERS CHECK  START
+             CALL ALLOCATEDM
+             CALL INITIATEDM
+            ! ANDERS CHECK  END
+     ENDIF
 
      IF (ELECTRO .EQ. 1) THEN
         CALL ALLOCATECOULOMB
@@ -431,7 +437,7 @@ PROGRAM LATTE
 
 #endif
 
-  ! Done with timers
+  ! Done with timers     !!!! ANDERS CHECK SOMETHING WRONG ABOUT THE TIMER?
   TX = STOP_TIMER(LATTE_TIMER)
   TX = TIMER_RESULTS()
   TX = SHUTDOWN_TIMER()

@@ -21,17 +21,21 @@
 
 SUBROUTINE GETMDF(SWITCH, CURRITER)
 
+
   USE CONSTANTS_MOD
   USE SETUPARRAY
   USE PPOTARRAY
   USE XBOARRAY
+  USE DMARRAY
   USE MYPRECISION
   USE COULOMBARRAY
+  USE NONOARRAY
 
   IMPLICIT NONE
 
   INTEGER :: SWITCH, CURRITER, I
   REAL(LATTEPREC) :: ZEROSCFMOD
+
   IF (EXISTERROR) RETURN
   !
   ! The atoms have moved, so we have to build a new H (and overlap matrix)
@@ -60,6 +64,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
      CALL BLDSPINH
   ENDIF
 
+
   IF (CONTROL .EQ. 5 .AND. CURRITER .EQ. 1) THEN
 
      ! We do this to initialize SP2 Fermi
@@ -84,8 +89,13 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
      IF (XBOON .EQ. 1) THEN ! We will add other types of XBO later
 
         ! Propagating partial charges or diagonal elements of H
-        IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."
+        IF(VERBOSE >= 1) WRITE(*,*)"Doing XBO ..."
+        ! ANDERS CHECK START
+        CALL XBODM(CURRITER) ! Propagate q's
+        WRITE(*,*) 'DM  GETMDF DELATQ = ', DELTAQDM(1:4)
+        ! ANDERS CHECK END
         CALL XBO(CURRITER) ! Propagate q's
+        WRITE(*,*) 'qq GETMDF DELATQ = ', DELTAQ(1:4)
 
         !
         ! If we are also propagating the chemical potential
@@ -124,7 +134,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
      CALL QCONSISTENCY(SWITCH, CURRITER) ! Self consistent charge transfer
   ENDIF
 
-  ! Run to self-consistency QITER = 0 -> only H(P) + D calculated ANDERS
+  ! Run to self-consistency QITER = 0 -> only H(P) + D calculated ANDER_S
 
   !
   ! Setting up our XBO arrays after the first iteration
@@ -137,6 +147,10 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
      IF (XBOON .EQ. 1) THEN ! Other cases to come
 
         IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."
+        !!! ANDERS CHECK START
+        CALL XBODM(1)
+        WRITE(*,*) 'DM  ITER = 1, GETMDF DELATQ = ', DELTAQDM(1:4)
+        !!! ANDERS CHECK END
         CALL XBO(1)
 
         IF (CONTROL .EQ. 1 .OR. CONTROL .EQ. 3 &

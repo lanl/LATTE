@@ -17,6 +17,7 @@ MYMODULES = myprecision.f90 constants_mod.f90 setuparray.f90 coulombarray.f90 \
 diagarray.f90 fermicommon.f90 mdarray.f90 neblistarray.f90 \
 nonoarray.f90 ppotarray.f90 purearray.f90 relaxcommon.f90 restartarray.f90 \
 sparsearray.f90 spinarray.f90 univarray.f90 virialarray.f90 xboarray.f90 \
+dmarray.f90 \
 kspacearray.f90 timer_mod.f90 subgraph.f90 matrixio.f90 sparsemath.f90 \
 sparsesp2.f90 subgraphsp2.f90 homolumo.f90 openfiles_mod.f90 kernelparser_mod.f90 \
 latteparser_latte_mod.f90 mixer_mod.f90 sp2progress.f90 genXprogress.f90  \
@@ -32,7 +33,10 @@ sp2T.f90 pulay_spprogress.f90 \
 sp2fermi.f90 sp2fermi_init.f90 sp2pure.f90 sp2pure_sparse.f90 kdiagmyh.f90 \
  kbodirect.f90 sp2gap.f90 sp2gap_setup.f90 readrestart.f90 initrng.f90 \
 parawrite.f90 parafileopen.f90 wrtcfgs.f90 wrtrestart.f90 pbc.f90 \
-addqdep.f90 allocatecoulomb.f90 allocatenebarrays.f90  allocatexbo.f90  \
+addqdep.f90 adddftbu_init.f90 adddftbu.f90 allocatecoulomb.f90 \
+hubbardforce.f90 \
+allocatenebarrays.f90  allocatexbo.f90  \
+allocatedm.f90 deallocatedm.f90 initiatedm.f90\
 atomcharge.f90 avepress.f90 avetemp.f90 bldnewH.f90 bldspinH.f90 \
 conjgradient.f90 coulomb_ewald.f90 coulomb_oldskool.f90 coulomb_rspace.f90 \
 coultailcoef.f90 deallocateall.f90 deallocatecoulomb.f90 \
@@ -48,7 +52,7 @@ pairpot.f90 panic.f90 plot_ppot.f90 plot_univ.f90 printsparse.f90 \
 readcr.f90 readmdcontroller.f90 readppot.f90  readtb.f90 resetprodhd.f90 \
 rhozero.f90 shockcomp.f90  spinrhodirect.f90 stdescent.f90 \
 summary.f90 tbmd.f90 toteng.f90 univscaling_function.f90 univtailcoef.f90  \
-vdwtailcoef.f90 velverlet.f90  xbo.f90 am.f90 bm.f90 factorial.f90 \
+vdwtailcoef.f90 velverlet.f90  xbo.f90 xbodm.f90 am.f90 bm.f90 factorial.f90 \
  slmmp.f90 tlmmp.f90 wignerd.f90 dfda.f90 dfdb.f90 dfdr.f90 \
 dunivscaling_function.f90 dslmmpda.f90 dslmmpdb.f90 dtlmmpda.f90 \
 dtlmmpdb.f90 dwignerddb.f90 gradH.f90 kbldnewh.f90  kgetrho.f90 kgradH.f90  \
