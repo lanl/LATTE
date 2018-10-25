@@ -45,13 +45,104 @@ CONTAINS
   SUBROUTINE QMIXPRG(PITER)
     IMPLICIT NONE
     INTEGER, INTENT(IN) :: PITER
+    INTEGER :: I,J,NUMORB, INDEX
 
     IF(MX%MIXERTYPE == "Linear")THEN
+
        CALL PRG_LINEARMIXER(DELTAQ,OLDDELTAQS,SCFERROR,MX%MIXCOEFF,MX%VERBOSE)
+
     ELSEIF(MX%MIXERTYPE == "Pulay")THEN
+
        CALL PRG_QMIXER(DELTAQ,OLDDELTAQS,DQIN,DQOUT,SCFERROR,PITER,MX%MIXCOEFF,MX%MPULAY,MX%VERBOSE)
+
     ELSEIF(MX%MIXERTYPE == "PulayQlist")THEN
-       CALL PRG_QMIXER(QLIST,OLDDELTAQS,DQIN,DQOUT,SCFERROR,PITER,MX%MIXCOEFF,MX%MPULAY,MX%VERBOSE)
+
+       IF(PITER == 1) OLDQLIST = QLIST
+       CALL PRG_QMIXER(QLIST,OLDQLIST,DQIN,DQOUT,SCFERROR,PITER,MX%MIXCOEFF,MX%MPULAY,MX%VERBOSE)
+       IF(.NOT. ALLOCATED(MYCHARGE)) ALLOCATE(MYCHARGE(NATS))
+       INDEX = 0
+       MYCHARGE = 0.0d0
+
+       DO I = 1, NATS
+
+          SELECT CASE(BASIS(ELEMPOINTER(I)))
+
+          CASE("s")
+
+             NUMORB = 1
+
+          CASE("p")
+
+             NUMORB = 3
+
+          CASE("d")
+
+             NUMORB = 5
+
+          CASE("f")
+
+             NUMORB = 7
+
+          CASE("sp")
+
+             NUMORB = 4
+
+          CASE("sd")
+
+             NUMORB = 6
+
+          CASE("sf")
+
+             NUMORB = 8
+
+          CASE("pd")
+
+             NUMORB = 8
+
+          CASE("pf")
+
+             NUMORB = 10
+
+          CASE("df")
+
+             NUMORB = 12
+
+          CASE("spd")
+
+             NUMORB = 9
+
+          CASE("spf")
+
+             NUMORB = 11
+
+          CASE("sdf")
+
+             NUMORB = 13
+
+          CASE("pdf")
+
+             NUMORB = 15
+
+          CASE("spdf")
+
+             NUMORB = 16
+
+          END SELECT
+
+          !     MYCHARGE = ZERO
+          DO J = 1, NUMORB
+
+             INDEX = INDEX + 1
+             MYCHARGE(I) = MYCHARGE(I) + QLIST(INDEX)
+
+          ENDDO
+
+          DELTAQ(I) = MYCHARGE(I) - ATOCC(ELEMPOINTER(I))
+
+       ENDDO
+
+       OLDDELTAQS = DELTAQ
+
     ELSE
        CALL ERRORS("mixer_mod:qmixprg","Mixing scheme not implemented. &
             & Check MixerType keyword in the input file")
