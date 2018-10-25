@@ -48,7 +48,7 @@ SUBROUTINE GETRHO(MDITER)
     ELSE
       CALL DIAGMYH()
       CALL SPINRHOEVECS
-      WRITE(*,*)"This is using the original LATTE routine. Spin-polarized non yet with PROGRESS/BML"
+      IF(VERBOSE >= 0) WRITE(*,*)"This is using the original LATTE routine. Spin-polarized non yet with PROGRESS/BML"
     ENDIF
 #else
      CALL DIAGMYH()
