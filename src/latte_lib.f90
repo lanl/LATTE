@@ -150,8 +150,9 @@ CONTAINS
 
        LIBCALLS = 0 ; MAXITER = -10
 
-       INQUIRE( FILE="animate/.", exist=LATTEINEXISTS)
-       IF (.NOT. LATTEINEXISTS) CALL SYSTEM("mkdir animate")
+      ! Only LATTE main code will create the animate folder
+      !  INQUIRE( FILE="animate/.", exist=LATTEINEXISTS)
+      !  IF (.NOT. LATTEINEXISTS) CALL SYSTEM("mkdir animate")
 
        NUMSCF = 0
        CHEMPOT = ZERO
