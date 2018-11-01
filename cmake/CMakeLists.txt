@@ -118,6 +118,12 @@ wrtrestartlib.f90 deorthomyrhoprogress.f90 orthomyHprogress.f90 readrestartlib.f
 readppotspline.f90 pairpotspline.f90 errors.f90 initcoulombklist.f90
 flcnnono.f90 flcnnono_sp.f90 kflcnnono.f90 dosfittab.f90) 
 
+if(NOT DBCSR_OPT)
+  set(DBCSR)
+else()
+  set(DBCSR dbcsr_var_mod.f90 init_dbcsr.f90 shutdown_dbcsr.f90)
+endif()
+
 foreach(_m MYMODULES MYSUBS DBCSR)
   set(${_m}_SOURCES)
   foreach(_file ${${_m}})
@@ -125,11 +131,7 @@ foreach(_m MYMODULES MYSUBS DBCSR)
   endforeach()
 endforeach()
 
-if(NOT DBCSR_OPT)
-  set(DBCSR_SOURCES)
-endif()
-
-add_library(latte ${MYMODULES_SOURCES} ${MYSUBS_SOURCES}
+add_library(latte ${MYMODULES_SOURCES} ${MYSUBS_SOURCES} ${DBCSR_SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/../src/latte_lib.f90
   ${CMAKE_CURRENT_SOURCE_DIR}/../src/latte_c_bind.f90
 )
