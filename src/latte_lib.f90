@@ -470,17 +470,36 @@ CONTAINS
              CALL FCOULNONO_SP
              CALL PULAY_SP
              IF (SPINON .EQ. 1) CALL FSPINNONO_SP
+
+             FTOT = FTOT - TWO*FPUL
+             
+             IF (ELECTRO .EQ. 0) FTOT = FTOT + FSLCN
+             IF (ELECTRO .EQ. 1) FTOT = FTOT + FSCOUL
+             IF (SPINON .EQ. 1) FTOT = FTOT + FSSPIN
+             
           ELSE
              ! Otherwise use the complex but general expansions Josh
              ! Coe implemented
-             CALL FCOULNONO
+
              CALL PULAY
-             IF (SPINON .EQ. 1) CALL FSPINNONO
+
+             FTOT = FTOT + FPUL
+
+!             CALL FCOULNONO
+!             CALL PULAY
+!             IF (SPINON .EQ. 1) CALL FSPINNONO
           ENDIF
+          
+!          FTOT = FTOT - TWO*FPUL
+          
+!          IF (ELECTRO .EQ. 0) FTOT = FTOT + FSLCN
+!          IF (ELECTRO .EQ. 1) FTOT = FTOT + FSCOUL
+!          IF (SPINON .EQ. 1) FTOT = FTOT + FSSPIN
+          
+          
+          !FTOT = FTOT - TWO*FPUL + FSCOUL
 
-          FTOT = FTOT - TWO*FPUL + FSCOUL
-
-          IF (SPINON .EQ. 1) FTOT = FTOT + FSSPIN
+          !IF (SPINON .EQ. 1) FTOT = FTOT + FSSPIN
 
        ENDIF
 
