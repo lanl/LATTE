@@ -13,7 +13,7 @@ else
   REALSIZE = 8
 endif
 
-CUDA_CC= nvcc -arch $(GPU_ARCH) -O${CUDA_OPT_LEVEL} ${PROF} ${DEBUG} ${INCLUDES} -DREALSIZE=$(REALSIZE) -ccbin /projects/opt/ppc64le/ibm/xlc-16.1.0/xlC/16.1.0/bin/xlc
+CUDA_CC= nvcc -arch $(GPU_ARCH) -O${CUDA_OPT_LEVEL} ${PROF} ${DEBUG} ${INCLUDES} -DREALSIZE=$(REALSIZE) -ccbin /usr/tce/packages/xl/xl-beta-2018.09.26/bin/xlc
 
 KERNEL_SOURCES=$(wildcard Kernels/*.cu)
 KERNEL_OBJECTS=$(KERNEL_SOURCES:.cu=.$(REALSIZE).o)
