@@ -37,17 +37,20 @@ SUBROUTINE PULAY
   INTEGER :: PREVJ, NEWJ
   INTEGER :: PBCI, PBCJ, PBCK
   INTEGER :: BASISI(5), BASISJ(5), LBRAINC, LKETINC
-  REAL(LATTEPREC) :: ALPHA, BETA, PHI, RHO, COSBETA
+  INTEGER :: SPININDI, SPININDJ
+  REAL(LATTEPREC) :: ALPHA, BETA, PHI, RHO, RHODIFF, COSBETA
   REAL(LATTEPREC) :: RIJ(3), DC(3)
-  REAL(LATTEPREC) :: MAGR, MAGR2, MAGRP, MAGRP2, FTMP(3)
+  REAL(LATTEPREC) :: MAGR, MAGR2, MAGRP, MAGRP2
+  REAL(LATTEPREC) :: FTMP_PULAY(3), FTMP_COUL(3), FTMP_SPIN(3)
   REAL(LATTEPREC) :: MAXRCUT, MAXRCUT2
+  REAL(LATTEPREC) :: WSPINI, WSPINJ
   REAL(LATTEPREC) :: MYDFDA, MYDFDB, MYDFDR, RCUTTB
+  
   REAL(LATTEPREC), EXTERNAL :: DFDA, DFDB, DFDR
   LOGICAL PATH
   IF (EXISTERROR) RETURN
 
   FPUL = ZERO
-
   VIRPUL = ZERO
 
   ! We first have to make the matrix S^-1 H rho = X^2 H rho
@@ -269,15 +272,23 @@ SUBROUTINE PULAY
 
   ENDIF
 
+
 !$OMP PARALLEL DO DEFAULT (NONE) &
 !$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &
 !$OMP SHARED(CR, BOX, X2HRHO, NOINT, ATELE, ELE1, ELE2) &
+!$OMP SHARED(BO, RHOUP, RHODOWN, SPINON, ELECTRO) & 
 !$OMP SHARED(HCUT, SCUT, MATINDLIST, BASISTYPE) &
+!$OMP SHARED(DELTASPIN, WSS, WPP, WDD, WFF, SPININDLIST) &
+!$OMP SHARED(HUBBARDU, DELTAQ, COULOMBV) & 
+!$OMP SHARED(LCNSHIFT) & 
+!$OMP SHARED(FPUL) &
 !$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &
-!$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP2, MAGRP, PATH, PHI, ALPHA, BETA, COSBETA, FTMP) &
-!$OMP PRIVATE(DC, LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET, RHO) &
+!$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP2, MAGRP, PATH, PHI, ALPHA, BETA, COSBETA) &
+!$OMP PRIVATE(FTMP_PULAY, FTMP_COUL, FTMP_SPIN) &
+!$OMP PRIVATE(DC, LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET, RHO, RHODIFF) &
 !$OMP PRIVATE(MYDFDA, MYDFDB, MYDFDR, RCUTTB) &
-!$OMP REDUCTION(+:FPUL, VIRPUL)   
+!$OMP PRIVATE(WSPINI, WSPINJ, SPININDI, SPININDJ) &
+!$OMP REDUCTION(+:VIRPUL)
 
 
   DO I = 1, NATS
@@ -350,6 +361,7 @@ SUBROUTINE PULAY
      END SELECT
 
      INDI = MATINDLIST(I)
+     IF (SPINON .EQ. 1) SPININDI = SPININDLIST(I)
 
      DO NEWJ = 1, TOTNEBTB(I)
 
@@ -457,10 +469,11 @@ SUBROUTINE PULAY
            END SELECT
 
            INDJ = MATINDLIST(J)
+           IF (SPINON .EQ. 1) SPININDJ = SPININDLIST(J)
+
 
            MAGRP2 = RIJ(1)*RIJ(1) + RIJ(2)*RIJ(2)
            MAGRP = SQRT(MAGRP2)
-
 
            ! transform to system in which z-axis is aligned with RIJ
 
@@ -494,7 +507,10 @@ SUBROUTINE PULAY
            ! dfda contribution seems to be wrong, but gives the right 
            ! answer(?)
 
-           FTMP = ZERO
+           FTMP_PULAY = ZERO
+           FTMP_COUL = ZERO
+           FTMP_SPIN = ZERO
+
            K = INDI
 
            LBRAINC = 1
@@ -502,6 +518,24 @@ SUBROUTINE PULAY
 
               LBRA = BASISI(LBRAINC)
               LBRAINC = LBRAINC + 1
+
+              IF (SPINON .EQ. 1) THEN
+
+                 SELECT CASE(LBRA)
+                 CASE(0)
+                    WSPINI = WSS(ELEMPOINTER(I))
+                 CASE(1)
+                    WSPINI = WPP(ELEMPOINTER(I))
+                 CASE(2)
+                    WSPINI = WDD(ELEMPOINTER(I))
+                 CASE(3)
+                    WSPINI = WFF(ELEMPOINTER(I))
+                 END SELECT
+                 
+                 WSPINI = WSPINI*DELTASPIN(SPININDI + LBRAINC - 1)
+              
+              ENDIF
+
 
               DO MBRA = -LBRA, LBRA
 
@@ -514,11 +548,36 @@ SUBROUTINE PULAY
                     LKET = BASISJ(LKETINC)
                     LKETINC = LKETINC + 1
 
+                    IF (SPINON .EQ. 1) THEN
+                       
+                       SELECT CASE(LKET)
+                       CASE(0)
+                          WSPINJ = WSS(ELEMPOINTER(J))
+                       CASE(1)
+                          WSPINJ = WPP(ELEMPOINTER(J))
+                       CASE(2)
+                          WSPINJ = WDD(ELEMPOINTER(J))
+                       CASE(3)
+                          WSPINJ = WFF(ELEMPOINTER(J))
+                       END SELECT
+                       
+                       WSPINJ = WSPINJ*DELTASPIN(SPININDJ + LKETINC - 1)
+
+                    ENDIF
+
                     DO MKET = -LKET, LKET
 
                        L = L + 1
 
-                       RHO = X2HRHO(L, K)
+                       SELECT CASE(SPINON)
+                       CASE(0)
+                          RHO = BO(L, K)
+                       CASE(1)
+                          RHO = RHOUP(L, K) + RHODOWN(L, K)
+                          RHODIFF = (RHOUP(L, K) - RHODOWN(L, K))*(WSPINI + WSPINJ)
+                       END SELECT
+
+!                       RHO = X2HRHO(L, K)
 
                        IF (.NOT. PATH) THEN
 
@@ -537,40 +596,113 @@ SUBROUTINE PULAY
                           ! d/d_alpha
                           !
 
-                          FTMP(1) = FTMP(1) + RHO * &
+                          FTMP_PULAY(1) = FTMP_PULAY(1) + X2HRHO(L, K) * &
+                               (-RIJ(2) / MAGRP2 * MYDFDA)
+                          
+                          FTMP_PULAY(2) = FTMP_PULAY(2) + X2HRHO(L, K) * &
+                               (RIJ(1)/ MAGRP2 * MYDFDA)
+
+
+                          FTMP_COUL(1) = FTMP_COUL(1) + RHO * &
                                (-RIJ(2) / MAGRP2 * MYDFDA)
 
-                          FTMP(2) = FTMP(2) + RHO * &
+                          FTMP_COUL(2) = FTMP_COUL(2) + RHO * &
                                (RIJ(1)/ MAGRP2 * MYDFDA)
+
+                          IF (SPINON .EQ. 1) THEN
+
+                             FTMP_SPIN(1) = FTMP_SPIN(1) + RHODIFF * &
+                                  (-RIJ(2) / MAGRP2 * MYDFDA)
+                             
+                             FTMP_SPIN(2) = FTMP_SPIN(2) + RHODIFF * &
+                                  (RIJ(1)/ MAGRP2 * MYDFDA)
+
+                          ENDIF
+
 
                           !
                           ! d/d_beta
                           !
-
-                          FTMP(1) = FTMP(1) + RHO * &
+                          
+                          FTMP_PULAY(1) = FTMP_PULAY(1) + X2HRHO(L, K) * &
                                (((((RIJ(3) * RIJ(1)) / &
                                MAGR2)) / MAGRP) * MYDFDB)
 
-                          FTMP(2) = FTMP(2) + RHO * &
+
+                          FTMP_PULAY(2) = FTMP_PULAY(2) + X2HRHO(L, K) * &
+                               (((((RIJ(3) * RIJ(2)) / &
+                               MAGR2)) / MAGRP) * MYDFDB)
+                               
+                          FTMP_PULAY(3) = FTMP_PULAY(3) - X2HRHO(L, K) * &
+                               (((ONE - ((RIJ(3) * RIJ(3)) / &
+                               MAGR2)) / MAGRP) * MYDFDB)
+
+                          
+                          FTMP_COUL(1) = FTMP_COUL(1) + RHO * &
+                               (((((RIJ(3) * RIJ(1)) / &
+                               MAGR2)) / MAGRP) * MYDFDB)
+
+                          FTMP_COUL(2) = FTMP_COUL(2) + RHO * &
                                (((((RIJ(3) * RIJ(2)) / &
                                MAGR2)) / MAGRP) * MYDFDB)
 
-                          FTMP(3) = FTMP(3) - RHO * &
+                          FTMP_COUL(3) = FTMP_COUL(3) - RHO * &
                                (((ONE - ((RIJ(3) * RIJ(3)) / &
                                MAGR2)) / MAGRP) * MYDFDB)
+
+                          IF (SPINON .EQ. 1) THEN
+                             
+                             FTMP_SPIN(1) = FTMP_SPIN(1) + RHODIFF * &
+                                  (((((RIJ(3) * RIJ(1)) / &
+                                  MAGR2)) / MAGRP) * MYDFDB)
+                             
+                             FTMP_SPIN(2) = FTMP_SPIN(2) + RHODIFF * &
+                                  (((((RIJ(3) * RIJ(2)) / &
+                                  MAGR2)) / MAGRP) * MYDFDB)
+                             
+                             FTMP_SPIN(3) = FTMP_SPIN(3) - RHODIFF * &
+                                  (((ONE - ((RIJ(3) * RIJ(3)) / &
+                                  MAGR2)) / MAGRP) * MYDFDB)
+                             
+                          ENDIF
+
 
                           !
                           ! d/dR
                           !
 
-                          FTMP(1) = FTMP(1) - RHO * DC(1) * &
+                          FTMP_PULAY(1) = FTMP_PULAY(1) - X2HRHO(L, K) * DC(1) * &
                                MYDFDR
 
-                          FTMP(2) = FTMP(2) - RHO * DC(2) * &
+                          FTMP_PULAY(2) = FTMP_PULAY(2) - X2HRHO(L, K) * DC(2) * &
                                MYDFDR
 
-                          FTMP(3) = FTMP(3) - RHO * DC(3) * &
+                          FTMP_PULAY(3) = FTMP_PULAY(3) - X2HRHO(L, K) * DC(3) * &
                                MYDFDR
+                          
+
+                          FTMP_COUL(1) = FTMP_COUL(1) - RHO * DC(1) * &
+                               MYDFDR
+
+                          FTMP_COUL(2) = FTMP_COUL(2) - RHO * DC(2) * &
+                               MYDFDR
+
+                          FTMP_COUL(3) = FTMP_COUL(3) - RHO * DC(3) * &
+                               MYDFDR
+
+                          IF (SPINON .EQ. 1) THEN
+
+                             FTMP_SPIN(1) = FTMP_SPIN(1) - RHODIFF * DC(1) * &
+                                  MYDFDR
+
+                             FTMP_SPIN(2) = FTMP_SPIN(2) - RHODIFF * DC(2) * &
+                                  MYDFDR
+                             
+                             FTMP_SPIN(3) = FTMP_SPIN(3) - RHODIFF * DC(3) * &
+                                  MYDFDR
+                             
+                          ENDIF
+                             
 
                        ELSE
 
@@ -582,17 +714,35 @@ SUBROUTINE PULAY
                           MYDFDB = DFDB(I, J, LBRA, LKET, &
                                MBRA, MKET, MAGR, ZERO, COSBETA, "S") / MAGR
 
-                          FTMP(1) = FTMP(1) - RHO * (COSBETA * MYDFDB)
+                          FTMP_PULAY(1) = FTMP_PULAY(1) - X2HRHO(L, K) * (COSBETA * MYDFDB)
+
+                          FTMP_COUL(1) = FTMP_COUL(1) - RHO * (COSBETA * MYDFDB)
+
+                          IF (SPINON .EQ. 1) THEN 
+                             FTMP_SPIN(1) = FTMP_SPIN(1) - RHODIFF * (COSBETA * MYDFDB)
+                          ENDIF
 
                           MYDFDB = DFDB(I, J, LBRA, LKET, &
                                MBRA, MKET, MAGR, PI/TWO, COSBETA, "S") / MAGR
 
-                          FTMP(2) = FTMP(2) - RHO * (COSBETA * MYDFDB)
+                          FTMP_PULAY(2) = FTMP_PULAY(2) - X2HRHO(L, K) * (COSBETA * MYDFDB)
 
+                          FTMP_COUL(2) = FTMP_COUL(2) - RHO * (COSBETA * MYDFDB)
+
+                          IF (SPINON .EQ. 1) THEN
+                             FTMP_SPIN(2) = FTMP_SPIN(2) - RHODIFF * (COSBETA * MYDFDB)
+                          ENDIF
+                             
                           MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
                                MKET, MAGR, ZERO, COSBETA, "S")
 
-                          FTMP(3) = FTMP(3) - RHO * COSBETA * MYDFDR
+                          FTMP_PULAY(3) = FTMP_PULAY(3) - X2HRHO(L, K) * COSBETA * MYDFDR
+
+                          FTMP_COUL(3) = FTMP_COUL(3) - RHO * COSBETA * MYDFDR
+                          
+                          IF (SPINON .EQ. 1) THEN
+                             FTMP_SPIN(3) = FTMP_SPIN(3) - RHODIFF * COSBETA * MYDFDR
+                          ENDIF
 
                        ENDIF
 
@@ -601,17 +751,60 @@ SUBROUTINE PULAY
               ENDDO
            ENDDO
 
-           FPUL(1,I) = FPUL(1,I) + FTMP(1)
-           FPUL(2,I) = FPUL(2,I) + FTMP(2)
-           FPUL(3,I) = FPUL(3,I) + FTMP(3)
+           FPUL(1,I) = FPUL(1,I) - TWO * FTMP_PULAY(1)
+           FPUL(2,I) = FPUL(2,I) - TWO * FTMP_PULAY(2)
+           FPUL(3,I) = FPUL(3,I) - TWO * FTMP_PULAY(3)
 
-           VIRPUL(1) = VIRPUL(1) + RIJ(1) * FTMP(1)
-           VIRPUL(2) = VIRPUL(2) + RIJ(2) * FTMP(2)
-           VIRPUL(3) = VIRPUL(3) + RIJ(3) * FTMP(3)
-           VIRPUL(4) = VIRPUL(4) + RIJ(1) * FTMP(2)
-           VIRPUL(5) = VIRPUL(5) + RIJ(2) * FTMP(3)
-           VIRPUL(6) = VIRPUL(6) + RIJ(3) * FTMP(1)
+           VIRPUL(1) = VIRPUL(1) - RIJ(1) * FTMP_PULAY(1)
+           VIRPUL(2) = VIRPUL(2) - RIJ(2) * FTMP_PULAY(2)
+           VIRPUL(3) = VIRPUL(3) - RIJ(3) * FTMP_PULAY(3)
+           VIRPUL(4) = VIRPUL(4) - RIJ(1) * FTMP_PULAY(2)
+           VIRPUL(5) = VIRPUL(5) - RIJ(2) * FTMP_PULAY(3)
+           VIRPUL(6) = VIRPUL(6) - RIJ(3) * FTMP_PULAY(1)
 
+           IF (ELECTRO .EQ. 1) THEN
+
+              FTMP_COUL = FTMP_COUL * ( HUBBARDU(ELEMPOINTER(J))*DELTAQ(J) + COULOMBV(J) &
+                    +HUBBARDU(ELEMPOINTER(I))*DELTAQ(I) + COULOMBV(I))
+
+           ELSE 
+
+              FTMP_COUL = FTMP_COUL * (LCNSHIFT(I) + LCNSHIFT(J))
+
+           ENDIF
+              
+           
+           FPUL(1,I) = FPUL(1,I) + FTMP_COUL(1)
+           FPUL(2,I) = FPUL(2,I) + FTMP_COUL(2)
+           FPUL(3,I) = FPUL(3,I) + FTMP_COUL(3)
+           
+           ! with the factor of 2...                                           \
+                      
+           VIRPUL(1) = VIRPUL(1) + RIJ(1)*FTMP_COUL(1)/TWO
+           VIRPUL(2) = VIRPUL(2) + RIJ(2)*FTMP_COUL(2)/TWO
+           VIRPUL(3) = VIRPUL(3) + RIJ(3)*FTMP_COUL(3)/TWO
+           VIRPUL(4) = VIRPUL(4) + RIJ(1)*FTMP_COUL(2)/TWO
+           VIRPUL(5) = VIRPUL(5) + RIJ(2)*FTMP_COUL(3)/TWO
+           VIRPUL(6) = VIRPUL(6) + RIJ(3)*FTMP_COUL(1)/TWO
+           
+           IF (SPINON .EQ. 1) THEN
+              
+              FPUL(1,I) = FPUL(1,I) + FTMP_SPIN(1)
+              FPUL(2,I) = FPUL(2,I) + FTMP_SPIN(2)
+              FPUL(3,I) = FPUL(3,I) + FTMP_SPIN(3)
+              
+              ! with the factor of 2...                                           \
+              
+              VIRPUL(1) = VIRPUL(1) + RIJ(1)*FTMP_SPIN(1)/TWO
+              VIRPUL(2) = VIRPUL(2) + RIJ(2)*FTMP_SPIN(2)/TWO
+              VIRPUL(3) = VIRPUL(3) + RIJ(3)*FTMP_SPIN(3)/TWO
+              VIRPUL(4) = VIRPUL(4) + RIJ(1)*FTMP_SPIN(2)/TWO
+              VIRPUL(5) = VIRPUL(5) + RIJ(2)*FTMP_SPIN(3)/TWO
+              VIRPUL(6) = VIRPUL(6) + RIJ(3)*FTMP_SPIN(1)/TWO
+              
+
+           ENDIF
+           
         ENDIF
 
      ENDDO
