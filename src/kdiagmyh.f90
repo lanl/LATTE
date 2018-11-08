@@ -68,8 +68,6 @@ SUBROUTINE KDIAGMYH
      CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
           DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
      
-     PRINT*, INFO
-
 #elif defined(XHEEVD)
 
      CALL ZHEEVD('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
