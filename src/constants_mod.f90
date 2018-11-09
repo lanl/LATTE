@@ -78,6 +78,7 @@ MODULE CONSTANTS_MOD
 
   CHARACTER(LEN = 100) :: PARAMPATH = "./TBparam"
   CHARACTER(LEN = 100) :: COORDSFILE = "./bl/inputblock.dat"
+  CHARACTER(LEN = 100) :: SKFFILES = "NONE"
 
   ! For the latte lib
   CHARACTER(LEN = 20) :: JOB

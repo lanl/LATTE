@@ -12,6 +12,7 @@ performanceExpectedTimes["opt"]=0.127
 performanceExpectedTimes["opt.cg"]=0.129
 performanceExpectedTimes["opt_cons"]=0.127
 performanceExpectedTimes["dorbitals"]=0.412
+performanceExpectedTimes["skf"]=1000.0
 performanceExpectedTimes["tableread"]=1.700
 performanceExpectedTimes["0scf"]=0.127
 performanceExpectedTimes["2scf"]=0.120
@@ -93,7 +94,7 @@ done
 
 # Testing geometry optimizations:
 
-for name in opt opt.cg opt_cons dorbitals; do
+for name in opt opt.cg opt_cons dorbitals skf; do
 
   INLATTEFILE="latte."$name".in"
   REF="monitorrelax."$name".xyz"
