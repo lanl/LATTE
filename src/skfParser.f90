@@ -25,7 +25,7 @@
 !!-----------------------------------------------------------------------------------!!
 !!                                                                                   !!
 !!  This file is part of SciFT project                                               !!
-!!  https://github.com/nfaguirrec/ccdyn                                              !!
+!!  https://github.com/nfaguirrec/scift                                              !!
 !!  Copyright (c) 2010-2014 Nestor F. Aguirre (nfaguirrec@gmail.com)                 !!
 !!                                                                                   !!
 !!  Redistribution and use in source and binary forms, with or without               !!
