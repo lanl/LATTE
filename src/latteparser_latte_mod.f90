@@ -123,7 +123,7 @@ CONTAINS
     USE FERMICOMMON
 
     IMPLICIT NONE
-    INTEGER, PARAMETER :: NKEY_CHAR = 7, NKEY_INT = 53, NKEY_RE = 21, NKEY_LOG = 2
+    INTEGER, PARAMETER :: NKEY_CHAR = 7, NKEY_INT = 54, NKEY_RE = 21, NKEY_LOG = 2
     CHARACTER(LEN=*) :: FILENAME
 
     !Library of keywords with the respective defaults.
@@ -142,7 +142,7 @@ CONTAINS
          'MDON=','PBCON=','RESTART=','CHARGE=','XBO=','XBODISON=','XBODISORDER=','NGPU=',& !33
          'KON=','COMPFORCE=','DOSFIT=','INTS2FIT=','NFITSTEP=','QFIT=',& !39
          'PPFITON=','ALLFITON=','PPSTEP=','BISTEP=','PP2FIT=','BINT2FIT=','PPNMOL=',& !46
-         'PPNGEOM=','PARREP=','VERBOSE=','MIXER=','RESTARTLIB=','FREEZE=','xControl=']
+         'PPNGEOM=','PARREP=','VERBOSE=','MIXER=','RESTARTLIB=','FREEZE=','xControl=','GETIR=']
     INTEGER :: VALVECTOR_INT(NKEY_INT) = (/ &
          1,0,6,1,1,1, &
          1,0,0,1,0,250, &
@@ -151,7 +151,7 @@ CONTAINS
          1,1,0,0,1,1,5,2, &
          0,1,0,1,5000,0,&
          0,0,500,500,2,6,10,&
-         200,0,1,0,0,0,-1 /)
+         200,0,1,0,0,0,-1,0 /)
 
     CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_RE(NKEY_RE) = [CHARACTER(LEN=50) :: &
          'CGTOL=','KBT=','SPINTOL=','ELEC_ETOL=','ELEC_QTOL=','COULACC=','COULCUT=', 'COULR1=',& !8
@@ -506,6 +506,8 @@ CONTAINS
       CALL ERRORS("latteparser_latte_mod","If CONTROL{ELECTRO= 1 ELECMETH= 1} &
       &then CONTROL{PBCON= 0}")
     END IF
+
+    GETIRON = VALVECTOR_INT(54)
 
     SCLTYPE = VALVECTOR_CHAR(7)
 
