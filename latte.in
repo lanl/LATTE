@@ -15,6 +15,7 @@ keyword. Example: #MyCommentedKeyword=
 
 #General controls
 CONTROL{
+  GETIR= 1
   XCONTROL= 1
   VERBOSE= 0 
   PARAMPATH= "./TBparam"
@@ -42,7 +43,7 @@ CONTROL{
   LCNON= 0 LCNITER= 4 CHTOL= 0.01
   SKIN= 1.0
   RELAX= 0 RELAXTYPE= SD MAXITER= 100 RLXFTOL= 0.00001
-  MDON= 1
+  MDON= 0
   PBCON= 1
   RESTART= 0
   CHARGE= 0
