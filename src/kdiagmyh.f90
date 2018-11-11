@@ -66,8 +66,8 @@ SUBROUTINE KDIAGMYH
 #ifdef XHEEV     
 
      CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
-          DIAG_ZWORK, DIAG_LWORK, DIAG_RWORK, INFO)
-
+          DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
+     
 #elif defined(XHEEVD)
 
      CALL ZHEEVD('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
@@ -75,7 +75,7 @@ SUBROUTINE KDIAGMYH
           ZHEEVD_IWORK, ZHEEVD_LIWORK, INFO)
 
      IF (INFO .NE. 0) CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
-          DIAG_ZWORK, DIAG_LWORK, DIAG_RWORK, INFO)
+          DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
 
 #endif
 
@@ -91,7 +91,7 @@ SUBROUTINE KDIAGMYH
 #ifdef XHEEV
 
         CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
-             DIAG_ZWORK, DIAG_LWORK, DIAG_RWORK, INFO)
+             DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
 
 #elif defined(XHEEVD)
         
