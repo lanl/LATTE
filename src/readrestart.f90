@@ -100,7 +100,7 @@ SUBROUTINE READRESTART
   !  READ(12,*) (ATELE(I), CR(1,I), CR(2,I), CR(3,I), I = 1, NATS)
 
   DO I = 1, NATS
-     READ(12,*) ATELE(I), CR(1,I), CR(2,I), CR(3,I)
+     READ(12,*) ATELE(I), CR(1,I), CR(2,I), CR(3,I), DELTAQ(I)
   ENDDO
 
 
@@ -155,6 +155,10 @@ SUBROUTINE READRESTART
   IF (MDON .EQ. 1) THEN
      DO I = 1, NATS
         READ(12,*) V(1,I), V(2,I), V(3,I)
+     ENDDO
+     READ(12,*) TOTE
+     DO I = 1, NATS
+        READ(12,*) FTOT(1,I), FTOT(2,I), FTOT(3,I)
      ENDDO
   ENDIF
 

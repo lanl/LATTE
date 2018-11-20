@@ -64,7 +64,14 @@ SUBROUTINE READCR
      READ(12,*) BOX(3,1), BOX(3,2), BOX(3,3)
 
      DO I = 1, NATS
-        READ(12,*) ATELE(I), CR(1,I), CR(2,I), CR(3,I)
+        if(VINIT.eq.0) then
+           read(12,*) ATELE(I), CR(1,I), CR(2,I), CR(3,I)
+        elseif (VINIT.eq.1) then
+           if (.not. allocated(V)) allocate(V(3,NATS))
+           read(12,*) ATELE(I), CR(1,I), CR(2,I), CR(3,I), V(1,I), V(2,I), V(3,I)
+        else
+           WRITE(*,*) "ERROR: wrong format in inputblock.dat"
+        endif
      ENDDO
 
      CLOSE(12)

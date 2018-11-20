@@ -37,7 +37,7 @@ MPIOPT = OFF
 
 #For GNU compiler:
 #FC = mpif90
-FC = gfortran
+FC = gfortran-mp-7
 FCL = $(FC)
 FFLAGS = -O3 -fopenmp -cpp
 #FFLAGS =  -fast -Mpreprocess -mp
