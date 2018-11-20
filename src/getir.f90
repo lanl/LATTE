@@ -43,14 +43,15 @@ end subroutine getCenterOfMass
 !!>
 !! Gets the inertia tensor and its eigen vectors and eigen values
 !!
-subroutine getInertiaTensor( inertiaTensor )
+subroutine getInertiaTensor( inertiaTensor, nRot )
   USE CONSTANTS_MOD
   USE SETUPARRAY
   USE MDARRAY
 
   implicit none
   
-  real(8) :: inertiaTensor(3,3)
+  real(8), intent(out) :: inertiaTensor(3,3)
+  integer, optional, intent(out) :: nRot
   
   real(8) :: eValsInertiaTensor(3)
   real(8) :: eVecsInertiaTensor(3,3)
@@ -75,7 +76,7 @@ subroutine getInertiaTensor( inertiaTensor )
   
   inertiaTensor = 0.0_8
   do i=1,NATS
-    massi = real(MASS(ELEMPOINTER(i)),8)!*1822.88853_8 ! amu to a.u.
+    massi = real(MASS(ELEMPOINTER(i)),8)*1822.88853_8 ! amu to a.u.
     inertiaTensor(1,1) = inertiaTensor(1,1) + massi * ( geometryInCM(2,i)**2 + geometryInCM(3,i)**2)
     inertiaTensor(1,2) = inertiaTensor(1,2) - massi * ( geometryInCM(1,i) * geometryInCM(2,i) )
     inertiaTensor(1,3) = inertiaTensor(1,3) - massi * ( geometryInCM(1,i) * geometryInCM(3,i) )
@@ -127,8 +128,16 @@ subroutine getInertiaTensor( inertiaTensor )
     stop
   end if
   
+  if( present(nRot) ) then
+    nRot = 3
+    if( abs( eValsInertiaTensor(1) ) < 10.0 ) then
+      nRot = 2 ! @todo Here is important make a second check to verify that molecule is indeed lineal
+    end if
+    write(*,*) ""
+    write(*,*) "nRot = ", nRot
+  end if
+  
   write(*,"(A,3F20.5)") "Inertia moments: ", eValsInertiaTensor
-  stop
   write(*,*) ""
   write(*,*) "Inertia tensor: "
   do i=1,3
@@ -141,14 +150,7 @@ subroutine getInertiaTensor( inertiaTensor )
   write(*,*) ""
   write(*,*) "Centered geometry:"
   do atom1=1,NATS
-    write(*,"(3F8.2)") geometryInCM(:,atom1)
-  end do
-  write(*,*) ""
-  
-  write(*,*) ""
-  write(*,*) "Original geometry:"
-  do atom1=1,NATS
-    write(*,"(F8.2,4X,3F8.2)") MASS(ELEMPOINTER(atom1)), CR(:,atom1)
+    write(*,"(F8.2,4X,3F8.2)") MASS(ELEMPOINTER(atom1)), geometryInCM(:,atom1)
   end do
   write(*,*) ""
   
@@ -180,18 +182,20 @@ subroutine projectLastElements( vectorialSpace, output )
   !! Realiza de ortogonalizacion sobre los last-1 vectores, previamente ortogonalizados.
   !!
   do i=1,last-1
-  squareNorm = dot_product( output(:,i), output(:,i) )	
+    squareNorm = dot_product( output(:,i), output(:,i) )
+    
+    projectionOverOrthogonalizedBasis = dot_product( output(:,i), vectorialSpace(:,last) )
+    
+    if ( squareNorm>1.0D-12 ) then
+      output( :, last ) = output( :, last ) - projectionOverOrthogonalizedBasis/sqrt(squareNorm)*output(:,i)
+    end if
+  end do
   
-  projectionOverOrthogonalizedBasis=dot_product( output(:,i),vectorialSpace(:,last) )
+  squareNorm = dot_product( output(:,last), output(:,last) )	
   
   if ( squareNorm>1.0D-12 ) then
-    
-    output( :, last ) = output( :, last ) - projectionOverOrthogonalizedBasis/sqrt(squareNorm)*output(:,i)
-  
+    output( :, last )=output( :, last )/sqrt(squareNorm)
   end if
-  end do
-  squareNorm = dot_product( output(:,last), output(:,last) )	
-  output( :, last )=output( :, last )/sqrt(squareNorm)
   
   !!
   !!******************************************************************
@@ -222,7 +226,7 @@ subroutine orthogonalizeLinearVectorialSpace( matrix )
   norm=sqrt(dot_product(matrix(:,1),matrix(:,1)))
   
   matrix(:,1)=matrix(:,1)/norm
-    
+  
   !!
   !! Realiza de ortogonalizacion consecutiva de cada uno de los vectores
   !! presentes en la matriz
@@ -241,6 +245,87 @@ subroutine orthogonalizeLinearVectorialSpace( matrix )
   end do
   
 end subroutine orthogonalizeLinearVectorialSpace
+
+!>
+!! indexing array so that array(indexes(j)), j=1..n is in
+!! ascending numerical order.
+!! method is heapsort, see also subroutine hpsort.
+!! taken from numerical recipies, p 233.
+!!
+subroutine rsort( array, indexes )
+  real(8), intent(in) :: array(:)
+  integer, intent(inout) :: indexes(:)
+  
+  integer :: i, j, l
+  integer :: n
+  integer :: id, ir
+  real(8) :: value
+  
+!   if( .not. allocated(array) ) then
+!     write(*,*) "Error in Math_sort, array not allocated"
+!     stop
+!   end if
+!   
+!   if( .not. allocated(indexes) ) then
+!     write(*,*) "Error in Math_sort, indexes not allocated"
+!     stop
+!   end if
+  
+  if( size(array) /= size(indexes) ) then
+    write(*,*) "Error in Math_sort, array and indexes have different size"
+    stop
+  end if
+  
+  n = size(array)
+  
+  do j=1,n
+    indexes(j)=j
+  end do
+  
+  if( n == 1 ) return
+  
+  l=n/2+1
+  ir=n
+  
+  do while( .true. )
+    if( l > 1 ) then
+      l = l-1
+      id = indexes(l)
+      value = array(id)
+    else
+      id=indexes(ir)
+      value=array(id)
+      indexes(ir)=indexes(1)
+      ir=ir-1
+      
+      if(ir == 1) then
+        indexes(1)=id
+        return
+      end if
+    end if
+    
+    i = l
+    j = 2*l
+    
+    do while( j <= ir )
+      if( j < ir ) then
+        if( array(indexes(j)) < array(indexes(j+1)) ) then
+          j=j+1
+        end if
+      end if
+      
+      if( value < array(indexes(j)) ) then
+        indexes(i)=indexes(j)
+        i=j
+        j=2*j
+      else
+        j=ir+1
+      end if
+    end do
+    
+    indexes(i)=id
+  end do
+end subroutine rsort
 
 !>
 !! @brief  Intercambia dos bloques de columnas especificados por los rangos A y B
@@ -279,10 +364,15 @@ subroutine getForceConstantsProjector( projector, nVib, nRotAndTrans )
 
   implicit none
   real(8), allocatable :: projector(:,:)
-  integer :: nVib
+  integer :: nVib, nRot
   integer :: nRotAndTrans
 
   interface
+    subroutine getInertiaTensor( inertiaTensor, nRot )
+      real(8), intent(out) :: inertiaTensor(3,3)
+      integer, optional, intent(out) :: nRot
+    end subroutine getInertiaTensor
+
     subroutine orthogonalizeLinearVectorialSpace( matrix )
       implicit none
       real(8), allocatable :: matrix(:,:)
@@ -293,6 +383,11 @@ subroutine getForceConstantsProjector( projector, nVib, nRotAndTrans )
       real(8), allocatable :: matrix(:,:)
       integer, intent(in) :: rangeSpecification(2)
     end subroutine swapBlockOfColumns
+    
+    subroutine rsort( array, indexes )
+      real(8), intent(in) :: array(:)
+      integer, intent(inout) :: indexes(:)
+    end subroutine rsort
   end interface
   
   integer :: i
@@ -307,13 +402,17 @@ subroutine getForceConstantsProjector( projector, nVib, nRotAndTrans )
   real(8) :: geometryInCM(3)
   real(8) :: centerOfMass(3)
   real(8) :: squareNorm
+  real(8) :: projectorNorm(6)
+  integer :: indexes(6)
 !   type(LinearVectorialSpace) :: spaceOfForceConstants
   real(8) :: inertiaTensor(3,3)
 
   allocate( projector(3*NATS,3*NATS) )
   
   call getCenterOfMass( centerOfMass )
-  call getInertiaTensor( inertiaTensor )
+  call getInertiaTensor( inertiaTensor, nRot )
+  
+  projector = 0.0_8
 
   do i=1,NATS
 
@@ -355,20 +454,43 @@ subroutine getForceConstantsProjector( projector, nVib, nRotAndTrans )
                 - coordinatesProyected(2)*inertiaTensor(2,1) )/sqrtMass
     projector(index_z,6) =	(coordinatesProyected(1)*inertiaTensor(3,2) &
                 - coordinatesProyected(2)*inertiaTensor(3,1) )/sqrtMass
+                
   end do
+  
+  write(*,*) ""
+  write(*,*) "Very initial projector: "
+  do i=1,size(projector,dim=2)
+    write(*,"(6F8.2)") projector(i,:)
+  end do
+  write(*,*) ""
 
   !! Verfies if the six vectors are actually rotational
   !! and translational normal modes
   nRotAndTrans = 0
   isNull=.false.
   aux = 0
-
+  
+  write(*,*) "projectorNorm"
+  projectorNorm = 0.0_8
   do i=1,6
+    projectorNorm(i) = dot_product( projector(:,i),projector(:,i) )
+    write(*,*) i, projectorNorm(i)
+  end do
+  
+  call rsort( projectorNorm, indexes )
+  
+  write(*,*) "projectorNorm(sorted)"
+  do i=1,6
+    write(*,*) i, projectorNorm( indexes(i) ), projectorNorm( indexes(i) )/sum(projectorNorm)
+  end do
+  write(*,*) ""
+
+!   do i=1,6
+  do i=1,size(projector(1,:))
 
     squareNorm = dot_product( projector(:,i),projector(:,i) )
-    write(*,*) i, squareNorm
 
-    if ( squareNorm > 1.0D-6 ) then
+    if ( squareNorm > 1.0d-6 ) then
 
       projector(:,i) = projector(:,i) / sqrt( squareNorm )
       nRotAndTrans = nRotAndTrans + 1
@@ -377,10 +499,14 @@ subroutine getForceConstantsProjector( projector, nVib, nRotAndTrans )
         projector(:,i-aux) = projector(:,i)
         projector(:,i) = 0.0_8
       end if
+      
+      write(*,*) i, "real", squareNorm
     else
       
       isNull = .true.
       aux = aux+1
+      
+      write(*,*) i, "fake", squareNorm
 
     end if
 
@@ -510,6 +636,13 @@ SUBROUTINE GETIR
   
   IF (EXISTERROR) RETURN
   
+  write(*,*) ""
+  write(*,*) "Original geometry:"
+  do atom1=1,NATS
+    write(*,"(F8.2,4X,3F8.2)") MASS(ELEMPOINTER(atom1)), CR(:,atom1)
+  end do
+  write(*,*) ""
+  
   call getTransformationMatrix( transformationMatrix )
   
   write(*,*) " transformationMatrix : "
@@ -517,9 +650,9 @@ SUBROUTINE GETIR
     write(*,"(6F8.2)") transformationMatrix(i,:)
   end do
   
-  do i=1,size(transformationMatrix,dim=1)
-    transformationMatrix(i,i) = 1.0_8 + transformationMatrix(i,i)
-  end do
+!   do i=1,size(transformationMatrix,dim=1)
+!     transformationMatrix(i,i) = 1.0_8 + transformationMatrix(i,i)
+!   end do
 
   CALL GETFORCE
   
@@ -610,9 +743,9 @@ SUBROUTINE GETIR
   write(*,*) "-------------------"
   do i=1,3*NATS
     if( eValsHessian(i) < 0.0_8 ) then
-      write(*,"(I10,F15.2)") i, -sqrt(abs(eValsHessian(i)))*219474.63068_8  ! a.u. to cm-1  
+      write(*,"(I10,F20.10)") i, -sqrt(abs(eValsHessian(i)))*219474.63068_8  ! a.u. to cm-1  
     else
-      write(*,"(I10,F15.2)") i, sqrt(eValsHessian(i))*219474.63068_8  ! a.u. to cm-1  
+      write(*,"(I10,F20.10)") i, sqrt(eValsHessian(i))*219474.63068_8  ! a.u. to cm-1  
     end if
   end do
   write(*,*) ""
