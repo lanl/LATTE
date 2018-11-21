@@ -113,18 +113,19 @@ subroutine getCenterOfMass( centerOfMass )
   USE CONSTANTS_MOD
   USE SETUPARRAY
   USE MDARRAY
+  USE MYPRECISION
 
   implicit none
 
-  real(8) :: centerOfMass(3)
-  
+  real(latteprec) :: centerOfMass(3)
+
   centerOfMass(1) = sum(MASS(ELEMPOINTER(:))*CR(1,:))
   centerOfMass(2) = sum(MASS(ELEMPOINTER(:))*CR(2,:))
   centerOfMass(3) = sum(MASS(ELEMPOINTER(:))*CR(3,:))
   centerOfMass = centerOfMass / sum(MASS(ELEMPOINTER(:)))
-  
+
   centerOfMass = centerOfMass*1.88972612456506_8 ! angs to a.u.
-  
+
 end subroutine getCenterOfMass
 
 !!>
@@ -134,36 +135,37 @@ subroutine getInertiaTensor( inertiaTensor, nRot )
   USE CONSTANTS_MOD
   USE SETUPARRAY
   USE MDARRAY
+  USE MYPRECISION
 
   implicit none
-  
-  real(8), intent(out) :: inertiaTensor(3,3)
+
+  real(latteprec), intent(out) :: inertiaTensor(3,3)
   integer, optional, intent(out) :: nRot
-  
-  real(8) :: eValsInertiaTensor(3)
-  real(8) :: eVecsInertiaTensor(3,3)
-  
+
+  real(latteprec) :: eValsInertiaTensor(3)
+  real(latteprec) :: eVecsInertiaTensor(3,3)
+
   integer :: i, j, atom1, atom2
-  real(8), allocatable :: geometryInCM(:,:)
-  real(8) :: centerOfMass(3)
-  real(8) :: massi
-  
+  real(latteprec), allocatable :: geometryInCM(:,:)
+  real(latteprec) :: centerOfMass(3)
+  real(latteprec) :: massi
+
   integer :: ssign
-  
-  real(8), allocatable :: workSpace(:)
+
+  real(latteprec), allocatable :: workSpace(:)
   integer :: ssize, info
-  
+
   ALLOCATE( geometryInCM(3,NATS) )
-  
+
   call getCenterOfMass( centerOfMass )
-  
+
   do i=1,NATS
     geometryInCM(:,i) = CR(:,i)*1.88972612456506_8 - centerOfMass(:)   ! angs to a.u.
   end do
-  
+
   inertiaTensor = 0.0_8
   do i=1,NATS
-    massi = real(MASS(ELEMPOINTER(i)),8)*1822.88853_8 ! amu to a.u.
+    massi = real(MASS(ELEMPOINTER(i)),latteprec)*1822.88853_8 ! amu to a.u.
     inertiaTensor(1,1) = inertiaTensor(1,1) + massi * ( geometryInCM(2,i)**2 + geometryInCM(3,i)**2)
     inertiaTensor(1,2) = inertiaTensor(1,2) - massi * ( geometryInCM(1,i) * geometryInCM(2,i) )
     inertiaTensor(1,3) = inertiaTensor(1,3) - massi * ( geometryInCM(1,i) * geometryInCM(3,i) )
@@ -171,24 +173,24 @@ subroutine getInertiaTensor( inertiaTensor, nRot )
     inertiaTensor(2,3) = inertiaTensor(2,3) - massi * ( geometryInCM(2,i) * geometryInCM(3,i) )
     inertiaTensor(3,3) = inertiaTensor(3,3) + massi * ( geometryInCM(1,i)**2 + geometryInCM(2,i)**2)
   end do
-  
+
   inertiaTensor(2,1) =inertiaTensor(1,2)
   inertiaTensor(3,1) =inertiaTensor(1,3)
   inertiaTensor(3,2) =inertiaTensor(2,3)
-  
+
   eVecsInertiaTensor = inertiaTensor
   allocate( workSpace( 3*3*3-1 ) )
-  
+
   ! Compute the eigen values and eigen vectors using the upper elements of the symmetric matrix
   call dsyev( 'V', 'L', 3, eVecsInertiaTensor, 3, eValsInertiaTensor, workSpace, 3*3*3-1, info )
-  
+
   if( info /= 0 ) then
     write(*,*) "### ERROR ### Diagonalizing the inertia tensor"
     stop
   end if
-  
+
   deallocate( workSpace )
-  
+
   !! Checks the determinant's sign
   ssign = eVecsInertiaTensor(1,1)*( &
           eVecsInertiaTensor(2,2)*eVecsInertiaTensor(3,3) &
@@ -199,14 +201,14 @@ subroutine getInertiaTensor( inertiaTensor, nRot )
           +eVecsInertiaTensor(1,3)*( &
           eVecsInertiaTensor(2,1)*eVecsInertiaTensor(3,2) &
           -eVecsInertiaTensor(3,1)*eVecsInertiaTensor(2,2))
-  
+
   !! Presers the handedness of the inertia tensor
   if ( ssign < 0.0 ) then
     eVecsInertiaTensor(1,2) = -eVecsInertiaTensor(1,2)
     eVecsInertiaTensor(2,2) = -eVecsInertiaTensor(2,2)
     eVecsInertiaTensor(3,2) = -eVecsInertiaTensor(3,2)
   endif
-  
+
   !! Verifies if the inertia tensor is correct
   if ( 	abs( eVecsInertiaTensor(1,1) ) < 1d-10 .and. &
         abs( eVecsInertiaTensor(2,2) ) < 1d-10 .and. &
@@ -214,7 +216,7 @@ subroutine getInertiaTensor( inertiaTensor, nRot )
     write(*,*) "### ERROR ### Invalid inertia tensor."
     stop
   end if
-  
+
   if( present(nRot) ) then
     nRot = 3
     if( abs( eValsInertiaTensor(1) ) < 10.0 ) then
@@ -223,7 +225,7 @@ subroutine getInertiaTensor( inertiaTensor, nRot )
     write(*,*) ""
     write(*,*) "nRot = ", nRot
   end if
-  
+
   write(*,"(A,3F20.5)") "Inertia moments: ", eValsInertiaTensor
   write(*,*) ""
   write(*,*) "Inertia tensor: "
@@ -231,59 +233,60 @@ subroutine getInertiaTensor( inertiaTensor, nRot )
     write(*,"(3F15.2)") inertiaTensor(:,i)
   end do
   write(*,*) ""
-  
+
   inertiaTensor = eVecsInertiaTensor !<<< @todo OJO esto no es verdad
-  
+
   write(*,*) ""
   write(*,*) "Centered geometry:"
   do atom1=1,NATS
     write(*,"(F8.2,4X,3F8.2)") MASS(ELEMPOINTER(atom1)), geometryInCM(:,atom1)
   end do
   write(*,*) ""
-  
+
   deallocate( geometryInCM )
 
 end subroutine getInertiaTensor
 
-!> 
-!! @brief Proyecta un numero dado de elementos sobre el resto de los elementos del espacio vectorial 
+!>
+!! @brief Proyecta un numero dado de elementos sobre el resto de los elementos del espacio vectorial
 !!		y ortogonaliza el espacio resultante mediante un proceso Gram-Schmidt
 !!
 !! @param this Espacio vectorial
 !<
 subroutine projectLastElements( vectorialSpace, output )
+  USE MYPRECISION
   implicit none
-  real(8) :: vectorialSpace(:,:)
-  real(8), allocatable :: output(:,:)
-  
+  real(latteprec) :: vectorialSpace(:,:)
+  real(latteprec), allocatable :: output(:,:)
+
   integer :: i
   integer :: last
-  real(8) :: squareNorm
-  real(8) :: projectionOverOrthogonalizedBasis
-  
+  real(latteprec) :: squareNorm
+  real(latteprec) :: projectionOverOrthogonalizedBasis
+
   last = size(vectorialSpace,dim=2)
   allocate( output( size(vectorialSpace,dim=1), last ) )
   output = vectorialSpace
-  
+
   !!***********************************************************************************
   !! Realiza de ortogonalizacion sobre los last-1 vectores, previamente ortogonalizados.
   !!
   do i=1,last-1
     squareNorm = dot_product( output(:,i), output(:,i) )
-    
+
     projectionOverOrthogonalizedBasis = dot_product( output(:,i), vectorialSpace(:,last) )
-    
+
     if ( squareNorm>1.0D-12 ) then
       output( :, last ) = output( :, last ) - projectionOverOrthogonalizedBasis/sqrt(squareNorm)*output(:,i)
     end if
   end do
-  
-  squareNorm = dot_product( output(:,last), output(:,last) )	
-  
+
+  squareNorm = dot_product( output(:,last), output(:,last) )
+
   if ( squareNorm>1.0D-12 ) then
     output( :, last )=output( :, last )/sqrt(squareNorm)
   end if
-  
+
   !!
   !!******************************************************************
 
@@ -293,27 +296,29 @@ end subroutine projectLastElements
 !! @brief Orthogonalize the components of a vectorial space
 !!
 subroutine orthogonalizeLinearVectorialSpace( matrix )
+  USE MYPRECISION
   implicit none
-  real(8), allocatable :: matrix(:,:)
-  
+  real(latteprec), allocatable :: matrix(:,:)
+
   interface
     subroutine projectLastElements( vectorialSpace, output )
+      USE MYPRECISION
       implicit none
-      real(8) :: vectorialSpace(:,:)
-      real(8), allocatable :: output(:,:)
+      real(latteprec) :: vectorialSpace(:,:)
+      real(latteprec), allocatable :: output(:,:)
     end subroutine projectLastElements
   end interface
 
   integer :: i
   integer :: last
-  real(8) :: norm
-  real(8), allocatable :: output(:,:)
-  
+  real(latteprec) :: norm
+  real(latteprec), allocatable :: output(:,:)
+
   last = size(matrix,dim=2)
   norm=sqrt(dot_product(matrix(:,1),matrix(:,1)))
-  
+
   matrix(:,1)=matrix(:,1)/norm
-  
+
   !!
   !! Realiza de ortogonalizacion consecutiva de cada uno de los vectores
   !! presentes en la matriz
@@ -323,14 +328,14 @@ subroutine orthogonalizeLinearVectorialSpace( matrix )
     matrix(:,1:i) = output
     if( allocated(output) ) deallocate(output)
   end do
-  
+
   !! Reortonormaliza para asegurar la ortonormalizacion
   do i=2,last
     call projectLastElements( matrix(:,1:i), output )
     matrix(:,1:i) = output
     if( allocated(output) ) deallocate(output)
   end do
-  
+
 end subroutine orthogonalizeLinearVectorialSpace
 
 !>
@@ -340,40 +345,41 @@ end subroutine orthogonalizeLinearVectorialSpace
 !! taken from numerical recipies, p 233.
 !!
 subroutine rsort( array, indexes )
-  real(8), intent(in) :: array(:)
+  USE MYPRECISION
+  real(latteprec), intent(in) :: array(:)
   integer, intent(inout) :: indexes(:)
-  
+
   integer :: i, j, l
   integer :: n
   integer :: id, ir
-  real(8) :: value
-  
+  real(latteprec) :: value
+
 !   if( .not. allocated(array) ) then
 !     write(*,*) "Error in Math_sort, array not allocated"
 !     stop
 !   end if
-!   
+!
 !   if( .not. allocated(indexes) ) then
 !     write(*,*) "Error in Math_sort, indexes not allocated"
 !     stop
 !   end if
-  
+
   if( size(array) /= size(indexes) ) then
     write(*,*) "Error in Math_sort, array and indexes have different size"
     stop
   end if
-  
+
   n = size(array)
-  
+
   do j=1,n
     indexes(j)=j
   end do
-  
+
   if( n == 1 ) return
-  
+
   l=n/2+1
   ir=n
-  
+
   do while( .true. )
     if( l > 1 ) then
       l = l-1
@@ -384,23 +390,23 @@ subroutine rsort( array, indexes )
       value=array(id)
       indexes(ir)=indexes(1)
       ir=ir-1
-      
+
       if(ir == 1) then
         indexes(1)=id
         return
       end if
     end if
-    
+
     i = l
     j = 2*l
-    
+
     do while( j <= ir )
       if( j < ir ) then
         if( array(indexes(j)) < array(indexes(j+1)) ) then
           j=j+1
         end if
       end if
-      
+
       if( value < array(indexes(j)) ) then
         indexes(i)=indexes(j)
         i=j
@@ -409,7 +415,7 @@ subroutine rsort( array, indexes )
         j=ir+1
       end if
     end do
-    
+
     indexes(i)=id
   end do
 end subroutine rsort
@@ -417,18 +423,20 @@ end subroutine rsort
 !>
 !! @brief  Intercambia dos bloques de columnas especificados por los rangos A y B
 !!
-!! @warning Coloca el bloque de columnas especificado al inicio de la matriz 
+!! @warning Coloca el bloque de columnas especificado al inicio de la matriz
 !!		el resto de columnas al final de la misma
 !! @warning Actualmente no se soportan rangos intermedios, solamente rangos contains
 !!			abiertos que incluyan el elemento terminal
 !! @todo Dar soporte a rangos no consecutivos
 !<
 subroutine swapBlockOfColumns( matrix, rangeSpecification )
+  USE MYPRECISION
+
   implicit none
-  real(8), allocatable :: matrix(:,:)
+  real(latteprec), allocatable :: matrix(:,:)
   integer, intent(in) :: rangeSpecification(2)
 
-  real(8), allocatable :: auxMatrix(:,:)
+  real(latteprec), allocatable :: auxMatrix(:,:)
 
   allocate( auxMatrix(size(matrix,dim=1), size(matrix,dim=2) ) )
   auxMatrix = matrix
@@ -448,35 +456,40 @@ subroutine getForceConstantsProjector( projector, nVib, nRotAndTrans )
   USE CONSTANTS_MOD
   USE SETUPARRAY
   USE MDARRAY
+  USE MYPRECISION
 
   implicit none
-  real(8), allocatable :: projector(:,:)
+  real(latteprec), allocatable :: projector(:,:)
   integer :: nVib, nRot
   integer :: nRotAndTrans
 
   interface
     subroutine getInertiaTensor( inertiaTensor, nRot )
-      real(8), intent(out) :: inertiaTensor(3,3)
+      USE MYPRECISION
+      real(latteprec), intent(out) :: inertiaTensor(3,3)
       integer, optional, intent(out) :: nRot
     end subroutine getInertiaTensor
 
     subroutine orthogonalizeLinearVectorialSpace( matrix )
+      USE MYPRECISION
       implicit none
-      real(8), allocatable :: matrix(:,:)
+      real(latteprec), allocatable :: matrix(:,:)
     end subroutine orthogonalizeLinearVectorialSpace
-    
+
     subroutine swapBlockOfColumns( matrix, rangeSpecification )
+      USE MYPRECISION
       implicit none
-      real(8), allocatable :: matrix(:,:)
+      real(latteprec), allocatable :: matrix(:,:)
       integer, intent(in) :: rangeSpecification(2)
     end subroutine swapBlockOfColumns
-    
+
     subroutine rsort( array, indexes )
-      real(8), intent(in) :: array(:)
+      USE MYPRECISION
+      real(latteprec), intent(in) :: array(:)
       integer, intent(inout) :: indexes(:)
     end subroutine rsort
   end interface
-  
+
   integer :: i
   integer :: j
   integer :: index_x
@@ -484,21 +497,21 @@ subroutine getForceConstantsProjector( projector, nVib, nRotAndTrans )
   integer :: index_z
   integer :: aux
   logical :: isNull
-  real(8) :: sqrtMass
-  real(8) :: coordinatesProyected(3)
-  real(8) :: geometryInCM(3)
-  real(8) :: centerOfMass(3)
-  real(8) :: squareNorm
-  real(8) :: projectorNorm(6)
+  real(latteprec) :: sqrtMass
+  real(latteprec) :: coordinatesProyected(3)
+  real(latteprec) :: geometryInCM(3)
+  real(latteprec) :: centerOfMass(3)
+  real(latteprec) :: squareNorm
+  real(latteprec) :: projectorNorm(6)
   integer :: indexes(6)
 !   type(LinearVectorialSpace) :: spaceOfForceConstants
-  real(8) :: inertiaTensor(3,3)
+  real(latteprec) :: inertiaTensor(3,3)
 
   allocate( projector(3*NATS,3*NATS) )
-  
+
   call getCenterOfMass( centerOfMass )
   call getInertiaTensor( inertiaTensor, nRot )
-  
+
   projector = 0.0_8
 
   do i=1,NATS
@@ -516,7 +529,7 @@ subroutine getForceConstantsProjector( projector, nVib, nRotAndTrans )
     coordinatesProyected(1)=dot_product( geometryInCM, inertiaTensor(1,:) )
     coordinatesProyected(2)=dot_product( geometryInCM, inertiaTensor(2,:) )
     coordinatesProyected(3)=dot_product( geometryInCM, inertiaTensor(3,:) )
-    
+
     projector(index_x,1) = sqrtMass
     projector(index_y,2) = sqrtMass
     projector(index_z,3) = sqrtMass
@@ -541,9 +554,9 @@ subroutine getForceConstantsProjector( projector, nVib, nRotAndTrans )
                 - coordinatesProyected(2)*inertiaTensor(2,1) )/sqrtMass
     projector(index_z,6) =	(coordinatesProyected(1)*inertiaTensor(3,2) &
                 - coordinatesProyected(2)*inertiaTensor(3,1) )/sqrtMass
-                
+
   end do
-  
+
   write(*,*) ""
   write(*,*) "Very initial projector: "
   do i=1,size(projector,dim=2)
@@ -556,16 +569,16 @@ subroutine getForceConstantsProjector( projector, nVib, nRotAndTrans )
   nRotAndTrans = 0
   isNull=.false.
   aux = 0
-  
+
   write(*,*) "projectorNorm"
   projectorNorm = 0.0_8
   do i=1,6
     projectorNorm(i) = dot_product( projector(:,i),projector(:,i) )
     write(*,*) i, projectorNorm(i)
   end do
-  
+
   call rsort( projectorNorm, indexes )
-  
+
   write(*,*) "projectorNorm(sorted)"
   do i=1,6
     write(*,*) i, projectorNorm( indexes(i) ), projectorNorm( indexes(i) )/sum(projectorNorm)
@@ -581,24 +594,24 @@ subroutine getForceConstantsProjector( projector, nVib, nRotAndTrans )
 
       projector(:,i) = projector(:,i) / sqrt( squareNorm )
       nRotAndTrans = nRotAndTrans + 1
-      
+
       if ( isNull ) then
         projector(:,i-aux) = projector(:,i)
         projector(:,i) = 0.0_8
       end if
-      
+
       write(*,*) i, "real", squareNorm
     else
-      
+
       isNull = .true.
       aux = aux+1
-      
+
       write(*,*) i, "fake", squareNorm
 
     end if
 
   end do
-  
+
   !!
   !!***********************************************************************
   nVib = 3*NATS - nRotAndTrans
@@ -609,7 +622,7 @@ subroutine getForceConstantsProjector( projector, nVib, nRotAndTrans )
     projector(j,i)=1.0_8
     j=j+1
   end do
-  
+
   write(*,*) ""
   write(*,*) "Initial projector: "
   do i=1,size(projector,dim=2)
@@ -619,14 +632,14 @@ subroutine getForceConstantsProjector( projector, nVib, nRotAndTrans )
 
   !! Construye un espacio vectorial lineal con los vectores previemente generados
   !!**********
-  !! 	Proyecta los vectores asociados a grados de libertad vibracionales sobre los 
-  !! 	asociados a grados de libertad rotacionales y traslacionales. - Los primeros 
-  !!	N vectores (nRotAndTrans ),  se asocian a los grados 
+  !! 	Proyecta los vectores asociados a grados de libertad vibracionales sobre los
+  !! 	asociados a grados de libertad rotacionales y traslacionales. - Los primeros
+  !!	N vectores (nRotAndTrans ),  se asocian a los grados
   !!	de libertad rotacionales y translacionales el resto se asocian a los grados de libertad
   !!	vibracionales -
   !!**
   call orthogonalizeLinearVectorialSpace( projector )
-  
+
   write(*,*) ""
   write(*,*) "Orthogonalized projector: "
   do i=1,size(projector,dim=2)
@@ -639,7 +652,7 @@ subroutine getForceConstantsProjector( projector, nVib, nRotAndTrans )
   !! asociados a rotaciones y traslaciones al final
   !!
   call swapBlockOfColumns( projector, [nRotAndTrans+1, 3*NATS] )
-  
+
   write(*,*) ""
   write(*,*) "Orthogonalized & sorted projector: "
   do i=1,size(projector,dim=2)
@@ -661,21 +674,23 @@ subroutine getTransformationMatrix( output )
   USE SETUPARRAY
   USE MYPRECISION
   USE MDARRAY
+  USE MYPRECISION
 
   implicit none
-  
+
   interface
     subroutine getForceConstantsProjector( projector, nVib, nRotAndTrans )
+      USE MYPRECISION
       implicit none
-      real(8), allocatable :: projector(:,:)
+      real(latteprec), allocatable :: projector(:,:)
       integer :: nVib, nRotAndTrans
     end subroutine getForceConstantsProjector
-  end interface 
-  
-  real(8), allocatable :: output(:,:)
-  real(8), allocatable :: forceConstansProjector(:,:)
+  end interface
+
+  real(latteprec), allocatable :: output(:,:)
+  real(latteprec), allocatable :: forceConstansProjector(:,:)
   integer :: nVib, nRotAndTrans
-  
+
   allocate( output(NATS*3,NATS*3) )
   output = 0.0_8
   call getForceConstantsProjector( forceConstansProjector, nVib, nRotAndTrans )
@@ -690,12 +705,13 @@ end subroutine getTransformationMatrix
   !! \param lattice_vectors System lattice vectors.
   !! \param origin (min(x),min(y),min(z)) set as the origin of the system.
   !!
-  subroutine prg_translatetogeomcandfoldtobox(coords,lattice_vectors,origin)
+  subroutine translatetogeomcandfoldtobox(coords,lattice_vectors,origin)
+    USE MYPRECISION
     implicit none
     integer                              ::  i
-    real(8), allocatable, intent(inout) ::  origin(:),coords(:,:)
-    real(8), intent(in)                 ::  lattice_vectors(:,:)
-    real(8)                             ::  geomc(3)
+    real(latteprec), allocatable, intent(inout) ::  origin(:),coords(:,:)
+    real(latteprec), intent(in)                 ::  lattice_vectors(:,:)
+    real(latteprec)                             ::  geomc(3)
 
     if(.not.allocated(origin)) allocate(origin(3))
 
@@ -719,23 +735,24 @@ end subroutine getTransformationMatrix
     !Shift origin slightly
     origin(1) = -1.0d-1 ; origin(2) = -1.0d-1; origin(3) = -1.0d-1
 
-  end subroutine prg_translatetogeomcandfoldtobox
+  end subroutine translatetogeomcandfoldtobox
 
  !> Wrap around atom i using pbc.
   !! \param coords Coordinates of the system (see system_type).
   !! \param lattice_vectors System lattice vectors.
   !! \param index Index atom to wrap around
   !!
-  subroutine prg_wraparound(coords,lattice_vectors,index,verbose)
+  subroutine wraparound(coords,lattice_vectors,index,verbose)
+    USE MYPRECISION
     implicit none
     integer                              ::  i, nats
     integer, intent(in)                  ::  index
     integer, intent(in), optional        ::  verbose
-    real(8), allocatable, intent(inout) ::  coords(:,:)
-    real(8), allocatable                ::  origin(:)
-    real(8), intent(in)                 ::  lattice_vectors(:,:)
+    real(latteprec), allocatable, intent(inout) ::  coords(:,:)
+    real(latteprec), allocatable                ::  origin(:)
+    real(latteprec), intent(in)                 ::  lattice_vectors(:,:)
 
-    if(present(verbose) .and. verbose >= 1)write(*,*)"In prg_wraparound ..."
+    if(present(verbose) .and. verbose >= 1)write(*,*)"In wraparound ..."
 
     if(.not.allocated(origin)) allocate(origin(3))
 
@@ -761,22 +778,23 @@ end subroutine getTransformationMatrix
     enddo
     !$end omp parallel do
 
-  end subroutine prg_wraparound
+  end subroutine wraparound
 
   !> Translate geometric center to the center of the box.
   !! \param coords Coordinates of the system (see system_type).
   !! \param lattice_vectors System lattice vectors.
   !! \param verbose Verbosity level.
   !!
-  subroutine prg_centeratbox(coords,lattice_vectors,verbose)
+  subroutine centeratbox(coords,lattice_vectors,verbose)
+    USE MYPRECISION
     implicit none
     integer                              ::  i, nats
     integer, intent(in), optional        ::  verbose
-    real(8)                             ::  gc(3)
-    real(8), allocatable, intent(inout) ::  coords(:,:)
-    real(8), intent(in)                 ::  lattice_vectors(:,:)
+    real(latteprec)                             ::  gc(3)
+    real(latteprec), allocatable, intent(inout) ::  coords(:,:)
+    real(latteprec), intent(in)                 ::  lattice_vectors(:,:)
 
-    if(present(verbose) .and. verbose >= 1)write(*,*)"In prg_centeratbox ..."
+    if(present(verbose) .and. verbose >= 1)write(*,*)"In centeratbox ..."
 
     nats=size(coords,dim=2)
 
@@ -790,7 +808,7 @@ end subroutine getTransformationMatrix
     enddo
     !$omp end parallel do
 
-    gc=gc/real(nats,8)
+    gc=gc/real(nats,latteprec)
 
     !$omp parallel do default(none) private(i) &
     !$omp shared(coords,lattice_vectors,nats, gc)
@@ -801,8 +819,8 @@ end subroutine getTransformationMatrix
     enddo
     !$omp end parallel do
 
-  end subroutine prg_centeratbox
-  
+  end subroutine centeratbox
+
 !!>
 !! Prepares the geometry for IR calculation
 !!
@@ -812,29 +830,41 @@ SUBROUTINE PREPAREIR
   USE SETUPARRAY
   USE MYPRECISION
   USE MDARRAY
+  USE MYPRECISION
+#ifdef PROGRESSON
+  USE BML
+  USE PRG_SYSTEM_MOD
+#endif
 
   implicit none
-  
+
   interface
-    subroutine prg_wraparound(coords,lattice_vectors,index,verbose)
+    subroutine wraparound(coords,lattice_vectors,index,verbose)
+      USE MYPRECISION
       implicit none
       integer, intent(in)                  ::  index
       integer, intent(in), optional        ::  verbose
-      real(8), allocatable, intent(inout) ::  coords(:,:)
-      real(8), intent(in)                 ::  lattice_vectors(:,:)
-    end subroutine prg_wraparound
-    subroutine prg_centeratbox(coords,lattice_vectors,verbose)
+      real(latteprec), allocatable, intent(inout) ::  coords(:,:)
+      real(latteprec), intent(in)                 ::  lattice_vectors(:,:)
+    end subroutine wraparound
+    subroutine centeratbox(coords,lattice_vectors,verbose)
+      USE MYPRECISION
       implicit none
       integer, intent(in), optional        ::  verbose
-      real(8), allocatable, intent(inout) ::  coords(:,:)
-      real(8), intent(in)                 ::  lattice_vectors(:,:)
-    end subroutine prg_centeratbox
-  end interface 
-  
+      real(latteprec), allocatable, intent(inout) ::  coords(:,:)
+      real(latteprec), intent(in)                 ::  lattice_vectors(:,:)
+    end subroutine centeratbox
+  end interface
+
+#ifdef PROGRESSON
   call prg_wraparound(CR,BOX,1,1)
   call prg_centeratbox(CR,BOX,1)
-  
-END SUBROUTINE PREPAREIR  
+#else
+  call wraparound(CR,BOX,1,1)
+  call centeratbox(CR,BOX,1)
+#endif
+
+END SUBROUTINE PREPAREIR
 
 !!>
 !! Calculates the IR spectrum
@@ -845,94 +875,99 @@ SUBROUTINE GETIR
   USE SETUPARRAY
   USE MYPRECISION
   USE MDARRAY
+  USE MYPRECISION
 
   implicit none
-  
+
   interface
     subroutine getTransformationMatrix( output )
+      USE MYPRECISION
       implicit none
-      real(8), allocatable :: output(:,:)
+      real(latteprec), allocatable :: output(:,:)
     end subroutine getTransformationMatrix
-    subroutine prg_translatetogeomcandfoldtobox(coords,lattice_vectors,origin)
+    subroutine translatetogeomcandfoldtobox(coords,lattice_vectors,origin)
+      USE MYPRECISION
       implicit none
-      real(8), allocatable, intent(inout) ::  origin(:),coords(:,:)
-      real(8), intent(in)                 ::  lattice_vectors(:,:)
-      real(8)                             ::  geomc(3)
-    end subroutine prg_translatetogeomcandfoldtobox
-    subroutine prg_wraparound(coords,lattice_vectors,index,verbose)
+      real(latteprec), allocatable, intent(inout) ::  origin(:),coords(:,:)
+      real(latteprec), intent(in)                 ::  lattice_vectors(:,:)
+      real(latteprec)                             ::  geomc(3)
+    end subroutine translatetogeomcandfoldtobox
+    subroutine wraparound(coords,lattice_vectors,index,verbose)
+      USE MYPRECISION
       implicit none
       integer, intent(in)                  ::  index
       integer, intent(in), optional        ::  verbose
-      real(8), allocatable, intent(inout) ::  coords(:,:)
-      real(8), intent(in)                 ::  lattice_vectors(:,:)
-    end subroutine prg_wraparound
-    subroutine prg_centeratbox(coords,lattice_vectors,verbose)
+      real(latteprec), allocatable, intent(inout) ::  coords(:,:)
+      real(latteprec), intent(in)                 ::  lattice_vectors(:,:)
+    end subroutine wraparound
+    subroutine centeratbox(coords,lattice_vectors,verbose)
+      USE MYPRECISION
       implicit none
       integer, intent(in), optional        ::  verbose
-      real(8), allocatable, intent(inout) ::  coords(:,:)
-      real(8), intent(in)                 ::  lattice_vectors(:,:)
-    end subroutine prg_centeratbox
-  end interface 
-  
+      real(latteprec), allocatable, intent(inout) ::  coords(:,:)
+      real(latteprec), intent(in)                 ::  lattice_vectors(:,:)
+    end subroutine centeratbox
+  end interface
+
   integer :: i, j, p1, p2, atom1, atom2
-  real(8) :: m1, m2
-  REAL(8) :: d2Vdp1dp2, HB
-  real(8), allocatable :: geom0(:,:)
-  
-  real(8) :: inertiaTensor(3,3)
-  
-  real(8), allocatable :: hessian(:,:)
-  real(8), allocatable :: eVecsHessian(:,:)
-  real(8), allocatable :: eValsHessian(:)
-  
-  real(8), allocatable :: transformationMatrix(:,:)
-  real(8), allocatable :: workSpace(:)
+  real(latteprec) :: m1, m2
+  REAL(latteprec) :: d2Vdp1dp2, HB
+  real(latteprec), allocatable :: geom0(:,:)
+
+  real(latteprec) :: inertiaTensor(3,3)
+
+  real(latteprec), allocatable :: hessian(:,:)
+  real(latteprec), allocatable :: eVecsHessian(:,:)
+  real(latteprec), allocatable :: eValsHessian(:)
+
+  real(latteprec), allocatable :: transformationMatrix(:,:)
+  real(latteprec), allocatable :: workSpace(:)
   integer :: ssize, info
-  
+
   IF (EXISTERROR) RETURN
- 
+
   write(*,*) ""
   write(*,*) "Original geometry:"
   do atom1=1,NATS
     write(*,"(F8.2,4X,3F8.2)") MASS(ELEMPOINTER(atom1)), CR(:,atom1)
   end do
   write(*,*) ""
-  
+
   call getTransformationMatrix( transformationMatrix )
-  
+
   write(*,*) " transformationMatrix : "
   do i=1,size(transformationMatrix,dim=2)
     write(*,"(6F8.2)") transformationMatrix(i,:)
   end do
-  
+
 !   do i=1,size(transformationMatrix,dim=1)
 !     transformationMatrix(i,i) = 1.0_8 + transformationMatrix(i,i)
 !   end do
 
   CALL GETFORCE
-  
+
   write(*,*) " Norm. grad = ", sqrt(sum(FTOT**2))
-  
+
   allocate( geom0(3,NATS) )
   allocate( hessian(3*NATS,3*NATS) )
-  
+
   geom0 = CR
-  
+
   hb = 0.001d0
 
   p1 = 1
   do atom1=1,NATS; do i=1,3
     m1 = MASS(ELEMPOINTER(atom1))*1822.88853_8 ! amu to a.u.
-    
+
 !     write(*,*) MASS(ELEMPOINTER(atom1)), CR(I,atom1)
-    
+
     p2 = 1
     do atom2=1,NATS; do j=1,3
       m2 = MASS(ELEMPOINTER(atom2))*1822.88853_8 ! amu to a.u.
-      
+
       FTOT = 0.0d0
       CR = geom0
-      
+
       !! Second derivatives are calculated as follows
       !! a,b = atom1, atom2
       !! i,j = x, y, or z
@@ -942,28 +977,28 @@ SUBROUTINE GETIR
       !! d2V(ai,bj)/daidbj = d( dV(ai,bj)/dai )/dbj = d( -F(ai,bj) )/dbj
       !!
       !! d2V(ai,bj)/daidbj ~ ( -F(ai,bj+hb) + F(ai,bj-hb) )/(2*hb)
-      
+
       CR(J,atom2) = CR(J,atom2) + hb
       CALL GETFORCE
-      
+
       d2Vdp1dp2 = -FTOT(I,atom1)
-      
+
       CR(J,atom2) = CR(J,atom2) - 2*hb
       CALL GETFORCE
-      
+
       d2Vdp1dp2 = ( d2Vdp1dp2 + FTOT(I,atom1) )/2.0d0/hb ! Derivative
       d2Vdp1dp2 = d2Vdp1dp2*0.0102908545816127_8  ! eV/angs^2 to a.u.
-      
+
       d2Vdp1dp2 = d2Vdp1dp2/sqrt(m1*m2) ! Mass weighted derivative
-      
+
       hessian( p1, p2 ) = d2Vdp1dp2
-        
+
       p2 = p2 + 1
     end do; end do
-    
+
     p1 = p1 + 1
   end do; end do
-  
+
   write(*,*) "Hessian:"
   do i=1,3*NATS
     do j=1,3*NATS
@@ -971,15 +1006,15 @@ SUBROUTINE GETIR
     end do
     write(*,*) ""
   end do
-  
+
   hessian = matmul( transpose(transformationMatrix), matmul( hessian, transformationMatrix ) )
-  
+
   CR = geom0 ! Restore original geometry
-  
+
 !   write(*,*) hessian
   allocate( eValsHessian(3*NATS) )
   allocate( eVecsHessian(3*NATS,3*NATS) )
-  
+
   write(*,*) "D^T*Hessian*D:"
   do i=1,3*NATS
     do j=1,3*NATS
@@ -987,28 +1022,28 @@ SUBROUTINE GETIR
     end do
     write(*,*) ""
   end do
-  
+
   allocate( workSpace( 3*3*NATS-1 ) )
   eVecsHessian = hessian
 
   ! Compute the eigen values and eigen vectors using the upper elements of the symmetric matrix
   call dsyev( 'V', 'L', 3*NATS, eVecsHessian, 3*NATS, eValsHessian, workSpace, 3*3*NATS-1, info )
-  
+
   deallocate( workSpace )
-  
+
   if ( info /= 0 ) then
     write(*,*) "### ERROR ### GETIR.dsyev: matrix diagonalization failed"
     stop
   end if
-  
+
   write(*,*) ""
   write(*,*) " Vib. Freqs (cm-1) "
   write(*,*) "-------------------"
   do i=1,3*NATS
     if( eValsHessian(i) < 0.0_8 ) then
-      write(*,"(I10,F20.10)") i, -sqrt(abs(eValsHessian(i)))*219474.63068_8  ! a.u. to cm-1  
+      write(*,"(I10,F20.10)") i, -sqrt(abs(eValsHessian(i)))*219474.63068_8  ! a.u. to cm-1
     else
-      write(*,"(I10,F20.10)") i, sqrt(eValsHessian(i))*219474.63068_8  ! a.u. to cm-1  
+      write(*,"(I10,F20.10)") i, sqrt(eValsHessian(i))*219474.63068_8  ! a.u. to cm-1
     end if
   end do
   write(*,*) ""
@@ -1017,12 +1052,12 @@ SUBROUTINE GETIR
 !   WRITE(*,*)"Im stoping in subroutine getir"
 !   WRITE(*,*)"Grep for GETIR"
 !   WRITE(*,*)"==========================="
-  
+
   deallocate( geom0 )
   deallocate( hessian )
   deallocate( eValsHessian )
   deallocate( eVecsHessian )
-  
+
   STOP
 
   RETURN
