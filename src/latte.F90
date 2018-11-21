@@ -307,7 +307,7 @@ PROGRAM LATTE
      
        CALL GETIR
     
-      ENDIF
+     ENDIF
 
 !     WRITE(6,*) F(1,1), F(2,1), F(3,1)
 !     WRITE(6,*) FPP(1,1), FPP(2,1), FPP(3,1)
