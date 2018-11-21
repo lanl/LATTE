@@ -99,6 +99,7 @@ PROGRAM LATTE
   ENDIF
 
   EREP = ZERO
+  IF (GETIRON .EQ. 1) CALL PREPAREIR !Making transformations to center at box
   IF (PPOTON .EQ. 1) CALL READPPOT
   IF (PPOTON .EQ. 2) CALL READPPOTTAB
   IF (PPOTON .EQ. 3) CALL READPPOTSPLINE
@@ -307,7 +308,7 @@ PROGRAM LATTE
      
        CALL GETIR
     
-      ENDIF
+     ENDIF
 
 !     WRITE(6,*) F(1,1), F(2,1), F(3,1)
 !     WRITE(6,*) FPP(1,1), FPP(2,1), FPP(3,1)

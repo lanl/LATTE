@@ -598,6 +598,156 @@ subroutine getTransformationMatrix( output )
 
 end subroutine getTransformationMatrix
 
+  !> Translate to geometric center.
+  !! \param coords Coordinates of the system (see system_type).
+  !! \param lattice_vectors System lattice vectors.
+  !! \param origin (min(x),min(y),min(z)) set as the origin of the system.
+  !!
+  subroutine prg_translatetogeomcandfoldtobox(coords,lattice_vectors,origin)
+    implicit none
+    integer                              ::  i
+    real(8), allocatable, intent(inout) ::  origin(:),coords(:,:)
+    real(8), intent(in)                 ::  lattice_vectors(:,:)
+    real(8)                             ::  geomc(3)
+
+    if(.not.allocated(origin)) allocate(origin(3))
+
+    ! Getting the geometric center.
+    do i=1,size(coords,dim=2)
+       geomc = geomc + coords(:,i)
+    enddo
+
+    geomc = geomc/size(coords,dim=2)
+
+    coords(1,:) = coords(1,:) - geomc(1)
+    coords(2,:) = coords(2,:) - geomc(2)
+    coords(3,:) = coords(3,:) - geomc(3)
+
+    coords(1,:) = mod(coords(1,:)*1000000,1000000*lattice_vectors(1,1))/1000000;
+    coords(2,:) = mod(coords(2,:)*1000000,1000000*lattice_vectors(2,2))/1000000;
+    coords(3,:) = mod(coords(3,:)*1000000,1000000*lattice_vectors(3,3))/1000000;
+
+    origin = 0.0
+
+    !Shift origin slightly
+    origin(1) = -1.0d-1 ; origin(2) = -1.0d-1; origin(3) = -1.0d-1
+
+  end subroutine prg_translatetogeomcandfoldtobox
+
+ !> Wrap around atom i using pbc.
+  !! \param coords Coordinates of the system (see system_type).
+  !! \param lattice_vectors System lattice vectors.
+  !! \param index Index atom to wrap around
+  !!
+  subroutine prg_wraparound(coords,lattice_vectors,index,verbose)
+    implicit none
+    integer                              ::  i, nats
+    integer, intent(in)                  ::  index
+    integer, intent(in), optional        ::  verbose
+    real(8), allocatable, intent(inout) ::  coords(:,:)
+    real(8), allocatable                ::  origin(:)
+    real(8), intent(in)                 ::  lattice_vectors(:,:)
+
+    if(present(verbose) .and. verbose >= 1)write(*,*)"In prg_wraparound ..."
+
+    if(.not.allocated(origin)) allocate(origin(3))
+
+    nats=size(coords,dim=2)
+
+    origin(1) = -coords(1,index) + lattice_vectors(1,1)/2.0d0
+    origin(2) = -coords(2,index) + lattice_vectors(2,2)/2.0d0
+    origin(3) = -coords(3,index) + lattice_vectors(3,3)/2.0d0
+
+    coords(1,:) = coords(1,:) + origin(1)
+    coords(2,:) = coords(2,:) + origin(2)
+    coords(3,:) = coords(3,:) + origin(3)
+
+    !$omp parallel do default(none) private(i) &
+    !$omp shared(coords,lattice_vectors,nats)
+    do i=1,nats
+       if(coords(1,i) > lattice_vectors(1,1))coords(1,i)=coords(1,i)-lattice_vectors(1,1)
+       if(coords(2,i) > lattice_vectors(2,2))coords(2,i)=coords(2,i)-lattice_vectors(2,2)
+       if(coords(3,i) > lattice_vectors(3,3))coords(3,i)=coords(3,i)-lattice_vectors(3,3)
+       if(coords(1,i) < 0.0d0)coords(1,i)=coords(1,i)+lattice_vectors(1,1)
+       if(coords(2,i) < 0.0d0)coords(2,i)=coords(2,i)+lattice_vectors(2,2)
+       if(coords(3,i) < 0.0d0)coords(3,i)=coords(3,i)+lattice_vectors(3,3)
+    enddo
+    !$end omp parallel do
+
+  end subroutine prg_wraparound
+
+  !> Translate geometric center to the center of the box.
+  !! \param coords Coordinates of the system (see system_type).
+  !! \param lattice_vectors System lattice vectors.
+  !! \param verbose Verbosity level.
+  !!
+  subroutine prg_centeratbox(coords,lattice_vectors,verbose)
+    implicit none
+    integer                              ::  i, nats
+    integer, intent(in), optional        ::  verbose
+    real(8)                             ::  gc(3)
+    real(8), allocatable, intent(inout) ::  coords(:,:)
+    real(8), intent(in)                 ::  lattice_vectors(:,:)
+
+    if(present(verbose) .and. verbose >= 1)write(*,*)"In prg_centeratbox ..."
+
+    nats=size(coords,dim=2)
+
+    gc= 0.0d0
+
+    !$omp parallel do default(none) private(i) &
+    !$omp shared(coords,nats) &
+    !$omp reduction(+:gc)
+    do i=1,nats
+       gc=gc + coords(:,i)
+    enddo
+    !$omp end parallel do
+
+    gc=gc/real(nats,8)
+
+    !$omp parallel do default(none) private(i) &
+    !$omp shared(coords,lattice_vectors,nats, gc)
+    do i=1,nats
+       coords(1,i) = coords(1,i) + lattice_vectors(1,1)/2.0d0 - gc(1)
+       coords(2,i) = coords(2,i) + lattice_vectors(2,2)/2.0d0 - gc(2)
+       coords(3,i) = coords(3,i) + lattice_vectors(3,3)/2.0d0 - gc(3)
+    enddo
+    !$omp end parallel do
+
+  end subroutine prg_centeratbox
+  
+!!>
+!! Prepares the geometry for IR calculation
+!!
+SUBROUTINE PREPAREIR
+
+  USE CONSTANTS_MOD
+  USE SETUPARRAY
+  USE MYPRECISION
+  USE MDARRAY
+
+  implicit none
+  
+  interface
+    subroutine prg_wraparound(coords,lattice_vectors,index,verbose)
+      implicit none
+      integer, intent(in)                  ::  index
+      integer, intent(in), optional        ::  verbose
+      real(8), allocatable, intent(inout) ::  coords(:,:)
+      real(8), intent(in)                 ::  lattice_vectors(:,:)
+    end subroutine prg_wraparound
+    subroutine prg_centeratbox(coords,lattice_vectors,verbose)
+      implicit none
+      integer, intent(in), optional        ::  verbose
+      real(8), allocatable, intent(inout) ::  coords(:,:)
+      real(8), intent(in)                 ::  lattice_vectors(:,:)
+    end subroutine prg_centeratbox
+  end interface 
+  
+  call prg_wraparound(CR,BOX,1,1)
+  call prg_centeratbox(CR,BOX,1)
+  
+END SUBROUTINE PREPAREIR  
 
 !!>
 !! Calculates the IR spectrum
@@ -616,6 +766,25 @@ SUBROUTINE GETIR
       implicit none
       real(8), allocatable :: output(:,:)
     end subroutine getTransformationMatrix
+    subroutine prg_translatetogeomcandfoldtobox(coords,lattice_vectors,origin)
+      implicit none
+      real(8), allocatable, intent(inout) ::  origin(:),coords(:,:)
+      real(8), intent(in)                 ::  lattice_vectors(:,:)
+      real(8)                             ::  geomc(3)
+    end subroutine prg_translatetogeomcandfoldtobox
+    subroutine prg_wraparound(coords,lattice_vectors,index,verbose)
+      implicit none
+      integer, intent(in)                  ::  index
+      integer, intent(in), optional        ::  verbose
+      real(8), allocatable, intent(inout) ::  coords(:,:)
+      real(8), intent(in)                 ::  lattice_vectors(:,:)
+    end subroutine prg_wraparound
+    subroutine prg_centeratbox(coords,lattice_vectors,verbose)
+      implicit none
+      integer, intent(in), optional        ::  verbose
+      real(8), allocatable, intent(inout) ::  coords(:,:)
+      real(8), intent(in)                 ::  lattice_vectors(:,:)
+    end subroutine prg_centeratbox
   end interface 
   
   integer :: i, j, p1, p2, atom1, atom2
@@ -630,12 +799,11 @@ SUBROUTINE GETIR
   real(8), allocatable :: eValsHessian(:)
   
   real(8), allocatable :: transformationMatrix(:,:)
-  
   real(8), allocatable :: workSpace(:)
   integer :: ssize, info
   
   IF (EXISTERROR) RETURN
-  
+ 
   write(*,*) ""
   write(*,*) "Original geometry:"
   do atom1=1,NATS
@@ -709,6 +877,14 @@ SUBROUTINE GETIR
     p1 = p1 + 1
   end do; end do
   
+  write(*,*) "Hessian:"
+  do i=1,3*NATS
+    do j=1,3*NATS
+      write(*,"(E20.2)",advance="no") hessian(i,j)
+    end do
+    write(*,*) ""
+  end do
+  
   hessian = matmul( transpose(transformationMatrix), matmul( hessian, transformationMatrix ) )
   
   CR = geom0 ! Restore original geometry
@@ -717,7 +893,7 @@ SUBROUTINE GETIR
   allocate( eValsHessian(3*NATS) )
   allocate( eVecsHessian(3*NATS,3*NATS) )
   
-  write(*,*) "Hessian:"
+  write(*,*) "D^T*Hessian*D:"
   do i=1,3*NATS
     do j=1,3*NATS
       write(*,"(E20.2)",advance="no") hessian(i,j)
