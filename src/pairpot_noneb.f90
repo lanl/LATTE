@@ -40,8 +40,6 @@ SUBROUTINE PAIRPOTNONEB
   REAL(LATTEPREC) :: FUNIV(3), FJOIN(3), FVDW(3), FCUT(3)
   REAL(LATTEPREC) :: PHI, DPHI(3), EXPTMP, R6, FTMP(3)
   REAL(LATTEPREC) :: POLYNOM, DPOLYNOM
-  CHARACTER(128) :: MISSPAIR ! in case some pair is missing
-
   IF (EXISTERROR) RETURN
 
   ! 
@@ -85,8 +83,6 @@ SUBROUTINE PAIRPOTNONEB
            !           PBCJ = NEBPP(3, NEWJ, I)
            !           PBCK = NEBPP(4, NEWJ, I)
 
-           RCUT2 = -1 ! use RCUT2 to decide whether the pair exist
-
            DO K = 1, NOPPS
 
               IF ((ATELE(I) .EQ. PPELE1(K) .AND. ATELE(J) .EQ. PPELE2(K)) &
@@ -102,12 +98,6 @@ SUBROUTINE PAIRPOTNONEB
               ENDIF
 
            ENDDO
-
-          ! check current pair found or not
-          IF (RCUT2 == -1) THEN
-              WRITE(MISSPAIR,'(a,a,a,a)') 'Missing pair: ', ATELE(I), '- ' , ATELE(J)
-              CALL ERRORS('PAIRPOTNONEB', MISSPAIR)
-          END IF
 
            RIJ(1) = CR(1,J) - CR(1,I)
            RIJ(2) = CR(2,J) - CR(2,I)
