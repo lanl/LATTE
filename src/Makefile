@@ -9,7 +9,7 @@ PPFLAGS = -DXSYEVD -D$(PRECISION)PREC -DGPU$(GPUOPT) -DDBCSR_$(DBCSR_OPT) -DMPI_
 PPFLAGS += -DPROGRESS$(PROGRESS)
 
 # Flags for linking GPU libraries
-GPU_LINKFLAG = -L../MATRIX -lgfortran -lstdc++
+GPU_LINKFLAG = -L../MATRIX -lgfortran -lstdc++ $(GPU_LINK_LIB)
 GPU_LIB = -L../MATRIX -lmatrix_cuda.$(PRECISION) $(GPU_CUDA_LIB)
 
 
