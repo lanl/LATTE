@@ -309,8 +309,10 @@ CONTAINS
        !
 
        CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
-       CALL DTIME(TARRAY, RESULT)
 
+#ifndef FCIDxlf
+       CALL DTIME(TARRAY, RESULT)
+#endif
 
 
        ! Set up neighbor lists for building the H and pair potentials
@@ -522,7 +524,12 @@ CONTAINS
        !
 
        TX = STOP_TIMER(LATTE_TIMER)
+
+
+#ifndef FCIDxlf
        CALL DTIME(TARRAY, RESULT)
+#endif
+
        CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
 
        CALL GETPRESSURE
@@ -610,7 +617,10 @@ CONTAINS
           ! Start the timers
           IF (VERBOSE >= 1)WRITE(*,*)"Starting timers ..."
           CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
+
+#ifndef FCIDxlf
           CALL DTIME(TARRAY, RESULT)
+#endif
 
           IF (VERBOSE >= 1)WRITE(*,*)"Setting up TBMD ..."
           CALL SETUPTBMD(NEWSYSTEM)
@@ -821,7 +831,10 @@ CONTAINS
        ! Start the timers
 
        CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
+
+#ifndef FCIDxlf
        CALL DTIME(TARRAY, RESULT)
+#endif
 
        !
        ! Call TBMD
@@ -835,7 +848,10 @@ CONTAINS
 
        ! Stop the timers
 
+#ifndef FCIDxlf
        CALL DTIME(TARRAY, RESULT)
+#endif
+
        CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
 
        CALL SUMMARY

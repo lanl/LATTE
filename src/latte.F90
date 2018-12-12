@@ -133,7 +133,10 @@ PROGRAM LATTE
      !
 
      CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
+
+#ifndef FCIDxlf
      CALL DTIME(TARRAY, RESULT)
+#endif
 
      ! Set up neighbor lists for building the H and pair potentials
 
@@ -275,7 +278,11 @@ PROGRAM LATTE
      !
 
      TX = STOP_TIMER(LATTE_TIMER)
+
+#ifndef FCIDxlf
      CALL DTIME(TARRAY, RESULT)
+#endif
+
      CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
 
      CALL GETPRESSURE
@@ -343,7 +350,11 @@ PROGRAM LATTE
      ! Start the timers
 
      CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
+
+
+#ifndef FCIDxlf
      CALL DTIME(TARRAY, RESULT)
+#endif
 
      !
      ! Call TBMD
@@ -359,7 +370,10 @@ PROGRAM LATTE
 
      ! Stop the timers
 
+#ifndef FCIDxlf
      CALL DTIME(TARRAY, RESULT)
+#endif
+
      CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
 
      CALL SUMMARY
