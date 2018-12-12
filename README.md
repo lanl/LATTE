@@ -49,17 +49,18 @@ For a full list of options use a CMake GUI, e.g. `ccache` or `cache-gui`.
 # Authors
 
 Nicolas Bock (T-1)
-Marc J. Cawkwell (T-1)
+Marc Cawkwell (T-1)
 Josh D. Coe (T-1)
-Aditi Krishnapriyan (T-1)
-Matthew P. Kroonblawd (T-1)
+Aditi Krishnapriyan (T-1 & Stanford)
+Matthew P. Kroonblawd (T-1 & Mizzou)
 Adam Lang (T-1)
+Chang Liu (T-1 & NCSU)
 Enrique Martinez Saez (MST-8)
 Susan M. Mniszewski (CCS-3)
 Christian F. A. Negre (T-1)
 Anders M. N. Niklasson (T-1)
 Edward Sanville (T-1)
-Mitchell A. Wood (T-1)
+Mitchell A. Wood (T-1 &  Purdue)
 Ping Yang (T-1)
 
 Los Alamos National Laboratory
@@ -76,7 +77,7 @@ with the following `bibtex` citation:
     @misc{LATTE,
       title = {LATTE},
       url = {https://github.com/lanl/LATTE},
-      author = {N. Bock and M. J. Cawkwell and J. D. Coe and A. Krishnapriyan and M. P. Kroonblawd and A. Lang and E. Martinez Saez and S. M. Mniszewski and C. F. A. Negre and A. M. N. Niklasson and E. Sanville and M. A. Wood and P. Yang},
+      author = {N. Bock and M. J. Cawkwell and J. D. Coe and A. Krishnapriyan and M. P. Kroonblawd and A. Lang and and C. Liu and E. Martinez Saez and S. M. Mniszewski and C. F. A. Negre and A. M. N. Niklasson and E. Sanville and M. A. Wood and P. Yang},
       year = {2008}
     }
 
