@@ -49,7 +49,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
      CALL KBLDNEWH
 
   ENDIF
-  CALL FLUSH(6)
+  FLUSH(6)
 
   ! Broken?
 
@@ -99,11 +99,11 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
         IF (SPINON .EQ. 1) CALL PROPSPINS(CURRITER) ! Propagate m's
 
-        CALL FLUSH(6)
+        FLUSH(6)
 
      ENDIF
 
-     CALL FLUSH(6)
+     FLUSH(6)
   ENDIF
 
   !
@@ -159,7 +159,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
 !  ENDIF
 
-  CALL FLUSH(6)
+  FLUSH(6)
   !
   ! Get the forces from the covalent part
   !
@@ -196,7 +196,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
   ENDIF
 
-  CALL FLUSH(6)
+  FLUSH(6)
 
   RETURN
 

@@ -220,7 +220,7 @@ CONTAINS
           !Forces, charges and element pointers are allocated in readcr
           CALL READCR
 
-          CALL FLUSH(6)
+          FLUSH(6)
 
        ELSE
 
@@ -248,7 +248,7 @@ CONTAINS
 
        CALL GETBNDFIL()
 
-       CALL FLUSH(6)
+       FLUSH(6)
 
 #ifdef GPUON
 
@@ -292,7 +292,7 @@ CONTAINS
        IF(.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
        CR = CR_IN
 
-       CALL FLUSH(6)
+       FLUSH(6)
 
     ENDIF
     !End of initialization
@@ -309,8 +309,10 @@ CONTAINS
        !
 
        CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
-       CALL DTIME(TARRAY, RESULT)
 
+#ifndef FCIDxlf
+       CALL DTIME(TARRAY, RESULT)
+#endif
 
 
        ! Set up neighbor lists for building the H and pair potentials
@@ -522,7 +524,12 @@ CONTAINS
        !
 
        TX = STOP_TIMER(LATTE_TIMER)
+
+
+#ifndef FCIDxlf
        CALL DTIME(TARRAY, RESULT)
+#endif
+
        CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
 
        CALL GETPRESSURE
@@ -590,7 +597,7 @@ CONTAINS
           IF (VERBOSE >= 1) WRITE(*,*)"NOTE: DT = 0 => MDMIX = QMIX"
           FULLQCONV = 1
           MDMIX = QMIX
-          CALL FLUSH(6)
+          FLUSH(6)
        ENDIF
 
        IF (LIBCALLS == 0) THEN
@@ -610,12 +617,15 @@ CONTAINS
           ! Start the timers
           IF (VERBOSE >= 1)WRITE(*,*)"Starting timers ..."
           CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
+
+#ifndef FCIDxlf
           CALL DTIME(TARRAY, RESULT)
+#endif
 
           IF (VERBOSE >= 1)WRITE(*,*)"Setting up TBMD ..."
           CALL SETUPTBMD(NEWSYSTEM)
 
-          CALL FLUSH(6)
+          FLUSH(6)
 
        ELSEIF (LIBCALLS > 0 .AND. RESTARTLIB == 0) THEN
 
@@ -754,7 +764,7 @@ CONTAINS
              IF(LIBCALLS .EQ. 0)THEN
                 OPEN(UNIT=20,FILE="trajectory.xyz",STATUS='unknown')
              ELSE
-                OPEN(UNIT=20,FILE="trajectory.xyz",ACCESS='append',STATUS='old')
+                OPEN(UNIT=20,FILE="trajectory.xyz",POSITION='append',STATUS='old')
              ENDIF
              !Extended xyz file.
              WRITE(20,*)NATS
@@ -801,7 +811,7 @@ CONTAINS
        !  ENDIF
 #endif
 
-       CALL FLUSH(6) !To force writing to file at every call
+       FLUSH(6) !To force writing to file at every call
 
        EXISTERROR_INOUT = EXISTERROR
 
@@ -821,7 +831,10 @@ CONTAINS
        ! Start the timers
 
        CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
+
+#ifndef FCIDxlf
        CALL DTIME(TARRAY, RESULT)
+#endif
 
        !
        ! Call TBMD
@@ -835,7 +848,10 @@ CONTAINS
 
        ! Stop the timers
 
+#ifndef FCIDxlf
        CALL DTIME(TARRAY, RESULT)
+#endif
+
        CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
 
        CALL SUMMARY
