@@ -20,4 +20,7 @@ log.*
 *~
 ./Restarts/*
 ./animate/*
+./bl/*
+latte.in
+makefile.CHOICES
 
