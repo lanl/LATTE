@@ -52,6 +52,8 @@ SUBROUTINE WRTCFGS(ITER)
   !  REAL(LATTEPREC), PARAMETER :: CONV = 1.66053D6/(3.0D0*1.38062D0)
   CHARACTER(LEN=50) :: FLNM
   CHARACTER(LEN=2) :: MYELEMENTS(92)
+  LOGICAL :: FILEEXISTS
+
   IF (EXISTERROR) RETURN
 
   ALLOCATE(T(NATS), MAGF(NATS))
@@ -124,6 +126,8 @@ SUBROUTINE WRTCFGS(ITER)
      ! Write CFG files if periodic boundary conditions are on
 
      IF (ITER .LT. 0) THEN
+        INQUIRE( FILE="animate/.", EXIST=FILEEXISTS)
+	IF (.NOT. FILEEXISTS) CALL SYSTEM("mkdir animate")
         WRITE(FLNM,'("animate/dump2atomeye.PANIC.cfg")')
         IF (ITER .EQ. -999) WRITE(FLNM,'("lastsystem.cfg")')
      ENDIF
@@ -146,6 +150,8 @@ SUBROUTINE WRTCFGS(ITER)
            WRITE(FLNM,'("animate/dump2atomeye.",I7,".cfg")') ITER
         ELSEIF (ITER .GE. 10000000 .AND. ITER .LT. 100000000) THEN
            WRITE(FLNM,'("animate/dump2atomeye.",I8,".cfg")') ITER
+        ELSEIF (ITER .GE. 100000000 .AND. ITER .LT. 1000000000) THEN
+           WRITE(FLNM,'("animate/dump2atomeye.",I9,".cfg")') ITER
         ENDIF
 
         OPEN(UNIT = 23, STATUS="UNKNOWN", FILE=FLNM)

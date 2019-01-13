@@ -7,11 +7,11 @@ include ../makefile.CHOICES
 
 FCID = $(shell echo $(FC) | head -c 3)
 
-PPFLAGS = -DXSYEVD -D$(PRECISION)PREC -DGPU$(GPUOPT) -DDBCSR_$(DBCSR_OPT) -DMPI_$(MPIOPT)
+PPFLAGS = -WF -DXSYEVD -D$(PRECISION)PREC -DGPU$(GPUOPT) -DDBCSR_$(DBCSR_OPT) -DMPI_$(MPIOPT)
 PPFLAGS += -DPROGRESS$(PROGRESS) -DFCID$(FCID)
 
 # Flags for linking GPU libraries
-GPU_LINKFLAG = -L../MATRIX -lgfortran -lstdc++ $(GPU_LINK_LIB)
+#GPU_LINKFLAG = -I../MATRIX -lstdc++ $(GPU_LINK_LIB)
 GPU_LIB = -L../MATRIX -lmatrix_cuda.$(PRECISION) $(GPU_CUDA_LIB)
 
 MYMODULES = myprecision.F90 constants_mod.F90 setuparray.F90 coulombarray.F90 \
@@ -106,7 +106,6 @@ ifeq ($(MAKELIB), ON)
 		$(RANLIB) ../liblatte.a
 		$(FC) $(FFLAGS) -c latte_c_bind.F90
 endif
-
 
 
 ifeq ($(DBCSR_OPT), ON)
