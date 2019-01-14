@@ -18,3 +18,9 @@ log.*
 *.gcda
 *.gcno
 *~
+./Restarts/*
+./animate/*
+./bl/*
+latte.in
+makefile.CHOICES
+

@@ -743,7 +743,7 @@ CONTAINS
              IF(LIBCALLS .EQ. 0)THEN
                 OPEN(UNIT=20,FILE="trajectory.xyz",STATUS='unknown')
              ELSE
-                OPEN(UNIT=20,FILE="trajectory.xyz",ACCESS='append',STATUS='old')
+                OPEN(UNIT=20,FILE="trajectory.xyz",POSITION='append',STATUS='old')
              ENDIF
              !Extended xyz file.
              WRITE(20,*)NATS
