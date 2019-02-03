@@ -65,7 +65,7 @@ CONTAINS
     !> Parsing sp2 input paramenters. this will read the variables in the input file.
     !  sp2 is the "SP2DATA_TYPE".
     IF(.NOT.SP2INIT)THEN
-       CALL PRG_PARSE_SP2(SP2D,"latte.in")
+       CALL PRG_PARSE_SP2(SP2D,LATTEINNAME)
        SP2INIT = .TRUE.
     ENDIF
 
