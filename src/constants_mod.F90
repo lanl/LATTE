@@ -76,8 +76,8 @@ MODULE CONSTANTS_MOD
   CHARACTER(LEN = 3) :: SP2CONV
   CHARACTER(LEN = 20) :: BASISTYPE, SCLTYPE !scltype controls whether we do exp or tabular integrals
 
-  CHARACTER(LEN = 100) :: PARAMPATH = "./TBparam"
-  CHARACTER(LEN = 100) :: COORDSFILE = "./bl/inputblock.dat"
+  CHARACTER(LEN = 1000) :: PARAMPATH = "./TBparam"
+  CHARACTER(LEN = 1000) :: COORDSFILE = "./bl/inputblock.dat"
 
   ! For the latte lib
   CHARACTER(LEN = 20) :: JOB
@@ -88,6 +88,7 @@ MODULE CONSTANTS_MOD
   LOGICAL :: STOPATMAXSCF
 
   !For the new input file parser
+  CHARACTER(LEN = 1000) :: LATTEINNAME = "latte.in"
   LOGICAL :: LATTEINEXISTS
 
   !! For truncated SP2 and entropy calculation
