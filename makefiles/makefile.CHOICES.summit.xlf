@@ -1,0 +1,76 @@
+#
+# Compilation and link flags for LATTE
+#
+
+# Precision - double or single
+PRECISION = DOUBLE
+#PRECISION = SINGLE
+
+# Make the latte library
+# AR and RUNLIB executable default path to compile 
+# latte as a library (change accordingly)
+MAKELIB = ON
+AR = /usr/bin/ar cq
+RANLIB = /usr/bin/ranlib
+
+# Use PROGRESS and BML libraries
+PROGRESS = OFF
+PROGRESS_PATH= $(HOME)/qmd-progress/install/lib64
+BML_PATH= $(HOME)/bml/install/lib64
+
+# Use METIS library for graph partitioning
+METIS = OFF
+METIS_PATH= $(HOME)/metis/metis-5.1.0/install
+
+# GPU available - OFF or ON
+GPUOPT = ON
+
+# Using DBCSR library from cp2k? OFF or ON
+DBCSR_OPT = OFF
+
+# Parallelizing over k-points?
+MPIOPT = OFF
+
+#
+# CPU Fortran options
+#
+
+FC = xlf90_r
+FCL = $(FC)
+# Optimization flags:
+FFLAGS = -qessl -qstrict=all -qsmp=omp -O2 -qextname 
+# Debug flags:
+FFLAGS += -g0 -qreport
+LINKFLAG = -qsmp=omp 
+
+#BLAS/LAPACK libraries:
+LIB = -L${OLCF_ESSL_ROOT}/lib64/ -lessl -lesslsmp -lesslsmpcuda -qextname
+LIB += -lxlopt -lxlf90_r -lxlfmath -lxl -lxlsmp 
+
+# Uncomment for coverage
+#CVR = OFF
+ifeq ($(CVR), ON)
+	FFLAGS += -fprofile-arcs -ftest-coverage
+	LINKFLAG += -fprofile-arcs -ftest-coverage
+endif
+
+ifeq ($(PROGRESS), ON)
+	LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml_fortran -lbml
+	FFLAGS += -I$(BML_PATH)/../include -I$(PROGRESS_PATH)/../include
+endif
+
+ifeq ($(GRAPH), ON) 
+	LIB += -L$(METIS_PATH)/lib -lmetis
+	FFLAGS += -I$(METIS_PATH)/include
+endif
+
+#DBCSR_LIB = -L/home/cawkwell/cp2k/lib/cawkwell/popt -lcp2k_dbcsr_lib
+#DBCSR_MOD = -I/home/cawkwell/cp2k/obj/cawkwell/popt
+
+#
+# GPU options
+#
+
+GPU_CUDA_LIB = -L${OLCF_CUDA_ROOT}/lib64/ -lcublas -lcudart
+
+GPU_ARCH = sm_70 
