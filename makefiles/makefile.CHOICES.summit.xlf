@@ -64,9 +64,6 @@ ifeq ($(GRAPH), ON)
 	FFLAGS += -I$(METIS_PATH)/include
 endif
 
-#DBCSR_LIB = -L/home/cawkwell/cp2k/lib/cawkwell/popt -lcp2k_dbcsr_lib
-#DBCSR_MOD = -I/home/cawkwell/cp2k/obj/cawkwell/popt
-
 #
 # GPU options
 #
