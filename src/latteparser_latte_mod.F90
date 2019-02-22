@@ -128,11 +128,10 @@ CONTAINS
 
     !Library of keywords with the respective defaults.
     CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_CHAR(NKEY_CHAR) = [CHARACTER(LEN=100) :: &
-         'JOBNAME=','BASISTYPE=','SP2CONV=','RELAXTYPE=','PARAMPATH=','COORDSFILE=', &
-         'SCLTYPE=' ]
+         'JOBNAME=','BASISTYPE=','SP2CONV=','RELAXTYPE=','PARAMPATH=','COORDSFILE=',&
+         'SCLTYPE=']
     CHARACTER(LEN=100) :: VALVECTOR_CHAR(NKEY_CHAR) = [CHARACTER(LEN=100) :: &
-         'MyJob','NONORTHO','REL','SD','./TBparam','./bl/inputblock.dat', &
-         'EXP']
+         'MyJob','NONORTHO','REL','SD','./TBparam','./bl/inputblock.dat','EXP']
 
     CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_INT(NKEY_INT) = [CHARACTER(LEN=50) :: &
          'XCONTROL=','DEBUGON=','FERMIM=','CGORLIB=','NORECS=','ENTROPYKIND=',&

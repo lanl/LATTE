@@ -142,7 +142,7 @@ SUBROUTINE BOEVECS
         ! If we have an even number of electrons
 
         IF (MOD(INT(TOTNE),2) .EQ. 0) THEN
-           EGAP = EVALS(INT(OCCTARGET) + 1) - EVALS(INT(OCCTARGET))
+           EGAP = EVALS(NINT(OCCTARGET) + 1) - EVALS(NINT(OCCTARGET))
         ELSE
            EGAP = ZERO
         ENDIF

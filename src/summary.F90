@@ -161,6 +161,11 @@ SUBROUTINE SUMMARY
   WRITE(6,'("# Pairwise energy = ", F16.8)') EREP
   WRITE(24,'("Tr[ rho*H ] = ", F16.8)') TRRHOH
   WRITE(24,'("Pairwise energy = ", F16.8)') EREP
+  
+  IF (PLUSDON .EQ. 1) THEN
+     WRITE(6,'("# Pairwise +D energy = ", F16.8)') EPLUSD
+     WRITE(24,'("# Pairwise +D energy = ", F16.8)') EPLUSD
+  ENDIF
 
   IF (ELECTRO .EQ. 1) THEN
      WRITE(6,'("# Coulombic + onsite E = ", F16.8)') ECOUL
@@ -190,32 +195,35 @@ SUBROUTINE SUMMARY
   WRITE(24,'("# Pressure (GPa) = ", F16.8)') PRESSURE
 
   IF (SPINON .EQ. 0) THEN
-     WRITE(6,'("# Total energy (zero K) = ", F16.8)') TRRHOH + EREP - ECOUL
+     WRITE(6,'("# Total energy (zero K) = ", F16.8)') TRRHOH + EREP - ECOUL + EPLUSD
      WRITE(6,'("")')
-     WRITE(6,'("# FREE ENERGY = ", F16.8)') TRRHOH + EREP - ECOUL - ENTE
+     WRITE(6,'("# FREE ENERGY = ", F16.8)') TRRHOH + EREP - ECOUL - ENTE + EPLUSD
      WRITE(6,'("")')
-     WRITE(24,'("Total energy (zero K) = ", F16.8)') TRRHOH + EREP - ECOUL
+     WRITE(24,'("Total energy (zero K) = ", F16.8)') TRRHOH + EREP - ECOUL + EPLUSD
      WRITE(24,'("")')
-     WRITE(24,'("FREE ENERGY = ", F16.8)') TRRHOH + EREP - ECOUL - ENTE
+     WRITE(24,'("FREE ENERGY = ", F16.8)') TRRHOH + EREP - ECOUL - ENTE + EPLUSD
      WRITE(24,'("")')
   ELSEIF (SPINON .EQ. 1) THEN
      WRITE(6,'("# Total energy (zero K) = ", F16.8)') TRRHOH + EREP - ECOUL + &
-          ESPIN 
+          ESPIN + EPLUSD
      WRITE(6,'("")')
      WRITE(6,'("# FREE ENERGY = ", F16.8)') TRRHOH + EREP - ECOUL - ENTE + &
-          ESPIN 
+          ESPIN + EPLUSD
      WRITE(6,'("")')
      WRITE(24,'("Total energy (zero K) = ", F16.8)') TRRHOH + EREP - ECOUL + &
-          ESPIN 
+          ESPIN + EPLUSD
      WRITE(24,'("")')
      WRITE(24,'("FREE ENERGY = ", F16.8)') TRRHOH + EREP - ECOUL - ENTE + &
-          ESPIN 
+          ESPIN + EPLUSD
      WRITE(24,'("")')
   ENDIF
 
-  WRITE(6,60) "#checkP ", SYSVOL, TRRHOH + EREP - ECOUL - ENTE, -PRESSURE/TOGPA
+  WRITE(6,60) "#checkP ", SYSVOL, TRRHOH + EREP - ECOUL - ENTE, -PRESSURE/TOGPA, &
+       STRTEN(1), STRTEN(4), STRTEN(6), STRTEN(2), STRTEN(5), STRTEN(3)
 
-60 FORMAT(A7, 3F18.6)
+ 
+
+60 FORMAT(A7, 9F18.6)
 
   ! Write the stress tensor
 

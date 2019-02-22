@@ -33,6 +33,7 @@ SUBROUTINE RHOZERO
   INTEGER :: I, K, SUBI, INDEX
   REAL(LATTEPREC) :: STOT, PTOT, NUMPERORB
   REAL(LATTEPREC) :: SUP, SDOWN, PUP, PDOWN, DUP, DDOWN, FUP, FDOWN
+  REAL(LATTEPREC) :: NUMPERS, NUMPERP, NUMPERD, NUMPERF
   REAL(LATTEPREC), PARAMETER :: SPINMAXS = ONE, SPINMAXP = THREE
   REAL(LATTEPREC), PARAMETER :: SPINMAXD = FIVE, SPINMAXF = SEVEN
   IF (EXISTERROR) RETURN
@@ -128,20 +129,48 @@ SUBROUTINE RHOZERO
 
         CASE("sd")
 
-           BOZERO(INDEX + 1) = TWO
+           IF (HES(ELEMPOINTER(I)) .LT. HED(ELEMPOINTER(I))) THEN
 
-           INDEX = INDEX + 1
+              NUMPERS = MIN(TWO, ATOCC(ELEMPOINTER(I)))
 
-           NUMPERORB = (ATOCC(ELEMPOINTER(I)) - TWO)/FIVE
+              NUMPERD = MIN(TWO, (ATOCC(ELEMPOINTER(I)) - TWO)/FIVE)
 
-           BOZERO(INDEX + 1) = NUMPERORB
-           BOZERO(INDEX + 2) = NUMPERORB
-           BOZERO(INDEX + 3) = NUMPERORB
-           BOZERO(INDEX + 4) = NUMPERORB
-           BOZERO(INDEX + 5) = NUMPERORB
+              IF (NUMPERD .LT. ZERO) NUMPERD = ZERO
 
-           INDEX = INDEX + 5
+              ! S
+              BOZERO(INDEX + 1) = NUMPERS
 
+              ! D
+              BOZERO(INDEX + 2) = NUMPERD
+              BOZERO(INDEX + 3) = NUMPERD
+              BOZERO(INDEX + 4) = NUMPERD
+              BOZERO(INDEX + 5) = NUMPERD
+              BOZERO(INDEX + 6) = NUMPERD
+              
+              INDEX = INDEX + 6
+
+           ELSE ! E_d < E_s
+
+              NUMPERD = MIN(TWO, ATOCC(ELEMPOINTER(I))/FIVE)
+
+              NUMPERS = MIN(TWO, ATOCC(ELEMPOINTER(I)) - TEN)
+
+              IF (NUMPERS .LT. ZERO) NUMPERS = ZERO
+
+               ! S                                                                                                                       
+              BOZERO(INDEX + 1) = NUMPERS
+
+              ! D                                                                                                                       
+              BOZERO(INDEX + 2) = NUMPERD
+              BOZERO(INDEX + 3) = NUMPERD
+              BOZERO(INDEX + 4) = NUMPERD
+              BOZERO(INDEX + 5) = NUMPERD
+              BOZERO(INDEX + 6) = NUMPERD
+
+              INDEX = INDEX + 6
+              
+           ENDIF
+           
         CASE("sf")
 
            ! Caution - f electron system!
@@ -260,74 +289,54 @@ SUBROUTINE RHOZERO
 
         CASE("spd")
 
-           ! s, d, then p
+           ! We're going to assume that the p's are always way high
 
-           IF (ATOCC(ELEMPOINTER(I)) .LE. TWO) THEN
+           ! E_s < E_d
+            
+           IF (HES(ELEMPOINTER(I)) .LT. HED(ELEMPOINTER(I))) THEN
 
-              BOZERO(INDEX + 1) = ATOCC(ELEMPOINTER(I))
+              NUMPERS = MIN(TWO, ATOCC(ELEMPOINTER(I)))
 
-              INDEX = INDEX + 1
+              NUMPERD = MIN(TWO, (ATOCC(ELEMPOINTER(I)) - TWO)/FIVE)
 
-              BOZERO(INDEX + 1) = ZERO
-              BOZERO(INDEX + 2) = ZERO
-              BOZERO(INDEX + 3) = ZERO
+              IF (NUMPERD .LT. ZERO) NUMPERD = ZERO
 
-              INDEX = INDEX + 3
+              NUMPERP = MIN(TWO, (ATOCC(ELEMPOINTER(I)) - TWELVE)/THREE)
 
-              BOZERO(INDEX + 1) = ZERO
-              BOZERO(INDEX + 2) = ZERO
-              BOZERO(INDEX + 3) = ZERO
-              BOZERO(INDEX + 4) = ZERO
-              BOZERO(INDEX + 5) = ZERO
+              IF (NUMPERP .LT. ZERO) NUMPERP = ZERO
 
-              INDEX = INDEX + 5
+           ELSE ! E_d < E_s
 
-           ELSE IF (ATOCC(ELEMPOINTER(I)) .GT. TWO .AND. &
-                ATOCC(ELEMPOINTER(I)) .LE. TWELVE) THEN
+              NUMPERD = MIN(TWO, ATOCC(ELEMPOINTER(I))/FIVE)
 
-              BOZERO(INDEX + 1) = TWO
+              NUMPERS = MIN(TWO, ATOCC(ELEMPOINTER(I)) - TEN)
 
-              INDEX = INDEX + 1
+              IF (NUMPERS .LT. ZERO) NUMPERS = ZERO
 
-              NUMPERORB = (ATOCC(ELEMPOINTER(I)) - TWO)/FIVE
+              NUMPERP = MIN(TWO, (ATOCC(ELEMPOINTER(I)) - TWELVE)/THREE)
 
-              BOZERO(INDEX + 1) = ZERO
-              BOZERO(INDEX + 2) = ZERO
-              BOZERO(INDEX + 3) = ZERO
-
-              INDEX = INDEX + 3
-
-              BOZERO(INDEX + 1) = NUMPERORB
-              BOZERO(INDEX + 2) = NUMPERORB
-              BOZERO(INDEX + 3) = NUMPERORB
-              BOZERO(INDEX + 4) = NUMPERORB
-              BOZERO(INDEX + 5) = NUMPERORB
-
-              INDEX = INDEX + 5
-
-           ELSE
-
-              BOZERO(INDEX + 1) = TWO
-
-              INDEX = INDEX + 1
-
-              NUMPERORB = (ATOCC(ELEMPOINTER(I)) - TWELVE)/THREE
-
-              BOZERO(INDEX + 1) = NUMPERORB
-              BOZERO(INDEX + 2) = NUMPERORB
-              BOZERO(INDEX + 3) = NUMPERORB
-
-              INDEX = INDEX + 3
-
-              BOZERO(INDEX + 1) = TWO
-              BOZERO(INDEX + 2) = TWO
-              BOZERO(INDEX + 3) = TWO
-              BOZERO(INDEX + 4) = TWO
-              BOZERO(INDEX + 5) = TWO
-
-              INDEX = INDEX + 5
+              IF (NUMPERP .LT. ZERO) NUMPERP = ZERO
 
            ENDIF
+
+           ! S
+           
+           BOZERO(INDEX + 1) = NUMPERS
+           
+           ! P
+           
+           BOZERO(INDEX + 2) = NUMPERP
+           BOZERO(INDEX + 3) = NUMPERP
+           BOZERO(INDEX + 4) = NUMPERP
+
+           ! D
+           BOZERO(INDEX + 5) = NUMPERD
+           BOZERO(INDEX + 6) = NUMPERD
+           BOZERO(INDEX + 7) = NUMPERD
+           BOZERO(INDEX + 8) = NUMPERD
+           BOZERO(INDEX + 9) = NUMPERD
+              
+           INDEX = INDEX + 9
 
         CASE("spf")
 
@@ -408,72 +417,81 @@ SUBROUTINE RHOZERO
 
         CASE("sdf")
 
-           ! Let's build this for the light actinides
+           ! MJC - re-doing this. We must fill up the orbitals in order of their energy.
+           ! If we don't we'll get nonsensical results
+           ! This is a big deal! The TB ground state for the atoms is not the same 
+           ! as the experimental or DFT ground state (partially occupied d's and f's).
 
-           ! 7s has 2 electrons, 6d2, 5f0 for Th, and 6d1, 5f? for the others
+           ! YOU HAVE BEEN WARNED. MJC 11/3/2018
 
-           IF (ATOCC(ELEMPOINTER(I)) .GE. THREE .AND. &
-                ATOCC(ELEMPOINTER(I)) .LE. FOUR) THEN
 
-              BOZERO(INDEX + 1) = TWO
+           ! We will assume that the s is always lower in energy than the d or f. This 
+           ! should work fine provided the initial DFT guess is reasonable
 
-              INDEX = INDEX + 1
+           IF (HED(ELEMPOINTER(I)) .LT. HEF(ELEMPOINTER(I))) THEN
 
-              NUMPERORB = (ATOCC(ELEMPOINTER(I)) - TWO)/FIVE
+              NUMPERS = MIN(TWO, ATOCC(ELEMPOINTER(I)))
 
-              BOZERO(INDEX + 1) = NUMPERORB
-              BOZERO(INDEX + 2) = NUMPERORB
-              BOZERO(INDEX + 3) = NUMPERORB
-              BOZERO(INDEX + 4) = NUMPERORB
-              BOZERO(INDEX + 5) = NUMPERORB
+              NUMPERD = MIN(TWO, (ATOCC(ELEMPOINTER(I)) - TWO)/FIVE)
 
-              INDEX = INDEX + 5
+              IF (NUMPERD .LT. ZERO) NUMPERD = ZERO
 
-              BOZERO(INDEX + 1) = ZERO
-              BOZERO(INDEX + 2) = ZERO
-              BOZERO(INDEX + 3) = ZERO
-              BOZERO(INDEX + 4) = ZERO
-              BOZERO(INDEX + 5) = ZERO
-              BOZERO(INDEX + 6) = ZERO
-              BOZERO(INDEX + 7) = ZERO
+              NUMPERF = MIN(TWO, (ATOCC(ELEMPOINTER(I)) - TWELVE)/SEVEN)
 
-              INDEX = INDEX + 7
+              IF (NUMPERF .LT. ZERO) NUMPERF = ZERO
 
-           ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. FOUR) THEN
+              ! S
+              BOZERO(INDEX + 1) = NUMPERS
+              
+              ! D
+              BOZERO(INDEX + 2) = NUMPERD
+              BOZERO(INDEX + 3) = NUMPERD
+              BOZERO(INDEX + 4) = NUMPERD
+              BOZERO(INDEX + 5) = NUMPERD
+              BOZERO(INDEX + 6) = NUMPERD
 
-              BOZERO(INDEX + 1) = TWO
+              ! F
+              BOZERO(INDEX + 7) = NUMPERF
+              BOZERO(INDEX + 8) = NUMPERF
+              BOZERO(INDEX + 9) = NUMPERF
+              BOZERO(INDEX + 10) = NUMPERF
+              BOZERO(INDEX + 11) = NUMPERF
+              BOZERO(INDEX + 12) = NUMPERF
+              BOZERO(INDEX + 13) = NUMPERF
 
-              INDEX = INDEX + 1
+              INDEX = INDEX + 13
 
-              !              NUMPERORB = ONE/FIVE
-              NUMPERORB = ZERO
+           ELSE ! IF E_f < E_d
 
-              BOZERO(INDEX + 1) = NUMPERORB
-              BOZERO(INDEX + 2) = NUMPERORB
-              BOZERO(INDEX + 3) = NUMPERORB
-              BOZERO(INDEX + 4) = NUMPERORB
-              BOZERO(INDEX + 5) = NUMPERORB
+              NUMPERS = MIN(TWO, ATOCC(ELEMPOINTER(I)))
 
-              INDEX = INDEX + 5
+              IF (NUMPERF .LT. ZERO) NUMPERF = ZERO
 
-              !              NUMPERORB = (ATOCC(ELEMPOINTER(I)) - THREE)/SEVEN
-              NUMPERORB = (ATOCC(ELEMPOINTER(I)) - TWO)/SEVEN
+              NUMPERD = MIN(TWO, (ATOCC(ELEMPOINTER(I)) - 16.0D0)/FIVE)
 
-              BOZERO(INDEX + 1) = NUMPERORB
-              BOZERO(INDEX + 2) = NUMPERORB
-              BOZERO(INDEX + 3) = NUMPERORB
-              BOZERO(INDEX + 4) = NUMPERORB
-              BOZERO(INDEX + 5) = NUMPERORB
-              BOZERO(INDEX + 6) = NUMPERORB
-              BOZERO(INDEX + 7) = NUMPERORB
+              IF (NUMPERD .LT. ZERO) NUMPERD = ZERO
 
-              INDEX = INDEX + 7
+              ! S                                                                                                                       
+              BOZERO(INDEX + 1) = NUMPERS
 
-           ELSE
+              ! D                                                                                                                       
+              BOZERO(INDEX + 2) = NUMPERD
+              BOZERO(INDEX + 3) = NUMPERD
+              BOZERO(INDEX + 4) = NUMPERD
+              BOZERO(INDEX + 5) = NUMPERD
+              BOZERO(INDEX + 6) = NUMPERD
 
-              CALL ERRORS("rhozero","Check the number of electrons &
-                   & you're using with the sdf basis")
+              ! F                                                                                                                       
+              BOZERO(INDEX + 7) = NUMPERF
+              BOZERO(INDEX + 8) = NUMPERF
+              BOZERO(INDEX + 9) = NUMPERF
+              BOZERO(INDEX + 10) = NUMPERF
+              BOZERO(INDEX + 11) = NUMPERF
+              BOZERO(INDEX + 12) = NUMPERF
+              BOZERO(INDEX + 13) = NUMPERF
 
+              INDEX = INDEX + 13
+              
            ENDIF
 
         CASE("pdf")

@@ -114,6 +114,13 @@ SUBROUTINE NEBLISTS(AMIALLO)
      RCUTTB = RCUTTB + SKIN
      RCUTTB2 = RCUTTB*RCUTTB
 
+     ! See whether we're using the dispersion correction
+
+     IF (PLUSDON .EQ. 1) THEN
+        IF (PLUSDCUT .GT. PPMAX) PPMAX = PLUSDCUT
+     ENDIF
+
+
      IF (PPOTON .GT. 0) THEN
         PPMAX = PPMAX + SKIN
         PPMAX2 = PPMAX*PPMAX
@@ -121,6 +128,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
         PPMAX = ZERO
         PPMAX2 = ZERO
      ENDIF
+
 
      RCUTCOUL = COULCUT + SKIN
      RCUTCOUL2 = RCUTCOUL * RCUTCOUL

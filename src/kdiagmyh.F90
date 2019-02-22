@@ -63,8 +63,26 @@ SUBROUTINE KDIAGMYH
 
   DO I = 1, NKTOT
 
+#ifdef XHEEV     
+
      CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
           DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
+     
+#elif defined(XHEEVD)
+
+     CALL ZHEEVD('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
+          ZHEEVD_WORK, ZHEEVD_LWORK, ZHEEVD_RWORK, ZHEEVD_LRWORK, &
+          ZHEEVD_IWORK, ZHEEVD_LIWORK, INFO)
+
+     IF (INFO .NE. 0) CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
+          DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
+
+#else
+
+     CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
+          DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
+
+#endif 
 
   ENDDO
 
@@ -75,8 +93,27 @@ SUBROUTINE KDIAGMYH
 
      IF (MOD(I, NUMPROCS) .EQ. MYID) THEN
 
+#ifdef XHEEV
+
         CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
              DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
+
+#elif defined(XHEEVD)
+        
+
+        CALL ZHEEVD('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
+             ZHEEVD_WORK, ZHEEVD_LWORK, ZHEEVD_RWORK, ZHEEVD_LRWORK, &
+             ZHEEVD_IWORK, ZHEEVD_LIWORK, INFO)
+
+        IF (INFO .NE. 0)  CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
+             DIAG_ZWORK, DIAG_LWORK, DIAG_RWORK, INFO)
+        
+#else
+
+        CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
+             DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
+          
+#endif 
 
      ENDIF
 
