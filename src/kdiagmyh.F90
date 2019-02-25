@@ -77,12 +77,7 @@ SUBROUTINE KDIAGMYH
      IF (INFO .NE. 0) CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
           DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
 
-#else
-
-     CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
-          DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
-
-#endif 
+#endif
 
   ENDDO
 
@@ -108,12 +103,7 @@ SUBROUTINE KDIAGMYH
         IF (INFO .NE. 0)  CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
              DIAG_ZWORK, DIAG_LWORK, DIAG_RWORK, INFO)
         
-#else
-
-        CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
-             DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
-          
-#endif 
+#endif
 
      ENDIF
 
