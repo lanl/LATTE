@@ -22,7 +22,8 @@
 FUNCTION BM(M, ALPHA)
 
   ! Build Bm function defined in eqn. (6) of PRB 72 165107
-
+  
+  USE WIGNERARRAY
   USE MYPRECISION
 
   IMPLICIT NONE
@@ -33,12 +34,12 @@ FUNCTION BM(M, ALPHA)
 
   ! Removed the Heaviside step function: MJC 1/10/13
 
-  IF (M == 0) THEN
+  IF (M .EQ. 0) THEN
      BM = ZERO
   ELSE IF (M .GT. 0) THEN
-     BM = -REAL((-1)**M, LATTEPREC)*SIN(ABS(M) * ALPHA)
+     BM = -REAL(MINUSONEPOW(M))*SIN(ABS(M) * ALPHA)
   ELSE IF (M .LT. 0) THEN
-     BM = REAL((-1)**M, LATTEPREC) * COS(ABS(M) * ALPHA)
+     BM = REAL(MINUSONEPOW(M)) * COS(ABS(M) * ALPHA)
   ENDIF
 
   RETURN

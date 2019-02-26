@@ -23,12 +23,12 @@ FUNCTION AM(M, ALPHA)
 
   ! Build Am function defined in eqn. (5) of PRB 72 165107
 
+  USE WIGNERARRAY
   USE MYPRECISION
 
   IMPLICIT NONE
 
   REAL(LATTEPREC) :: AM, ALPHA
-  !  REAL(LATTEPREC), EXTERNAL:: HEAVI
   INTEGER :: M
 
   ! Removed the call to the Heaviside step function to save on 
@@ -36,12 +36,12 @@ FUNCTION AM(M, ALPHA)
 
   ! MJC 1/10/14
 
-  IF (M == 0) THEN
+  IF (M .EQ. 0) THEN
      AM = ONE / SQRT2
   ELSE IF ( M .GT. 0) THEN
-     AM = REAL((-1)**M, LATTEPREC) * COS(ABS(M)*ALPHA)
+     AM = REAL(MINUSONEPOW(M)) * COS(ABS(M)*ALPHA)
   ELSE IF ( M .LT. 0) THEN
-     AM = REAL((-1)**M, LATTEPREC) * SIN(ABS(M)*ALPHA)
+     AM = REAL(MINUSONEPOW(M)) * SIN(ABS(M)*ALPHA)
   ENDIF
 
   RETURN

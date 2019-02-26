@@ -24,39 +24,35 @@ FUNCTION WIGNERD(L, M, MP, COSBETA)
   ! Builds Wigner d function 
   ! notation conforms to that in PRB 72 165107 (2005), eq. (9)
 
+  USE WIGNERARRAY
   USE MYPRECISION
 
   IMPLICIT NONE
 
-  REAL(LATTEPREC) :: BETA, PREF, SUM, NUMER, DENOM, WIGNERD
+  REAL(LATTEPREC) :: BETA, PREF, MYSUM, NUMER, DENOM, WIGNERD
   REAL(LATTEPREC) :: COSBETA
-  INTEGER, EXTERNAL :: FACTORIAL
   INTEGER :: K, L, M, MP
 
-  !  PREF = TWO ** (-L) * REAL( (-1)**(L - MP)) * &
-  !       SQRT( REAL(FACTORIAL(L + M) * FACTORIAL(L - M) * &
-  !       FACTORIAL(L + MP) * FACTORIAL(L - MP)) )
-
-  PREF =  REAL( (-1)**(L - MP)) * &
+  PREF = (REAL(MINUSONEPOW( L - MP ))/REAL(TWOPOW(L))) * &
        SQRT( REAL(FACTORIAL(L + M) * FACTORIAL(L - M) * &
-       FACTORIAL(L + MP) * FACTORIAL(L - MP)) ) / REAL(2**L)
-
-  SUM = ZERO
+       FACTORIAL(L + MP) * FACTORIAL(L - MP)) )
+  
+  MYSUM = ZERO
 
   DO K = MAX(0, - M - MP), MIN(L - M, L - MP)
 
-     NUMER = REAL( (-1)**K ) * &
+     NUMER = REAL( MINUSONEPOW(K) ) * &
           (ONE - COSBETA) ** (L - K - HALF * (M + MP)) * &
           (ONE + COSBETA) ** (K + HALF * (M + MP))
 
      DENOM = REAL(FACTORIAL(K) * FACTORIAL(L - M - K) * &
           FACTORIAL(L - MP - K) * FACTORIAL(M + MP + K))
 
-     SUM = SUM + NUMER / DENOM
+     MYSUM = MYSUM + NUMER / DENOM
 
   ENDDO
 
-  WIGNERD = PREF * SUM
+  WIGNERD = PREF * MYSUM
 
   RETURN 
 
