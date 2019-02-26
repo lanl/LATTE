@@ -38,18 +38,28 @@ SUBROUTINE DEORTHOMYRHO
 
 #ifdef DOUBLEPREC
 
+#ifdef GPUON
+
+     CALL mmlatte(HDIM, 0, 0, ONE, ZERO, XMAT, BO, NONOTMP)
+
+     CALL mmlatte(HDIM, 0, 1, ONE, ZERO, NONOTMP, XMAT, BO)
+
+#elif defined(GPUOFF)
+
      CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
           XMAT, HDIM, BO, HDIM, ZERO, NONOTMP, HDIM)
 
-     CALL DGEMM('N', 'C', HDIM, HDIM, HDIM, ONE, &
+     CALL DGEMM('N', 'T', HDIM, HDIM, HDIM, ONE, &
           NONOTMP, HDIM, XMAT, HDIM, ZERO, BO, HDIM)
+
+#endif
 
 #elif defined(SINGLEPREC)
 
      CALL SGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
           XMAT, HDIM, BO, HDIM, ZERO, NONOTMP, HDIM)
 
-     CALL SGEMM('N', 'C', HDIM, HDIM, HDIM, ONE, &
+     CALL SGEMM('N', 'T', HDIM, HDIM, HDIM, ONE, &
           NONOTMP, HDIM, XMAT, HDIM, ZERO, BO, HDIM)
 
 #endif
@@ -57,6 +67,18 @@ SUBROUTINE DEORTHOMYRHO
   ELSE
 
 #ifdef DOUBLEPREC
+
+#ifdef GPUON
+
+     CALL mmlatte(HDIM, 0, 0, ONE, ZERO, XMAT, RHOUP, NONOTMP)
+
+     CALL mmlatte(HDIM, 0, 1, ONE, ZERO, NONOTMP, XMAT, RHOUP)
+
+     CALL mmlatte(HDIM, 0, 0, ONE, ZERO, XMAT, RHODOWN, NONOTMP)
+
+     CALL mmlatte(HDIM, 0, 1, ONE, ZERO, NONOTMP, XMAT, RHODOWN)
+
+#elif defined(GPUOFF)
 
      CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
           XMAT, HDIM, RHOUP, HDIM, ZERO, NONOTMP, HDIM)
@@ -69,6 +91,8 @@ SUBROUTINE DEORTHOMYRHO
 
      CALL DGEMM('N', 'T', HDIM, HDIM, HDIM, ONE, &
           NONOTMP, HDIM, XMAT, HDIM, ZERO, RHODOWN, HDIM)
+
+#endif
 
 #elif defined(SINGLEPREC)
 

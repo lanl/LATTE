@@ -47,7 +47,8 @@ SUBROUTINE KPULAY
   REAL(LATTEPREC) :: KPOINT(3), KX0, KY0, KZ0, KDOTL
   REAL(LATTEPREC) :: B1(3), B2(3), B3(3), MAG1, MAG2, MAG3, A1A2XA3, K0(3)
   REAL(LATTEPREC), EXTERNAL :: DFDA, DFDB, DFDR
-  COMPLEX(LATTEPREC) :: FTMP(3), RHO, CONJGBLOCH
+  COMPLEX(LATTEPREC) :: FTMP_PULAY(3), FTMP_COUL(3)
+  COMPLEX(LATTEPREC) :: RHO_PULAY, RHO_COUL, CONJGBLOCH
   COMPLEX(LATTEPREC), ALLOCATABLE :: KX2HRHO(:,:,:), KTMP(:,:)
   COMPLEX(LATTEPREC), PARAMETER :: ZONE=CMPLX(ONE), ZZERO=CMPLX(ZERO), ZHALF=CMPLX(HALF)
 
@@ -135,12 +136,13 @@ SUBROUTINE KPULAY
 
 !$OMP PARALLEL DO DEFAULT (NONE) &
 !$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &
-!$OMP SHARED(CR, BOX, KX2HRHO, NOINT, ATELE, ELE1, ELE2) &
-!$OMP SHARED(HCUT, SCUT, MATINDLIST, BASISTYPE) &
+!$OMP SHARED(CR, BOX, KX2HRHO, KBO, NOINT, ATELE, ELE1, ELE2) &
+!$OMP SHARED(HCUT, SCUT, MATINDLIST, BASISTYPE, ELECTRO) &
 !$OMP SHARED(K0, B1, B2, B3, NKX, NKY, NKZ, KF) &
+!$OMP SHARED(LCNSHIFT, HUBBARDU, DELTAQ, COULOMBV) &
 !$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &
-!$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP2, MAGRP, PATH, PHI, ALPHA, BETA, COSBETA, FTMP) &
-!$OMP PRIVATE(DC, LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET, RHO) &
+!$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP2, MAGRP, PATH, PHI, ALPHA, BETA, COSBETA, FTMP_PULAY, FTMP_COUL) &
+!$OMP PRIVATE(DC, LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET, RHO_PULAY, RHO_COUL) &
 !$OMP PRIVATE(MYDFDA, MYDFDB, MYDFDR, RCUTTB, CONJGBLOCH, KDOTL) &
 !$OMP PRIVATE(KPOINT, KCOUNT) &
 !$OMP REDUCTION(+: VIRBONDK)
@@ -360,7 +362,9 @@ SUBROUTINE KPULAY
            ! dfda contribution seems to be wrong, but gives the right
            ! answer(?)
 
-           FTMP = ZERO
+           FTMP_PULAY = ZERO
+           FTMP_COUL = ZERO
+
            K = INDI
 
            LBRAINC = 1
@@ -419,46 +423,79 @@ SUBROUTINE KPULAY
 
                                    CONJGBLOCH = EXP(CMPLX(ZERO,-KDOTL))
 
-                                   RHO = KX2HRHO(K,L,KCOUNT)*CONJGBLOCH
+                                   RHO_PULAY = KX2HRHO(K,L,KCOUNT)*CONJGBLOCH
+
+                                   RHO_COUL = KBO(K,L,KCOUNT)*CONJGBLOCH
 
                                    !
                                    ! d/d_alpha
                                    !
 
-                                   FTMP(1) = FTMP(1) + RHO * &
+                                   FTMP_PULAY(1) = FTMP_PULAY(1) + RHO_PULAY * &
                                         (-RIJ(2) / MAGRP2 * MYDFDA)
 
-                                   FTMP(2) = FTMP(2) + RHO * &
+                                   FTMP_PULAY(2) = FTMP_PULAY(2) + RHO_PULAY * &
                                         (RIJ(1)/ MAGRP2 * MYDFDA)
+
+                                   FTMP_COUL(1) = FTMP_COUL(1) + RHO_COUL * &
+                                        (-RIJ(2) / MAGRP2 * MYDFDA)
+
+                                   FTMP_COUL(2) = FTMP_COUL(2) + RHO_COUL * &
+                                        (RIJ(1)/ MAGRP2 * MYDFDA)
+
 
                                    !
                                    ! d/d_beta
                                    !
 
-                                   FTMP(1) = FTMP(1) + RHO * &
+                                   FTMP_PULAY(1) = FTMP_PULAY(1) + RHO_PULAY * &
                                         (((((RIJ(3) * RIJ(1)) / &
                                         MAGR2)) / MAGRP) * MYDFDB)
 
-                                   FTMP(2) = FTMP(2) + RHO * &
+                                   FTMP_PULAY(2) = FTMP_PULAY(2) + RHO_PULAY * &
                                         (((((RIJ(3) * RIJ(2)) / &
                                         MAGR2)) / MAGRP) * MYDFDB)
 
-                                   FTMP(3) = FTMP(3) - RHO * &
+                                   FTMP_PULAY(3) = FTMP_PULAY(3) - RHO_PULAY * &
                                         (((ONE - ((RIJ(3) * RIJ(3)) / &
                                         MAGR2)) / MAGRP) * MYDFDB)
+
+                                   FTMP_COUL(1) = FTMP_COUL(1) + RHO_COUL * &
+                                        (((((RIJ(3) * RIJ(1)) / &
+                                        MAGR2)) / MAGRP) * MYDFDB)
+
+                                   FTMP_COUL(2) = FTMP_COUL(2) + RHO_COUL * &
+                                        (((((RIJ(3) * RIJ(2)) / &
+                                        MAGR2)) / MAGRP) * MYDFDB)
+
+                                   FTMP_COUL(3) = FTMP_COUL(3) - RHO_COUL * &
+                                        (((ONE - ((RIJ(3) * RIJ(3)) / &
+                                        MAGR2)) / MAGRP) * MYDFDB)
+
+                                   
 
                                    !
                                    ! d/dR
                                    !
 
-                                   FTMP(1) = FTMP(1) - RHO * DC(1) * &
+                                   FTMP_PULAY(1) = FTMP_PULAY(1) - RHO_PULAY * DC(1) * &
                                         MYDFDR
 
-                                   FTMP(2) = FTMP(2) - RHO * DC(2) * &
+                                   FTMP_PULAY(2) = FTMP_PULAY(2) - RHO_PULAY * DC(2) * &
                                         MYDFDR
 
-                                   FTMP(3) = FTMP(3) - RHO * DC(3) * &
+                                   FTMP_PULAY(3) = FTMP_PULAY(3) - RHO_PULAY * DC(3) * &
                                         MYDFDR
+
+                                   FTMP_COUL(1) = FTMP_COUL(1) - RHO_COUL * DC(1) * &
+                                        MYDFDR
+
+                                   FTMP_COUL(2) = FTMP_COUL(2) - RHO_COUL * DC(2) * &
+                                        MYDFDR
+
+                                   FTMP_COUL(3) = FTMP_COUL(3) - RHO_COUL * DC(3) * &
+                                        MYDFDR
+
 
                                 ENDDO
                              ENDDO
@@ -500,11 +537,17 @@ SUBROUTINE KPULAY
 
                                    CONJGBLOCH = EXP(CMPLX(ZERO,-KDOTL))
 
-                                   RHO = KX2HRHO(K,L,KCOUNT)*CONJGBLOCH
+                                   RHO_PULAY = KX2HRHO(K,L,KCOUNT)*CONJGBLOCH
 
-                                   FTMP(1) = FTMP(1) - RHO * COSBETA * MYDFDB
-                                   FTMP(2) = FTMP(2) - RHO * COSBETA * MYDFDB
-                                   FTMP(3) = FTMP(3) - RHO * COSBETA * MYDFDR
+                                   RHO_COUL = KBO(K,L,KCOUNT)*CONJGBLOCH
+
+                                   FTMP_PULAY(1) = FTMP_PULAY(1) - RHO_PULAY * COSBETA * MYDFDB
+                                   FTMP_PULAY(2) = FTMP_PULAY(2) - RHO_PULAY * COSBETA * MYDFDB
+                                   FTMP_PULAY(3) = FTMP_PULAY(3) - RHO_PULAY * COSBETA * MYDFDR
+
+                                   FTMP_COUL(1) = FTMP_COUL(1) - RHO_COUL * COSBETA * MYDFDB
+                                   FTMP_COUL(2) = FTMP_COUL(2) - RHO_COUL * COSBETA * MYDFDB
+                                   FTMP_COUL(3) = FTMP_COUL(3) - RHO_COUL * COSBETA * MYDFDR
 
                                 ENDDO
                              ENDDO
@@ -517,24 +560,51 @@ SUBROUTINE KPULAY
               ENDDO
            ENDDO
 
-           KF(1,I) = KF(1,I) + FTMP(1)
-           KF(2,I) = KF(2,I) + FTMP(2)
-           KF(3,I) = KF(3,I) + FTMP(3)
+           KF(1,I) = KF(1,I) - TWO * FTMP_PULAY(1)
+           KF(2,I) = KF(2,I) - TWO * FTMP_PULAY(2)
+           KF(3,I) = KF(3,I) - TWO * FTMP_PULAY(3)
 
-           VIRBONDK(1) = VIRBONDK(1) + RIJ(1) * FTMP(1)
-           VIRBONDK(2) = VIRBONDK(2) + RIJ(2) * FTMP(2)
-           VIRBONDK(3) = VIRBONDK(3) + RIJ(3) * FTMP(3)
-           VIRBONDK(4) = VIRBONDK(4) + RIJ(1) * FTMP(2)
-           VIRBONDK(5) = VIRBONDK(5) + RIJ(2) * FTMP(3)
-           VIRBONDK(6) = VIRBONDK(6) + RIJ(3) * FTMP(1)
+           VIRBONDK(1) = VIRBONDK(1) - RIJ(1) * FTMP_PULAY(1)
+           VIRBONDK(2) = VIRBONDK(2) - RIJ(2) * FTMP_PULAY(2)
+           VIRBONDK(3) = VIRBONDK(3) - RIJ(3) * FTMP_PULAY(3)
+           VIRBONDK(4) = VIRBONDK(4) - RIJ(1) * FTMP_PULAY(2)
+           VIRBONDK(5) = VIRBONDK(5) - RIJ(2) * FTMP_PULAY(3)
+           VIRBONDK(6) = VIRBONDK(6) - RIJ(3) * FTMP_PULAY(1)
 
+
+           IF (ELECTRO .EQ. 1) THEN
+
+              FTMP_COUL = FTMP_COUL * ( HUBBARDU(ELEMPOINTER(J))*DELTAQ(J) + COULOMBV(J) &
+                   +HUBBARDU(ELEMPOINTER(I))*DELTAQ(I) + COULOMBV(I))
+           
+           ELSE
+
+              FTMP_COUL = FTMP_COUL * (LCNSHIFT(I) + LCNSHIFT(J))
+
+           ENDIF
+           
+           
+           KF(1,I) = KF(1,I) + FTMP_COUL(1)
+           KF(2,I) = KF(2,I) + FTMP_COUL(2)
+           KF(3,I) = KF(3,I) + FTMP_COUL(3)
+           
+           ! with the factor of 2...                                            
+           
+           VIRBONDK(1) = VIRBONDK(1) + RIJ(1)*FTMP_COUL(1)/TWO
+           VIRBONDK(2) = VIRBONDK(2) + RIJ(2)*FTMP_COUL(2)/TWO
+           VIRBONDK(3) = VIRBONDK(3) + RIJ(3)*FTMP_COUL(3)/TWO
+           VIRBONDK(4) = VIRBONDK(4) + RIJ(1)*FTMP_COUL(2)/TWO
+           VIRBONDK(5) = VIRBONDK(5) + RIJ(2)*FTMP_COUL(3)/TWO
+           VIRBONDK(6) = VIRBONDK(6) + RIJ(3)*FTMP_COUL(1)/TWO
+           
+           
         ENDIF
 
      ENDDO
-
+     
   ENDDO
 
-  !$OMP END PARALLEL DO
+!$OMP END PARALLEL DO
 
   DEALLOCATE(KX2HRHO, KTMP)
 

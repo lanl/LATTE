@@ -58,6 +58,22 @@ SUBROUTINE PULAY_SP
 
 #ifdef DOUBLEPREC
 
+#ifdef GPUON
+
+        ! XMAT * XMAT = S^-1
+
+        CALL mmlatte(HDIM, 0, 0, ONE, ZERO, XMAT, XMAT, X2HRHO)
+
+        ! S^-1 * H
+
+        CALL mmlatte(HDIM, 0, 0, ONE, ZERO, X2HRHO, H, NONOTMP)
+
+        ! (S^-1 * H)*RHO
+
+        CALL mmlatte(HDIM, 0, 0, ONE, ZERO, NONOTMP, BO, X2HRHO)
+
+#elif defined(GPUOFF)
+
         ! XMAT * XMAT = S^-1
 
         CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
@@ -72,6 +88,8 @@ SUBROUTINE PULAY_SP
 
         CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
              NONOTMP, HDIM, BO, HDIM, ZERO, X2HRHO, HDIM)
+
+#endif
 
 #elif defined(SINGLEPREC)
 
@@ -101,11 +119,21 @@ SUBROUTINE PULAY_SP
 
 #ifdef DOUBLEPREC
 
+#ifdef GPUON
+
+        CALL mmlatte(HDIM, 0, 0, ONE, ZERO, BO, H, NONOTMP)
+
+        CALL mmlatte(HDIM, 0, 0, HALF, ZERO, NONOTMP, BO, X2HRHO)
+
+#elif defined(GPUOFF)
+
         CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
              BO, HDIM, H, HDIM, ZERO, NONOTMP, HDIM)
 
         CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, HALF, &
              NONOTMP, HDIM, BO, HDIM, ZERO, X2HRHO, HDIM)
+
+#endif
 
 #elif defined(SINGLEPREC)
 
@@ -125,6 +153,24 @@ SUBROUTINE PULAY_SP
 
 #ifdef DOUBLEPREC
 
+#ifdef GPUON
+
+        ! XMAT * XMAT = S^-1  
+
+        CALL mmlatte(HDIM, 0, 0, ONE, ZERO, XMAT, XMAT, SPINTMP)
+
+        !      Hup * rhoup
+
+        CALL mmlatte(HDIM, 0, 0, ONE, ZERO, HUP, RHOUP, NONOTMP)
+
+        ! (Hup * rhoup) + Hdown*rhodown
+        
+        CALL mmlatte(HDIM, 0, 0, ONE, ONE, HDOWN, RHODOWN, NONOTMP)
+
+        CALL mmlatte(HDIM, 0, 0, ONE, ZERO, SPINTMP, NONOTMP, X2HRHO)
+
+#elif defined(GPUOFF)
+        
         ! XMAT * XMAT = S^-1
 
         CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
@@ -143,6 +189,8 @@ SUBROUTINE PULAY_SP
 
         CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
              SPINTMP, HDIM, NONOTMP, HDIM, ZERO, X2HRHO, HDIM)
+
+#endif
 
 #elif defined(SINGLEPREC)
 
@@ -173,6 +221,18 @@ SUBROUTINE PULAY_SP
 
         ! At zero K: tr(rho H rho)
 
+#ifdef GPUON
+
+        CALL mmlatte(HDIM, 0, 0, ONE, ZERO, RHOUP, HUP, NONOTMP)
+
+        CALL mmlatte(HDIM, 0, 0, ONE, ZERO, NONOTMP, RHOUP, X2HRHO)
+
+        CALL mmlatte(HDIM, 0, 0, ONE, ZERO, RHODOWN, HDOWN, NONOTMP)
+
+        CALL mmlatte(HDIM, 0, 0, ONE, ONE, NONOTMP, RHODOWN, X2HRHO)
+
+#elif defined(GPUOFF)
+
         CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
              RHOUP, HDIM, HUP, HDIM, ZERO, NONOTMP, HDIM)
 
@@ -184,6 +244,8 @@ SUBROUTINE PULAY_SP
 
         CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
              NONOTMP, HDIM, RHODOWN, HDIM, ONE, X2HRHO, HDIM)
+
+#endif
 
 #elif defined(SINGLEPREC)
 
@@ -209,12 +271,13 @@ SUBROUTINE PULAY_SP
 !$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &                     
 !$OMP SHARED(CR, BOX, X2HRHO, NOINT, ATELE, ELE1, ELE2) &         
 !$OMP SHARED(BOND, OVERL, MATINDLIST, BTYPE, BASISTYPE) &             
+!$OMP SHARED(FPUL) &
 !$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &  
 !$OMP PRIVATE(RIJ, DC, MAGR, INVR, FTMP) &                    
 !$OMP PRIVATE(DSSSDR, DSPSDR, DPSSDR, DPPSDR, DPPPDR, PPSMPPP, PPSUBINVR)&    
 !$OMP PRIVATE( L, M, N, L2, M2, N2, LM, LN, MN, LMN) &                        
 !$OMP PRIVATE(HSSS, HSPS, HPSS, HPPS, HPPP)&                                  
-!$OMP REDUCTION(+:FPUL, VIRPUL)  
+!$OMP REDUCTION(+:VIRPUL)  
 
   DO I = 1, NATS
 

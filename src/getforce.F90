@@ -60,21 +60,32 @@ SUBROUTINE GETFORCE
            IF (ELECTRO .EQ. 1) CALL FCOULNONO_SP
            IF (SPINON .EQ. 1) CALL FSPINNONO_SP
 
+
+           FTOT = FTOT - TWO*FPUL
+           
+           IF (ELECTRO .EQ. 0) FTOT = FTOT + FSLCN
+           IF (ELECTRO .EQ. 1) FTOT = FTOT + FSCOUL
+           IF (SPINON .EQ. 1) FTOT = FTOT + FSSPIN
+
         ELSE
 
            ! Otherwise use the complex but general expansions Josh Coe implemented
+
            CALL PULAY
-           IF (ELECTRO .EQ. 0) CALL FLCNNONO
-           IF (ELECTRO .EQ. 1) CALL FCOULNONO
-           IF (SPINON .EQ. 1) CALL FSPINNONO
+
+!           CALL PULAY
+!           IF (ELECTRO .EQ. 0) CALL FLCNNONO
+!           IF (ELECTRO .EQ. 1) CALL FCOULNONO
+!           IF (SPINON .EQ. 1) CALL FSPINNONO
+
+           FTOT = FTOT + FPUL
 
         ENDIF
 
-        FTOT = FTOT - TWO*FPUL
-        
-        IF (ELECTRO .EQ. 0) FTOT = FTOT + FSLCN
-        IF (ELECTRO .EQ. 1) FTOT = FTOT + FSCOUL
-        IF (SPINON .EQ. 1) FTOT = FTOT + FSSPIN
+!        FTOT = FTOT - TWO*FPUL
+!        IF (ELECTRO .EQ. 0) FTOT = FTOT + FSLCN
+!        IF (ELECTRO .EQ. 1) FTOT = FTOT + FSCOUL
+!        IF (SPINON .EQ. 1) FTOT = FTOT + FSSPIN
 
      ENDIF
 
@@ -87,13 +98,16 @@ SUBROUTINE GETFORCE
      IF (BASISTYPE .EQ. "NONORTHO") THEN
 
         CALL KPULAY
-        IF (ELECTRO .EQ. 0) CALL KFLCNNONO
-        IF (ELECTRO .EQ. 1) CALL KFCOULNONO
+        
+        FTOT = FTOT + FPUL
 
-        FTOT = FTOT - TWO*FPUL
+!        IF (ELECTRO .EQ. 0) CALL KFLCNNONO
+!        IF (ELECTRO .EQ. 1) CALL KFCOULNONO
 
-        IF (ELECTRO .EQ. 0) FTOT = FTOT + FSLCN
-        IF (ELECTRO .EQ. 1) FTOT = FTOT + FSCOUL
+!        FTOT = FTOT - TWO*FPUL
+
+!        IF (ELECTRO .EQ. 0) FTOT = FTOT + FSLCN
+!        IF (ELECTRO .EQ. 1) FTOT = FTOT + FSCOUL
 
      ENDIF
 
@@ -113,6 +127,12 @@ SUBROUTINE GETFORCE
      CALL PAIRPOTSPLINE
      FTOT = FTOT + FPP
   ENDIF
+
+  IF (PLUSDON .EQ. 1) THEN
+     CALL PAIRPOTPLUSD
+     FTOT = FTOT + FPLUSD
+  ENDIF
+
 
   IF (ELECTRO .EQ. 1) FTOT = FTOT + FCOUL
 

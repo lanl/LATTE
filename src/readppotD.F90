@@ -19,33 +19,49 @@
 ! Public License for more details.                                         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-MODULE NONOARRAY
+SUBROUTINE READPPOTPLUSD()
 
-  USE MYPRECISION 
+  USE CONSTANTS_MOD
+  USE PPOTARRAY
 
   IMPLICIT NONE
-  SAVE
 
-  ! Work arrays are for DSYEV when generating s^-1/2
-  ! SMAT contains the overlap matrix S
-  ! UMAT contains eigenvectors of S and NONO_EVALS its eigenvalues
-  ! XMAT contains transformation matrix X^dag S X = 1
-  ! NONOTMP is an array for storing AB in the product ABC...
-  ! HORTHO contains X^dag H X
+  INTEGER :: I, J, K
+  CHARACTER(LEN=20) :: HD
+  LOGICAL :: FILEEXISTS
 
-  INTEGER :: NONO_LWORK, NONO_LIWORK
-  INTEGER :: NONZERO
-  INTEGER, ALLOCATABLE  :: NONO_IWORK(:)
-  REAL(LATTEPREC), ALLOCATABLE :: NONO_WORK(:)
-  REAL(LATTEPREC), ALLOCATABLE :: UMAT(:,:), NONO_EVALS(:)
-  REAL(LATTEPREC), ALLOCATABLE :: XMAT(:,:), SMAT(:,:), NONOTMP(:,:)
-  REAL(LATTEPREC), ALLOCATABLE :: ORTHOH(:,:)
-  REAL(LATTEPREC), ALLOCATABLE :: ORTHOHUP(:,:), ORTHOHDOWN(:,:)
-  REAL(LATTEPREC), ALLOCATABLE :: HJJ(:), SH2(:,:)
-  REAL(LATTEPREC), ALLOCATABLE :: ORTHOBO(:,:)
+  IF (EXISTERROR) RETURN
 
-  ! For the Pulay force = 2Tr[S^-1 H rho dS/dR ]
+  IF (BASISTYPE .EQ. "ORTHO") THEN
+     INQUIRE( FILE=TRIM(PARAMPATH)//"/ppotsplusD.ortho", exist=FILEEXISTS)
+     IF (.NOT. FILEEXISTS) THEN
+        CALL ERRORS("readppot","ppot.ortho file does not exist. &
+             & Please either set PPOTON= 0 or add a file for the pair potentials.")
+     ELSE
+        OPEN(UNIT=14,STATUS="OLD", FILE=TRIM(PARAMPATH)//"/ppotsplusD.ortho")
+     END IF
+  ELSEIF (BASISTYPE .EQ. "NONORTHO") THEN
+     INQUIRE( FILE=TRIM(PARAMPATH)//"/ppotsplusD.nonortho", exist=FILEEXISTS)
+     IF (.NOT. FILEEXISTS) THEN
+        CALL ERRORS("readppot","ppot.ortho file does not exist. &
+             & Please either set PPOTON= 0 or add a file for the pair potentials.")
+     ELSE
+        OPEN(UNIT=14, STATUS="OLD", FILE=TRIM(PARAMPATH)//"/ppotsplusD.nonortho")
+     END IF
+  END IF
 
-  REAL(LATTEPREC), ALLOCATABLE :: X2HRHO(:,:), SPINTMP(:,:)
+  READ(14,*) HD, NOPPD
 
-END MODULE NONOARRAY
+  ALLOCATE(PPELE(NOPPD), RZERO(NOPPD), C6(NOPPD))
+
+  READ(14,*) HD, PLUSDS6
+  READ(14,*) HD, PLUSDGAMMA
+  READ(14,*) HD, PLUSDCUT
+  READ(14,*) HD, HD, HD
+  DO I = 1, NOPPD
+     READ(14,*) PPELE(I), RZERO(I), C6(I)
+  ENDDO
+
+  RETURN
+
+END SUBROUTINE READPPOTPLUSD

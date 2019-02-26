@@ -343,6 +343,8 @@ SUBROUTINE TBMD
            CALL PAIRPOTSPLINE
         ENDIF
 
+        IF (PLUSDON .EQ. 1) CALL PAIRPOTPLUSD
+
         CALL GETKE
 
         CALL TOTENG
@@ -372,7 +374,7 @@ SUBROUTINE TBMD
 
         ENDIF
 
-        TOTE = TRRHOH + EREP + KEE - ENTE - ECOUL + ESPIN
+        TOTE = TRRHOH + EREP + KEE - ENTE - ECOUL + ESPIN + EPLUSD
 
         !         write(*,*)"Ekin", KEE
         !         write(*,*)"Epot", TRRHOH + EREP - ENTE - ECOUL + ESPIN
