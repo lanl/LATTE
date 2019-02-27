@@ -19,7 +19,7 @@ KERNEL_SOURCES=$(wildcard Kernels/*.cu)
 KERNEL_OBJECTS=$(KERNEL_SOURCES:.cu=.$(REALSIZE).o)
 
 #MATRIX_SOURCES=$(wildcard M_*.cu) $(wildcard F_*.cu) SP2Pure.cu SP2Fermi.cu SolveMatrixCG.cu Allocate.cu TestMultiply.cu
-MATRIX_SOURCES=$(wildcard M_*.cu) $(wildcard F_*.cu) SP2Pure.cu SP2Fermi.cu SolveMatrixCG.cu Allocate.cu runmatmult.cu
+MATRIX_SOURCES=$(wildcard M_*.cu) $(wildcard F_*.cu) SP2Pure.cu SP2Fermi.cu SolveMatrixCG.cu Allocate.cu runmatmult.cu genmatmult.cu
 MATRIX_CUDA_OBJECTS=$(MATRIX_SOURCES:.cu=.cuda.$(REALSIZE).o)
 
 all: libmatrix_cuda.$(PRECISION).a
