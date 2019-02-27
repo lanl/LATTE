@@ -14,7 +14,7 @@ endif
 
 lammps : 
 	(rm liblatte.a; cd src; make; cd ..)
-	(cd $(HOME)/lammps/src; touch fix_latte.cpp; make mpi; cd -)
+	(cd $(HOME)/lammps/src; touch fix_latte.cpp; make serial; cd -)
 	
 src : 
 	(rm liblatte.a; cd src; make; cd ..)
