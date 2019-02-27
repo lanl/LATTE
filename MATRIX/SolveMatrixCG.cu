@@ -69,6 +69,8 @@ void solve_matrix_cg(REAL *bo_ptr, int hdim, REAL cgtol2, int fermim) {
 
       iter++;
 
+//      printf("%d \n", iter);
+
       // A * P0 - intermediate term used in CG
       M_Multiply( a, p0, tmpmat);
 
@@ -105,7 +107,7 @@ void solve_matrix_cg(REAL *bo_ptr, int hdim, REAL cgtol2, int fermim) {
       // p0 = -1.0 * r0 + p0
       M_MultiplyScalarSum( &MINUS1, r0, p0);
 
-      //printf("iter = %d error2 = %e cgtol2= %e \n", iter, error2, cgtol2);
+//      printf("iter = %d error2 = %e cgtol2= %e \n", iter, error2, cgtol2);
 
       if (error2 < cgtol2) breakloop = 1;
 
