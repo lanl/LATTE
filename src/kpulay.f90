@@ -76,7 +76,7 @@ SUBROUTINE KPULAY
 
   ! B1 = 2*PI*(A2 X A3)/(A1.(A2 X A3))
 
-  B1 = B1/A1A2XA3
+  B1 = TWO*PI*B1/A1A2XA3
 
   ! B2 = 2*PI*(A3 x A1)/(A1(A2 X A3))
 
@@ -84,15 +84,21 @@ SUBROUTINE KPULAY
   B2(2) = (BOX(1,1)*BOX(3,3) - BOX(3,1)*BOX(1,3))/A1A2XA3
   B2(3) = (BOX(3,1)*BOX(1,2) - BOX(1,1)*BOX(3,2))/A1A2XA3
 
+  B2 = TWO*PI*B2
+
   ! B3 = 2*PI*(A1 x A2)/(A1(A2 X A3))
 
   B3(1) = (BOX(1,2)*BOX(2,3) - BOX(2,2)*BOX(1,3))/A1A2XA3
   B3(2) = (BOX(2,1)*BOX(1,3) - BOX(1,1)*BOX(2,3))/A1A2XA3
   B3(3) = (BOX(1,1)*BOX(2,2) - BOX(2,1)*BOX(1,2))/A1A2XA3
 
-  K0 = PI*(ONE - REAL(NKX))/(REAL(NKX))*B1 + &
-       PI*(ONE - REAL(NKY))/(REAL(NKY))*B2 + &
-       PI*(ONE - REAL(NKZ))/(REAL(NKZ))*B3 - PI*KSHIFT
+  B3 = TWO*PI*B3
+
+  K0 = PI*KSHIFT
+
+!  K0 = PI*(ONE - REAL(NKX))/(REAL(NKX))*B1 + &
+!       PI*(ONE - REAL(NKY))/(REAL(NKY))*B2 + &
+!       PI*(ONE - REAL(NKZ))/(REAL(NKZ))*B3 - PI*KSHIFT
 
   ! We first have to make the matrix S^-1 H rho = X^2 H rho
 
@@ -412,10 +418,15 @@ SUBROUTINE KPULAY
 
                                 DO KZ = 1, NKZ
 
-                                   KPOINT = TWO*PI*(REAL(KX-1)*B1/REAL(NKX) + &
-                                        REAL(KY-1)*B2/REAL(NKY) + &
-                                        REAL(KZ-1)*B3/REAL(NKZ)) + K0
+!                                   KPOINT = TWO*PI*(REAL(KX-1)*B1/REAL(NKX) + &
+!                                        REAL(KY-1)*B2/REAL(NKY) + &
+!                                        REAL(KZ-1)*B3/REAL(NKZ)) + K0
 
+                                   KPOINT = ZERO
+                                   KPOINT = KPOINT + (TWO*REAL(KX) - REAL(NKX) - ONE)/(TWO*REAL(NKX))*B1
+                                   KPOINT = KPOINT + (TWO*REAL(KY) - REAL(NKY) - ONE)/(TWO*REAL(NKY))*B2
+                                   KPOINT = KPOINT + (TWO*REAL(KZ) - REAL(NKZ) - ONE)/(TWO*REAL(NKZ))*B3
+                                   
                                    KCOUNT = KCOUNT+1
 
                                    KDOTL = KPOINT(1)*RIJ(1) + KPOINT(2)*RIJ(2) + &
@@ -526,10 +537,15 @@ SUBROUTINE KPULAY
 
                                 DO KZ = 1, NKZ
 
-                                   KPOINT = TWO*PI*(REAL(KX-1)*B1/REAL(NKX) + &
-                                        REAL(KY-1)*B2/REAL(NKY) + &
-                                        REAL(KZ-1)*B3/REAL(NKZ)) + K0
+!                                   KPOINT = TWO*PI*(REAL(KX-1)*B1/REAL(NKX) + &
+!                                        REAL(KY-1)*B2/REAL(NKY) + &
+!                                        REAL(KZ-1)*B3/REAL(NKZ)) + K0
 
+                                   KPOINT = ZERO
+                                   KPOINT = KPOINT + (TWO*REAL(KX) - REAL(NKX) - ONE)/(TWO*REAL(NKX))*B1
+                                   KPOINT = KPOINT + (TWO*REAL(KY) - REAL(NKY) - ONE)/(TWO*REAL(NKY))*B2
+                                   KPOINT = KPOINT + (TWO*REAL(KZ) - REAL(NKZ) - ONE)/(TWO*REAL(NKZ))*B3
+                                   
                                    KCOUNT = KCOUNT+1
 
                                    KDOTL = KPOINT(1)*RIJ(1) + KPOINT(2)*RIJ(2) + &

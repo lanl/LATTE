@@ -64,7 +64,7 @@ SUBROUTINE KBLDNEWH
 
   ! B1 = (A2 X A3)/(A1.(A2 X A3))
 
-  B1 = B1/A1A2XA3
+  B1 = TWO*PI*B1/A1A2XA3
 
   ! B2 = (A3 x A1)/(A1(A2 X A3))
 
@@ -72,11 +72,15 @@ SUBROUTINE KBLDNEWH
   B2(2) = (BOX(1,1)*BOX(3,3) - BOX(3,1)*BOX(1,3))/A1A2XA3
   B2(3) = (BOX(3,1)*BOX(1,2) - BOX(1,1)*BOX(3,2))/A1A2XA3
 
+  B2 = TWO*PI*B2
+
   ! B3 = (A1 x A2)/(A1(A2 X A3))
 
   B3(1) = (BOX(1,2)*BOX(2,3) - BOX(2,2)*BOX(1,3))/A1A2XA3
   B3(2) = (BOX(2,1)*BOX(1,3) - BOX(1,1)*BOX(2,3))/A1A2XA3
   B3(3) = (BOX(1,1)*BOX(2,2) - BOX(2,1)*BOX(1,2))/A1A2XA3
+
+  B3 = TWO*PI*B3
 
   INDEX = 0
 
@@ -294,9 +298,13 @@ SUBROUTINE KBLDNEWH
 
   ENDIF
 
-  K0 = PI*(ONE - REAL(NKX))/(REAL(NKX))*B1 + &
-       PI*(ONE - REAL(NKY))/(REAL(NKY))*B2 + &
-       PI*(ONE - REAL(NKZ))/(REAL(NKZ))*B3 - PI*KSHIFT
+  K0 = PI*KSHIFT
+
+!  K0 = PI*(ONE - REAL(NKX))/(REAL(NKX))*B1 + &
+!       PI*(ONE - REAL(NKY))/(REAL(NKY))*B2 + &
+!       PI*(ONE - REAL(NKZ))/(REAL(NKZ))*B3 - PI*KSHIFT
+
+!  PRINT*, K0
 
 !$OMP PARALLEL DO DEFAULT (NONE) & 
 !$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &    
@@ -307,7 +315,6 @@ SUBROUTINE KBLDNEWH
 !$OMP PRIVATE(LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET) &        
 !$OMP PRIVATE(BLOCH, KDOTL, KPOINT, KCOUNT, KHTMP, KSTMP)&
 !$OMP PRIVATE(RCUTTB, IBRA, IKET, AMMBRA, WIGLBRAMBRA, ANGFACTOR, MP) 
-!!$OMP REDUCTION(+:HK)
 
   DO I = 1, NATS
 
@@ -494,7 +501,7 @@ SUBROUTINE KBLDNEWH
            MAGRP = SQRT(RIJ(1) * RIJ(1) + RIJ(2) * RIJ(2))
 
            ! transform to system in which z-axis is aligned with RIJ,
-           IF (ABS(RIJ(1)) .GT. 1.0E-12) THEN
+           IF (ABS(RIJ(1)) .GT. 1.0D-12) THEN
 
               IF (RIJ(1) .GT. ZERO .AND. RIJ(2) .GE. ZERO) THEN
                  PHI = ZERO
@@ -505,9 +512,9 @@ SUBROUTINE KBLDNEWH
               ENDIF
               ALPHA = ATAN(RIJ(2) / RIJ(1)) + PHI
 
-           ELSEIF (ABS(RIJ(2)) .GT. 1.0E-12) THEN
+           ELSEIF (ABS(RIJ(2)) .GT. 1.0D-12) THEN
 
-              IF (RIJ(2) .GT. 1.0E-12) THEN
+              IF (RIJ(2) .GT. 1.0D-12) THEN
                  ALPHA = PI / TWO
               ELSE
                  ALPHA = THREE * PI / TWO
@@ -589,9 +596,16 @@ SUBROUTINE KBLDNEWH
 
                              DO KZ = 1, NKZ
 
-                                KPOINT = TWO*PI*(REAL(KX-1)*B1/REAL(NKX) + &
-                                     REAL(KY-1)*B2/REAL(NKY) + &
-                                     REAL(KZ-1)*B3/REAL(NKZ)) + K0
+!                                KPOINT = TWO*PI*(REAL(KX-1)*B1/REAL(NKX) + &
+!                                     REAL(KY-1)*B2/REAL(NKY) + &
+!                                     REAL(KZ-1)*B3/REAL(NKZ)) + K0
+
+!                                print*, kx, ky, kz, kpoint
+
+                                KPOINT = ZERO
+                                KPOINT = KPOINT + (TWO*REAL(KX) - REAL(NKX) - ONE)/(TWO*REAL(NKX))*B1
+                                KPOINT = KPOINT + (TWO*REAL(KY) - REAL(NKY) - ONE)/(TWO*REAL(NKY))*B2
+                                KPOINT = KPOINT + (TWO*REAL(KZ) - REAL(NKZ) - ONE)/(TWO*REAL(NKZ))*B3
 
                                 KCOUNT = KCOUNT+1
 
@@ -641,9 +655,16 @@ SUBROUTINE KBLDNEWH
                              DO KY = 1, NKY
                                 DO KZ = 1, NKZ
 
-                                   KPOINT = TWO*PI*(REAL(KX-1)*B1/REAL(NKX) + &
-                                        REAL(KY-1)*B2/REAL(NKY) + &
-                                        REAL(KZ-1)*B3/REAL(NKZ)) + K0
+                                   !KPOINT = TWO*PI*(REAL(KX-1)*B1/REAL(NKX) + &
+                                   !     REAL(KY-1)*B2/REAL(NKY) + &
+                                   !     REAL(KZ-1)*B3/REAL(NKZ)) + K0
+                                   
+                                   KPOINT = ZERO
+                                   KPOINT = KPOINT + (TWO*REAL(KX) - REAL(NKX) - ONE)/(TWO*REAL(NKX))*B1
+                                   KPOINT = KPOINT + (TWO*REAL(KY) - REAL(NKY) - ONE)/(TWO*REAL(NKY))*B2
+                                   KPOINT = KPOINT + (TWO*REAL(KZ) - REAL(NKZ) - ONE)/(TWO*REAL(NKZ))*B3
+                                   
+                                   !                                   print*, kx, ky, kz, kpoint
 
                                    KCOUNT = KCOUNT+1
 
