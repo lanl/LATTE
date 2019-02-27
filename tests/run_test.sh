@@ -16,6 +16,7 @@ performanceExpectedTimes["tableread"]=1.700
 performanceExpectedTimes["0scf"]=0.127
 performanceExpectedTimes["2scf"]=0.120
 performanceExpectedTimes["fullscf"]=0.158
+performanceExpectedTimes["fullscf.ortho"]=1.050
 performanceExpectedTimes["fullscf.etemp"]=0.160
 performanceExpectedTimes["sp2"]=0.161
 performanceExpectedTimes["sp2.sparse"]=0.579
@@ -125,7 +126,7 @@ done
 
 # Testing for MD simulations:
 
-for name in tableread 0scf 2scf fullscf fullscf.etemp sp2 sp2.sparse fullscf.nvt \
+for name in tableread 0scf 2scf fullscf fullscf.ortho fullscf.etemp sp2 sp2.sparse fullscf.nvt \
        	fullscf.npt fullscf.vdw fullscf.spin fullscf.kon fullscf.rspace ; do
 
   INLATTEFILE="latte."$name".in"
