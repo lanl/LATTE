@@ -108,6 +108,7 @@ void M_MultiplyTranspose(Matrix A, Matrix B, Matrix C);
 void M_Multiply(REAL *scalar, Matrix A, Matrix B, REAL *scalar2, Matrix C);
 void M_MultiplyMgpu(REAL *scalar, Matrix A, Matrix B, REAL *scalar2, Matrix C);
 void M_Multiply(REAL scalar, Matrix A, Matrix B); // B=scalar*A
+void M_Multiply(int tposea, int tposeb, REAL *scalar1, Matrix A, Matrix B, REAL *scalar2, Matrix C);
 void M_MultiplyAdd(REAL scalar, Matrix A, REAL scalar2, Matrix B, Matrix C); // C = scalar*A + scalar2*B
 void M_MultiplySub(REAL scalar, Matrix A, REAL scalar2, Matrix B, Matrix C); // C = scalar*A - scalar2*B
 void M_MultiplyAdd(REAL scalar, Matrix A, Matrix B, Matrix C); // C = scalar*A + B
@@ -152,6 +153,8 @@ void M_TransBlk2(int size, Matrix A, Matrix A2, int d);
 void *Allocate(const char Label[], void *Pointer, size_t Size);
 
 void runmatmult(int hdim, REAL *bo_pointer, REAL *h_pointer);
+
+void genmatmult(int hdim, int tposea, int tposeb, REAL alpha, REAL beta, REAL *amat_pointer, REAL *bmat_pointer, REAL *cmat_pointer);
 
 void sp2pure_nospin3(REAL bndfil, int  hdim, REAL *bo_pointer, REAL maxeval, REAL *h_pointer, REAL maxminusmin, int minsp2iter, int sp2convint);
 
