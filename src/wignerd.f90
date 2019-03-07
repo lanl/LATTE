@@ -33,29 +33,33 @@ FUNCTION WIGNERD(L, M, MP, COSBETA)
   REAL(LATTEPREC) :: COSBETA, POWER1, POWER2, POWTMP
   INTEGER :: K, L, M, MP
 
-  PREF = (REAL(MINUSONEPOW( L - MP ))/REAL(TWOPOW(L))) * &
-       SQRT( REAL(FACTORIAL(L + M) * FACTORIAL(L - M) * &
-       FACTORIAL(L + MP) * FACTORIAL(L - MP)) )
+
+  IF (ABS(MP) .GT. L) THEN
+
+     WIGNERD = ZERO
+
+  ELSE
+
+     PREF = (REAL(MINUSONEPOW( L - MP ))/REAL(TWOPOW(L))) * &
+          SQRTFACT(L+M)*SQRTFACT(L-M)*SQRTFACT(L+MP)*SQRTFACT(L-MP)
+
+     WIGNERD = ZERO
   
-  MYSUM = ZERO
+     DO K = MAX(0, - M - MP), MIN(L - M, L - MP)
+        
+        POWTMP = REAL(M + MP)/TWO
+        POWER1 = REAL(L - K) - POWTMP
+        POWER2 = REAL(K) + POWTMP
+        
+        WIGNERD = WIGNERD + REAL( MINUSONEPOW(K) ) * &
+             ((ONE - COSBETA) ** POWER1) * ((ONE + COSBETA) ** POWER2) / &
+             REAL(FACTORIAL(K) * FACTORIAL(L - M - K) * &
+             FACTORIAL(L - MP - K) * FACTORIAL(M + MP + K))
+     ENDDO
+     
+     WIGNERD = PREF * WIGNERD
 
-  DO K = MAX(0, - M - MP), MIN(L - M, L - MP)
-
-     POWTMP = REAL(M + MP)/TWO
-     POWER1 = REAL(L - K) - POWTMP
-     POWER2 = REAL(K) + POWTMP
-
-     NUMER = REAL( MINUSONEPOW(K) ) * &
-          ((ONE - COSBETA) ** POWER1) * ((ONE + COSBETA) ** POWER2)
-
-     DENOM = REAL(FACTORIAL(K) * FACTORIAL(L - M - K) * &
-          FACTORIAL(L - MP - K) * FACTORIAL(M + MP + K))
-
-     MYSUM = MYSUM + NUMER / DENOM
-
-  ENDDO
-
-  WIGNERD = PREF * MYSUM
+  ENDIF
 
   RETURN 
 
