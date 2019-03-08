@@ -9,7 +9,7 @@
 !!   where num is the position of the new keyword in the vector.
 !! - Use DUMMY= as a placeholder. This variable will be ignored by not searched by the parser.
 !!
-MODULE LATTEPARSER_LATTE_MOD
+MODULE LATTEPARSER
 
   USE CONSTANTS_MOD
   USE SETUPARRAY
@@ -39,7 +39,7 @@ MODULE LATTEPARSER_LATTE_MOD
 #ifdef PROGRESSON
   !> General latte input variables type.
   !!
-  TYPE, PUBLIC :: LATTE_TYPE
+  TYPE :: LATTE_TYPE
 
      !> Name of the current job.
      CHARACTER(20) :: JOBNAME
@@ -741,4 +741,4 @@ CONTAINS
   END SUBROUTINE PARSE_KMESH
 
 
-END MODULE LATTEPARSER_LATTE_MOD
+END MODULE LATTEPARSER
