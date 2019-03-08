@@ -24,6 +24,7 @@ FUNCTION AM(M, ALPHA)
   ! Build Am function defined in eqn. (5) of PRB 72 165107
 
   USE MYPRECISION
+  USE CONSTANTS_MOD
 
   IMPLICIT NONE
 
@@ -39,9 +40,9 @@ FUNCTION AM(M, ALPHA)
   IF (M == 0) THEN
      AM = ONE / SQRT2
   ELSE IF ( M .GT. 0) THEN
-     AM = REAL((-1)**M, LATTEPREC) * COS(ABS(M)*ALPHA)
+     AM = REALM1K(M+1) * COS(ABS(M)*ALPHA)
   ELSE IF ( M .LT. 0) THEN
-     AM = REAL((-1)**M, LATTEPREC) * SIN(ABS(M)*ALPHA)
+     AM = REALM1K(M+1) * SIN(ABS(M)*ALPHA)
   ENDIF
 
   RETURN

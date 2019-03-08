@@ -25,32 +25,33 @@ FUNCTION WIGNERD(L, M, MP, COSBETA)
   ! notation conforms to that in PRB 72 165107 (2005), eq. (9)
 
   USE MYPRECISION
+  USE CONSTANTS_MOD
 
   IMPLICIT NONE
 
   REAL(LATTEPREC) :: BETA, PREF, SUM, NUMER, DENOM, WIGNERD
-  REAL(LATTEPREC) :: COSBETA
+  REAL(LATTEPREC) :: COSBETA, ONEMCOSBETA, ONEPCOSBETA, HALFMPMP
   INTEGER, EXTERNAL :: FACTORIAL
   INTEGER :: K, L, M, MP
 
-  !  PREF = TWO ** (-L) * REAL( (-1)**(L - MP)) * &
-  !       SQRT( REAL(FACTORIAL(L + M) * FACTORIAL(L - M) * &
-  !       FACTORIAL(L + MP) * FACTORIAL(L - MP)) )
-
-  PREF =  REAL( (-1)**(L - MP)) * &
-       SQRT( REAL(FACTORIAL(L + M) * FACTORIAL(L - M) * &
-       FACTORIAL(L + MP) * FACTORIAL(L - MP)) ) / REAL(2**L)
+  PREF =  REALM1K(L - MP +1) * &
+       SQRT( REAL(FACTORIALLIST(L + M + 1) * FACTORIALLIST(L - M + 1) * &
+       FACTORIALLIST(L + MP +1) * FACTORIALLIST(L - MP +1)) ) / REAL(2**L)
 
   SUM = ZERO
+  HALFMPMP = HALF*(M + MP)
+  ONEMCOSBETA = ONE - COSBETA
+  ONEPCOSBETA = ONE + COSBETA
+ 
 
   DO K = MAX(0, - M - MP), MIN(L - M, L - MP)
 
-     NUMER = REAL( (-1)**K ) * &
-          (ONE - COSBETA) ** (L - K - HALF * (M + MP)) * &
-          (ONE + COSBETA) ** (K + HALF * (M + MP))
+     NUMER = REALM1K(K+1) * &
+          ONEMCOSBETA ** (L - K - HALFMPMP) * &
+          ONEPCOSBETA ** (K + HALFMPMP)
 
-     DENOM = REAL(FACTORIAL(K) * FACTORIAL(L - M - K) * &
-          FACTORIAL(L - MP - K) * FACTORIAL(M + MP + K))
+     DENOM = REAL(FACTORIALLIST(K+1) * FACTORIALLIST(L - M - K +1 ) * &
+          FACTORIALLIST(L - MP - K+1) * FACTORIALLIST(M + MP + K+1))
 
      SUM = SUM + NUMER / DENOM
 

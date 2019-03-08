@@ -1,3 +1,4 @@
+
 !> LATTE parser.
 !! \ingroup LATTE
 !! \brief This module is used to parse all the necessary input variables for a LATTE TB run (SCF/OPT/MD)
@@ -9,7 +10,7 @@
 !!   where num is the position of the new keyword in the vector.
 !! - Use DUMMY= as a placeholder. This variable will be ignored by not searched by the parser.
 !!
-MODULE LATTEPARSER_LATTE_MOD
+MODULE LATTEPARSER_LATTE
 
   USE CONSTANTS_MOD
   USE SETUPARRAY
@@ -28,18 +29,17 @@ MODULE LATTEPARSER_LATTE_MOD
   USE BML
 #endif
 
-  IMPLICIT NONE
-
-  PRIVATE
+!  IMPLICIT NONE
+ 
+  PUBLIC
 
   INTEGER, PARAMETER :: DP = LATTEPREC
 
-  PUBLIC :: PARSE_CONTROL, PARSE_MD, PARSE_KMESH
 
 #ifdef PROGRESSON
   !> General latte input variables type.
   !!
-  TYPE, PUBLIC :: LATTE_TYPE
+  TYPE  :: LATTE_TYPE
 
      !> Name of the current job.
      CHARACTER(20) :: JOBNAME
@@ -110,7 +110,10 @@ MODULE LATTEPARSER_LATTE_MOD
 
   END TYPE LATTE_TYPE
 
-  TYPE(LATTE_TYPE), PUBLIC :: LT
+
+  TYPE(LATTE_TYPE) :: LT
+
+  PUBLIC :: PARSE_CONTROL, PARSE_MD, PARSE_KMESH
 
 #endif
 
@@ -741,4 +744,4 @@ CONTAINS
   END SUBROUTINE PARSE_KMESH
 
 
-END MODULE LATTEPARSER_LATTE_MOD
+END MODULE LATTEPARSER_LATTE
