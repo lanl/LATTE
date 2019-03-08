@@ -33,7 +33,7 @@ SUBROUTINE PULAY
   IMPLICIT NONE
 
   INTEGER :: I, J, K, L, M, N, KK, INDI, INDJ
-  INTEGER :: LBRA, MBRA, LKET, MKET
+  INTEGER :: LBRA, MBRA, LKET, MKET, MP
   INTEGER :: PREVJ, NEWJ
   INTEGER :: PBCI, PBCJ, PBCK
   INTEGER :: BASISI(5), BASISJ(5), LBRAINC, LKETINC
@@ -45,8 +45,11 @@ SUBROUTINE PULAY
   REAL(LATTEPREC) :: MAXRCUT, MAXRCUT2
   REAL(LATTEPREC) :: WSPINI, WSPINJ
   REAL(LATTEPREC) :: MYDFDA, MYDFDB, MYDFDR, RCUTTB
-  
+  REAL(LATTEPREC) :: MYDFDA1, MYDFDB1, MYDFDR1
+  REAL(LATTEPREC) :: MYSLMMPL2(10), MYSLMMPL1(10), MYTMMPL2(10), MYTMMPL1(10), MYUNIVSCALE(10) 
+  REAL(LATTEPREC), EXTERNAL :: DFDAPREC, DFDBPREC, DFDRPREC
   REAL(LATTEPREC), EXTERNAL :: DFDA, DFDB, DFDR
+  REAL(LATTEPREC), EXTERNAL :: SLMMP, TLMMP, UNIVSCALE
   LOGICAL PATH
   IF (EXISTERROR) RETURN
 
@@ -286,8 +289,10 @@ SUBROUTINE PULAY
 !$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP2, MAGRP, PATH, PHI, ALPHA, BETA, COSBETA) &
 !$OMP PRIVATE(FTMP_PULAY, FTMP_COUL, FTMP_SPIN) &
 !$OMP PRIVATE(DC, LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET, RHO, RHODIFF) &
-!$OMP PRIVATE(MYDFDA, MYDFDB, MYDFDR, RCUTTB) &
+!$OMP PRIVATE(MYDFDA, MYDFDB, MYDFDR, RCUTTB, MP) &
+!$OMP PRIVATE(MYDFDA1, MYDFDB1, MYDFDR1) &
 !$OMP PRIVATE(WSPINI, WSPINJ, SPININDI, SPININDJ) &
+!$OMP PRIVATE(MYSLMMPL2, MYSLMMPL1, MYTMMPL2,MYTMMPL1, MYUNIVSCALE) &
 !$OMP REDUCTION(+:VIRPUL)
 
 
@@ -543,6 +548,12 @@ SUBROUTINE PULAY
                  L = INDJ
 
                  LKETINC = 1
+
+                 DO MP = 1,LBRA
+                    MYSLMMPL1(MP) = SLMMP(LBRA, MBRA, MP, ALPHA, COSBETA) 
+                    MYTMMPL1(MP)  =  TLMMP(LBRA, MBRA, MP, ALPHA, COSBETA)
+                 ENDDO
+
                  DO WHILE (BASISJ(LKETINC) .NE. -1)
 
                     LKET = BASISJ(LKETINC)
@@ -565,6 +576,10 @@ SUBROUTINE PULAY
 
                     ENDIF
 
+                    DO MP = 1,MIN(LBRA, LKET)
+                       MYUNIVSCALE(MP) = UNIVSCALE(I, J,LBRA, LKET, MP, MAGR, "S")     
+                    ENDDO
+
                     DO MKET = -LKET, LKET
 
                        L = L + 1
@@ -582,15 +597,46 @@ SUBROUTINE PULAY
                        IF (.NOT. PATH) THEN
 
                           ! Unroll loops and pre-compute
+                          DO MP = 1,MIN(LBRA, LKET)
+                             MYSLMMPL2(MP) = SLMMP(LKET, MKET, MP, ALPHA, COSBETA)
+                             MYTMMPL2(MP)  =  TLMMP(LKET, MKET, MP, ALPHA, COSBETA) 
+                          ENDDO
 
-                          MYDFDA = DFDA(I, J, LBRA, LKET, MBRA, &
+                          MYDFDA = DFDAPREC(MYSLMMPL1,MYSLMMPL2,MYTMMPL1,MYTMMPL2, MYUNIVSCALE,&
+                               I, J, LBRA, LKET, MBRA,&
+                                MKET, MAGR, ALPHA, COSBETA, "S")
+
+                          MYDFDB = DFDBPREC(MYSLMMPL1, MYSLMMPL2, MYTMMPL1,MYTMMPL2, MYUNIVSCALE, &
+                               I, J, LBRA, LKET, MBRA, &
                                MKET, MAGR, ALPHA, COSBETA, "S")
 
-                          MYDFDB = DFDB(I, J, LBRA, LKET, MBRA, &
+                          MYDFDR = DFDRPREC(MYTMMPL1,MYTMMPL2, &
+                                I, J, LBRA, LKET, MBRA, &
                                MKET, MAGR, ALPHA, COSBETA, "S")
-
-                          MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
-                               MKET, MAGR, ALPHA, COSBETA, "S")
+                           
+      
+                 !         MYDFDA = DFDA(I, J, LBRA, LKET, MBRA, &
+                 !              MKET, MAGR, ALPHA, COSBETA, "S")
+                 !
+                 !         MYDFDB = DFDB(I, J, LBRA, LKET, MBRA, &
+                 !              MKET, MAGR, ALPHA, COSBETA, "S")
+                 !   
+                 !         MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
+                 !              MKET, MAGR, ALPHA, COSBETA, "S")
+                 ! 
+                  !      IF(MYDFDA1 .ne. MYDFDA)then 
+                  !        WRITE(*,*)MYDFDA1,MYDFDA
+                  !        stop "MYDFDA1 .ne. MYDFDA"
+                  !      endif
+                  !      IF(MYDFDB1 .ne. MYDFDB)then
+                  !        WRITE(*,*)MYDFDB1,MYDFDB
+                  !        stop "MYDFDB1 .ne. MYDFDB"
+                  !      endif
+                  !      IF(MYDFDR1 .ne. MYDFDR)then
+                  !        WRITE(*,*)MYDFDR1,MYDFDR
+                  !        stop "MYDFDR1 .ne. MYDFDR"
+                  !      endif
+ 
 
                           !
                           ! d/d_alpha
@@ -649,6 +695,7 @@ SUBROUTINE PULAY
                           FTMP_COUL(3) = FTMP_COUL(3) - RHO * &
                                (((ONE - ((RIJ(3) * RIJ(3)) / &
                                MAGR2)) / MAGRP) * MYDFDB)
+
 
                           IF (SPINON .EQ. 1) THEN
                              
@@ -746,8 +793,12 @@ SUBROUTINE PULAY
 
                        ENDIF
 
+
+
                     ENDDO
+
                  ENDDO
+
               ENDDO
            ENDDO
 

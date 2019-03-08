@@ -27,7 +27,7 @@ DBCSRMODS = dbcsr_var_mod.F90 init_dbcsr.F90 shutdown_dbcsr.F90
 
 MYSUBS = allocatediag.F90 allocatenono.F90 allocatepure.F90 bodirect.F90 \
 deallocatediag.F90 deallocatepure.F90 deorthomyrho.F90 deallocatenono.F90 \
-diagmyh.F90 entropy.F90 fermiexpans.F90 genX.F90  latte.F90 orthomyH.F90 \
+diagmyh.F90 diagmyhprogress.F90 entropy.F90 fermiexpans.F90 genX.F90  latte.F90 orthomyH.F90 \
  orthomyrho.F90  pulay.F90 pulay_sp.F90 solvematcg.F90 solvematlapack.F90 \
 sp2T.F90 pulay_spprogress.F90 \
 sp2fermi.F90 sp2fermi_init.F90 sp2pure.F90 sp2pure_sparse.F90 kdiagmyh.F90 \
@@ -47,10 +47,11 @@ neblists.F90 noelec.F90 norms.F90 nptrescale.F90  nvtrescale.F90 \
 pairpot.F90 panic.F90 plot_ppot.F90 plot_univ.F90 printsparse.F90 \
  propchempot_xbo.F90 propspins_xbo.F90 qconsistency.F90 readcontrols.F90 \
 readcr.F90 readmdcontroller.F90 readppot.F90  readtb.F90 resetprodhd.F90 \
-rhozero.F90 shockcomp.F90  spinrhodirect.F90 stdescent.F90 \
+rhozero.F90 shockcomp.F90  spinrhodirect.F90  spinrhodirectprogress.F90 stdescent.F90 \
 summary.F90 tbmd.F90 toteng.F90 univscaling_function.F90 univtailcoef.F90  \
 vdwtailcoef.F90 velverlet.F90  xbo.F90 am.F90 bm.F90 factorial.F90 \
  slmmp.F90 tlmmp.F90 wignerd.F90 dfda.F90 dfdb.F90 dfdr.F90 \
+ dfda_prec.F90 dfdb_prec.F90 dfdr_prec.F90 \
 dunivscaling_function.F90 dslmmpda.F90 dslmmpdb.F90 dtlmmpda.F90 \
 dtlmmpdb.F90 dwignerddb.F90 gradH.F90 kbldnewh.F90  kgetrho.F90 kgradH.F90  \
 bldnewHS_sp.F90 gradH_sp.F90 univscaling.F90 dunivscaling.F90 kgetdos.F90 \
