@@ -37,7 +37,7 @@ SUBROUTINE GETPRESSURE
 
   !  SYSVOL = BOXDIMS(1)*BOXDIMS(2)*BOXDIMS(3)
 
-  SYSVOL = ABS(BOX(1,1)*(BOX(2,2)*BOX(3,3) - BOX(3,2)*BOX(2,3)) + &
+  SYSVOL = ABS(BOX(1,1)*(BOX(2,2)*BOX(3,3) - BOX(3,2)*BOX(2,3)) - &
        BOX(1,2)*(BOX(2,1)*BOX(3,3) - BOX(3,1)*BOX(2,3)) + &
        BOX(1,3)*(BOX(2,1)*BOX(3,2) - BOX(3,1)*BOX(2,2)))
 
