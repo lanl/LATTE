@@ -298,17 +298,20 @@ SUBROUTINE GRADH
                  L = INDJ
 
                  LKETINC = 1
+
+                 DO MP = 1,LBRA
+                    MYSLMMPL1(MP) = SLMMP(LBRA, MBRA, MP, ALPHA, COSBETA) 
+                    MYTMMPL1(MP)  =  TLMMP(LBRA, MBRA, MP, ALPHA, COSBETA)
+                 ENDDO
+
                  DO WHILE (BASISJ(LKETINC) .NE. -1)
 
                     LKET = BASISJ(LKETINC)
                     LKETINC = LKETINC + 1
 
-                        DO MP = 1,MIN(LBRA, LKET)
-                          MYSLMMPL1(MP) = SLMMP(LBRA, MBRA, MP, ALPHA, COSBETA) 
-                          MYTMMPL1(MP)  =  TLMMP(LBRA, MBRA, MP, ALPHA, COSBETA)
-                          MYUNIVSCALE(MP) = UNIVSCALE(I, J,LBRA, LKET, MP, MAGR, "S")     
-                        ENDDO
-
+                    DO MP = 1,MIN(LBRA, LKET)
+                       MYUNIVSCALE(MP) = UNIVSCALE(I, J,LBRA, LKET, MP, MAGR, "S")     
+                    ENDDO
 
                     DO MKET = -LKET, LKET
 
@@ -325,10 +328,10 @@ SUBROUTINE GRADH
 
                           ! Unroll loops and pre-compute
 
-                        DO MP = 1,MIN(LBRA, LKET)
-                          MYSLMMPL2(MP) = SLMMP(LKET, MKET, MP, ALPHA, COSBETA)
-                          MYTMMPL2(MP)  =  TLMMP(LKET, MKET, MP, ALPHA, COSBETA) 
-                        ENDDO
+                          DO MP = 1,MIN(LBRA, LKET)
+                            MYSLMMPL2(MP) = SLMMP(LKET, MKET, MP, ALPHA, COSBETA)
+                            MYTMMPL2(MP)  =  TLMMP(LKET, MKET, MP, ALPHA, COSBETA) 
+                          ENDDO
 
                           MYDFDA = DFDAPREC(MYSLMMPL1, MYSLMMPL2, MYTMMPL1, MYTMMPL2, MYUNIVSCALE,&
                                I, J, LBRA, LKET, MBRA,&
