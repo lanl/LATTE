@@ -21,7 +21,7 @@ sparsearray.F90 spinarray.F90 univarray.F90 virialarray.F90 xboarray.F90 \
 kspacearray.F90 timer_mod.F90 subgraph.F90 matrixio.F90 sparsemath.F90 \
 sparsesp2.F90 subgraphsp2.F90 homolumo.F90 openfiles_mod.F90 kernelparser_mod.F90 \
 latteparser_latte_mod.F90 mixer_mod.F90 sp2progress.F90 genXprogress.F90  \
-bodirectprogress.F90 constraints_mod.F90 latte_lib.F90 
+bodirectprogress.F90 constraints_mod.F90 latte_lib.F90 wignerarray.F90
 
 DBCSRMODS = dbcsr_var_mod.F90 init_dbcsr.F90 shutdown_dbcsr.F90
 
@@ -50,8 +50,9 @@ readcr.F90 readmdcontroller.F90 readppot.F90  readtb.F90 resetprodhd.F90 \
 rhozero.F90 shockcomp.F90  spinrhodirect.F90  spinrhodirectprogress.F90 stdescent.F90 \
 summary.F90 tbmd.F90 toteng.F90 univscaling_function.F90 univtailcoef.F90  \
 vdwtailcoef.F90 velverlet.F90  xbo.F90 am.F90 bm.F90 factorial.F90 \
- slmmp.F90 tlmmp.F90 wignerd.F90 dfda.F90 dfdb.F90 dfdr.F90 \
- dfda_prec.F90 dfdb_prec.F90 dfdr_prec.F90 \
+ slmmp.F90 tlmmp.F90 dfda.F90 dfdb.F90 dfdr.F90 \
+dfda_prec.F90 dfdb_prec.F90 dfdr_prec.F90 \
+ wignerd.F90 \
 dunivscaling_function.F90 dslmmpda.F90 dslmmpdb.F90 dtlmmpda.F90 \
 dtlmmpdb.F90 dwignerddb.F90 gradH.F90 kbldnewh.F90  kgetrho.F90 kgradH.F90  \
 bldnewHS_sp.F90 gradH_sp.F90 univscaling.F90 dunivscaling.F90 kgetdos.F90 \

@@ -33,19 +33,15 @@ SUBROUTINE GRADH
 
   INTEGER :: I, J, K, L, M, N, KK, INDI, INDJ
   INTEGER :: LBRA, MBRA, LKET, MKET
-  INTEGER :: PREVJ, NEWJ, MP
+  INTEGER :: PREVJ, NEWJ
   INTEGER :: PBCI, PBCJ, PBCK
   INTEGER :: BASISI(5), BASISJ(5), LBRAINC, LKETINC
   REAL(LATTEPREC) :: ALPHA, BETA, PHI, RHO, COSBETA
   REAL(LATTEPREC) :: RIJ(3), DC(3)
   REAL(LATTEPREC) :: MAGR, MAGR2, MAGRP, MAGRP2, FTMP(3)
-  REAL(LATTEPREC) :: MYSLMMPL2(10), MYSLMMPL1(10), MYTMMPL2(10), MYTMMPL1(10), MYUNIVSCALE(10) 
   REAL(LATTEPREC) :: MAXRCUT, MAXRCUT2
   REAL(LATTEPREC) :: MYDFDA, MYDFDB, MYDFDR, RCUTTB
-  REAL(LATTEPREC) :: MYDFDA1, MYDFDB1, MYDFDR1
-  REAL(LATTEPREC), EXTERNAL :: DFDAPREC, DFDBPREC, DFDRPREC
   REAL(LATTEPREC), EXTERNAL :: DFDA, DFDB, DFDR
-  REAL(LATTEPREC), EXTERNAL :: SLMMP, TLMMP, UNIVSCALE
   LOGICAL PATH
   IF (EXISTERROR) RETURN
 
@@ -61,8 +57,6 @@ SUBROUTINE GRADH
 !$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP2, MAGRP, PATH, PHI, ALPHA, BETA, COSBETA, FTMP) &
 !$OMP PRIVATE(DC, LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET, RHO) &
 !$OMP PRIVATE(MYDFDA, MYDFDB, MYDFDR, RCUTTB) &
-!$OMP PRIVATE(MYDFDA1, MYDFDB1, MYDFDR1) &
-!$OMP PRIVATE(MYSLMMPL2, MYSLMMPL1, MYTMMPL2,MYTMMPL1, MYUNIVSCALE) &
 !$OMP REDUCTION(+:VIRBOND)        
 
   DO I = 1, NATS
@@ -300,21 +294,10 @@ SUBROUTINE GRADH
                  L = INDJ
 
                  LKETINC = 1
-
-                 DO MP = 1,LBRA
-                    MYSLMMPL1(MP) = SLMMP(LBRA, MBRA, MP, ALPHA, COSBETA) 
-                    MYTMMPL1(MP)  =  TLMMP(LBRA, MBRA, MP, ALPHA, COSBETA)
-                 ENDDO
-
                  DO WHILE (BASISJ(LKETINC) .NE. -1)
 
                     LKET = BASISJ(LKETINC)
                     LKETINC = LKETINC + 1
-
-                        DO MP = 1,MIN(LBRA, LKET)
-                          MYUNIVSCALE(MP) = UNIVSCALE(I, J,LBRA, LKET, MP, MAGR, "H")     
-                        ENDDO
-
 
                     DO MKET = -LKET, LKET
 
@@ -331,44 +314,15 @@ SUBROUTINE GRADH
 
                           ! Unroll loops and pre-compute
 
-                        DO MP = 1,MIN(LBRA, LKET)
-                          MYSLMMPL2(MP) = SLMMP(LKET, MKET, MP, ALPHA, COSBETA)
-                          MYTMMPL2(MP)  =  TLMMP(LKET, MKET, MP, ALPHA, COSBETA) 
-                        ENDDO
-
-                          MYDFDA = DFDAPREC(MYSLMMPL1, MYSLMMPL2, MYTMMPL1, MYTMMPL2, MYUNIVSCALE,&
-                               I, J, LBRA, LKET, MBRA,&
-                                MKET, MAGR, ALPHA, COSBETA, "H")
-
-                          MYDFDB = DFDBPREC(MYSLMMPL1, MYSLMMPL2, MYTMMPL1, MYTMMPL2, MYUNIVSCALE, &
-                               I, J, LBRA, LKET, MBRA, &
+                          MYDFDA = DFDA(I, J, LBRA, LKET, MBRA, &
                                MKET, MAGR, ALPHA, COSBETA, "H")
 
-                          MYDFDR = DFDRPREC(MYTMMPL1, MYTMMPL2, &
-                                I, J, LBRA, LKET, MBRA, &
+                          MYDFDB = DFDB(I, J, LBRA, LKET, MBRA, &
                                MKET, MAGR, ALPHA, COSBETA, "H")
-                           
-               !           MYDFDA1 = DFDA(I, J, LBRA, LKET, MBRA, &
-               !                MKET, MAGR, ALPHA, COSBETA, "H")
 
-               !           MYDFDB1 = DFDB(I, J, LBRA, LKET, MBRA, &
-               !                MKET, MAGR, ALPHA, COSBETA, "H")
+                          MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
+                               MKET, MAGR, ALPHA, COSBETA, "H")
 
-               !           MYDFDR1 = DFDR(I, J, LBRA, LKET, MBRA, &
-               !                MKET, MAGR, ALPHA, COSBETA, "H")
-
-               !         IF(MYDFDA1 .ne. MYDFDA)then 
-               !           WRITE(*,*)MYDFDA1,MYDFDA
-               !           stop "MYDFDA1 .ne. MYDFDA"
-               !         endif
-               !         IF(MYDFDB1 .ne. MYDFDB)then
-               !           WRITE(*,*)MYDFDB1,MYDFDB
-               !           stop "MYDFDB1 .ne. MYDFDB"
-               !         endif
-               !         IF(MYDFDR1 .ne. MYDFDR)then
-               !           WRITE(*,*)MYDFDR1,MYDFDR
-               !           stop "MYDFDR1 .ne. MYDFDR"
-               !         endif
                           !
                           ! d/d_alpha
                           !
