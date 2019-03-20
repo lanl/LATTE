@@ -24,6 +24,7 @@ SUBROUTINE BLDSPINH
   USE CONSTANTS_MOD
   USE SETUPARRAY
   USE SPINARRAY
+  USE KSPACEARRAY
   USE NONOARRAY
   USE MYPRECISION
 
@@ -41,6 +42,7 @@ SUBROUTINE BLDSPINH
   INTEGER :: INDEX, HINDEX
   REAL(LATTEPREC) :: DSPINS, DSPINP
   REAL(LATTEPREC) :: HSS, HSP, HPP, HDD, HFF
+  COMPLEX(LATTEPREC) :: ZTMP
   IF (EXISTERROR) RETURN
 
   INDEX = 0
@@ -312,34 +314,65 @@ SUBROUTINE BLDSPINH
 
   IF (BASISTYPE .EQ. "ORTHO") THEN
 
-     HUP = H
-     HDOWN = H
+     IF (KON .EQ. 0) THEN
+     
+        HUP = H
+        HDOWN = H
+        
+        DO I = 1, HDIM
+           HUP(I,I) = HUP(I,I) + H2VECT(I)
+           HDOWN(I,I) = HDOWN(I,I) - H2VECT(I)
+        ENDDO
 
-     DO I = 1, HDIM
-        HUP(I,I) = HUP(I,I) + H2VECT(I)
-        HDOWN(I,I) = HDOWN(I,I) - H2VECT(I)
-     ENDDO
+     ELSE
+
+        DO K = 1, NKTOT
+           DO I = 1, HDIM
+              KHUP(I,I,K) = HK(I,I,K) + H2VECT(I)
+              KHDOWN(I,I,K) = HK(I,I,K) - H2VECT(I)
+           ENDDO
+        ENDDO
+
+     ENDIF
 
   ELSEIF (BASISTYPE .EQ. "NONORTHO") THEN
 
-     ! Now we have H_2, we can form SH_2, and then symmetrize it
+     IF (KON .EQ. 0) THEN
 
-     DO I = 1, HDIM
-        DO J = 1, HDIM
+        DO I = 1, HDIM
+           DO J = 1, HDIM
 
-           SH2(J,I) = SMAT(J,I)*H2VECT(I)
+              SH2(J,I) = SMAT(J,I)*(H2VECT(I) + H2VECT(J))/TWO
 
+           ENDDO
         ENDDO
-     ENDDO
+        
+        ! H_up = H + SH2 ; H_down = H = SH2
+        
+        HUP = H + SH2
+        
+        HDOWN = H - SH2
 
-     SH2 = (SH2 + TRANSPOSE(SH2))/TWO
+     ELSE ! Now we're doing kspace
 
-     ! H_up = H + SH2 ; H_down = H = SH2
+        KHUP = HK
+        KHDOWN = HK
 
-     HUP = H + SH2
+        DO K = 1, NKTOT
+           DO I = 1, HDIM
+              DO J = 1, HDIM
+                 
+                 ZTMP = SK(J,I,K)*(H2VECT(I) + H2VECT(J))/TWO
 
-     HDOWN = H - SH2
+                 KHUP(J,I,K) = HK(J,I,K) + ZTMP
+                 KHDOWN(J,I,K) = HK(J,I,K) - ZTMP
+                 
+              ENDDO
+           ENDDO
+        ENDDO
 
+     END IF
+              
   ENDIF
 
   RETURN

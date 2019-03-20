@@ -62,9 +62,9 @@ SUBROUTINE PLOTPPOT
      R1 = POTCOEF(9, PPSEL)
      RCUT = POTCOEF(10,PPSEL)
 
-     DO II = 1, 1000
+     DO II = 1, 21
 
-        MAGR = 0.7D0 + 4.3D0*REAL(II-1)/THOUSAND
+        MAGR = 0.5D0 + (RCUT - 0.5D0)*REAL(II-1)/20.0
 
         !        MAGR = MAGR - POTCOEF(6,PPSEL)
 
@@ -120,15 +120,23 @@ SUBROUTINE PLOTPPOT
 
   ENDDO
 
-  DO II = 1, 1000
+  DO I = 1, NOPPS
+     
+     RCUT = POTCOEF(10,I)
 
-     MAGR = 0.7D0 + 4.3D0*REAL(II-1)/THOUSAND
+     DO II = 1, 21
 
-     WRITE(56, 10) MAGR, &
-          (MYPAIRPOTS(II,I), I = 1, NOPPS)
+        MAGR = 0.5D0 + (RCUT - 0.5D0)*REAL(II-1)/20.0
 
-     WRITE(57, 10) MAGR , &
-          (MYF(II,I), I = 1, NOPPS)
+        WRITE(56, 10) MAGR, MYPAIRPOTS(II,I)
+
+! &
+!          (MYPAIRPOTS(II,I), I = 1, NOPPS)
+
+!     WRITE(57, 10) MAGR , &
+!          (MYF(II,I), I = 1, NOPPS)
+
+  ENDDO
   ENDDO
 
 10 FORMAT(100G18.9)

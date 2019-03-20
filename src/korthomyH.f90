@@ -40,16 +40,36 @@ SUBROUTINE KORTHOMYH
   ! ORTHOH = X^dag H X
   !
 
-  DO II = 1, NKTOT
+  IF (SPINON .EQ. 0) THEN
+     
+     DO II = 1, NKTOT
+        
+        CALL ZGEMM('C', 'N', HDIM, HDIM, HDIM, ALPHA, KXMAT(:,:,II), &
+             HDIM, HK(:,:,II), HDIM, BETA, KTMP, HDIM)
+        CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ALPHA, KTMP, HDIM, &
+             KXMAT(:,:,II), HDIM, BETA, KORTHOH(:,:,II), HDIM)
+        
+     ENDDO
 
-     CALL ZGEMM('C', 'N', HDIM, HDIM, HDIM, ALPHA, KXMAT(:,:,II), &
-          HDIM, HK(:,:,II), HDIM, BETA, KTMP, HDIM)
-     CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ALPHA, KTMP, HDIM, &
-          KXMAT(:,:,II), HDIM, BETA, KORTHOH(:,:,II), HDIM)
+  ELSE
 
-  ENDDO
+     DO II = 1, NKTOT
 
+        CALL ZGEMM('C', 'N', HDIM, HDIM, HDIM, ALPHA, KXMAT(:,:,II), &
+             HDIM, KHUP(:,:,II), HDIM, BETA, KTMP, HDIM)
+        CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ALPHA, KTMP, HDIM, &
+             KXMAT(:,:,II), HDIM, BETA, KORTHOHUP(:,:,II), HDIM)
 
+        CALL ZGEMM('C', 'N', HDIM, HDIM, HDIM, ALPHA, KXMAT(:,:,II), &
+             HDIM, KHDOWN(:,:,II), HDIM, BETA, KTMP, HDIM)
+        CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ALPHA, KTMP, HDIM, &
+             KXMAT(:,:,II), HDIM, BETA, KORTHOHDOWN(:,:,II), HDIM)
+
+     ENDDO
+
+  ENDIF
+
+  DEALLOCATE(KTMP)
 
   RETURN
 

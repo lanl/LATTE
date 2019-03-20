@@ -24,12 +24,13 @@ SUBROUTINE GETDELTASPIN
   USE CONSTANTS_MOD
   USE SETUPARRAY
   USE SPINARRAY
+  USE KSPACEARRAY
   USE NONOARRAY
   USE MYPRECISION
 
   IMPLICIT NONE
 
-  INTEGER :: I, J, INDEX, DINDEX
+  INTEGER :: I, J, K, INDEX, DINDEX
   IF (EXISTERROR) RETURN
 
   INDEX = 0
@@ -400,6 +401,7 @@ SUBROUTINE GETDELTASPIN
 
      ENDDO
 
+
   ELSEIF (BASISTYPE .EQ. "NONORTHO") THEN
 
      ! Mulliken spin densities in non-orthogonal basis:
@@ -408,15 +410,38 @@ SUBROUTINE GETDELTASPIN
 
      ! n_sigma = partial_trace(rho_sigma S)
 
-     SPINLIST = ZERO
+     IF (KON .EQ. 0) THEN
 
-     DO I = 1, HDIM
-        DO J = 1, HDIM
-
-           SPINLIST(I) = SPINLIST(I) + (RHOUP(J,I) - RHODOWN(J,I))*SMAT(J,I)
-
+        SPINLIST = ZERO
+        
+        DO I = 1, HDIM
+           DO J = 1, HDIM
+              
+              SPINLIST(I) = SPINLIST(I) + (RHOUP(J,I) - RHODOWN(J,I))*SMAT(J,I)
+              
+           ENDDO
         ENDDO
-     ENDDO
+        
+     ELSE ! If we're doing magnetic TB in k-space
+        
+        ZSPINLIST = (ZERO, ZERO)
+
+        DO K = 1, NKTOT
+           DO I = 1, HDIM
+              DO J = 1, HDIM
+
+                 ZSPINLIST(I) = ZSPINLIST(I) + ((KRHOUP(J,I,K) - KRHODOWN(J,I,K))*SK(I,J,K) + &
+                      (KRHOUP(I,J,K) - KRHODOWN(I,J,K))*SK(J,I,K))/TWO
+                 
+              ENDDO
+           ENDDO
+        ENDDO
+
+        ZSPINLIST = ZSPINLIST/REAL(NKTOT)
+
+        SPINLIST = REAL(ZSPINLIST)
+
+     ENDIF
 
      DO I = 1, NATS
 

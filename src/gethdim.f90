@@ -133,15 +133,32 @@ SUBROUTINE GETHDIM
 
      ! With spins, we need spin-up and spin-down density matrices
 
-     ALLOCATE(HUP(HDIM, HDIM), HDOWN(HDIM, HDIM))
-     ALLOCATE(RHOUP(HDIM, HDIM), RHODOWN(HDIM, HDIM))
-     ALLOCATE(H2VECT(HDIM))
 
-     HUP = ZERO
-     HDOWN = ZERO
-     RHOUP = ZERO
-     RHODOWN = ZERO
+     IF (KON .EQ. 0) THEN 
 
+        ALLOCATE(HUP(HDIM, HDIM), HDOWN(HDIM, HDIM))
+        ALLOCATE(RHOUP(HDIM, HDIM), RHODOWN(HDIM, HDIM))
+        ALLOCATE(H2VECT(HDIM))
+        
+        HUP = ZERO
+        HDOWN = ZERO
+        RHOUP = ZERO
+        RHODOWN = ZERO
+
+     ELSEIF (KON .EQ. 1) THEN
+
+
+        ALLOCATE(KHUP(HDIM, HDIM, NKTOT), KHDOWN(HDIM, HDIM, NKTOT))
+        ALLOCATE(KRHOUP(HDIM, HDIM, NKTOT), KRHODOWN(HDIM, HDIM, NKTOT))
+        ALLOCATE(H2VECT(HDIM))
+
+        KHUP = ZERO
+        KHDOWN = ZERO
+        KRHOUP = ZERO
+        KRHODOWN = ZERO
+
+     ENDIF
+        
      ! And our spin-dependent H_(2) matrix
 
      DO I = 1, NATS
@@ -195,8 +212,15 @@ SUBROUTINE GETHDIM
      ! This array is required when we calculate Mulliken spin densities
      ! with a non-orthogonal basis
 
-     IF (BASISTYPE .EQ. "NONORTHO") ALLOCATE(SPINLIST(HDIM))
-
+     IF (BASISTYPE .EQ. "NONORTHO") THEN
+        IF (KON .EQ. 0) THEN
+           ALLOCATE(SPINLIST(HDIM))
+        ELSE
+           ALLOCATE(SPINLIST(HDIM), ZSPINLIST(HDIM))
+        ENDIF
+     ENDIF
+        
+           
      ALLOCATE(DELTASPIN(DELTADIM), OLDDELTASPIN(DELTADIM))
 
      DELTASPIN = ZERO

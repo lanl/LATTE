@@ -41,15 +41,35 @@ SUBROUTINE KDEORTHOMYRHO
 
   ALLOCATE(KTMP(HDIM, HDIM))
 
-  DO I = 1, NKTOT
+  IF (SPINON .EQ. 0) THEN
 
-     CALL ZGEMM('N','N', HDIM, HDIM, HDIM, ALPHA, KXMAT(:,:,I), HDIM, &
-          KBO(:,:,I), HDIM, BETA, KTMP, HDIM)
-     CALL ZGEMM('N', 'C', HDIM, HDIM, HDIM, ALPHA, KTMP, HDIM, &
-          KXMAT(:,:,I), HDIM, BETA, KBO(:,:,I), HDIM)
+     DO I = 1, NKTOT
+        
+        CALL ZGEMM('N','N', HDIM, HDIM, HDIM, ALPHA, KXMAT(:,:,I), HDIM, &
+             KBO(:,:,I), HDIM, BETA, KTMP, HDIM)
+        CALL ZGEMM('N', 'C', HDIM, HDIM, HDIM, ALPHA, KTMP, HDIM, &
+             KXMAT(:,:,I), HDIM, BETA, KBO(:,:,I), HDIM)
+        
+     ENDDO
 
-  ENDDO
+  ELSE
 
+     DO I = 1, NKTOT
+
+        CALL ZGEMM('N','N', HDIM, HDIM, HDIM, ALPHA, KXMAT(:,:,I), HDIM, &
+             KRHOUP(:,:,I), HDIM, BETA, KTMP, HDIM)
+        CALL ZGEMM('N', 'C', HDIM, HDIM, HDIM, ALPHA, KTMP, HDIM, &
+             KXMAT(:,:,I), HDIM, BETA, KRHOUP(:,:,I), HDIM)
+
+        CALL ZGEMM('N','N', HDIM, HDIM, HDIM, ALPHA, KXMAT(:,:,I), HDIM, &
+             KRHODOWN(:,:,I), HDIM, BETA, KTMP, HDIM)
+        CALL ZGEMM('N', 'C', HDIM, HDIM, HDIM, ALPHA, KTMP, HDIM, &
+             KXMAT(:,:,I), HDIM, BETA, KRHODOWN(:,:,I), HDIM)
+
+     ENDDO
+
+  ENDIF
+     
   DEALLOCATE(KTMP)
 
   RETURN

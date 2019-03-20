@@ -31,89 +31,176 @@ SUBROUTINE KGETDOS
   IMPLICIT NONE
 
   INTEGER :: I, J, K, COUNT
-  REAL(LATTEPREC), PARAMETER :: EWINDOW = 0.05, ETA = 0.05
+  REAL(LATTEPREC), PARAMETER :: EWINDOW = 0.05D0, ETA = 0.05D0
   REAL(LATTEPREC) :: INTDOS, ENERGY, NUME, DOSMIN, DOSMAX
+  REAL(LATTEPREC) :: INTDOSUP, INTDOSDOWN
   INTEGER :: NDOSBINS, BINID, NUMORB
-  REAL(LATTEPREC), ALLOCATABLE :: DOS(:)
+  REAL(LATTEPREC), ALLOCATABLE :: DOS(:), DOSUP(:), DOSDOWN(:)
   COMPLEX(LATTEPREC) :: CMPARG
   IF (EXISTERROR) RETURN
 
-  DOSMAX = MAXVAL(KEVALS) + 10.0*EWINDOW
-  DOSMIN = MINVAL(KEVALS) - 10.0*EWINDOW
+  IF (SPINON .EQ. 0) THEN
+     DOSMAX = MAXVAL(KEVALS) + 10.0D0*EWINDOW
+     DOSMIN = MINVAL(KEVALS) - 10.0D0*EWINDOW
+  ELSE
+     DOSMAX = MAX(MAXVAL(KEVALSUP), MAXVAL(KEVALSDOWN)) + 10.0D0*EWINDOW
+     DOSMIN = MIN(MINVAL(KEVALSUP), MINVAL(KEVALSDOWN)) - 10.0D0*EWINDOW
+  ENDIF
 
   NDOSBINS = INT((DOSMAX - DOSMIN)/EWINDOW)
 
-  ALLOCATE(DOS(NDOSBINS))
+  IF (SPINON .EQ. 0) THEN
+     ALLOCATE(DOS(NDOSBINS))
+     DOS = ZERO
+  ELSE
+     ALLOCATE(DOSUP(NDOSBINS), DOSDOWN(NDOSBINS))
+     DOSUP = ZERO
+     DOSDOWN = ZERO
+  ENDIF
 
-  DOS = ZERO
 
   DO I = 1, NDOSBINS
 
      ENERGY = DOSMIN + REAL(I-1)*EWINDOW
 
-     DO K = 1, NKTOT
-        DO J = 1, HDIM
+     IF (SPINON .EQ. 0) THEN
 
-           CMPARG = ONE/(ENERGY - KEVALS(J,K) + CMPLX(ZERO,ETA))
-
-           DOS(I) = DOS(I) - (ONE/PI)*AIMAG(CMPARG)
-
+        DO K = 1, NKTOT
+           DO J = 1, HDIM
+              
+              CMPARG = ONE/(ENERGY - KEVALS(J,K) + CMPLX(ZERO,ETA))
+              
+              DOS(I) = DOS(I) - (ONE/PI)*AIMAG(CMPARG)
+              
+           ENDDO
         ENDDO
-     ENDDO
+        
+        DOS(I) = DOS(I)/REAL(NKTOT)
 
-  ENDDO
+     ELSE
 
-  DOS = DOS/REAL(NKTOT)
+        DO K = 1, NKTOT
+           DO J = 1, HDIM
 
-  ! To normalize, lets integrate the dos
+              CMPARG = ONE/(ENERGY - KEVALSUP(J,K) + CMPLX(ZERO,ETA))
 
-  INTDOS = ZERO
-  COUNT = 0
-  DO I = 1, NDOSBINS
+              DOSUP(I) = DOSUP(I) - (ONE/PI)*AIMAG(CMPARG)
 
-     ENERGY = DOSMIN + REAL(I-1)*EWINDOW
+              CMPARG = ONE/(ENERGY - KEVALSDOWN(J,K) + CMPLX(ZERO,ETA))
 
-     IF (ENERGY .LE. CHEMPOT) THEN
-        COUNT = COUNT + 1
-        IF (MOD(I,2) .EQ. 0) THEN
-           INTDOS = INTDOS + FOUR*DOS(I)
-        ELSE
-           INTDOS = INTDOS + TWO*DOS(I)
-        ENDIF
+              DOSDOWN(I) = DOSDOWN(I) - (ONE/PI)*AIMAG(CMPARG)
+
+           ENDDO
+        ENDDO
+        
+        DOSUP(I) = DOSUP(I)/REAL(NKTOT)
+        DOSDOWN(I) = DOSDOWN(I)/REAL(NKTOT)
+
      ENDIF
 
   ENDDO
 
-  INTDOS = INTDOS - DOS(1) - DOS(COUNT)
 
-  INTDOS = INTDOS*EWINDOW/THREE
-
-  ! Let's figure out what the integrated DOS should be
-  ! In VASP the integral of the DOS up to the chemical 
-  ! potential = the total number of electrons. Let's do the 
-  ! same.
+  ! To normalize, lets integrate the dos
 
   NUME = ZERO
   DO I = 1, NATS
      NUME = NUME + ATOCC(ELEMPOINTER(I))
   ENDDO
+  
 
-  DOS = DOS*NUME/INTDOS
+  IF (SPINON .EQ. 0) THEN
+     
+     INTDOS = ZERO
+     COUNT = 0
+     DO I = 1, NDOSBINS
+        
+        ENERGY = DOSMIN + REAL(I-1)*EWINDOW
+        
+        IF (ENERGY .LE. CHEMPOT) THEN
+           COUNT = COUNT + 1
+           IF (MOD(I,2) .EQ. 0) THEN
+              INTDOS = INTDOS + FOUR*DOS(I)
+           ELSE
+              INTDOS = INTDOS + TWO*DOS(I)
+           ENDIF
+        ENDIF
+        
+     ENDDO
+     
+     INTDOS = INTDOS - DOS(1) - DOS(COUNT)
 
+     INTDOS = INTDOS*EWINDOW/THREE
+
+     DOS = DOS*NUME/INTDOS
+
+  ELSE
+
+     INTDOSUP = ZERO
+     INTDOSDOWN = ZERO
+
+     COUNT = 0
+     DO I = 1, NDOSBINS
+
+        ENERGY = DOSMIN + REAL(I-1)*EWINDOW
+
+        IF (ENERGY .LE. CHEMPOT) THEN
+           COUNT = COUNT + 1
+           IF (MOD(I,2) .EQ. 0) THEN
+              INTDOS = INTDOS + FOUR*(DOSUP(I) + DOSDOWN(I))
+!              INTDOSUP = INTDOSUP + FOUR*DOSUP(I)
+!              INTDOSDOWN = INTDOSDOWN + FOUR*DOSDOWN(I)
+           ELSE
+              INTDOS = INTDOS + TWO*(DOSUP(I) + DOSDOWN(I))
+!              INTDOSUP = INTDOSUP + TWO*DOSUP(I)
+!              INTDOSDOWN = INTDOSDOWN + TWO*DOSDOWN(I)
+           ENDIF
+        ENDIF
+        
+     ENDDO
+
+     INTDOS = INTDOS - (DOSUP(1) + DOSDOWN(1) + DOSUP(COUNT)+DOSDOWN(COUNT))
+     
+!     INTDOSUP = INTDOSUP - DOSUP(1) - DOSUP(COUNT)
+
+!     INTDOSUP = INTDOSUP*EWINDOW/THREE
+
+!     INTDOSDOWN = INTDOSDOWN - DOSDOWN(1) - DOSDOWN(COUNT)
+
+!     INTDOSDOWN = INTDOSDOWN*EWINDOW/THREE
+
+!     DOSUP = DOSUP*NUME/(INTDOSUP*TWO)
+!     DOSDOWN = DOSDOWN*NUME/(INTDOSDOWN*TWO)
+
+     INTDOS = INTDOS*EWINDOW/THREE
+
+     DOSUP = DOSUP*NUME/(INTDOS*TWO)
+     DOSDOWN = DOSDOWN*NUME/(INTDOS*TWO)
+
+     
+  ENDIF
 
   OPEN(UNIT=50, STATUS="UNKNOWN", FILE="DoS.dat")
 
   DO I = 1, NDOSBINS
 
-     WRITE(50, 10) DOSMIN + REAL(I-1)*EWINDOW - CHEMPOT, DOS(I)
+     IF (SPINON .EQ. 0) THEN
+        WRITE(50, 10) DOSMIN + REAL(I-1)*EWINDOW - CHEMPOT, DOS(I)
+     ELSE
+        WRITE(50, 10) DOSMIN + REAL(I-1)*EWINDOW - CHEMPOT, DOSUP(I), DOSDOWN(I)
+     ENDIF
 
   ENDDO
 
-10 FORMAT(2F12.6)
+10 FORMAT(3F12.6)
 
   CLOSE(50)
 
-  DEALLOCATE(DOS)
+  IF (SPINON .EQ. 0) THEN
+     DEALLOCATE(DOS)
+  ELSE 
+     DEALLOCATE(DOSUP, DOSDOWN)
+  ENDIF
 
   RETURN
 

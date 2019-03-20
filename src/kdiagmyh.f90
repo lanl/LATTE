@@ -54,33 +54,78 @@ SUBROUTINE KDIAGMYH
   ! eigenvectors of all NKTOT of our H matrices               
 
   IF (BASISTYPE .EQ. "ORTHO") THEN
-     KEVECS = HK
+     IF (SPINON .EQ. 0) THEN
+        KEVECS = HK
+     ELSE
+        KEVECSUP = KHUP
+        KEVECSDOWN = KHDOWN
+     ENDIF
+        
   ELSEIF (BASISTYPE .EQ. "NONORTHO") THEN
-     KEVECS = KORTHOH
+
+     IF (SPINON .EQ. 0) THEN
+        KEVECS = KORTHOH
+     ELSE
+        KEVECSUP = KORTHOHUP
+        KEVECSDOWN = KORTHOHDOWN
+     ENDIF
+
   ENDIF
 
 #ifdef MPI_OFF
 
   DO I = 1, NKTOT
 
+     IF (SPINON .EQ. 0) THEN
+
 #ifdef XHEEV     
 
-     CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
-          DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
+        CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
+             DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
      
 #elif defined(XHEEVD)
 
-     CALL ZHEEVD('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
-          ZHEEVD_WORK, ZHEEVD_LWORK, ZHEEVD_RWORK, ZHEEVD_LRWORK, &
-          ZHEEVD_IWORK, ZHEEVD_LIWORK, INFO)
-
-     IF (INFO .NE. 0) CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
-          DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
+        CALL ZHEEVD('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
+             ZHEEVD_WORK, ZHEEVD_LWORK, ZHEEVD_RWORK, ZHEEVD_LRWORK, &
+             ZHEEVD_IWORK, ZHEEVD_LIWORK, INFO)
+        
+        IF (INFO .NE. 0) CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
+             DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
 
 #endif
 
-  ENDDO
+     ELSE ! Spin polarized k-space
 
+#ifdef XHEEV
+
+        CALL ZHEEV('V', 'U', HDIM, KEVECSUP(:,:,I), HDIM, KEVALSUP(:,I), &
+             DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
+
+        CALL ZHEEV('V', 'U', HDIM, KEVECSDOWN(:,:,I), HDIM, KEVALSDOWN(:,I), &
+             DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
+
+
+#elif defined(XHEEVD)
+
+        CALL ZHEEVD('V', 'U', HDIM, KEVECSUP(:,:,I), HDIM, KEVALSUP(:,I), &
+             ZHEEVD_WORK, ZHEEVD_LWORK, ZHEEVD_RWORK, ZHEEVD_LRWORK, &
+             ZHEEVD_IWORK, ZHEEVD_LIWORK, INFO)
+
+        IF (INFO .NE. 0) CALL ZHEEV('V', 'U', HDIM, KEVECSUP(:,:,I), HDIM, KEVALSUP(:,I), &
+             DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
+
+        CALL ZHEEVD('V', 'U', HDIM, KEVECSDOWN(:,:,I), HDIM, KEVALSDOWN(:,I), &
+             ZHEEVD_WORK, ZHEEVD_LWORK, ZHEEVD_RWORK, ZHEEVD_LRWORK, &
+             ZHEEVD_IWORK, ZHEEVD_LIWORK, INFO)
+
+        IF (INFO .NE. 0) CALL ZHEEV('V', 'U', HDIM, KEVECSDOWN(:,:,I), HDIM, KEVALSDOWN(:,I), &
+             DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
+
+#endif
+
+     ENDIF
+
+  ENDDO
 
 #elif defined(MPI_ON)
 
@@ -88,22 +133,57 @@ SUBROUTINE KDIAGMYH
 
      IF (MOD(I, NUMPROCS) .EQ. MYID) THEN
 
+
+        IF (SPINON .EQ. 0) THEN
+
 #ifdef XHEEV
 
-        CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
-             DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
-
+           CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
+                DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
+           
 #elif defined(XHEEVD)
         
 
-        CALL ZHEEVD('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
-             ZHEEVD_WORK, ZHEEVD_LWORK, ZHEEVD_RWORK, ZHEEVD_LRWORK, &
-             ZHEEVD_IWORK, ZHEEVD_LIWORK, INFO)
-
-        IF (INFO .NE. 0)  CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
-             DIAG_ZWORK, DIAG_LWORK, DIAG_RWORK, INFO)
-        
+           CALL ZHEEVD('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
+                ZHEEVD_WORK, ZHEEVD_LWORK, ZHEEVD_RWORK, ZHEEVD_LRWORK, &
+                ZHEEVD_IWORK, ZHEEVD_LIWORK, INFO)
+           
+           IF (INFO .NE. 0)  CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
+                DIAG_ZWORK, DIAG_LWORK, DIAG_RWORK, INFO)
+           
 #endif
+
+        ELSE ! Spin polarized
+
+#ifdef XHEEV
+
+           CALL ZHEEV('V', 'U', HDIM, KEVECSUP(:,:,I), HDIM, KEVALSUP(:,I), &
+                DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
+
+           CALL ZHEEV('V', 'U', HDIM, KEVECSDOWN(:,:,I), HDIM, KEVALSDOWN(:,I), &
+                DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
+
+#elif defined(XHEEVD)
+
+
+           CALL ZHEEVD('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
+                ZHEEVD_WORK, ZHEEVD_LWORK, ZHEEVD_RWORK, ZHEEVD_LRWORK, &
+                ZHEEVD_IWORK, ZHEEVD_LIWORK, INFO)
+
+           IF (INFO .NE. 0)  CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
+                DIAG_ZWORK, DIAG_LWORK, DIAG_RWORK, INFO)
+
+           CALL ZHEEVD('V', 'U', HDIM, KEVECSDOWN(:,:,I), HDIM, KEVALSDOWN(:,I), &
+                ZHEEVD_WORK, ZHEEVD_LWORK, ZHEEVD_RWORK, ZHEEVD_LRWORK, &
+                ZHEEVD_IWORK, ZHEEVD_LIWORK, INFO)
+
+           IF (INFO .NE. 0)  CALL ZHEEV('V', 'U', HDIM, KEVECSDOWN(:,:,I), HDIM, KEVALSDOWN(:,I), &
+                DIAG_ZWORK, DIAG_LWORK, DIAG_RWORK, INFO)
+
+
+#endif
+
+        ENDIF
 
      ENDIF
 
@@ -125,7 +205,6 @@ SUBROUTINE KDIAGMYH
         IF (MOD(I,NUMPROCS) .EQ. MYID) THEN 
 
            ! If so, sent it to the others
-
 
            CALL MPI_SEND(KEVALS(1,I), HDIM, MPI_DOUBLE_PRECISION, &
                 0, I, MPI_COMM_WORLD, IERR)

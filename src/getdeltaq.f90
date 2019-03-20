@@ -33,10 +33,11 @@ SUBROUTINE GETDELTAQ
 
   INTEGER :: I, J, K, INDEX, NUMORB
   COMPLEX(LATTEPREC) :: QTMP
-  IF (EXISTERROR) RETURN
-  !  COMPLEX(LATTEPREC), ALLOCATABLE :: TMPQ(:)
+  COMPLEX(LATTEPREC), ALLOCATABLE :: TMPQ(:)
 
-  !  ALLOCATE(TMPQ(HDIM))
+  IF (EXISTERROR) RETURN
+  
+  ALLOCATE(TMPQ(HDIM))
 
   INDEX = 0
 
@@ -91,33 +92,69 @@ SUBROUTINE GETDELTAQ
 
      IF (BASISTYPE .EQ. "ORTHO") THEN
 
-        DO K = 1, NKTOT
-           DO I = 1, HDIM
-              QLIST(I) = QLIST(I) + REAL(KBO(I,I,K))
+        IF (SPINON .EQ. 0) THEN
+
+           DO K = 1, NKTOT
+              DO I = 1, HDIM
+                 QLIST(I) = QLIST(I) + REAL(KBO(I,I,K))
+              ENDDO
            ENDDO
-        ENDDO
+           
+        ELSE
+
+           DO K = 1, NKTOT
+              DO I = 1, HDIM
+                 QLIST(I) = QLIST(I) + REAL(KRHOUP(I,I,K) + KRHODOWN(I,I,K))
+              ENDDO
+           ENDDO
+
+        ENDIF
 
         QLIST = QLIST/REAL(NKTOT)
-
+        
      ELSE
 
         !        TMPQ = (ZERO, ZERO)
-        DO K = 1, NKTOT
-           DO I = 1, HDIM
-              DO J = 1, HDIM
-                 !                 TMPQ(I) = TMPQ(I) + KBO(J,I,K)*CONJG(SK(I,J,K))
-                 QTMP = HALF*((KBO(J,I,K))*SK(I,J,K) + &
-                      (KBO(I,J,K))*SK(J,I,K))
-                 !                 QTMP = HALF*((KBO(J,I,K))*SK(I,J,K) + &
-                 !                      (KBO(J,I,K))*SK(I,J,K))
-                 QLIST(I) = QLIST(I) + REAL(QTMP)
-                 !                 QLIST(I) = QLIST(I) + REAL(KBO(J,I,K)*CONJG(SK(J,I,K)))
+
+        IF (SPINON .EQ. 0) THEN
+           
+           DO K = 1, NKTOT
+              DO I = 1, HDIM
+                 DO J = 1, HDIM
+                    !                 TMPQ(I) = TMPQ(I) + KBO(J,I,K)*CONJG(SK(I,J,K))
+                    QTMP = HALF*((KBO(J,I,K))*SK(I,J,K) + &
+                         (KBO(I,J,K))*SK(J,I,K))
+                    !                 QTMP = HALF*((KBO(J,I,K))*SK(I,J,K) + &
+                    !                      (KBO(J,I,K))*SK(I,J,K))
+                    QLIST(I) = QLIST(I) + REAL(QTMP)
+                    !                 QLIST(I) = QLIST(I) + REAL(KBO(J,I,K)*CONJG(SK(J,I,K)))
+                 ENDDO
               ENDDO
            ENDDO
-        ENDDO
-        !        TMPQ = TMPQ/REAL(NKTOT)
+           !        TMPQ = TMPQ/REAL(NKTOT)
 
-        QLIST = QLIST/REAL(NKTOT)
+           QLIST = QLIST/REAL(NKTOT)
+          
+        ELSE
+
+           TMPQ = ZERO
+
+           DO K = 1, NKTOT 
+              DO I = 1, HDIM
+                 DO J = 1, HDIM
+
+                    TMPQ(I) = TMPQ(I) + ((KRHOUP(J,I,K) + KRHODOWN(J,I,K))*SK(I,J,K) + &
+                         (KRHOUP(I,J,K) + KRHODOWN(I,J,K))*SK(J,I,K))/TWO
+
+                 ENDDO
+              ENDDO
+           ENDDO
+
+           QLIST = REAL(TMPQ)/REAL(NKTOT)
+
+        ENDIF
+
+           
         !         DO I =1, HDIM
         !           PRINT*, I, TMPQ(I), QLIST(I)
         !        ENDDO
@@ -130,6 +167,7 @@ SUBROUTINE GETDELTAQ
 
   ENDIF
 
+  DEALLOCATE(TMPQ)
 
   DO I = 1, NATS
 

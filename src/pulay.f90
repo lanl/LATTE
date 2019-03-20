@@ -278,7 +278,7 @@ SUBROUTINE PULAY
 !$OMP SHARED(CR, BOX, X2HRHO, NOINT, ATELE, ELE1, ELE2) &
 !$OMP SHARED(BO, RHOUP, RHODOWN, SPINON, ELECTRO) & 
 !$OMP SHARED(HCUT, SCUT, MATINDLIST, BASISTYPE) &
-!$OMP SHARED(DELTASPIN, WSS, WPP, WDD, WFF, SPININDLIST) &
+!$OMP SHARED(DELTASPIN, WSS, WPP, WDD, WFF, SPININDLIST, H2VECT) &
 !$OMP SHARED(HUBBARDU, DELTAQ, COULOMBV) & 
 !$OMP SHARED(LCNSHIFT) & 
 !$OMP SHARED(FPUL) &
@@ -287,7 +287,6 @@ SUBROUTINE PULAY
 !$OMP PRIVATE(FTMP_PULAY, FTMP_COUL, FTMP_SPIN) &
 !$OMP PRIVATE(DC, LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET, RHO, RHODIFF) &
 !$OMP PRIVATE(MYDFDA, MYDFDB, MYDFDR, RCUTTB) &
-!$OMP PRIVATE(WSPINI, WSPINJ, SPININDI, SPININDJ) &
 !$OMP REDUCTION(+:VIRPUL)
 
 
@@ -361,7 +360,7 @@ SUBROUTINE PULAY
      END SELECT
 
      INDI = MATINDLIST(I)
-     IF (SPINON .EQ. 1) SPININDI = SPININDLIST(I)
+!     IF (SPINON .EQ. 1) SPININDI = SPININDLIST(I)
 
      DO NEWJ = 1, TOTNEBTB(I)
 
@@ -469,7 +468,7 @@ SUBROUTINE PULAY
            END SELECT
 
            INDJ = MATINDLIST(J)
-           IF (SPINON .EQ. 1) SPININDJ = SPININDLIST(J)
+!           IF (SPINON .EQ. 1) SPININDJ = SPININDLIST(J)
 
 
            MAGRP2 = RIJ(1)*RIJ(1) + RIJ(2)*RIJ(2)
@@ -519,24 +518,6 @@ SUBROUTINE PULAY
               LBRA = BASISI(LBRAINC)
               LBRAINC = LBRAINC + 1
 
-              IF (SPINON .EQ. 1) THEN
-
-                 SELECT CASE(LBRA)
-                 CASE(0)
-                    WSPINI = WSS(ELEMPOINTER(I))
-                 CASE(1)
-                    WSPINI = WPP(ELEMPOINTER(I))
-                 CASE(2)
-                    WSPINI = WDD(ELEMPOINTER(I))
-                 CASE(3)
-                    WSPINI = WFF(ELEMPOINTER(I))
-                 END SELECT
-                 
-                 WSPINI = WSPINI*DELTASPIN(SPININDI + LBRAINC - 1)
-              
-              ENDIF
-
-
               DO MBRA = -LBRA, LBRA
 
                  K = K + 1
@@ -548,23 +529,6 @@ SUBROUTINE PULAY
                     LKET = BASISJ(LKETINC)
                     LKETINC = LKETINC + 1
 
-                    IF (SPINON .EQ. 1) THEN
-                       
-                       SELECT CASE(LKET)
-                       CASE(0)
-                          WSPINJ = WSS(ELEMPOINTER(J))
-                       CASE(1)
-                          WSPINJ = WPP(ELEMPOINTER(J))
-                       CASE(2)
-                          WSPINJ = WDD(ELEMPOINTER(J))
-                       CASE(3)
-                          WSPINJ = WFF(ELEMPOINTER(J))
-                       END SELECT
-                       
-                       WSPINJ = WSPINJ*DELTASPIN(SPININDJ + LKETINC - 1)
-
-                    ENDIF
-
                     DO MKET = -LKET, LKET
 
                        L = L + 1
@@ -574,7 +538,7 @@ SUBROUTINE PULAY
                           RHO = BO(L, K)
                        CASE(1)
                           RHO = RHOUP(L, K) + RHODOWN(L, K)
-                          RHODIFF = (RHOUP(L, K) - RHODOWN(L, K))*(WSPINI + WSPINJ)
+                          RHODIFF = (RHOUP(L, K) - RHODOWN(L, K))*(H2VECT(L) + H2VECT(K))
                        END SELECT
 
 !                       RHO = X2HRHO(L, K)

@@ -38,6 +38,7 @@ SUBROUTINE KPULAY
   INTEGER :: PREVJ, NEWJ
   INTEGER :: PBCI, PBCJ, PBCK
   INTEGER :: BASISI(5), BASISJ(5), LBRAINC, LKETINC
+  INTEGER :: SPININDI, SPININDJ
   INTEGER :: KX, KY, KZ, KCOUNT
   REAL(LATTEPREC) :: ALPHA, BETA, PHI,  COSBETA
   REAL(LATTEPREC) :: RIJ(3), DC(3)
@@ -46,10 +47,11 @@ SUBROUTINE KPULAY
   REAL(LATTEPREC) :: MYDFDA, MYDFDB, MYDFDR, RCUTTB
   REAL(LATTEPREC) :: KPOINT(3), KX0, KY0, KZ0, KDOTL
   REAL(LATTEPREC) :: B1(3), B2(3), B3(3), MAG1, MAG2, MAG3, A1A2XA3, K0(3)
+  REAL(LATTEPREC) :: WSPINI, WSPINJ
   REAL(LATTEPREC), EXTERNAL :: DFDA, DFDB, DFDR
-  COMPLEX(LATTEPREC) :: FTMP_PULAY(3), FTMP_COUL(3)
-  COMPLEX(LATTEPREC) :: RHO_PULAY, RHO_COUL, CONJGBLOCH
-  COMPLEX(LATTEPREC), ALLOCATABLE :: KX2HRHO(:,:,:), KTMP(:,:)
+  COMPLEX(LATTEPREC) :: FTMP_PULAY(3), FTMP_COUL(3), FTMP_SPIN(3)
+  COMPLEX(LATTEPREC) :: RHO_PULAY, RHO_COUL, RHO_DIFF, CONJGBLOCH
+  COMPLEX(LATTEPREC), ALLOCATABLE :: KX2HRHO(:,:,:), KTMP(:,:), KTMP2(:,:)
   COMPLEX(LATTEPREC), PARAMETER :: ZONE=CMPLX(ONE), ZZERO=CMPLX(ZERO), ZHALF=CMPLX(HALF)
 
   LOGICAL PATH
@@ -57,14 +59,10 @@ SUBROUTINE KPULAY
 
   ! These were allocated elsewhere. We'll use them to accumulate the complex forces
 
-  IF (SPINON .EQ. 1) THEN
-     CALL ERRORS("kpulay","Non-ortho k-space and spin polarization not yet implemented")
-  ENDIF
-
   KF = CMPLX(ZERO)
   VIRBONDK = CMPLX(ZERO)
 
-  ALLOCATE(KX2HRHO(HDIM, HDIM, NKTOT), KTMP(HDIM, HDIM))
+  ALLOCATE(KX2HRHO(HDIM, HDIM, NKTOT), KTMP(HDIM, HDIM), KTMP2(HDIM, HDIM))
 
   ! Computing the reciprocal lattice vectors
 
@@ -96,61 +94,108 @@ SUBROUTINE KPULAY
 
   K0 = PI*KSHIFT
 
-!  K0 = PI*(ONE - REAL(NKX))/(REAL(NKX))*B1 + &
-!       PI*(ONE - REAL(NKY))/(REAL(NKY))*B2 + &
-!       PI*(ONE - REAL(NKZ))/(REAL(NKZ))*B3 - PI*KSHIFT
-
   ! We first have to make the matrix S^-1 H rho = X^2 H rho
 
-  IF (KBT .GT. 0.000001) THEN
+  IF (SPINON .EQ. 0) THEN
 
-     ! Finite temperature
+     IF (KBT .GT. 0.000001) THEN
+        
+        ! Finite temperature
 
-     DO K = 1, NKTOT
-
-        CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ZONE, &
-             KXMAT(:,:,K), HDIM, KXMAT(:,:,K), HDIM, ZZERO, KX2HRHO(:,:,K), HDIM)
-
-        CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ZONE, &
-             KX2HRHO(:,:,K), HDIM, HK(:,:,K), HDIM, ZZERO, KTMP, HDIM)
-
-        ! (S^-1 * H)*RHO
-
-        CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ZONE, &
+        DO K = 1, NKTOT
+           
+           CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ZONE, &
+                KXMAT(:,:,K), HDIM, KXMAT(:,:,K), HDIM, ZZERO, KX2HRHO(:,:,K), HDIM)
+           
+           CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ZONE, &
+                KX2HRHO(:,:,K), HDIM, HK(:,:,K), HDIM, ZZERO, KTMP, HDIM)
+           
+           ! (S^-1 * H)*RHO
+           
+           CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ZONE, &
              KTMP, HDIM, KBO(:,:,K), HDIM, ZZERO, KX2HRHO(:,:,K), HDIM)
+           
+        ENDDO
+        
+     ELSE
+        
+        ! Te = 0 : Fp = 2Tr[rho H rho dS/dR]
+        
+        ! Be careful - we're working with bo = 2rho, so we need
+        ! the factor of 1/2...
+        
+        DO K = 1, NKTOT
+           
+           CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ZONE, &
+                KBO(:,:,K), HDIM, HK(:,:,K), HDIM, ZZERO, KTMP, HDIM)
+           
+           CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ZHALF, &
+                KTMP, HDIM, KBO(:,:,K), HDIM, ZZERO, KX2HRHO(:,:,K), HDIM)
+           
+        ENDDO
+        
+     ENDIF
 
-     ENDDO
+  ELSE ! Now the same but for magnetic systems
 
-  ELSE
+     IF (KBT .GT. 0.000001) THEN
 
-     ! Te = 0 : Fp = 2Tr[rho H rho dS/dR]
+        DO K = 1, NKTOT
 
-     ! Be careful - we're working with bo = 2rho, so we need
-     ! the factor of 1/2...
+           CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ZONE, &
+                KXMAT(:,:,K), HDIM, KXMAT(:,:,K), HDIM, ZZERO, KTMP2, HDIM)
 
-     DO K = 1, NKTOT
+           CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ZONE, &
+                KHUP(:,:,K), HDIM, KRHOUP(:,:,K), HDIM, ZZERO, KTMP, HDIM)
 
-        CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ZONE, &
-             KBO(:,:,K), HDIM, HK(:,:,K), HDIM, ZZERO, KTMP, HDIM)
+           CALL ZGEMM('N', 'N',  HDIM, HDIM, HDIM, ZONE, &
+                KHDOWN(:,:,K), HDIM, KRHODOWN(:,:,K), HDIM, ZONE, KTMP, HDIM)
 
-        CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ZHALF, &
-             KTMP, HDIM, KBO(:,:,K), HDIM, ZZERO, KX2HRHO(:,:,K), HDIM)
+           ! (S^-1 * H)*RHO                                                                                                       
 
-     ENDDO
+           CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ZONE, &
+             KTMP2, HDIM, KTMP, HDIM, ZZERO, KX2HRHO(:,:,K), HDIM)
+
+        ENDDO
+        
+     ELSE
+
+        DO K = 1, NKTOT
+
+           CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ZONE, &
+                KRHOUP(:,:,K), HDIM, KHUP(:,:,K), HDIM, ZZERO, KTMP2, HDIM)
+
+           CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ZONE, &
+                KTMP2, HDIM, KRHOUP(:,:,K), HDIM, ZZERO, KX2HRHO(:,:,K), HDIM)
+
+           CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ZONE, &
+                KRHODOWN(:,:,K), HDIM, KHDOWN(:,:,K), HDIM, ZZERO, KTMP2, HDIM)
+
+           CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ZONE, &
+                KTMP2, HDIM, KRHODOWN(:,:,K), HDIM, ZONE, KX2HRHO(:,:,K), HDIM)
+
+        ENDDO
+
+     ENDIF
 
   ENDIF
 
+
 !$OMP PARALLEL DO DEFAULT (NONE) &
 !$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &
-!$OMP SHARED(CR, BOX, KX2HRHO, KBO, NOINT, ATELE, ELE1, ELE2) &
+!$OMP SHARED(CR, BOX, KX2HRHO, KBO,  NOINT, ATELE, ELE1, ELE2) &
+!$OMP SHARED(KRHOUP, KRHODOWN, SPINON, H2VECT) &
 !$OMP SHARED(HCUT, SCUT, MATINDLIST, BASISTYPE, ELECTRO) &
+!$OMP SHARED(DELTASPIN, WSS, WPP, WDD, WFF, SPININDLIST) &
 !$OMP SHARED(K0, B1, B2, B3, NKX, NKY, NKZ, KF) &
 !$OMP SHARED(LCNSHIFT, HUBBARDU, DELTAQ, COULOMBV) &
 !$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &
-!$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP2, MAGRP, PATH, PHI, ALPHA, BETA, COSBETA, FTMP_PULAY, FTMP_COUL) &
-!$OMP PRIVATE(DC, LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET, RHO_PULAY, RHO_COUL) &
+!$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP2, MAGRP, PATH, PHI, ALPHA, BETA, COSBETA)&
+!$OMP PRIVATE(FTMP_PULAY, FTMP_COUL, FTMP_SPIN) &
+!$OMP PRIVATE(DC, LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET, RHO_PULAY, RHO_COUL, RHO_DIFF) &
 !$OMP PRIVATE(MYDFDA, MYDFDB, MYDFDR, RCUTTB, CONJGBLOCH, KDOTL) &
 !$OMP PRIVATE(KPOINT, KCOUNT) &
+!!$OMP PRIVATE(WSPINI, WSPINJ, SPININDI, SPININDJ) &
 !$OMP REDUCTION(+: VIRBONDK)
 
 
@@ -224,6 +269,7 @@ SUBROUTINE KPULAY
      END SELECT
 
      INDI = MATINDLIST(I)
+!     IF (SPINON .EQ. 1) SPININDI = SPININDLIST(I)
 
      DO NEWJ = 1, TOTNEBTB(I)
 
@@ -331,6 +377,7 @@ SUBROUTINE KPULAY
            END SELECT
 
            INDJ = MATINDLIST(J)
+!           IF (SPINON .EQ. 1) SPININDJ = SPININDLIST(J)
 
            MAGRP2 = RIJ(1)*RIJ(1) + RIJ(2)*RIJ(2)
            MAGRP = SQRT(MAGRP2)
@@ -370,6 +417,7 @@ SUBROUTINE KPULAY
 
            FTMP_PULAY = ZERO
            FTMP_COUL = ZERO
+           FTMP_SPIN = ZERO
 
            K = INDI
 
@@ -378,7 +426,7 @@ SUBROUTINE KPULAY
 
               LBRA = BASISI(LBRAINC)
               LBRAINC = LBRAINC + 1
-
+              
               DO MBRA = -LBRA, LBRA
 
                  K = K + 1
@@ -418,10 +466,6 @@ SUBROUTINE KPULAY
 
                                 DO KZ = 1, NKZ
 
-!                                   KPOINT = TWO*PI*(REAL(KX-1)*B1/REAL(NKX) + &
-!                                        REAL(KY-1)*B2/REAL(NKY) + &
-!                                        REAL(KZ-1)*B3/REAL(NKZ)) + K0
-
                                    KPOINT = ZERO
                                    KPOINT = KPOINT + (TWO*REAL(KX) - REAL(NKX) - ONE)/(TWO*REAL(NKX))*B1
                                    KPOINT = KPOINT + (TWO*REAL(KY) - REAL(NKY) - ONE)/(TWO*REAL(NKY))*B2
@@ -436,8 +480,15 @@ SUBROUTINE KPULAY
 
                                    RHO_PULAY = KX2HRHO(K,L,KCOUNT)*CONJGBLOCH
 
-                                   RHO_COUL = KBO(K,L,KCOUNT)*CONJGBLOCH
-
+                                   SELECT CASE(SPINON)
+                                   CASE(0)
+                                      RHO_COUL = KBO(K,L,KCOUNT)*CONJGBLOCH
+                                   CASE(1)
+                                      RHO_COUL = (KRHOUP(K,L,KCOUNT) + KRHODOWN(K,L,KCOUNT))*CONJGBLOCH
+                                      RHO_DIFF = (KRHOUP(K,L,KCOUNT) - KRHODOWN(K,L,KCOUNT)) * &
+                                           CONJGBLOCH*(H2VECT(K) + H2VECT(L))
+                                   END SELECT
+                                      
                                    !
                                    ! d/d_alpha
                                    !
@@ -454,6 +505,15 @@ SUBROUTINE KPULAY
                                    FTMP_COUL(2) = FTMP_COUL(2) + RHO_COUL * &
                                         (RIJ(1)/ MAGRP2 * MYDFDA)
 
+                                   IF (SPINON .EQ. 1) THEN
+
+                                      FTMP_SPIN(1) = FTMP_SPIN(1) + RHO_DIFF * &
+                                           (-RIJ(2) / MAGRP2 * MYDFDA)
+                                      
+                                      FTMP_SPIN(2) = FTMP_SPIN(2) + RHO_DIFF * &
+                                           (RIJ(1)/ MAGRP2 * MYDFDA)
+                                      
+                                   ENDIF
 
                                    !
                                    ! d/d_beta
@@ -483,6 +543,21 @@ SUBROUTINE KPULAY
                                         (((ONE - ((RIJ(3) * RIJ(3)) / &
                                         MAGR2)) / MAGRP) * MYDFDB)
 
+                                   IF (SPINON .EQ. 1) THEN
+
+                                      FTMP_SPIN(1) = FTMP_SPIN(1) + RHO_DIFF * &
+                                           (((((RIJ(3) * RIJ(1)) / &
+                                           MAGR2)) / MAGRP) * MYDFDB)
+                                      
+                                      FTMP_SPIN(2) = FTMP_SPIN(2) + RHO_DIFF * &
+                                           (((((RIJ(3) * RIJ(2)) / &
+                                           MAGR2)) / MAGRP) * MYDFDB)
+                                      
+                                      FTMP_SPIN(3) = FTMP_SPIN(3) - RHO_DIFF * &
+                                           (((ONE - ((RIJ(3) * RIJ(3)) / &
+                                           MAGR2)) / MAGRP) * MYDFDB)
+                                      
+                                   ENDIF
                                    
 
                                    !
@@ -507,6 +582,18 @@ SUBROUTINE KPULAY
                                    FTMP_COUL(3) = FTMP_COUL(3) - RHO_COUL * DC(3) * &
                                         MYDFDR
 
+                                   IF (SPINON .EQ. 1) THEN
+                                      
+                                      FTMP_SPIN(1) = FTMP_SPIN(1) - RHO_DIFF * DC(1) * &
+                                           MYDFDR
+                                      
+                                      FTMP_SPIN(2) = FTMP_SPIN(2) - RHO_DIFF * DC(2) * &
+                                           MYDFDR
+                                      
+                                      FTMP_SPIN(3) = FTMP_SPIN(3) - RHO_DIFF * DC(3) * &
+                                           MYDFDR
+                                      
+                                   ENDIF
 
                                 ENDDO
                              ENDDO
@@ -522,7 +609,6 @@ SUBROUTINE KPULAY
                           MYDFDB = DFDB(I, J, LBRA, LKET, &
                                MBRA, MKET, MAGR, ZERO, COSBETA, "S") / MAGR
 
-
                           MYDFDB = DFDB(I, J, LBRA, LKET, &
                                MBRA, MKET, MAGR, PI/TWO, COSBETA, "S") / MAGR
 
@@ -537,9 +623,6 @@ SUBROUTINE KPULAY
 
                                 DO KZ = 1, NKZ
 
-!                                   KPOINT = TWO*PI*(REAL(KX-1)*B1/REAL(NKX) + &
-!                                        REAL(KY-1)*B2/REAL(NKY) + &
-!                                        REAL(KZ-1)*B3/REAL(NKZ)) + K0
 
                                    KPOINT = ZERO
                                    KPOINT = KPOINT + (TWO*REAL(KX) - REAL(NKX) - ONE)/(TWO*REAL(NKX))*B1
@@ -555,7 +638,14 @@ SUBROUTINE KPULAY
 
                                    RHO_PULAY = KX2HRHO(K,L,KCOUNT)*CONJGBLOCH
 
-                                   RHO_COUL = KBO(K,L,KCOUNT)*CONJGBLOCH
+                                   SELECT CASE(SPINON)
+                                   CASE(0)
+                                      RHO_COUL = KBO(K,L,KCOUNT)*CONJGBLOCH
+                                   CASE(1)
+                                      RHO_COUL = (KRHOUP(K,L,KCOUNT) + KRHODOWN(K,L,KCOUNT))*CONJGBLOCH
+                                      RHO_DIFF = (KRHOUP(K,L,KCOUNT) - KRHODOWN(K,L,KCOUNT)) * &
+                                           CONJGBLOCH*(H2VECT(K) + H2VECT(L))
+                                   END SELECT
 
                                    FTMP_PULAY(1) = FTMP_PULAY(1) - RHO_PULAY * COSBETA * MYDFDB
                                    FTMP_PULAY(2) = FTMP_PULAY(2) - RHO_PULAY * COSBETA * MYDFDB
@@ -565,10 +655,17 @@ SUBROUTINE KPULAY
                                    FTMP_COUL(2) = FTMP_COUL(2) - RHO_COUL * COSBETA * MYDFDB
                                    FTMP_COUL(3) = FTMP_COUL(3) - RHO_COUL * COSBETA * MYDFDR
 
+                                   IF (SPINON .EQ. 1) THEN
+                                      FTMP_SPIN(1) = FTMP_SPIN(1) - RHO_DIFF * (COSBETA * MYDFDB)
+                                      FTMP_SPIN(2) = FTMP_SPIN(2) - RHO_DIFF * (COSBETA * MYDFDB)
+                                      FTMP_SPIN(3) = FTMP_SPIN(3) - RHO_DIFF * (COSBETA * MYDFDR)
+                                   ENDIF
+
+
                                 ENDDO
                              ENDDO
                           ENDDO
-
+                          
                        ENDIF
 
                     ENDDO
@@ -598,7 +695,7 @@ SUBROUTINE KPULAY
               FTMP_COUL = FTMP_COUL * (LCNSHIFT(I) + LCNSHIFT(J))
 
            ENDIF
-           
+
            
            KF(1,I) = KF(1,I) + FTMP_COUL(1)
            KF(2,I) = KF(2,I) + FTMP_COUL(2)
@@ -613,7 +710,22 @@ SUBROUTINE KPULAY
            VIRBONDK(5) = VIRBONDK(5) + RIJ(2)*FTMP_COUL(3)/TWO
            VIRBONDK(6) = VIRBONDK(6) + RIJ(3)*FTMP_COUL(1)/TWO
            
+
+           IF (SPINON .EQ. 1) THEN
+
+              KF(1,I) = KF(1,I) + FTMP_SPIN(1)
+              KF(2,I) = KF(2,I) + FTMP_SPIN(2)
+              KF(3,I) = KF(3,I) + FTMP_SPIN(3)
+
+              VIRBONDK(1) = VIRBONDK(1) + RIJ(1)*FTMP_SPIN(1)/TWO
+              VIRBONDK(2) = VIRBONDK(2) + RIJ(2)*FTMP_SPIN(2)/TWO
+              VIRBONDK(3) = VIRBONDK(3) + RIJ(3)*FTMP_SPIN(3)/TWO
+              VIRBONDK(4) = VIRBONDK(4) + RIJ(1)*FTMP_SPIN(2)/TWO
+              VIRBONDK(5) = VIRBONDK(5) + RIJ(2)*FTMP_SPIN(3)/TWO
+              VIRBONDK(6) = VIRBONDK(6) + RIJ(3)*FTMP_SPIN(1)/TWO
            
+           ENDIF
+
         ENDIF
 
      ENDDO
@@ -622,7 +734,7 @@ SUBROUTINE KPULAY
 
 !$OMP END PARALLEL DO
 
-  DEALLOCATE(KX2HRHO, KTMP)
+  DEALLOCATE(KX2HRHO, KTMP, KTMP2)
 
   !  PRINT*, KF(1,1), KF(2,1), KF(3,1)
 

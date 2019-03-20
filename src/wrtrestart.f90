@@ -34,7 +34,7 @@ SUBROUTINE WRTRESTART(ITER)
 
   INTEGER :: I, K, ITER
   INTEGER :: MYID, IERR
-  COMPLEX(LATTEPREC) :: KSUM
+  COMPLEX(LATTEPREC) :: KSUM, KSUMUP, KSUMDOWN
   CHARACTER(LEN=100) :: FLNM
   IF (EXISTERROR) RETURN
 
@@ -194,11 +194,33 @@ SUBROUTINE WRTRESTART(ITER)
      ENDIF
 
   ELSEIF (SPINON .EQ. 1) THEN
+     
+     IF (KON .EQ. 0) THEN
 
-     WRITE(21,18) HDIM
-     DO I = 1, HDIM
-        WRITE(21,19) RHOUP(I,I), RHODOWN(I,I)
-     ENDDO
+        WRITE(21,18) HDIM
+        DO I = 1, HDIM
+           WRITE(21,19) RHOUP(I,I), RHODOWN(I,I)
+        ENDDO
+        
+     ELSE
+
+        DO I = 1, HDIM
+           KSUMUP = CMPLX(ZERO)
+           KSUMDOWN = CMPLX(ZERO)
+
+           DO K = 1, NKTOT
+              KSUMUP = KSUMUP + KRHOUP(I,I,K)
+              KSUMDOWN = KSUMDOWN + KRHODOWN(I,I,K)
+           ENDDO
+
+           WRITE(21,19) REAL(KSUMUP)/(REAL(NKTOT)), &
+                REAL(KSUMDOWN)/(REAL(NKTOT))
+
+        ENDDO
+        
+     ENDIF
+
+
 
   ENDIF
 

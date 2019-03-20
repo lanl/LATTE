@@ -50,15 +50,23 @@ SUBROUTINE GETPRESSURE
 
   IF (BASISTYPE .EQ. "NONORTHO") THEN
 
-     IF (SPONLY .EQ. 0) THEN
-
-        VIRIAL = VIRIAL - VIRPUL
+     IF (KON .EQ. 0) THEN
         
-        IF (ELECTRO .EQ. 0) VIRIAL = VIRIAL + VIRSLCN
-        IF (ELECTRO .EQ. 1) VIRIAL = VIRIAL + VIRSCOUL
-        IF (SPINON .EQ. 1) VIRIAL = VIRIAL + VIRSSPIN
+        IF (SPONLY .EQ. 0) THEN
+           
+           VIRIAL = VIRIAL - VIRPUL
+           
+           IF (ELECTRO .EQ. 0) VIRIAL = VIRIAL + VIRSLCN
+           IF (ELECTRO .EQ. 1) VIRIAL = VIRIAL + VIRSCOUL
+           IF (SPINON .EQ. 1) VIRIAL = VIRIAL + VIRSSPIN
+           
+        ELSE 
+           
+           VIRIAL = VIRIAL + VIRPUL
+           
+        ENDIF
 
-     ELSE 
+     ELSE ! k-space
 
         VIRIAL = VIRIAL + VIRPUL
 

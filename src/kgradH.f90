@@ -81,16 +81,12 @@ SUBROUTINE KGRADH
 
   B3 = TWO*PI*B3
 
-  K0 = PI*KSHIFT
-
-!  K0 = PI*(ONE - REAL(NKX))/(REAL(NKX))*B1 + &
-!       PI*(ONE - REAL(NKY))/(REAL(NKY))*B2 + &
-!       PI*(ONE - REAL(NKZ))/(REAL(NKZ))*B3 - PI*KSHIFT
-
+!  K0 = PI*KSHIFT
 
 !$OMP PARALLEL DO DEFAULT (NONE) &
 !$OMP SHARED(NATS, BASIS, ELEMPOINTER, TOTNEBTB, NEBTB) &
 !$OMP SHARED(CR, BOX, KBO, SPINON, NOINT, ATELE, ELE1, ELE2) &
+!$OMP SHARED(KRHOUP, KRHODOWN)&  
 !$OMP SHARED(HCUT, SCUT, MATINDLIST, BASISTYPE) &
 !$OMP SHARED(K0, B1, B2, B3, NKX, NKY, NKZ, KF) &
 !$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &
@@ -370,10 +366,6 @@ SUBROUTINE KGRADH
 
                                 DO KZ = 1, NKZ
 
-!                                   KPOINT = TWO*PI*(REAL(KX-1)*B1/REAL(NKX) + &
-!                                        REAL(KY-1)*B2/REAL(NKY) + &
-!                                        REAL(KZ-1)*B3/REAL(NKZ)) + K0
-
                                    KPOINT = ZERO
                                    KPOINT = KPOINT + (TWO*REAL(KX) - REAL(NKX) - ONE)/(TWO*REAL(NKX))*B1
                                    KPOINT = KPOINT + (TWO*REAL(KY) - REAL(NKY) - ONE)/(TWO*REAL(NKY))*B2
@@ -389,10 +381,8 @@ SUBROUTINE KGRADH
                                    SELECT CASE(SPINON)
                                    CASE(0)
                                       RHO = KBO(K,L, KCOUNT)
-                                      !                                   RHO = CONJG(KBO(L,K,KCOUNT))
                                    CASE(1)
-                                      CALL ERRORS("kgradH","KSPACE AND SPIN POLARIZATION NOT IMPLEMENTED")
-                                      !                                   RHO = RHOUP(L, K) + RHODOWN(L, K)
+                                      RHO = KRHOUP(K,L,KCOUNT) + KRHODOWN(K,L,KCOUNT)
                                    END SELECT
 
 
@@ -482,10 +472,8 @@ SUBROUTINE KGRADH
                                    SELECT CASE(SPINON)
                                    CASE(0)
                                       RHO = KBO(K,L, KCOUNT)
-                                      !                                   RHO = CONJG(KBO(L,K,KCOUNT))
                                    CASE(1)
-                                      CALL ERRORS("kgradH","KSPACE AND SPIN POLARIZATION NOT IMPLEMENTED")
-                                      !                                   RHO = RHOUP(L, K) + RHODOWN(L, K)
+                                      RHO = KRHOUP(K,L,KCOUNT) + KRHODOWN(K,L,KCOUNT)
                                    END SELECT
 
                                    FTMP(1) = FTMP(1) - RHO * COSBETA * MYDFDB*CONJGBLOCH

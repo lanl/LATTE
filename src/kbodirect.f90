@@ -38,6 +38,7 @@ SUBROUTINE KBOEVECS
   INTEGER :: ITER, BREAKLOOP, LOOPTARGET, COUNT, MYKPOINT
   INTEGER :: CPLOC(1)
   REAL(LATTEPREC) :: OCCTARGET, OCC, FDIRAC, DFDIRAC
+  REAL(LATTEPREC) :: OCCUP, OCCDOWN
   REAL(LATTEPREC) :: OCCERROR, SHIFTCP, FDIRACARG, EXPARG
   REAL(LATTEPREC), PARAMETER :: MAXSHIFT = ONE
   REAL(LATTEPREC) :: S, OCCLOGOCC_ELECTRONS, OCCLOGOCC_HOLES
@@ -55,7 +56,7 @@ SUBROUTINE KBOEVECS
 #endif
 
   ZONE = CMPLX(ONE)
-  KBO = CMPLX(ZERO) ! Initialize the density matrix
+!  KBO = CMPLX(ZERO) ! Initialize the density matrix
 
   OCCTARGET = BNDFIL*REAL(HDIM*NKTOT)
 
@@ -78,39 +79,80 @@ SUBROUTINE KBOEVECS
 
         ITER = ITER + 1
         OCC = ZERO
+        OCCUP = ZERO
+        OCCDOWN = ZERO
         DFDIRAC = ZERO
 
 
         ! Loop over all k-points too
 
-        !$OMP PARALLEL DO DEFAULT(NONE) &
-        !$OMP SHARED(NKTOT, HDIM, KEVALS, CHEMPOT, KBT) &
-        !$OMP PRIVATE(K, I, FDIRACARG, EXPARG, FDIRAC) &
-        !$OMP REDUCTION(+: OCC, DFDIRAC)
+        IF (SPINON .EQ. 0) THEN
 
-        DO K = 1, NKTOT
-           DO I = 1, HDIM
+!$OMP PARALLEL DO DEFAULT(NONE) &
+!$OMP SHARED(NKTOT, HDIM, KEVALS, CHEMPOT, KBT) &
+!$OMP PRIVATE(K, I, FDIRACARG, EXPARG, FDIRAC) &
+!$OMP REDUCTION(+: OCC, DFDIRAC)
 
-              FDIRACARG = (KEVALS(I, K) - CHEMPOT)/KBT
-
-              FDIRACARG = MAX(FDIRACARG, -EXPTOL)
-              FDIRACARG = MIN(FDIRACARG, EXPTOL)
-
-              EXPARG = EXP(FDIRACARG)
-              FDIRAC = ONE/(ONE + EXPARG)
-              OCC = OCC + FDIRAC
-              DFDIRAC = DFDIRAC + EXPARG*FDIRAC*FDIRAC
-
+           DO K = 1, NKTOT
+              DO I = 1, HDIM
+                 
+                 FDIRACARG = (KEVALS(I, K) - CHEMPOT)/KBT
+                 
+                 FDIRACARG = MAX(FDIRACARG, -EXPTOL)
+                 FDIRACARG = MIN(FDIRACARG, EXPTOL)
+                 
+                 EXPARG = EXP(FDIRACARG)
+                 FDIRAC = ONE/(ONE + EXPARG)
+                 OCC = OCC + FDIRAC
+                 DFDIRAC = DFDIRAC + EXPARG*FDIRAC*FDIRAC
+                 
+              ENDDO
            ENDDO
-        ENDDO
 
-        !$OMP END PARALLEL DO
+           
+
+!$OMP END PARALLEL DO
+
+           OCCERROR = (OCCTARGET - OCC)/REAL(NKTOT)
+           
+        ELSE ! This bit is for spin polarized calculations
+ 
+           
+           DO K = 1, NKTOT
+              DO I = 1, HDIM
+
+                 FDIRACARG = (KEVALSUP(I, K) - CHEMPOT)/KBT
+
+                 FDIRACARG = MAX(FDIRACARG, -EXPTOL)
+                 FDIRACARG = MIN(FDIRACARG, EXPTOL)
+
+                 EXPARG = EXP(FDIRACARG)
+                 FDIRAC = ONE/(ONE + EXPARG)
+                 OCCUP = OCCUP + FDIRAC
+                 DFDIRAC = DFDIRAC + EXPARG*FDIRAC*FDIRAC
+
+
+                 FDIRACARG = (KEVALSDOWN(I, K) - CHEMPOT)/KBT
+
+                 FDIRACARG = MAX(FDIRACARG, -EXPTOL)
+                 FDIRACARG = MIN(FDIRACARG, EXPTOL)
+
+                 EXPARG = EXP(FDIRACARG)
+                 FDIRAC = ONE/(ONE + EXPARG)
+                 OCCDOWN = OCCDOWN + FDIRAC
+                 DFDIRAC = DFDIRAC + EXPARG*FDIRAC*FDIRAC
+
+
+              ENDDO
+           ENDDO
+
+           OCCERROR = TOTNE - (OCCUP + OCCDOWN)/REAL(NKTOT)
+
+        ENDIF
 
         DFDIRAC = DFDIRAC/REAL(NKTOT)
 
         DFDIRAC = DFDIRAC/KBT
-
-        OCCERROR = (OCCTARGET - OCC)/REAL(NKTOT)
 
         IF (ABS(DFDIRAC) .LT. NUMLIMIT) DFDIRAC = SIGN(NUMLIMIT, DFDIRAC)
 
@@ -119,6 +161,7 @@ SUBROUTINE KBOEVECS
         IF (ABS(SHIFTCP) .GT. MAXSHIFT) SHIFTCP = SIGN(MAXSHIFT, SHIFTCP)
 
         CHEMPOT = CHEMPOT + SHIFTCP
+
 
      ENDDO
 
@@ -132,32 +175,69 @@ SUBROUTINE KBOEVECS
 
      IF (MDON .EQ. 0 .OR. &
           (MDON .EQ. 1 .AND. MOD(ENTROPYITER, WRTFREQ) .EQ. 0 )) THEN
+        
+        IF (SPINON .EQ. 0) THEN
 
-        !$OMP PARALLEL DO DEFAULT(NONE) &
-        !$OMP SHARED(NKTOT, HDIM, KEVALS, CHEMPOT, KBT) &
-        !$OMP PRIVATE(K, I, FDIRACARG, FDIRAC, OCCLOGOCC_HOLES, OCCLOGOCC_ELECTRONS) &
-        !$OMP REDUCTION(+: S)
+!$OMP PARALLEL DO DEFAULT(NONE) &
+!$OMP SHARED(NKTOT, HDIM, KEVALS, CHEMPOT, KBT) &
+!$OMP PRIVATE(K, I, FDIRACARG, FDIRAC, OCCLOGOCC_HOLES, OCCLOGOCC_ELECTRONS) &
+!$OMP REDUCTION(+: S)
 
-        DO K = 1, NKTOT
-           DO I = 1, HDIM
-
-              FDIRACARG = (KEVALS(I, K) - CHEMPOT)/KBT
-
-              FDIRACARG = MAX(FDIRACARG, -EXPTOL)
-              FDIRACARG = MIN(FDIRACARG, EXPTOL)
-
-              FDIRAC = ONE/(ONE + EXP(FDIRACARG))
-
-              OCCLOGOCC_ELECTRONS = FDIRAC * LOG(FDIRAC)
-              OCCLOGOCC_HOLES = (ONE - FDIRAC) * LOG(ONE - FDIRAC)
-
-              S = S + TWO*(OCCLOGOCC_ELECTRONS + OCCLOGOCC_HOLES)
-
+           DO K = 1, NKTOT
+              DO I = 1, HDIM
+                 
+                 FDIRACARG = (KEVALS(I, K) - CHEMPOT)/KBT
+                 
+                 FDIRACARG = MAX(FDIRACARG, -EXPTOL)
+                 FDIRACARG = MIN(FDIRACARG, EXPTOL)
+                 
+                 FDIRAC = ONE/(ONE + EXP(FDIRACARG))
+                 
+                 OCCLOGOCC_ELECTRONS = FDIRAC * LOG(FDIRAC)
+                 OCCLOGOCC_HOLES = (ONE - FDIRAC) * LOG(ONE - FDIRAC)
+                 
+                 S = S + TWO*(OCCLOGOCC_ELECTRONS + OCCLOGOCC_HOLES)
+                 
+              ENDDO
            ENDDO
-        ENDDO
 
-        !$OMP END PARALLEL DO
+!$OMP END PARALLEL DO
 
+        ELSE
+
+           DO K = 1, NKTOT
+              DO I = 1, HDIM
+
+                 FDIRACARG = (KEVALSUP(I, K) - CHEMPOT)/KBT
+
+                 FDIRACARG = MAX(FDIRACARG, -EXPTOL)
+                 FDIRACARG = MIN(FDIRACARG, EXPTOL)
+
+                 FDIRAC = ONE/(ONE + EXP(FDIRACARG))
+
+                 OCCLOGOCC_ELECTRONS = FDIRAC * LOG(FDIRAC)
+                 OCCLOGOCC_HOLES = (ONE - FDIRAC) * LOG(ONE - FDIRAC)
+
+                 S = S + (OCCLOGOCC_ELECTRONS + OCCLOGOCC_HOLES)
+
+
+                 FDIRACARG = (KEVALSDOWN(I, K) - CHEMPOT)/KBT
+
+                 FDIRACARG = MAX(FDIRACARG, -EXPTOL)
+                 FDIRACARG = MIN(FDIRACARG, EXPTOL)
+
+                 FDIRAC = ONE/(ONE + EXP(FDIRACARG))
+
+                 OCCLOGOCC_ELECTRONS = FDIRAC * LOG(FDIRAC)
+                 OCCLOGOCC_HOLES = (ONE - FDIRAC) * LOG(ONE - FDIRAC)
+
+                 S = S + (OCCLOGOCC_ELECTRONS + OCCLOGOCC_HOLES)
+
+              ENDDO
+           ENDDO
+           
+        ENDIF
+        
         S = S/REAL(NKTOT)
 
         ! Compute the gap only when we have to...
@@ -176,20 +256,56 @@ SUBROUTINE KBOEVECS
 
 #ifdef MPI_OFF
 
-     DO K = 1, NKTOT
-        DO I = 1, HDIM
+     IF (SPINON .EQ. 0) THEN
 
-           FDIRACARG = (KEVALS(I,K) - CHEMPOT)/KBT
-
-           FDIRACARG = MAX(FDIRACARG, -EXPTOL)
-           FDIRACARG = MIN(FDIRACARG, EXPTOL)
-
-           ZFDIRAC = CMPLX(ONE/(ONE + EXP(FDIRACARG)))
-
-           CALL ZGERC(HDIM, HDIM, ZFDIRAC, KEVECS(:,I,K), 1, KEVECS(:,I,K), 1, KBO(:,:,K), HDIM)
-
+        KBO = ZERO
+     
+        DO K = 1, NKTOT
+           DO I = 1, HDIM
+              
+              FDIRACARG = (KEVALS(I,K) - CHEMPOT)/KBT
+              
+              FDIRACARG = MAX(FDIRACARG, -EXPTOL)
+              FDIRACARG = MIN(FDIRACARG, EXPTOL)
+              
+              ZFDIRAC = CMPLX(ONE/(ONE + EXP(FDIRACARG)))
+              
+              CALL ZGERC(HDIM, HDIM, ZFDIRAC, KEVECS(:,I,K), 1, KEVECS(:,I,K), 1, KBO(:,:,K), HDIM)
+              
+           ENDDO
         ENDDO
-     ENDDO
+
+     ELSE 
+        
+        KRHOUP = ZERO
+        KRHODOWN = ZERO
+
+        DO K = 1, NKTOT
+           DO I = 1, HDIM
+
+              FDIRACARG = (KEVALSUP(I,K) - CHEMPOT)/KBT
+
+              FDIRACARG = MAX(FDIRACARG, -EXPTOL)
+              FDIRACARG = MIN(FDIRACARG, EXPTOL)
+
+              ZFDIRAC = CMPLX(ONE/(ONE + EXP(FDIRACARG)))
+
+              CALL ZGERC(HDIM, HDIM, ZFDIRAC, KEVECSUP(:,I,K), 1, KEVECSUP(:,I,K), 1, KRHOUP(:,:,K), HDIM)
+
+              FDIRACARG = (KEVALSDOWN(I,K) - CHEMPOT)/KBT
+
+              FDIRACARG = MAX(FDIRACARG, -EXPTOL)
+              FDIRACARG = MIN(FDIRACARG, EXPTOL)
+
+              ZFDIRAC = CMPLX(ONE/(ONE + EXP(FDIRACARG)))
+
+              CALL ZGERC(HDIM, HDIM, ZFDIRAC, KEVECSDOWN(:,I,K), 1, KEVECSDOWN(:,I,K), 1, KRHODOWN(:,:,K), HDIM)
+              
+
+           ENDDO
+        ENDDO
+
+     ENDIF
 
 #elif defined(MPI_ON)
 
@@ -383,7 +499,7 @@ SUBROUTINE KBOEVECS
 
   !  PRINT*, COUNT, OCCTARGET
 
-  KBO = KBO*CMPLX(TWO)
+  IF (SPINON .EQ. 0) KBO = KBO*CMPLX(TWO)
 
   IF (DEBUGON .EQ. 1) THEN
 

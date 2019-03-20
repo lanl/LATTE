@@ -74,7 +74,7 @@ SUBROUTINE TOTENG
         TRRHOH = REAL(ZTRRHOH)/REAL(NKTOT)
 
      ENDIF
-
+     
   ELSE
 
      !
@@ -89,16 +89,37 @@ SUBROUTINE TOTENG
      ! bits to get the total energy
      !
 
-     DO I = 1, HDIM
-        DO J = 1, HDIM
+     IF (KON .EQ. 0) THEN
 
-           TRRHOH = TRRHOH + (RHOUP(J,I) + RHODOWN(J,I))*H(J,I)
+        DO I = 1, HDIM
+           DO J = 1, HDIM
+              
+              TRRHOH = TRRHOH + (RHOUP(J,I) + RHODOWN(J,I))*H(J,I)
+              
+           ENDDO
 
+           TRRHOH = TRRHOH - (RHOUPZERO(I) + RHODOWNZERO(I))*H(I,I)
+           
         ENDDO
 
-        TRRHOH = TRRHOH - (RHOUPZERO(I) + RHODOWNZERO(I))*H(I,I)
+     ELSE
 
-     ENDDO
+        DO K = 1, NKTOT
+           DO I = 1, HDIM
+              DO J = 1, HDIM
+
+                 ZTRRHOH = ZTRRHOH + (KRHOUP(J,I,K) + KRHODOWN(J,I,K))*HK(I,J,K)
+
+              ENDDO
+
+              ZTRRHOH = ZTRRHOH - (RHOUPZERO(I) + RHODOWNZERO(I))*HK(I,I,K)
+
+           ENDDO
+        ENDDO
+
+        TRRHOH = REAL(ZTRRHOH)/REAL(NKTOT)
+           
+     ENDIF
 
   ENDIF
 

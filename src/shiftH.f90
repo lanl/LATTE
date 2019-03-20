@@ -134,17 +134,16 @@ SUBROUTINE SHIFTH(CHI)
               
               INDEX = INDEX + 1
               HJJ(INDEX) = LCNSHIFT(I)
-!              H(INDEX, INDEX) = HDIAG(INDEX) + LCNSHIFT(I)
                            
            ENDDO
            
         ENDDO
-        
+
         DO I = 1, HDIM
            DO J = 1, HDIM
 
               H(J,I) = H0(J,I) + SMAT(J,I)*(HJJ(I) + HJJ(J))/TWO
-
+              
            ENDDO
         ENDDO
 
@@ -162,20 +161,10 @@ SUBROUTINE SHIFTH(CHI)
         
         DO I = 1, NATS           
 
-!           IF (CONTROL .EQ. 1) THEN
-
-              !Using the response function calculated in GETRESPF               
-
-!              LCNSHIFT(I) = LCNSHIFT(I) + RESPCHI(I)*DELTAQ(I)
-
-!           ELSE
-
-              ! Using a constant                                                
-
-              LCNSHIFT(I) = LCNSHIFT(I) + CHI * DELTAQ(I)
-
-!           ENDIf
+           ! Using a constant                                                
            
+           LCNSHIFT(I) = LCNSHIFT(I) + CHI * DELTAQ(I)
+                      
         ENDDO
 
         DO K = 1, NKTOT

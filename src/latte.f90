@@ -171,7 +171,6 @@ PROGRAM LATTE
 
      ENDIF
 
-
      !
      ! If we're starting from a restart file, we need to modify H such
      ! that it agrees with the density matrix elements read from file
@@ -185,9 +184,13 @@ PROGRAM LATTE
      !
 
      IF (SPINON .EQ. 1) THEN
+
         CALL GETDELTASPIN
+
         CALL BLDSPINH
+
      ENDIF
+ 
 
      IF (CONTROL .EQ. 1) THEN
         CALL ALLOCATEDIAG
@@ -251,7 +254,7 @@ PROGRAM LATTE
 
 
      CALL TOTENG
-     
+
      ECOUL = ZERO
      IF (ELECTRO .EQ. 1) CALL GETCOULE
 

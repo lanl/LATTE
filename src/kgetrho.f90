@@ -23,41 +23,13 @@ SUBROUTINE KGETRHO
 
   USE CONSTANTS_MOD
   USE MYPRECISION
-  USE KSPACEARRAY
-  USE DIAGARRAY
-  !  USE MPI
 
   IMPLICIT NONE
   IF (EXISTERROR) RETURN
 
-  !  INTEGER :: START_CLOCK, STOP_CLOCK, CLOCK_RATE, CLOCK_MAX
-
-  !  INTEGER :: I, J, MYID, IERR
-  ! Lets first build our NKTOT Hamiltonians (we'll need all of them
-  ! in order to get the density matrix via SP2....
-
-  !  CALL MPI_COMM_RANK(MPI_COMM_WORLD, MYID, IERR)
-
-  !  CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
-
   CALL KDIAGMYH
 
-  !  CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
-
-  !  PRINT*, "# Diag time (s) = ", &
-  !      REAL(STOP_CLOCK - START_CLOCK)/REAL(CLOCK_RATE)
-
-  !  DO I = 1, NKTOT
-  !     PRINT*, I, MYID, KEVALS(1,I)
-  !  ENDDO
-
   CALL KBOEVECS
-
-
-
-  !  DO I = 1, NKTOT
-  !        PRINT*, I, MYID, KBO(1,1,I), KBO(HDIM, HDIM, I)
-  !  ENDDO
 
   RETURN
 

@@ -47,6 +47,9 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
   ! we'll have to get these from our charge-independent H matrix first
   !
 
+  ALLOKQ = 0
+  ALLOKM = 0
+
   ENTE = ZERO
 
   IF (FULLQCONV .EQ. 1 .OR. MDITER .LE. 10) THEN
@@ -110,7 +113,7 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
         CALL GETDELTAQ
 
         IF (SPINON .EQ. 1) CALL GETDELTASPIN
-
+        
      ENDIF
 
      !
@@ -118,6 +121,7 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
      !
 
      ALLOK = 1
+
      ITER = 0
 
      IF (SPINON .EQ. 1) ALLOCATE(SPINDIFF(DELTADIM))
@@ -179,11 +183,10 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
            ENDIF
         ENDIF
 
-
         CALL GETDELTAQ
 
-        IF (ABS(MAXVAL(DELTAQ)) .LT. ELEC_QTOL) ALLOK = 0
-        !PRINT*, ABS(MAXVAL(DELTAQ)), ELEC_QTOL
+        ALLOKQ = 0
+        IF (ABS(MAXVAL(DELTAQ)) .GT. ELEC_QTOL) ALLOKQ = 1
 
         IF (SPINON .EQ. 1) THEN
 
@@ -191,8 +194,9 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
            CALL GETDELTASPIN
 
            SPINDIFF = ABS(DELTASPIN - OLDDELTASPIN)
-
-           IF (MAXVAL(SPINDIFF) .LT. SPINTOL)  ALLOK = 0
+           
+           ALLOKM = 0
+           IF (MAXVAL(SPINDIFF) .GT. SPINTOL)  ALLOKM = 1
 
            ! Mix new and old spin densities
 
@@ -200,6 +204,7 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
 
         ENDIF
 
+        ALLOK = ALLOKQ + ALLOKM
 
         IF (ITER .EQ. MAXSCF) THEN
 
