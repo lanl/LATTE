@@ -44,7 +44,7 @@ SUBROUTINE KPULAY
   REAL(LATTEPREC) :: RIJ(3), DC(3)
   REAL(LATTEPREC) :: MAGR, MAGR2, MAGRP, MAGRP2
   REAL(LATTEPREC) :: MAXRCUT, MAXRCUT2
-  REAL(LATTEPREC) :: MYDFDA, MYDFDB, MYDFDR, RCUTTB
+  REAL(LATTEPREC) :: MYDFDA, MYDFDB, MYDFDR, RCUTTB, TMPVAL
   REAL(LATTEPREC) :: KPOINT(3), KX0, KY0, KZ0, KDOTL
   REAL(LATTEPREC) :: B1(3), B2(3), B3(3), MAG1, MAG2, MAG3, A1A2XA3, K0(3)
   REAL(LATTEPREC) :: WSPINI, WSPINJ
@@ -193,9 +193,8 @@ SUBROUTINE KPULAY
 !$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP2, MAGRP, PATH, PHI, ALPHA, BETA, COSBETA)&
 !$OMP PRIVATE(FTMP_PULAY, FTMP_COUL, FTMP_SPIN) &
 !$OMP PRIVATE(DC, LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET, RHO_PULAY, RHO_COUL, RHO_DIFF) &
-!$OMP PRIVATE(MYDFDA, MYDFDB, MYDFDR, RCUTTB, CONJGBLOCH, KDOTL) &
+!$OMP PRIVATE(MYDFDA, MYDFDB, MYDFDR, RCUTTB, CONJGBLOCH, KDOTL, TMPVAL) &
 !$OMP PRIVATE(KPOINT, KCOUNT) &
-!!$OMP PRIVATE(WSPINI, WSPINJ, SPININDI, SPININDJ) &
 !$OMP REDUCTION(+: VIRBONDK)
 
 
@@ -448,14 +447,18 @@ SUBROUTINE KPULAY
 
                           ! Unroll loops and pre-compute
 
-                          MYDFDA = DFDA(I, J, LBRA, LKET, MBRA, &
-                               MKET, MAGR, ALPHA, COSBETA, "S")
+                          CALL DFDX(I, J, LBRA, LKET, MBRA, &
+                               MKET, MAGR, ALPHA, COSBETA, "S", &
+                               MYDFDA, MYDFDB, MYDFDR)
+                          
+                          !MYDFDA = DFDA(I, J, LBRA, LKET, MBRA, &
+                          !     MKET, MAGR, ALPHA, COSBETA, "S")
 
-                          MYDFDB = DFDB(I, J, LBRA, LKET, MBRA, &
-                               MKET, MAGR, ALPHA, COSBETA, "S")
+                          !MYDFDB = DFDB(I, J, LBRA, LKET, MBRA, &
+                          !     MKET, MAGR, ALPHA, COSBETA, "S")
 
-                          MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
-                               MKET, MAGR, ALPHA, COSBETA, "S")
+                          !MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
+                          !     MKET, MAGR, ALPHA, COSBETA, "S")
 
 
                           KCOUNT = 0
@@ -606,14 +609,26 @@ SUBROUTINE KPULAY
 
                           ! fixed: MJC 12/17/13
 
-                          MYDFDB = DFDB(I, J, LBRA, LKET, &
-                               MBRA, MKET, MAGR, ZERO, COSBETA, "S") / MAGR
+                          CALL DFDX(I, J, LBRA, LKET, MBRA, &
+                               MKET, MAGR, PI/TWO, COSBETA, "S", &
+                               MYDFDA, MYDFDB, MYDFDR)
 
-                          MYDFDB = DFDB(I, J, LBRA, LKET, &
-                               MBRA, MKET, MAGR, PI/TWO, COSBETA, "S") / MAGR
+                          TMPVAL = MYDFDB / MAGR
+ 
+                          CALL DFDX(I, J, LBRA, LKET, MBRA, &
+                               MKET, MAGR, ZERO, COSBETA, "S", &
+                               MYDFDA, MYDFDB, MYDFDR)
 
-                          MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
-                               MKET, MAGR, ZERO, COSBETA, "S")
+                          MYDFDB = MYDFDB / MAGR
+
+!                          MYDFDB = DFDB(I, J, LBRA, LKET, &
+!                               MBRA, MKET, MAGR, ZERO, COSBETA, "S") / MAGR
+
+!                          MYDFDB = DFDB(I, J, LBRA, LKET, &
+!                               MBRA, MKET, MAGR, PI/TWO, COSBETA, "S") / MAGR
+
+!                          MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
+!                               MKET, MAGR, ZERO, COSBETA, "S")
 
                           KCOUNT = 0
 
@@ -648,16 +663,16 @@ SUBROUTINE KPULAY
                                    END SELECT
 
                                    FTMP_PULAY(1) = FTMP_PULAY(1) - RHO_PULAY * COSBETA * MYDFDB
-                                   FTMP_PULAY(2) = FTMP_PULAY(2) - RHO_PULAY * COSBETA * MYDFDB
+                                   FTMP_PULAY(2) = FTMP_PULAY(2) - RHO_PULAY * COSBETA * TMPVAL
                                    FTMP_PULAY(3) = FTMP_PULAY(3) - RHO_PULAY * COSBETA * MYDFDR
 
                                    FTMP_COUL(1) = FTMP_COUL(1) - RHO_COUL * COSBETA * MYDFDB
-                                   FTMP_COUL(2) = FTMP_COUL(2) - RHO_COUL * COSBETA * MYDFDB
+                                   FTMP_COUL(2) = FTMP_COUL(2) - RHO_COUL * COSBETA * TMPVAL
                                    FTMP_COUL(3) = FTMP_COUL(3) - RHO_COUL * COSBETA * MYDFDR
 
                                    IF (SPINON .EQ. 1) THEN
                                       FTMP_SPIN(1) = FTMP_SPIN(1) - RHO_DIFF * (COSBETA * MYDFDB)
-                                      FTMP_SPIN(2) = FTMP_SPIN(2) - RHO_DIFF * (COSBETA * MYDFDB)
+                                      FTMP_SPIN(2) = FTMP_SPIN(2) - RHO_DIFF * (COSBETA * TMPVAL)
                                       FTMP_SPIN(3) = FTMP_SPIN(3) - RHO_DIFF * (COSBETA * MYDFDR)
                                    ENDIF
 

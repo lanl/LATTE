@@ -547,14 +547,18 @@ SUBROUTINE PULAY
 
                           ! Unroll loops and pre-compute
 
-                          MYDFDA = DFDA(I, J, LBRA, LKET, MBRA, &
-                               MKET, MAGR, ALPHA, COSBETA, "S")
+                          CALL DFDX(I, J, LBRA, LKET, MBRA, &
+                               MKET, MAGR, ALPHA, COSBETA, "S", &
+                               MYDFDA, MYDFDB, MYDFDR)
 
-                          MYDFDB = DFDB(I, J, LBRA, LKET, MBRA, &
-                               MKET, MAGR, ALPHA, COSBETA, "S")
+!                          MYDFDA = DFDA(I, J, LBRA, LKET, MBRA, &
+!                               MKET, MAGR, ALPHA, COSBETA, "S")
 
-                          MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
-                               MKET, MAGR, ALPHA, COSBETA, "S")
+!                          MYDFDB = DFDB(I, J, LBRA, LKET, MBRA, &
+!                               MKET, MAGR, ALPHA, COSBETA, "S")
+
+!                          MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
+!                               MKET, MAGR, ALPHA, COSBETA, "S")
 
                           !
                           ! d/d_alpha
@@ -675,20 +679,31 @@ SUBROUTINE PULAY
 
                           ! fixed: MJC 12/17/13
 
-                          MYDFDB = DFDB(I, J, LBRA, LKET, &
-                               MBRA, MKET, MAGR, ZERO, COSBETA, "S") / MAGR
+                          CALL DFDX(I, J, LBRA, LKET, MBRA, &
+                               MKET, MAGR, ZERO, COSBETA, "S", &
+                               MYDFDA, MYDFDB, MYDFDR)
+
+                          MYDFDB = MYDFDB/MAGR
 
                           FTMP_PULAY(1) = FTMP_PULAY(1) - X2HRHO(L, K) * (COSBETA * MYDFDB)
 
                           FTMP_COUL(1) = FTMP_COUL(1) - RHO * (COSBETA * MYDFDB)
 
+                          FTMP_PULAY(3) = FTMP_PULAY(3) - X2HRHO(L, K) * COSBETA * MYDFDR
+
+                          FTMP_COUL(3) = FTMP_COUL(3) - RHO * COSBETA * MYDFDR
+
                           IF (SPINON .EQ. 1) THEN 
                              FTMP_SPIN(1) = FTMP_SPIN(1) - RHODIFF * (COSBETA * MYDFDB)
+                             FTMP_SPIN(3) = FTMP_SPIN(3) - RHODIFF * COSBETA * MYDFDR
                           ENDIF
 
-                          MYDFDB = DFDB(I, J, LBRA, LKET, &
-                               MBRA, MKET, MAGR, PI/TWO, COSBETA, "S") / MAGR
-
+                          CALL DFDX(I, J, LBRA, LKET, MBRA, &
+                               MKET, MAGR, PI/TWO, COSBETA, "S", &
+                               MYDFDA, MYDFDB, MYDFDR)
+                          
+                          MYDFDB = MYDFDB/MAGR
+                          
                           FTMP_PULAY(2) = FTMP_PULAY(2) - X2HRHO(L, K) * (COSBETA * MYDFDB)
 
                           FTMP_COUL(2) = FTMP_COUL(2) - RHO * (COSBETA * MYDFDB)
@@ -697,17 +712,6 @@ SUBROUTINE PULAY
                              FTMP_SPIN(2) = FTMP_SPIN(2) - RHODIFF * (COSBETA * MYDFDB)
                           ENDIF
                              
-                          MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
-                               MKET, MAGR, ZERO, COSBETA, "S")
-
-                          FTMP_PULAY(3) = FTMP_PULAY(3) - X2HRHO(L, K) * COSBETA * MYDFDR
-
-                          FTMP_COUL(3) = FTMP_COUL(3) - RHO * COSBETA * MYDFDR
-                          
-                          IF (SPINON .EQ. 1) THEN
-                             FTMP_SPIN(3) = FTMP_SPIN(3) - RHODIFF * COSBETA * MYDFDR
-                          ENDIF
-
                        ENDIF
 
                     ENDDO

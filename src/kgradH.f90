@@ -42,7 +42,7 @@ SUBROUTINE KGRADH
   REAL(LATTEPREC) :: RIJ(3), DC(3)
   REAL(LATTEPREC) :: MAGR, MAGR2, MAGRP, MAGRP2
   REAL(LATTEPREC) :: MAXARRAY(20), MAXRCUT, MAXRCUT2
-  REAL(LATTEPREC) :: MYDFDA, MYDFDB, MYDFDR, RCUTTB
+  REAL(LATTEPREC) :: MYDFDA, MYDFDB, MYDFDR, RCUTTB, TMPVAL
   REAL(LATTEPREC) :: KPOINT(3), KX0, KY0, KZ0, KDOTL
   REAL(LATTEPREC) :: B1(3), B2(3), B3(3), MAG1, MAG2, MAG3, A1A2XA3, K0(3)
   REAL(LATTEPREC), EXTERNAL :: DFDA, DFDB, DFDR
@@ -92,7 +92,7 @@ SUBROUTINE KGRADH
 !$OMP PRIVATE(I, J, K, NEWJ, BASISI, BASISJ, INDI, INDJ, PBCI, PBCJ, PBCK) &
 !$OMP PRIVATE(RIJ, MAGR2, MAGR, MAGRP2, MAGRP, PATH, PHI, ALPHA, BETA, COSBETA, FTMP) &
 !$OMP PRIVATE(DC, LBRAINC, LBRA, MBRA, L, LKETINC, LKET, MKET, RHO) &
-!$OMP PRIVATE(MYDFDA, MYDFDB, MYDFDR, CONJGBLOCH, KDOTL, RCUTTB) &
+!$OMP PRIVATE(MYDFDA, MYDFDB, MYDFDR, CONJGBLOCH, KDOTL, RCUTTB, TMPVAL) &
 !$OMP PRIVATE(KPOINT, KCOUNT) &
 !$OMP REDUCTION(+: VIRBONDK)
 
@@ -345,14 +345,18 @@ SUBROUTINE KGRADH
 
                           ! Unroll loops and pre-compute
 
-                          MYDFDA = DFDA(I, J, LBRA, LKET, MBRA, &
-                               MKET, MAGR, ALPHA, COSBETA, "H")
+                          CALL DFDX(I, J, LBRA, LKET, MBRA, &
+                               MKET, MAGR, ALPHA, COSBETA, "H", &
+                               MYDFDA, MYDFDB, MYDFDR)
+                          
+!                          MYDFDA = DFDA(I, J, LBRA, LKET, MBRA, &
+!                               MKET, MAGR, ALPHA, COSBETA, "H")
 
-                          MYDFDB = DFDB(I, J, LBRA, LKET, MBRA, &
-                               MKET, MAGR, ALPHA, COSBETA, "H")
+!                          MYDFDB = DFDB(I, J, LBRA, LKET, MBRA, &
+!                               MKET, MAGR, ALPHA, COSBETA, "H")
 
-                          MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
-                               MKET, MAGR, ALPHA, COSBETA, "H")
+!                          MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
+!                               MKET, MAGR, ALPHA, COSBETA, "H")
 
                           !
                           ! d/d_alpha
@@ -435,15 +439,27 @@ SUBROUTINE KGRADH
 
                           ! Bug fixed: MJC 12/17/13
 
+                          CALL DFDX(I, J, LBRA, LKET, MBRA, &
+                               MKET, MAGR, PI/TWO, COSBETA, "H", &
+                               MYDFDA, MYDFDB, MYDFDR)
 
-                          MYDFDB = DFDB(I, J, LBRA, LKET, MBRA, &
-                               MKET, MAGR, ZERO, COSBETA, "H") / MAGR
+                          TMPVAL = MYDFDB/MAGR
 
-                          MYDFDB = DFDB(I, J, LBRA, LKET, &
-                               MBRA, MKET, MAGR, PI/TWO, COSBETA, "H") / MAGR
+                          CALL DFDX(I, J, LBRA, LKET, MBRA, &
+                               MKET, MAGR, ZERO, COSBETA, "H", &
+                               MYDFDA, MYDFDB, MYDFDR)
 
-                          MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
-                               MKET, MAGR, ZERO, COSBETA, "H")
+                          MYDFDB = MYDFDB/MAGR
+                          
+                          
+!                          MYDFDB = DFDB(I, J, LBRA, LKET, MBRA, &
+!                               MKET, MAGR, ZERO, COSBETA, "H") / MAGR
+
+!                          MYDFDB = DFDB(I, J, LBRA, LKET, &
+!                               MBRA, MKET, MAGR, PI/TWO, COSBETA, "H") / MAGR
+
+!                          MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
+!                               MKET, MAGR, ZERO, COSBETA, "H")
 
 
                           KCOUNT = 0
@@ -477,7 +493,7 @@ SUBROUTINE KGRADH
                                    END SELECT
 
                                    FTMP(1) = FTMP(1) - RHO * COSBETA * MYDFDB*CONJGBLOCH
-                                   FTMP(2) = FTMP(2) - RHO * COSBETA * MYDFDB*CONJGBLOCH
+                                   FTMP(2) = FTMP(2) - RHO * COSBETA * TMPVAL*CONJGBLOCH
                                    FTMP(3) = FTMP(3) - RHO * COSBETA * MYDFDR*CONJGBLOCH
 
                                 ENDDO
@@ -507,7 +523,7 @@ SUBROUTINE KGRADH
      ENDDO
 
   ENDDO
-  !$OMP END PARALLEL DO
+!$OMP END PARALLEL DO
 
 
   !  PRINT *, KF(1,1)/REAL(NKTOT)

@@ -314,14 +314,18 @@ SUBROUTINE GRADH
 
                           ! Unroll loops and pre-compute
 
-                          MYDFDA = DFDA(I, J, LBRA, LKET, MBRA, &
-                               MKET, MAGR, ALPHA, COSBETA, "H")
+                          CALL DFDX(I, J, LBRA, LKET, MBRA, &
+                               MKET, MAGR, ALPHA, COSBETA, "H", &
+                               MYDFDA, MYDFDB, MYDFDR)
+                          
+!                          MYDFDA = DFDA(I, J, LBRA, LKET, MBRA, &
+!                               MKET, MAGR, ALPHA, COSBETA, "H")
 
-                          MYDFDB = DFDB(I, J, LBRA, LKET, MBRA, &
-                               MKET, MAGR, ALPHA, COSBETA, "H")
+!                          MYDFDB = DFDB(I, J, LBRA, LKET, MBRA, &
+!                               MKET, MAGR, ALPHA, COSBETA, "H")
 
-                          MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
-                               MKET, MAGR, ALPHA, COSBETA, "H")
+!                          MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
+!                               MKET, MAGR, ALPHA, COSBETA, "H")
 
                           !
                           ! d/d_alpha
@@ -370,20 +374,35 @@ SUBROUTINE GRADH
 
                           ! fixed: MJC 12/17/13
 
-                          MYDFDB = DFDB(I, J, LBRA, LKET, &
-                               MBRA, MKET, MAGR, ZERO, COSBETA, "H") / MAGR
+                          CALL DFDX(I, J, LBRA, LKET, MBRA, &
+                               MKET, MAGR, ZERO, COSBETA, "H", &
+                               MYDFDA, MYDFDB, MYDFDR)
+
+!                          MYDFDB = DFDB(I, J, LBRA, LKET, &
+!                               MBRA, MKET, MAGR, ZERO, COSBETA, "H") / MAGR
+
+                          MYDFDB = MYDFDB/MAGR
 
                           FTMP(1) = FTMP(1) - RHO * (COSBETA * MYDFDB)
 
-                          MYDFDB = DFDB(I, J, LBRA, LKET, &
-                               MBRA, MKET, MAGR, PI/TWO, COSBETA, "H") / MAGR
+                          FTMP(3) = FTMP(3) - RHO * COSBETA * MYDFDR 
+
+                          
+                          CALL DFDX(I, J, LBRA, LKET, MBRA, &
+                               MKET, MAGR, PI/TWO, COSBETA, "H", &
+                               MYDFDA, MYDFDB, MYDFDR)
+
+                          !MYDFDB = DFDB(I, J, LBRA, LKET, &
+                          !     MBRA, MKET, MAGR, PI/TWO, COSBETA, "H") / MAGR
+                          
+                          MYDFDB = MYDFDB/MAGR
 
                           FTMP(2) = FTMP(2) - RHO * (COSBETA * MYDFDB)
 
-                          MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
-                               MKET, MAGR, ZERO, COSBETA, "H")
+                          !MYDFDR = DFDR(I, J, LBRA, LKET, MBRA, &
+                          !     MKET, MAGR, ZERO, COSBETA, "H")
 
-                          FTMP(3) = FTMP(3) - RHO * COSBETA * MYDFDR                          
+                          !FTMP(3) = FTMP(3) - RHO * COSBETA * MYDFDR                          
 
                        ENDIF
 
