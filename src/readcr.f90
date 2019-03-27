@@ -118,13 +118,11 @@ SUBROUTINE READCR
   ! SPONLY = 0: use GRADHSP
   ! SPONLY = 1: use Josh Coe's implementation of the automatic H build
 
-!  SPONLY = 0
+  SPONLY = 0
   DO I = 1, NATS
      IF (BASIS(ELEMPOINTER(I)) .NE. "s" .AND. &
           BASIS(ELEMPOINTER(I)) .NE. "sp") SPONLY = 1
   ENDDO
-
-!  SPONLY = 1
 
   ! At the moment we must run Josh's implementation if we do tabulated integrals
 
@@ -136,8 +134,6 @@ SUBROUTINE READCR
      PRINT*, "#FYI: d or f orbitals detected so we're using the"
      PRINT*, "#slower, general SK expansions"
   ENDIF
-
-  !  SPONLY = 1
 
   ! If we're enforcing LCN and we're using diagonalization
 
