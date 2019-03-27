@@ -36,9 +36,9 @@ addqdep.f90 allocatecoulomb.f90 allocatenebarrays.f90  allocatexbo.f90  \
 atomcharge.f90 avepress.f90 avetemp.f90 bldnewH.f90 bldspinH.f90 \
 conjgradient.f90 coulomb_ewald.f90 coulomb_oldskool.f90 coulomb_rspace.f90 \
 coultailcoef.f90 deallocateall.f90 deallocatecoulomb.f90 \
-deallocatenebarrays.f90  deallocatexbo.f90 fcoulnono.f90 fcoulnono_sp.f90 \
+deallocatenebarrays.f90  deallocatexbo.f90 fcoulnono_sp.f90 \
 fermiallocate.f90 fermideallocate.f90 \
-fspinnono.f90 fspinnono_sp.f90  gershgorin.f90 getbndfil.f90 \
+ fspinnono_sp.f90  gershgorin.f90 getbndfil.f90 \
 getcoule.f90 getdensity.f90 getdeltaq.f90 getdeltaspin.f90 gethdim.f90 \
 getke.f90 getmaxf.f90 getmdf.f90 getpressure.f90 getrho.f90 getspinE.f90  \
  ifrestart.f90 initcoulomb.f90 initialv.f90 initshockcomp.f90 msrelax.f90 \
@@ -49,7 +49,7 @@ readcr.f90 readmdcontroller.f90 readppot.f90  readtb.f90 resetprodhd.f90 \
 rhozero.f90 shockcomp.f90  spinrhodirect.f90 stdescent.f90 \
 summary.f90 tbmd.f90 toteng.f90 univscaling_function.f90 univtailcoef.f90  \
 vdwtailcoef.f90 velverlet.f90  xbo.f90 am.f90 bm.f90  \
- slmmp.f90 tlmmp.f90 wignerd.f90 dfda.f90 dfdb.f90 dfdr.f90 \
+ slmmp.f90 tlmmp.f90 wignerd.f90 dfdx.f90 \
 dunivscaling_function.f90 dslmmpda.f90 dslmmpdb.f90 dtlmmpda.f90 \
 dtlmmpdb.f90 dwignerddb.f90 gradH.f90 kbldnewh.f90  kgetrho.f90 kgradH.f90  \
 bldnewHS_sp.f90 gradH_sp.f90 univscaling.f90 dunivscaling.f90 kgetdos.f90 \
@@ -57,14 +57,14 @@ qneutral.f90 shiftH.f90 getmatindlist.f90 nvtlangevin.f90 nvtandersen.f90 \
 nvtNH.f90 sp2pure_sparse_parallel.f90 sp2pure_sparse_parallel_simple.f90 \
 sp2pure_subgraph_parallel.f90 gaussrn.f90 nnz.f90 allocatesubgraph.f90 \
 deallocatesubgraph.f90 dosfit.f90 mofit.f90 getrespf.f90 gendiag.f90 \
-mofit_plato.f90 ppfit.f90 pairpot_noneb.f90 allfit.f90 \
+mofit_plato.f90 pairpot_noneb.f90  \
 readppottab.f90 pairpottab.f90 hugrescale.f90 avesforhug.f90 getdipole.f90 \
 fittingoutput.f90 tabtest.f90 kgenX.f90 korthomyH.f90 kdeorthomyrho.f90 \
-kfcoulnono.f90 kpulay.f90 getforce.f90 masses2symbols.f90 setuptbmd.f90 \
+ kpulay.f90 getforce.f90 masses2symbols.f90 setuptbmd.f90 \
 wrtrestartlib.f90 deorthomyrhoprogress.f90 orthomyHprogress.f90 readrestartlib.f90 \
 readppotspline.f90 pairpotspline.f90 errors.f90 initcoulombklist.f90 \
-flcnnono.f90 flcnnono_sp.f90 kflcnnono.f90 dosfittab.f90 \
-readppotD.f90 pairpot_plusD.f90
+ flcnnono_sp.f90 dosfittab.f90 \
+readppotD.f90 pairpot_plusD.f90 
 
 # dependencies
 # DEP_FILE = makefile.dep
