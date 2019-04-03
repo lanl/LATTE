@@ -35,6 +35,7 @@ SUBROUTINE TOTENG
   IF (EXISTERROR) RETURN
 
   TRRHOH = ZERO
+  TRRHOH0 = ZERO
   ZTRRHOH = CMPLX(ZERO,ZERO)
 
   !  IF (ELECTRO .EQ. 1) THEN
@@ -47,10 +48,12 @@ SUBROUTINE TOTENG
            DO J = 1, HDIM
 
               TRRHOH = TRRHOH + BO(J,I)*H(J,I)
+              TRRHOH0 = TRRHOH0 + BO(J,I)*H0(J,I)
 
            ENDDO
 
            TRRHOH = TRRHOH - BOZERO(I)*H(I,I)
+           TRRHOH0 = TRRHOH0 - BOZERO(I)*H0(I,I)
 
         ENDDO
 
@@ -93,10 +96,12 @@ SUBROUTINE TOTENG
         DO J = 1, HDIM
 
            TRRHOH = TRRHOH + (RHOUP(J,I) + RHODOWN(J,I))*H(J,I)
+           TRRHOH0 = TRRHOH0 + (RHOUP(J,I) + RHODOWN(J,I))*H0(J,I)
 
         ENDDO
 
         TRRHOH = TRRHOH - (RHOUPZERO(I) + RHODOWNZERO(I))*H(I,I)
+        TRRHOH0 = TRRHOH0 - (RHOUPZERO(I) + RHODOWNZERO(I))*H0(I,I)
 
      ENDDO
 

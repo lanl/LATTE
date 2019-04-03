@@ -16,6 +16,7 @@ GPU_LIB = -L../MATRIX -lmatrix_cuda.$(PRECISION) $(GPU_CUDA_LIB)
 
 MYMODULES = myprecision.F90 constants_mod.F90 setuparray.F90 coulombarray.F90 \
 diagarray.F90 fermicommon.F90 mdarray.F90 neblistarray.F90 \
+dmarray.F90 \
 nonoarray.F90 ppotarray.F90 purearray.F90 relaxcommon.F90 restartarray.F90 \
 sparsearray.F90 spinarray.F90 univarray.F90 virialarray.F90 xboarray.F90 \
 kspacearray.F90 timer_mod.F90 subgraph.F90 matrixio.F90 sparsemath.F90 \
@@ -34,13 +35,15 @@ sp2fermi.F90 sp2fermi_init.F90 sp2pure.F90 sp2pure_sparse.F90 kdiagmyh.F90 \
  kbodirect.F90 sp2gap.F90 sp2gap_setup.F90 readrestart.F90 initrng.F90 \
 parawrite.F90 parafileopen.F90 wrtcfgs.F90 wrtrestart.F90 pbc.F90 \
 addqdep.F90 allocatecoulomb.F90 allocatenebarrays.F90  allocatexbo.F90  \
+adddftbu_init.F90 adddftbu.F90 allocatedm.F90 hubbardforce.F90 \
+deallocatedm.F90 initiatedm.F90 hubfcontr_sp.F90 \
 atomcharge.F90 avepress.F90 avetemp.F90 bldnewH.F90 bldspinH.F90 \
 conjgradient.F90 coulomb_ewald.F90 coulomb_oldskool.F90 coulomb_rspace.F90 \
 coultailcoef.F90 deallocateall.F90 deallocatecoulomb.F90 \
 deallocatenebarrays.F90  deallocatexbo.F90 fcoulnono.F90 fcoulnono_sp.F90 \
 fermiallocate.F90 fermideallocate.F90 \
 fspinnono.F90 fspinnono_sp.F90  gershgorin.F90 getbndfil.F90 \
-getcoule.F90 getdensity.F90 getdeltaq.F90 getdeltaspin.F90 gethdim.F90 \
+getcoule.F90 getdensity.F90 getdeltaq.F90 getdeltaq_resp.F90 getdeltaspin.F90 gethdim.F90 \
 getke.F90 getmaxf.F90 getmdf.F90 getpressure.F90 getrho.F90 getspinE.F90  \
  ifrestart.F90 initcoulomb.F90 initialv.F90 initshockcomp.F90 msrelax.F90 \
 neblists.F90 noelec.F90 norms.F90 nptrescale.F90  nvtrescale.F90 \
@@ -65,7 +68,7 @@ kfcoulnono.F90 kpulay.F90 getforce.F90 masses2symbols.F90 setuptbmd.F90 \
 wrtrestartlib.F90 deorthomyrhoprogress.F90 orthomyHprogress.F90 readrestartlib.F90 \
 readppotspline.F90 pairpotspline.F90 errors.F90 initcoulombklist.F90 \
 flcnnono.F90 flcnnono_sp.F90 kflcnnono.F90 dosfittab.F90 \
-readppotD.F90 pairpot_plusD.F90
+readppotD.F90 pairpot_plusD.F90 can_resp.F90
 
 # dependencies
 # DEP_FILE = makefile.dep

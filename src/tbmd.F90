@@ -32,6 +32,8 @@ SUBROUTINE TBMD
   USE NONOARRAY
   USE MYPRECISION
   USE LATTEPARSER_LATTE_MOD
+  USE XBOARRAY  ! ANDERS CHANGE
+  USE DMARRAY   ! ANDERS CHANGE
 
   IMPLICIT NONE
 
@@ -42,6 +44,8 @@ SUBROUTINE TBMD
   REAL(LATTEPREC) :: THETIME, NEWESPIN, NEWECOUL
   REAL(LATTEPREC) :: RN, MYVOL
   INTEGER :: FLAGAND
+
+  OPEN(UNIT=63, STATUS="UNKNOWN", FILE="EnergyCheck.dat")
 
   IF (EXISTERROR) RETURN
 
@@ -116,7 +120,7 @@ SUBROUTINE TBMD
 
   IF (RESTART .EQ. 0) THEN
 
-     CALL GETMDF(0,1)
+     CALL GETMDF(0,1)     ! WAS HERE NOW NO CHANGE ANDERS 
 
   ELSEIF (RESTART .EQ. 1) THEN
 
@@ -347,7 +351,7 @@ SUBROUTINE TBMD
 
         CALL GETKE
 
-        CALL TOTENG
+        CALL TOTENG   ! ANDERS CHANGE Now also calculating TRRHOH0 = tr[D*H0]
 
         ! For the 0 SCF MD the coulomb energy is calculated in GETMDF
 
@@ -374,11 +378,13 @@ SUBROUTINE TBMD
 
         ENDIF
 
-        TOTE = TRRHOH + EREP + KEE - ENTE - ECOUL + ESPIN + EPLUSD
+        CALL HUBBARDFORCE  ! ANDERS CHANGE  (Calculates hubbard forces, soon) and energy contributions
 
-        !         write(*,*)"Ekin", KEE
-        !         write(*,*)"Epot", TRRHOH + EREP - ENTE - ECOUL + ESPIN
-        !         write(*,*)"components",TRRHOH, EREP, ENTE, ECOUL
+        !TOTE = TRRHOH + EREP + KEE - ENTE - ECOUL + ESPIN + EPLUSD 
+        TOTE = TRRHOH + EREP + KEE - ENTE - ECOUL + ESPIN + EPLUSD + 2.D0*EHub  ! ANDERS CHANGE Test only
+
+        write(*,*)'TOTE A =', TOTE
+        write(*,*)'TOTE B =', TRRHOH0 + ECOUL + EREP + KEE - ENTE + ESPIN + 2.D0*Ehub ! ANDERS NEW ENERGY EXPRESSION
 
         IF (GETHUG .EQ. 1) CALL AVESFORHUG(PRESSURE, TOTE, TEMPERATURE, SYSVOL)
 
@@ -414,6 +420,9 @@ SUBROUTINE TBMD
 
               WRITE(6,99)"Data", THETIME, TOTE, TEMPERATURE, PRESSURE, EGAP, &
                    CHEMPOT
+              ! ANDERS OUTPUT
+              WRITE(63,98) THETIME, TOTE, TEMPERATURE, norm2(PNK(1,:)-DELTAQ(:))/sqrt(1.D0*NATS), EGAP, &
+                   CHEMPOT
 
            ENDIF
 
@@ -442,6 +451,7 @@ SUBROUTINE TBMD
         ENDIF
 
 
+98      FORMAT(20G18.9)
 99      FORMAT(A4,20G18.9)
 
 16      FORMAT(F12.5, F20.8, 1X, F9.1, 1X, F12.3, 1X, G18.9, 1X, G18.9)

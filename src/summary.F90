@@ -32,6 +32,8 @@ SUBROUTINE SUMMARY
   USE DIAGARRAY
   USE VIRIALARRAY
   USE NONOARRAY
+  USE DMARRAY   ! ANDERS CHANGE
+
 
   IMPLICIT NONE
 
@@ -192,7 +194,14 @@ SUBROUTINE SUMMARY
   CALL GETPRESSURE
 
   WRITE(6,'("# Pressure (GPa) = ", F16.8)') PRESSURE
-  WRITE(24,'("# Pressure (GPa) = ", F16.8)') PRESSURE
+  WRITE(25,'("# Pressure (GPa) = ", F16.8)') PRESSURE
+
+  CALL HUBBARDFORCE  ! ANDERS CHANGE  (Calculates hubbard forces, soon) and energy contributions
+  CALL TOTENG  ! ANDERS CHANGE  (Calculates hubbard forces, soon) and energy contributions
+  TOTE = TRRHOH + EREP + KEE - ENTE - ECOUL + ESPIN + EPLUSD + 2.D0*EHub  ! ANDERS CHANGE Test only
+  write(*,*)'ECOUL = ', ECOUL, ' TRRHOH0 = ', TRRHOH0, ' 2*EHub = ', 2.D0*Ehub 
+  write(*,*)'TOTE B =', TRRHOH0 + ECOUL + EREP + KEE - ENTE + ESPIN + 2.D0*Ehub ! ANDERS NEW ENERGY EXPRESSION
+
 
   IF (SPINON .EQ. 0) THEN
      WRITE(6,'("# Total energy (zero K) = ", F16.8)') TRRHOH + EREP - ECOUL + EPLUSD

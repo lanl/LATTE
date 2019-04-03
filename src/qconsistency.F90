@@ -28,15 +28,19 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   USE TIMER_MOD
   USE MYPRECISION
   USE MIXER_MOD
+  USE DMARRAY ! CHANGE ANDERS
+  USE NONOARRAY ! CHANGE ANDERS TEMP FOR CHECK ONLY
 
   IMPLICIT NONE
 
   INTEGER :: I, SWITCH, MDITER, ITER, II
-  INTEGER :: ALLOKQ, ALLOKM, ALLOK
+  INTEGER :: ALLOKQ, ALLOKM, ALLOK, MDSOFT
   INTEGER :: START_CLOCK, STOP_CLOCK, CLOCK_RATE, CLOCK_MAX, ITERACC
   REAL(4) :: TIMEACC
   REAL(LATTEPREC) :: MAXDQ
   REAL(LATTEPREC), ALLOCATABLE :: QDIFF(:), SPINDIFF(:)
+
+  MDSOFT = 1   ! CHANGE ANDERS
 
   IF (EXISTERROR) RETURN
 
@@ -55,8 +59,10 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
   TIMEACC = 0.0
   ITERACC = 0
+  write(*,*) 'QCONSISTENCY  MDITER = ', MDITER
+  write(*,*) 'QCONSISTENCY  MDSOFT = ', MDSOFT
 
-  IF (FULLQCONV .EQ. 1 .OR. MDITER .LE. 10) THEN
+  IF (FULLQCONV .EQ. 1 .OR. MDITER .LE. MDSOFT) THEN
 
      IF (SWITCH .EQ. 0) THEN
 
@@ -79,6 +85,10 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            ENDIF
         ENDIF
 
+        write(*,*) ' QCONS ORTHOH = ', ORTHOH(1,1:HDIM)
+
+!        DOrth_old = BO  ! ANDERS CHANGE
+
 
         ! Compute the density matrix
 
@@ -89,6 +99,9 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ELSE
            CALL KGETRHO
         ENDIF
+
+        DOrth_old = BO  ! ANDERS CHANGE
+        write(*,*) ' QCONS DORTH_Old = ', BO(1,1:HDIM)
 
         TX = STOP_TIMER(DMBUILD_TIMER)
 
@@ -136,44 +149,41 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
      DO WHILE (ALLOK .GT. 0)
 
         ITER = ITER + 1
-        IF(VERBOSE >= 1)WRITE(*,*)"SCF ITER =", ITER
+        !IF(VERBOSE >= 1)WRITE(*,*)"SCF_ITER =", ITER   !! ANDERS
         FLUSH(6)
 
 
         IF (ELECMETH .EQ. 0) THEN
 
-           !
            ! First do the real space part of the electrostatics
            ! This subroutine is based on Sanville's work
-           !
 
            CALL COULOMBRSPACE
 
-           !
            ! And now the long range bit (this is also a modified version
            ! of Ed's code).
-           !
 
            CALL COULOMBEWALD
 
-
         ELSE
 
-           !
            ! Doing the electrostatics all in real space
            ! help tremendously when getting the virial
-           !
 
            CALL GASPCOULOMB
 
         ENDIF
 
-        !
         ! Now let's modify the diagonal elements of our H matrix according
         ! to the electrostatic potential experienced by each atom
-        !
 
         CALL ADDQDEP
+
+        write(*,*) 'innan rad 1 H = ', H(1,1:HDIM)  ! ANDERS CHANGE
+        write(*,*) 'innan rad 2 H = ', H(2,1:HDIM)  ! ANDERS CHANGE
+        CALL ADDDFTBU_INIT ! ANDERS CHANGE
+        write(*,*) ' rad 1 H = ', H(1,1:HDIM)  ! ANDERS CHANGE
+        write(*,*) ' rad 2 H = ', H(2,1:HDIM)  ! ANDERS CHANGE
 
         ! Got to add the electrostatic potential to
         ! the Slater-Koster H before adding H_2 to form
@@ -203,6 +213,9 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
               CALL KORTHOMYH
            ENDIF
         ENDIF
+        write(*,*) ' HOrth = ', ORTHOH(1,1:HDIM)  ! ANDERS CHANGE
+        write(*,*) ' SMAT = ', SMAT(1,1:HDIM)  ! ANDERS CHANGE
+        write(*,*) ' XMAT = ', XMAT(1,1:HDIM)  ! ANDERS CHANGE
 
         !
         ! New Hamiltonian: get the bond order
@@ -217,6 +230,9 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ELSE
            CALL KGETRHO
         ENDIF
+
+        DOrth = BO  ! ANDERS CHANGE
+        write(*,*) ' QConsist BO orth = ', BO(1,1:HDIM)
 
         TX = STOP_TIMER(DMBUILD_TIMER)
 
@@ -267,7 +283,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         ! Mix new and old partial charges
 
-        IF (MDITER .LE. 10) THEN
+        IF (MDITER .LE. MDSOFT) THEN
 #ifdef PROGRESSON
            IF(MX%MIXERON)THEN
               CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
@@ -275,7 +291,24 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
               DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
            ENDIF
 #elif defined(PROGRESSOFF)
-           DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
+          ! NRANK = MIN(NORECS,NATS)         !ANDERS: STEALING UNUSED NORECS INPUT FOR NRANK NEEDS FIX!
+          ! NRANK = 0 -> linear mixing, NRANK = NATS gives exact Newton
+          ! CALL KERNELMIXER(ITER,NRANK)     !ANDERS: Alternative mixing scheme ANDERS
+          ! DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
+                     !!! ANDERS CHECK
+
+           write(*,*) ' QCONSISTENCY MIX A DOrth_old = ', DOrth_old(1,1:HDIM)
+           write(*,*) ' QCONSISTENCY MIX A Delta_DOrth = ', DOrth(1,1:HDIM) - DOrth_old(1,1:HDIM)
+           BO = DOrth_old + QMIX*(DOrth - DOrth_old)  ! ANDERS CHANGE
+           DOrth_old = BO                             ! ANDERS CHANGE
+           CALL DEORTHOMYRHO
+           CALL GETDELTAQ
+
+           !!! ANDERS CHECK
+!           write(*,*) ' TBMD HUBBARD ENERGY in QCONS'
+!           call HUBBARDFORCE
+!           write(*,*) ' TBMD HUBBARD ENERGY = ', EHub
+
 #endif
 
         ELSE
@@ -288,12 +321,17 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            ENDIF
 #elif defined(PROGRESSOFF)
            DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
+           BO = DOrth_old + QMIX*(DOrth - DOrth_old)  ! ANDERS CHANGE
+           DOrth_old = BO                             ! ANDERS CHANGE
+           CALL DEORTHOMYRHO
+!          CALL GETDELTAQ
 #endif
-
 
         ENDIF
 
-        IF(VERBOSE >= 1)WRITE(*,*)"SCF error (MAXDQ) =",MAXDQ
+        DOrth = DOrth_old  ! ANDERS CHANGE
+
+        IF(VERBOSE >= 1) WRITE(*,*)"SCF_Iter:", ITER,", SCF error (MAXDQ) =",MAXDQ
 
         ALLOKM = 0
 
@@ -313,6 +351,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         ALLOK = ALLOKQ + ALLOKM
+
+!        MAXSCF = 3  ! CHANGE ANDERS
 
         IF (ITER .EQ. MAXSCF) THEN
 
@@ -339,7 +379,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
      FLUSH(6)
 
-  ELSEIF (FULLQCONV .EQ. 0 .AND. MDON .EQ. 1 .AND. MDITER .GT. 10) THEN
+  ELSEIF (FULLQCONV .EQ. 0 .AND. MDON .EQ. 1 .AND. MDITER .GT. MDSOFT) THEN
 
      ! Now we're doing MD
 
@@ -358,6 +398,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         CALL ADDQDEP
+        CALL ADDDFTBU  ! ANDERS CHANGE
 
         !
         ! Building the spin up and spin down H's after we've
@@ -400,6 +441,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         OLDDELTAQS = DELTAQ
+        DOrth = BO  ! ANDERS CHANGE
 
         !
         ! Get a new set of charges for our system
@@ -427,7 +469,13 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ! Mix to get new charges
         !
 
+        ! Linear mixing BOMD with QITER >= 1
         DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
+
+        BO = DOrth_old + QMIX*(DOrth - DOrth_old)  ! ANDERS CHANGE
+        DOrth_old = BO                             ! ANDERS CHANGE
+        CALL DEORTHOMYRHO
+!       CALL GETDELTAQ
 
         !        PRINT*, DELTAQ(1)
 
@@ -440,6 +488,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
      ENDDO
+     ! Here we start if QITER = 0 in MD
 
      ! Calculate the bond order one more time since we need the forces for
      ! that charge distribution
@@ -457,6 +506,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
      ENDIF
 
      CALL ADDQDEP
+     CALL ADDDFTBU  ! ANDERS CHANGE
 
      ! This is the right order
 
@@ -493,6 +543,10 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
      ELSE
         CALL KGETRHO
      ENDIF
+
+     DOrth = BO
+
+     write(*,*) 'QCONSISTENCYCHECK- DOING_MD? --'  ! ANDERS
 
      IF (BASISTYPE .EQ. "NONORTHO") THEN
         IF (KON .EQ. 0) THEN
