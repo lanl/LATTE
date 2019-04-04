@@ -35,7 +35,7 @@ CONTAINS
     CHARACTER(1), ALLOCATABLE              ::  tempc(:)
     CHARACTER(100), ALLOCATABLE            ::  vect(:,:)
     CHARACTER(50)                          ::  keyvector_char(:), keyvector_int(:), keyvector_log(:), keyvector_re(:)
-    CHARACTER(100)                         ::  valvector_char(:)
+    CHARACTER(1000)                         ::  valvector_char(:)
     CHARACTER(LEN=*)                       ::  FILENAME
     CHARACTER(LEN=*), INTENT(IN), OPTIONAL ::  STARTSTOP(2)
     CHARACTER(LEN=100)                      ::  TEMPCFLEX
@@ -369,7 +369,7 @@ CONTAINS
     ENDDO
 
     DO J=1,NKEY_CHAR
-       WRITE(*,*)"#    ",TRIM(KEYVECTOR_CHAR(J)),VALVECTOR_CHAR(J)
+       WRITE(*,*)"#    ",TRIM(KEYVECTOR_CHAR(J)),TRIM(VALVECTOR_CHAR(J))
     ENDDO
 
     DO J=1,NKEY_LOG
