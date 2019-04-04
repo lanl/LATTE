@@ -26,6 +26,7 @@ performanceExpectedTimes["fullscf.spin"]=0.231
 performanceExpectedTimes["fullscf.kon"]=0.973
 performanceExpectedTimes["fullscf.rspace"]=0.014
 performanceExpectedTimes["fittingoutput.dat"]=0.002
+performanceExpectedTimes["vib.molden"]=0.99
 performanceExpectedTimes["0scf"]=0.127
 performanceExpectedTimes["fullscf"]=0.158
 performanceExpectedTimes["sp2"]=0.161
