@@ -15,7 +15,6 @@ keyword. Example: #MyCommentedKeyword=
 
 #General controls
 CONTROL{
-  GETIR= 1
   XCONTROL= 1
   VERBOSE= 0 
   PARAMPATH= "./TBparam"
@@ -60,6 +59,7 @@ CONTROL{
   PPBETA= 1000.0 PPSIGMA= 0.01 PPNMOL= 10 PPNGEOM= 200
   PARREP= 0
   ER= 1.0
+  VIBANALYSIS= 1 VIBSAVE= "vib.molden"
 }
 
 #Controls for QMD
