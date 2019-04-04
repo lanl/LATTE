@@ -161,13 +161,6 @@ done
 
 for name in fittingoutput.dat vib.molden; do
 
-  if [ $CMAKE_WITH_PROGRESS != "yes" ] then # For compatibility with TravisCI
-    if [ $name = "vib.molden" ] then
-      echo -en "   Testing for "$name" ... N/A (PROGRESSON required)"
-	  continue
-    fi
-  fi
-
   INLATTEFILE="latte."$name".in"
   REF="ref."$name
   COORDS=$name".dat"
@@ -179,6 +172,11 @@ for name in fittingoutput.dat vib.molden; do
   echo -en "   Testing for "$name" ... "
 
   time=`( /usr/bin/time -f "%U" $RUN > out ) 2>&1 > /dev/null`
+  
+  if [ -n "`grep "### ERROR ### VIBANALYSIS keyword requires PROGRESSON" out`" ] then
+      echo "   Testing for "$name" ... N/A (PROGRESSON required)"
+	  continue
+  fi
   
   tol=0.0001
   
