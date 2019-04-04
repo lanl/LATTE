@@ -117,7 +117,7 @@ kfcoulnono.F90 kpulay.F90 getforce.F90 masses2symbols.F90 setuptbmd.F90
 wrtrestartlib.F90 deorthomyrhoprogress.F90 orthomyHprogress.F90 readrestartlib.F90
 readppotspline.F90 pairpotspline.F90 errors.F90 initcoulombklist.F90
 flcnnono.F90 flcnnono_sp.F90 kflcnnono.F90 dosfittab.F90 
-readppotD.F90 pairpot_plusD.F90)
+readppotD.F90 pairpot_plusD.F90 vibanalysis.F90)
 
 foreach(_m MYMODULES MYSUBS DBCSR)
   set(${_m}_SOURCES)
