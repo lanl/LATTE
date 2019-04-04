@@ -158,7 +158,7 @@ done
 
 # Testing exact output files
 
-for name in fittingoutput.dat ; do
+for name in fittingoutput.dat vib.molden; do
 
   INLATTEFILE="latte."$name".in"
   REF="ref."$name
