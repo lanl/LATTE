@@ -175,7 +175,7 @@ for name in fittingoutput.dat vib.molden; do
   
   if [ -n "`grep "### ERROR ### VIBANALYSIS keyword requires PROGRESSON" out`" ]
   then
-      echo "   Testing for "$name" ... N/A (PROGRESSON required)"
+      echo "N/A (PROGRESSON required)"
 	  continue
   fi
   
