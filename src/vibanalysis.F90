@@ -37,7 +37,7 @@ subroutine getCenterOfMass( centerOfMass )
   centerOfMass(3) = sum(MASS(ELEMPOINTER(:))*CR(3,:))
   centerOfMass = centerOfMass / sum(MASS(ELEMPOINTER(:)))
 
-  centerOfMass = centerOfMass*1.88972612456506_8 ! angs to a.u.
+  centerOfMass = centerOfMass*1.88972612456506_latteprec ! angs to a.u.
 
 end subroutine getCenterOfMass
 
@@ -75,10 +75,10 @@ subroutine getAxesOfInertia( axesOfInertia, nRot )
   call getCenterOfMass( centerOfMass )
 
   do i=1,NATS
-    geometryInCM(:,i) = CR(:,i)*1.88972612456506_8 - centerOfMass(:)   ! angs to a.u.
+    geometryInCM(:,i) = CR(:,i)*1.88972612456506_latteprec - centerOfMass(:)   ! angs to a.u.
   end do
 
-  inertiaTensor = 0.0_8
+  inertiaTensor = 0.0_latteprec
   do i=1,NATS
     massi = real(MASS(ELEMPOINTER(i)),latteprec)*amu ! amu to a.u.
     
@@ -285,7 +285,7 @@ subroutine getProjector( projector, nVib, nRotAndTrans )
   call getCenterOfMass( centerOfMass )
   call getAxesOfInertia( axesOfInertia, nRot )
 
-  projector = 0.0_8
+  projector = 0.0_latteprec
 
   do i=1,NATS
 
@@ -293,8 +293,8 @@ subroutine getProjector( projector, nVib, nRotAndTrans )
     index_y = 3*i - 1
     index_z = 3*i
 
-    sqrtMass = sqrt( MASS(ELEMPOINTER(i))*1822.88853_8 ) ! amu to a.u.
-    geometryInCM = CR(:,i)*1.88972612456506_8-centerOfMass(:)  ! angs to a.u.
+    sqrtMass = sqrt( MASS(ELEMPOINTER(i))*1822.88853_latteprec ) ! amu to a.u.
+    geometryInCM = CR(:,i)*1.88972612456506_latteprec-centerOfMass(:)  ! angs to a.u.
 
     !!
     !! Projects the cartesian coordinates on the inertia axes
@@ -349,7 +349,7 @@ subroutine getProjector( projector, nVib, nRotAndTrans )
 
       if ( isNull ) then
         projector(:,i-aux) = projector(:,i)
-        projector(:,i) = 0.0_8
+        projector(:,i) = 0.0_latteprec
       end if
 
       if( VERBOSE >= 1 ) write(*,*) i, "real", squareNorm
@@ -380,7 +380,7 @@ subroutine getProjector( projector, nVib, nRotAndTrans )
   !! Some vectors associated with vibrations are added at the end to compleate the transformation matrix
   j=1
   do i=nRotAndTrans+1,3*NATS
-    projector(j,i)=1.0_8
+    projector(j,i)=1.0_latteprec
     j=j+1
   end do
 
@@ -445,13 +445,13 @@ subroutine getTransformationMatrix( output, nVib )
   integer :: i, nRotAndTrans
 
   allocate( output(3*NATS,3*NATS) )
-  output = 0.0_8
+  output = 0.0_latteprec
   call getProjector( projector, nVib, nRotAndTrans )
 
-  output = -1.0_8 * matmul( projector, transpose(projector) )
+  output = -1.0_latteprec * matmul( projector, transpose(projector) )
             
   do i=1,size(output,dim=1)
-    output(i,i) = 1.0_8 + output(i,i)
+    output(i,i) = 1.0_latteprec + output(i,i)
   end do
 
 end subroutine getTransformationMatrix
@@ -503,13 +503,15 @@ SUBROUTINE PREPAREIR
 
   implicit none
 
+  if( PBCON == 1 ) then
 #ifdef PROGRESSON
-  call prg_wraparound(CR,BOX,1,1)
-  call prg_centeratbox(CR,BOX,1)
+    call prg_wraparound(CR,BOX,1,1)
+    call prg_centeratbox(CR,BOX,1)
 #else
-  write(*,*) "### ERROR ### VIBANALYSIS keyword requires PROGRESSON"
-  stop
+    write(*,*) "### ERROR ### VIBANALYSIS keyword requires PROGRESSON if PBCON= 1 is chosen"
+    stop
 #endif
+  end if
 
 END SUBROUTINE PREPAREIR
 
@@ -704,7 +706,7 @@ SUBROUTINE VIBRATIONAL_ANALYSIS
 
   geom0 = CR
 
-  hb = 0.001d0 ! angs
+  hb = 0.001_latteprec ! angs
   
   mlsi = TIME_MLS()
   
@@ -718,8 +720,8 @@ SUBROUTINE VIBRATIONAL_ANALYSIS
 			m2 = MASS(ELEMPOINTER(atom2))*amu ! amu to a.u.
 			do j=1,3
 			
-			if( p2 >= p1 .and. norm2( CR(:,atom2)-CR(:,atom1) ) < 4.0_8 ) then
-				FTOT = 0.0d0
+			if( p2 >= p1 .and. norm2( CR(:,atom2)-CR(:,atom1) ) < 4.0_latteprec ) then
+				FTOT = 0.0_latteprec
 				CR = geom0
 		
 				!! Second derivatives of the potential are calculated as follows
@@ -742,15 +744,15 @@ SUBROUTINE VIBRATIONAL_ANALYSIS
 				CALL GETFORCE
 				call GETDIPOLEVEC( dipoleVec )
 		
-				d2Vdp1dp2 = -0.5_8*FTOT(I,atom1)
-				dMudR(:,p2) = -0.5_8*dipoleVec
+				d2Vdp1dp2 = -0.5_latteprec*FTOT(I,atom1)
+				dMudR(:,p2) = -0.5_latteprec*dipoleVec
 		
-				CR(J,atom2) = CR(J,atom2) - 2.0_8*hb
+				CR(J,atom2) = CR(J,atom2) - 2.0_latteprec*hb
 				CALL GETFORCE
 				call GETDIPOLEVEC( dipoleVec )
 		
-				d2Vdp1dp2 = ( d2Vdp1dp2 + 0.5_8*FTOT(I,atom1) )/hb ! Derivative
-				dMudR(:,p2) = ( dMudR(:,p2) + 0.5_8*dipoleVec )/hb ! Derivative
+				d2Vdp1dp2 = ( d2Vdp1dp2 + 0.5_latteprec*FTOT(I,atom1) )/hb ! Derivative
+				dMudR(:,p2) = ( dMudR(:,p2) + 0.5_latteprec*dipoleVec )/hb ! Derivative
 				
 				d2Vdp1dp2 = d2Vdp1dp2*(eV/angs**2)  ! eV/angs^2 to a.u.
 				d2Vdp1dp2 = d2Vdp1dp2/sqrt(m1*m2) ! Mass weighted derivative
@@ -775,7 +777,7 @@ SUBROUTINE VIBRATIONAL_ANALYSIS
 	end do
   end do
   
-!   dMudR = 0.0_8
+!   dMudR = 0.0_latteprec
 !   p1 = 1
 !   do atom1=1,NATS
 !     m1 = MASS(ELEMPOINTER(atom1))*amu ! amu to a.u.
@@ -791,13 +793,13 @@ SUBROUTINE VIBRATIONAL_ANALYSIS
 ! 		CALL GETFORCE
 ! 		call GETDIPOLEVEC( dipoleVec )
 ! 
-! 		dMudR(:,p1) = -0.5_8*dipoleVec
+! 		dMudR(:,p1) = -0.5_latteprec*dipoleVec
 ! 
-! 		CR(i,atom1) = CR(i,atom1) - 2.0_8*hb
+! 		CR(i,atom1) = CR(i,atom1) - 2.0_latteprec*hb
 ! 		CALL GETFORCE
 ! 		call GETDIPOLEVEC( dipoleVec )
 ! 
-! 		dMudR(:,p1) = ( dMudR(:,p1) + 0.5_8*dipoleVec )/hb   ! Derivative
+! 		dMudR(:,p1) = ( dMudR(:,p1) + 0.5_latteprec*dipoleVec )/hb   ! Derivative
 ! 		
 ! 		dMudR(:,p1) = dMudR(:,p1)*angs ! angs to a.u.
 ! 		dMudR(:,p1) = dMudR(:,p1)/sqrt(m1) ! Mass weighted derivative
@@ -876,7 +878,7 @@ SUBROUTINE VIBRATIONAL_ANALYSIS
   write(*,*) " Low Vib. Freqs (cm-1) "
   write(*,*) "-----------------------"
   do i=1,3*NATS-nVib
-    if( eValsHessian(i) < 0.0_8 ) then
+    if( eValsHessian(i) < 0.0_latteprec ) then
 	  freqs(i) = -sqrt(abs(eValsHessian(i)))
       write(*,"(I10,F20.10)") i, freqs(i)/cm1 ! a.u. to cm-1
     else
@@ -889,7 +891,7 @@ SUBROUTINE VIBRATIONAL_ANALYSIS
   write(*,*) " Vib. Freqs (cm-1) "
   write(*,*) "-------------------"
   do i=3*NATS-nVib+1,3*NATS
-    if( eValsHessian(i) < 0.0_8 ) then
+    if( eValsHessian(i) < 0.0_latteprec ) then
 	  freqs(i) = -sqrt(abs(eValsHessian(i)))
       write(*,"(I10,F20.10)") i, freqs(i)/cm1 ! a.u. to cm-1
     else
@@ -899,13 +901,13 @@ SUBROUTINE VIBRATIONAL_ANALYSIS
   end do
   write(*,*) ""
   
-  ZPE = 0.0_8
+  ZPE = 0.0_latteprec
   do i=3*NATS-nVib+1,3*NATS
-    if( freqs(i) > 0.0_8 ) then
+    if( freqs(i) > 0.0_latteprec ) then
       ZPE = ZPE + freqs(i)
     end if
   end do
-  ZPE = ZPE/2.0_8
+  ZPE = ZPE/2.0_latteprec
   
   write(*,*) ""
   write(*,*) " ZPE = ", ZPE/cm1, "cm-1"  ! a.u. to cm-1
@@ -916,7 +918,7 @@ SUBROUTINE VIBRATIONAL_ANALYSIS
   ZPE = ZPE/eV ! Stored value in eV
   
   allocate( lCart(3*NATS,3*NATS) )
-  lCart = 0.0_8
+  lCart = 0.0_latteprec
 
   p1 = 1
   do atom1=1,NATS
@@ -927,7 +929,7 @@ SUBROUTINE VIBRATIONAL_ANALYSIS
 		do atom2=1,NATS; do j=1,3
 		
 			if( p1 == p2 ) then
-				lCart(p1,p2) = 1.0_8/sqrt(m1)
+				lCart(p1,p2) = 1.0_latteprec/sqrt(m1)
 			end if
 			
 			p2 = p2 + 1

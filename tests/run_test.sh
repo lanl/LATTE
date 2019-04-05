@@ -173,13 +173,7 @@ for name in fittingoutput.dat vib.molden; do
 
   time=`( /usr/bin/time -f "%U" $RUN > out ) 2>&1 > /dev/null`
   
-  if [ -n "`grep "### ERROR ### VIBANALYSIS keyword requires PROGRESSON" out`" ]
-  then
-      echo "N/A (PROGRESSON required)"
-	  continue
-  fi
-  
-  tol=0.0001
+  tol=0.001
   
   check=`
     awk '
