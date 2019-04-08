@@ -504,13 +504,12 @@ SUBROUTINE PREPAREIR
   implicit none
 
   if( PBCON == 1 ) then
-#ifdef PROGRESSON
-    call prg_wraparound(CR,BOX,1,1)
-    call prg_centeratbox(CR,BOX,1)
-#else
-    write(*,*) "### ERROR ### VIBANALYSIS keyword requires PROGRESSON if PBCON= 1 is chosen"
-    stop
-#endif
+! #ifdef PROGRESSON
+!     call prg_wraparound(CR,BOX,1,1)
+!     call prg_centeratbox(CR,BOX,1)
+! #else
+    write(*,*) "@@@ WARNING @@@ VIBANALYSIS may need PBCON= 0"
+! #endif
   end if
 
 END SUBROUTINE PREPAREIR
