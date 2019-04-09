@@ -190,7 +190,9 @@ SUBROUTINE MSRELAX
         DO I = 1, NATS
            WRITE(20,11) ATELE(I), CR(1,I), CR(2,I), CR(3,I)
         ENDDO
-
+        
+        IF (BREAKLOOP .EQ. 1 .AND. VIBANALYSIS .EQ. 1) CALL VIBRATIONAL_ANALYSIS
+        
         IF (KON .EQ. 0) THEN
 
            IF (SPONLY .EQ. 0) THEN
@@ -277,6 +279,8 @@ SUBROUTINE MSRELAX
            DO I = 1, NATS
               WRITE(20,11) ATELE(I), CR(1,I), CR(2,I), CR(3,I)
            ENDDO
+           
+           IF (BREAKLOOP .EQ. 1 .AND. VIBANALYSIS .EQ. 1) CALL VIBRATIONAL_ANALYSIS
 
            IF (KON .EQ. 0) THEN
 

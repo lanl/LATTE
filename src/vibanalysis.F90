@@ -714,6 +714,7 @@ SUBROUTINE VIBRATIONAL_ANALYSIS
 				!!
 				!! dMu(bj)/dbj = ( -0.5*Mu(bj-hb) + 0.0*Mu(bj) + 0.5*Mu(bj+hb) )/hb
 				!!             = ( -0.5*Mu(bj-hb) + 0.5*Mu(bj+hb) )/hb
+				
 				CR(J,atom2) = CR(J,atom2) + hb
 				CALL GETFORCE
 				call GETDIPOLEVEC( dipoleVec )
