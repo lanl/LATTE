@@ -487,34 +487,6 @@ SUBROUTINE GETDIPOLEVEC(DIPOLEVEC)
 END SUBROUTINE GETDIPOLEVEC
 
 !!>
-!! Prepares the geometry for IR calculation
-!!
-SUBROUTINE PREPAREIR
-
-  USE CONSTANTS_MOD
-  USE SETUPARRAY
-  USE MYPRECISION
-  USE MDARRAY
-  USE MYPRECISION
-#ifdef PROGRESSON
-  USE BML
-  USE PRG_SYSTEM_MOD
-#endif
-
-  implicit none
-
-  if( PBCON == 1 ) then
-! #ifdef PROGRESSON
-!     call prg_wraparound(CR,BOX,1,1)
-!     call prg_centeratbox(CR,BOX,1)
-! #else
-    write(*,*) "@@@ WARNING @@@ VIBANALYSIS may need PBCON= 0"
-! #endif
-  end if
-
-END SUBROUTINE PREPAREIR
-
-!!>
 !! Saves the vibrational analysis in MOLDEN format
 !!
 subroutine saveMolden( symbols, coords, freqs, intensities, lCart, nVib )
