@@ -624,6 +624,7 @@ SUBROUTINE VIBRATIONAL_ANALYSIS
   real(latteprec) :: dipoleVec(3)
   real(latteprec), allocatable :: dMudR(:,:)
   real(latteprec), allocatable :: dMudQ(:,:)
+  integer, allocatable :: dMudR_check(:)
   real(latteprec), allocatable :: intensities(:)
   
   real(latteprec) :: mlsi
@@ -671,9 +672,12 @@ SUBROUTINE VIBRATIONAL_ANALYSIS
   allocate( hessian(3*NATS,3*NATS) )
   allocate( dMudR(3,3*NATS) )
   allocate( dMudQ(3,3*NATS) )
+  allocate( dMudR_check(3*NATS) )
   
   hessian = 0.0_latteprec
   dMudR = 0.0_latteprec
+  dMudQ = 0.0_latteprec
+  dMudR_check = 0
 
   geom0 = CR
 
@@ -710,29 +714,33 @@ SUBROUTINE VIBRATIONAL_ANALYSIS
 				!!
 				!! dMu(bj)/dbj = ( -0.5*Mu(bj-hb) + 0.0*Mu(bj) + 0.5*Mu(bj+hb) )/hb
 				!!             = ( -0.5*Mu(bj-hb) + 0.5*Mu(bj+hb) )/hb
-		
+				
 				CR(J,atom2) = CR(J,atom2) + hb
 				CALL GETFORCE
 				call GETDIPOLEVEC( dipoleVec )
 		
 				d2Vdp1dp2 = -0.5_latteprec*FTOT(I,atom1)
-				dMudR(:,p2) = -0.5_latteprec*dipoleVec
+				if( dMudR_check(p2)==0 ) dMudR(:,p2) = -0.5_latteprec*dipoleVec
 		
 				CR(J,atom2) = CR(J,atom2) - 2.0_latteprec*hb
 				CALL GETFORCE
 				call GETDIPOLEVEC( dipoleVec )
 		
 				d2Vdp1dp2 = ( d2Vdp1dp2 + 0.5_latteprec*FTOT(I,atom1) )/hb ! Derivative
-				dMudR(:,p2) = ( dMudR(:,p2) + 0.5_latteprec*dipoleVec )/hb ! Derivative
+				if( dMudR_check(p2)==0 ) dMudR(:,p2) = ( dMudR(:,p2) + 0.5_latteprec*dipoleVec )/hb ! Derivative
 				
 				d2Vdp1dp2 = d2Vdp1dp2*(eV/angs**2)  ! eV/angs^2 to a.u.
 				d2Vdp1dp2 = d2Vdp1dp2/sqrt(m1*m2) ! Mass weighted derivative
 				
-				dMudR(:,p2) = dMudR(:,p2)*angs ! angs to a.u.
-				dMudR(:,p2) = dMudR(:,p2)/sqrt(m2) ! Mass weighted derivative
+				if( dMudR_check(p2)==0 ) then
+					dMudR(:,p2) = dMudR(:,p2)*angs ! angs to a.u.
+					dMudR(:,p2) = dMudR(:,p2)/sqrt(m2) ! Mass weighted derivative
+				end if
 		
 				hessian( p1, p2 ) = d2Vdp1dp2
 				hessian( p2, p1 ) = d2Vdp1dp2 ! The matrix is symmetric
+				
+				dMudR_check(p2) = 1 ! Ensures that the derivative is calculated only once
 				
 				if( VERBOSE >= 2 ) then
 					write(*,*) "    atom1=", atom1, "atom2=", atom2, i, j, d2Vdp1dp2
@@ -945,7 +953,7 @@ SUBROUTINE VIBRATIONAL_ANALYSIS
   p1 = 1 
   do i=1,3 ! x, y, z
     do j=1,NATS ! Normal mode
-		dMudQ(i,p1) = dot_product( dMudR(i,:), eVecsHessian(p1,:) )
+		dMudQ(i,p1) = dot_product( dMudR(i,:), eVecsHessian(:,p1) )
 		p1 = p1 + 1
 	end do
   end do
@@ -974,6 +982,7 @@ SUBROUTINE VIBRATIONAL_ANALYSIS
   deallocate( lCart )
   deallocate( dMudR )
   deallocate( dMudQ )
+  deallocate( dMudR_check )
   deallocate( intensities )
 
   RETURN

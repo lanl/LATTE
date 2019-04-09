@@ -50,7 +50,7 @@ CONTAINS
 
     MYMIXERTYPE = MX%MIXERTYPE
 
-    IF(VERBOSE >= 1) WRITE(*,*)"MixerType=", MYMIXERTYPE
+    IF(VERBOSE >= 2) WRITE(*,*)"MixerType=", MYMIXERTYPE
 
     IF(MYMIXERTYPE == "PulayLinear" .AND. PITER >= 10) MYMIXERTYPE = "Linear"
 

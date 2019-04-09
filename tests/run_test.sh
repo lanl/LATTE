@@ -185,10 +185,15 @@ for name in fittingoutput.dat vib.molden; do
         split(value,arr)
         
         for(i=1;i<=NF;i++){
-          # Here is possible to include a filter to compare only numbers in case the files are more complex
-          if( sqrt((arr[i]-$i)**2)>'$tol' ){
+          if( $i~/^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/ &&
+              arr[i]~/^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/ &&
+              sqrt((arr[i]-$i)**2)>'$tol' ){
             print 1
             loc=1
+            print "### Matching error ###" > "/dev/stderr"
+            print "   Expected: ", $0 > "/dev/stderr"
+            print "   Obtained: ", value > "/dev/stderr"
+            
             exit
           }
         }
