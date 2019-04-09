@@ -1,22 +1,7 @@
-#LATTE INPUT FILE
-#================
-
-This input file resumes the content of MDcontroller and TBparam/control.in
-The parser will read this file only if it is present inside the running folder.
-In case this file is not present Latte will read the two files as originally.
-The order of the keywords is not important in this file.
-Everything is a comment by default unless a word contains an "equal" sign.
-To comment a particular keyword the "hash" symbol has to be added next to the
-keyword. Example: #MyCommentedKeyword=
-
-
-#Uncomment the following keyword to force variable settings
-#DEFAULTNONE
-
 #General controls
 CONTROL{
   XCONTROL= 1
-  VERBOSE= 0 
+  VERBOSE= 1 
   PARAMPATH= "./TBparam"
   COORDSFILE= "./bl/inputblock.dat"
   BASISTYPE= NONORTHO
@@ -30,11 +15,11 @@ CONTROL{
   PPOTON= 1 VDWON= 0
   SPINON= 0 SPINTOL= 1.0e-4
   ELECTRO= 1 #Use #ELECTRO= 0 for metals
-  ELECMETH= 0 ELEC_ETOL= 0.001 ELEC_QTOL= 1.0e-4
+  ELECMETH= 0 ELEC_ETOL= 1.0e-8 ELEC_QTOL= 1.0e-8
   COULACC= 1.0e-6 COULCUT= -500.0 COULR1= 500.0
   MAXSCF= 250 STOPATMAXSCF= F
   BREAKTOL= 1.0E-12 MINSP2ITER= 22 SP2CONV= REL
-  FULLQCONV= 0 QITER= 1
+  FULLQCONV= 1 QITER= 1
   QMIX= 0.2 SPINMIX= 0.25 MDMIX= 0.25
   ORDERNMOL= 0
   SPARSEON= 0 THRESHOLDON= 1 NUMTHRESH= 1.0e-6 FILLINSTOP= 100 BLKSZ= 4
@@ -62,29 +47,13 @@ CONTROL{
   VIBANALYSIS= 1 VIBSAVE= "vib.molden"
 }
 
-#Controls for QMD
-MDCONTROL{
-  MAXITER= 5000
-  UDNEIGH= 25
-  DT= 0.25
-  TEMPERATURE= 300.00 RNDIST= GAUSSIAN SEEDINIT= UNIFORM
-  DUMPFREQ= 250
-  RSFREQ= 500
-  WRTFREQ= 25
-  TOINITTEMP5= 1
-  THERMPER= 500
-  THERMRUN= 50000
-  NVTON= 0 NPTON= 0 AVEPER= 1000  FRICTION= 1000.0 SEED= 54
-  PTARGET= 0.0 NPTTYPE= ISO
-  SHOCKON= 0
-  SHOCKSTART= 100000
-  SHOCKDIR= 1
-  UPARTICLE= 500.0 USHOCK= -4590.0 C0= 1300.0
-  MDADAPT= 0
-  GETHUG= 0 E0= -795.725  V0= 896.984864 P0= 0.083149
+#Pulay Mixer. This options are available when LATTE is compiled with
+#PROGRESS/BML
+MIXER{
+   MixerType= Pulay #Will use the Pulay mixer (Linear is an other option)
+   Verbose= 0
+   MPulay= 5 #Number of pulay vectors/matrices
+   MixCoeff= 0.1 #Coefficient for mixing charges
+   MixerON= T #This variable is equivalent to commenting the whole lines in MIXER
 }
 
-KMESH{
-  NKX= 8 NKY= 8 NKZ= 8
-  KSHIFTX= 0.0 KSHIFTY= 0.0 KSHIFTZ= 0.0
-}
