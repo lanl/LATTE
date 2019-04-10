@@ -197,6 +197,8 @@ for name in fittingoutput.dat vib.molden; do
             exit
           }
         }
+        
+        if( $0~/FR-NORM-COORD/ ) exit # Normal coordinates cannot be compared in VIB
       }
       END{
         if(loc==0)
