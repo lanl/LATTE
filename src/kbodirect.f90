@@ -309,6 +309,8 @@ SUBROUTINE KBOEVECS
 
 #elif defined(MPI_ON)
 
+     KBO = ZERO
+
      DO K = 1, NKTOT
 
         IF (MOD(K,NUMPROCS) .EQ. MYID) THEN
@@ -328,7 +330,7 @@ SUBROUTINE KBOEVECS
         ENDIF
      ENDDO
 
-     !     CALL MPI_Barrier(MPI_COMM_WORLD, IERR)
+     CALL MPI_Barrier(MPI_COMM_WORLD, IERR)
 
      ! Collect KBO on rank 0 then broadcast
 
@@ -444,7 +446,7 @@ SUBROUTINE KBOEVECS
         ENDIF
      ENDDO
 
-     !     CALL MPI_Barrier(MPI_COMM_WORLD, IERR)
+     CALL MPI_Barrier(MPI_COMM_WORLD, IERR)
 
      ! Collect KBO on rank 0 then broadcast
 
@@ -521,6 +523,8 @@ SUBROUTINE KBOEVECS
 #ifdef MPI_ON
   DEALLOCATE(TMPKBO)
 #endif
+
+!  PRINT*, "BO ",KBO(1,1,1), KBO(HDIM, HDIM, NKTOT)
 
   RETURN
 
