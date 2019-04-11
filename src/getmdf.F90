@@ -34,12 +34,12 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   INTEGER :: SWITCH, CURRITER, I
   REAL(LATTEPREC) :: ZEROSCFMOD, MLSI
 
-
-  MLSI = TIME_MLS()
   IF (EXISTERROR) RETURN
   !
   ! The atoms have moved, so we have to build a new H (and overlap matrix)
-  !
+  
+ MLSI = TIME_MLS()
+  
   IF (KON .EQ. 0) THEN
      IF(VERBOSE >= 1)WRITE(*,*)"KON = 0 ..."
      IF (SPONLY .EQ. 0) THEN
@@ -54,7 +54,9 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
   ENDIF
   FLUSH(6)
+WRITE(*,*) "Time get H",  TIME_MLS() - MLSI
 
+ MLSI = TIME_MLS()
   ! Broken?
 
   !  IF (SWITCH .EQ. 0 .AND. RESTART .EQ. 1) CALL IFRESTART
@@ -110,6 +112,8 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
      FLUSH(6)
   ENDIF
 
+WRITE(*,*) "Time for PROPCHEMPOT XBO GETDELTASPIN",  TIME_MLS() - MLSI
+MLSI = TIME_MLS()
   !
   ! If SWITCH = 0, then we don't have a set of partials charges
   ! yet and we'll have to get them from the charge-independent
@@ -128,6 +132,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
      CALL QCONSISTENCY(SWITCH, CURRITER) ! Self consistent charge transfer
   ENDIF
 
+ WRITE(*,*) "Time for QNEUTRAL QCONSISTENCY ",  TIME_MLS() - MLSI
   ! Run to self-consistency QITER = 0 -> only H(P) + D calculated ANDERS
 
   !
@@ -153,6 +158,8 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
   ENDIF
 
+
+MLSI = TIME_MLS()
   ! Setting up the XBO arrays
 
 !  IF (XBOON .EQ. 1 .AND. ELECTRO .EQ. 0) THEN
@@ -173,6 +180,10 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
   IF(VERBOSE >= 1)WRITE(*,*)"Getting forces ..."
   CALL GETFORCE
+
+WRITE(*,*) "Time for GETFORCE  ",  TIME_MLS() - MLSI
+
+MLSI = TIME_MLS()
 
   IF (ELECTRO .EQ. 1 .AND. QITER .EQ. 0) THEN
 
@@ -201,6 +212,10 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   ENDIF
   
   WRITE(*,*)"Time for GETMDF", TIME_MLS()-MLSI
+
+WRITE(*,*) "Time GETDELTAQ ",  TIME_MLS() - MLSI
+
+WRITE(*,*) "Time GETDELTAQ ",  TIME_MLS() - MLSI
 
   FLUSH(6)
 

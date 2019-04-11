@@ -90,6 +90,7 @@ MODULE CONSTANTS_MOD
 
   !For the new input file parser
   CHARACTER(LEN = 1000) :: LATTEINNAME = "latte.in"
+  CHARACTER(LEN = 1000) :: OUTFILE = "log.latte"
   LOGICAL :: LATTEINEXISTS
 
   !! For truncated SP2 and entropy calculation
