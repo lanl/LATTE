@@ -33,11 +33,13 @@ SUBROUTINE GETFORCE
   FTOT = ZERO
 
   IF (KON .EQ. 0) THEN
+ MLSI = TIME_MLS()
      IF (SPONLY .EQ. 0) THEN
         CALL GRADHSP
      ELSE
         CALL GRADH
      ENDIF
+WRITE(*,*) "Time for GRAD", TIME_MLS() - MLSI
      FTOT = TWO * F
 
      IF (BASISTYPE .EQ. "NONORTHO") THEN
@@ -71,8 +73,9 @@ SUBROUTINE GETFORCE
 
            ! Otherwise use the complex but general expansions Josh Coe implemented
 
+ MLSI = TIME_MLS()
            CALL PULAY
-
+WRITE(*,*) "Time for PULAY", TIME_MLS() - MLSI
 !           CALL PULAY
 !           IF (ELECTRO .EQ. 0) CALL FLCNNONO
 !           IF (ELECTRO .EQ. 1) CALL FCOULNONO

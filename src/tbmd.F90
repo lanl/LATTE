@@ -85,7 +85,7 @@ SUBROUTINE TBMD
 
   IF (RESTART .EQ. 0) THEN
 
-     ALLOCATE (V(3,NATS))
+     IF(.NOT. ALLOCATED(V)) ALLOCATE (V(3,NATS))
 
      !
      ! Initialize velocities if TOINITTEMP = 1

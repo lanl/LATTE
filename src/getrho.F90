@@ -65,7 +65,16 @@ SUBROUTINE GETRHO(MDITER)
 
         CALL GERSHGORIN
 
+#ifdef PROGRESSON
+
+        CALL SP2PRG
+
+#elif defined(PROGRESSOFF)
+
         CALL SP2PURE
+
+#endif
+
 
         !        IF (MDITER .LE. 10) THEN
         !           CALL SP2GAP_SETUP

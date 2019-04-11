@@ -35,7 +35,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   INTEGER :: ALLOKQ, ALLOKM, ALLOK
   INTEGER :: START_CLOCK, STOP_CLOCK, CLOCK_RATE, CLOCK_MAX, ITERACC
   REAL(4) :: TIMEACC
-  REAL(LATTEPREC) :: MAXDQ
+  REAL(LATTEPREC) :: MAXDQ, MLSI
   REAL(LATTEPREC), ALLOCATABLE :: QDIFF(:), SPINDIFF(:)
 
   IF (EXISTERROR) RETURN
@@ -187,7 +187,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
 
         ! We've made changes to the H matrix so we have to re-orthogonalize
-
+        MLSI = TIME_MLS()
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
 #ifdef PROGRESSON
@@ -204,12 +204,14 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            ENDIF
         ENDIF
 
+        WRITE(*,*) "Time for ORTHOMYH ",  TIME_MLS() - MLSI
         !
         ! New Hamiltonian: get the bond order
         !
 
         ! Compute the density matrix
 
+        MLSI = TIME_MLS()
         TX = START_TIMER(DMBUILD_TIMER)
 
         IF (KON .EQ. 0) THEN
@@ -218,6 +220,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            CALL KGETRHO
         ENDIF
 
+        WRITE(*,*) "Time for BUILDRHO ",  TIME_MLS() - MLSI
         TX = STOP_TIMER(DMBUILD_TIMER)
 
         ! We have a density matrix computed in from the orthogonalized
@@ -346,6 +349,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
      DO II = 1, QITER
 
+        MLSI = TIME_MLS()
+
         IF (ELECMETH .EQ. 0) THEN
 
            CALL COULOMBRSPACE
@@ -359,15 +364,18 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         CALL ADDQDEP
-
+        WRITE(*,*)"Time for COULOMBRSPACE,COULOMBEWALD,GASPCOULOMB", TIME_MLS() - MLSI 
         !
         ! Building the spin up and spin down H's after we've
         ! added the electrostatic potential to the Slater-Koster one,
         ! as it should be.
         !
 
+        MLSI = TIME_MLS()
         IF (SPINON .EQ. 1) CALL BLDSPINH
-
+        WRITE(*,*)"Time for BLDSPINH", TIME_MLS() - MLSI
+ 
+        MLSI = TIME_MLS()
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
 
@@ -386,6 +394,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            ENDIF
         ENDIF
 
+        WRITE(*,*)"Time for ORTHOMYH", TIME_MLS() - MLSI
 
         !
         ! New Hamiltonian: get the bond order
@@ -394,18 +403,21 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ! Compute the density matrix
 
 
+        MLSI = TIME_MLS()
         IF (KON .EQ. 0) THEN
            CALL GETRHO(MDITER)
         ELSE
            CALL KGETRHO
         ENDIF
 
+        WRITE(*,*)"Time for GETRHO", TIME_MLS() - MLSI
         OLDDELTAQS = DELTAQ
 
         !
         ! Get a new set of charges for our system
         !
 
+        MLSI = TIME_MLS()
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
 #ifdef PROGRESSON
@@ -421,6 +433,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
               CALL KDEORTHOMYRHO
            ENDIF
         ENDIF
+        WRITE(*,*)"Time for DEORTHOMYRHO", TIME_MLS() - MLSI
 
         CALL GETDELTAQ
 

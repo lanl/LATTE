@@ -107,7 +107,7 @@ CONTAINS
   !! \brief Note: All units are LATTE units by default. See https://github.com/losalamos/LATTE/blob/master/Manual/LATTE_manual.pdf
   !!
   SUBROUTINE LATTE(NTYPES, TYPES, CR_IN, MASSES_IN, XLO, XHI, XY, XZ, YZ, FTOT_OUT, &
-       MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIAL_INOUT, NEWSYSTEM, EXISTERROR_INOUT)
+       MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIAL_INOUT, NEWSYSTEM, EXISTERROR_INOUT, FNAME)
 
     USE CONSTANTS_MOD, ONLY: EXISTERROR
 
@@ -118,7 +118,7 @@ CONTAINS
     INTEGER :: MYID = 0
     REAL :: TARRAY(2), RESULT, SYSTDIAG, SYSTPURE
     REAL(LATTEPREC) :: DBOX
-    CHARACTER(LEN=50) :: FLNM
+    REAL(LATTEPREC) :: MLSI, LUMO, HOMO
 
     REAL(LATTEPREC), INTENT(IN)  :: CR_IN(:,:),VEL_IN(:,:), MASSES_IN(:),XLO(3),XHI(3)
     REAL(LATTEPREC), INTENT(IN)  :: DT_IN, XY, XZ, YZ
@@ -126,8 +126,8 @@ CONTAINS
     REAL(LATTEPREC), INTENT(OUT) :: VIRIAL_INOUT(6)
     INTEGER, INTENT(IN) ::  NTYPES, TYPES(:), MAXITER_IN
     LOGICAL(1), INTENT(INOUT) :: EXISTERROR_INOUT
-    REAL(LATTEPREC) :: MLSI, LUMO, HOMO
     INTEGER, INTENT(INOUT) :: NEWSYSTEM
+    CHARACTER(LEN=*), OPTIONAL, INTENT(IN) :: FNAME
 
 #ifdef PROGRESSON
     TYPE(SYSTEM_TYPE) :: SY
@@ -167,6 +167,10 @@ CONTAINS
        TX = INIT_TIMER()
        TX = START_TIMER(LATTE_TIMER)
 
+       IF(PRESENT(FNAME))THEN
+          LATTEINNAME = TRIM(ADJUSTL(FNAME))
+       ENDIF
+
        INQUIRE( FILE=LATTEINNAME, exist=LATTEINEXISTS )
 
        IF (LATTEINEXISTS) THEN
@@ -183,13 +187,19 @@ CONTAINS
        IF(VERBOSE <= 0)THEN
           OPEN(UNIT=6, FILE="/dev/null", FORM="formatted")
        ELSE
-          OPEN(UNIT=6, FILE="log.latte", FORM="formatted")
+          OPEN(UNIT=6, FILE=OUTFILE, FORM="formatted")
        ENDIF
 
        IF(VERBOSE >= 1)THEN
           WRITE(*,*)"# The log file for latte_lib"
           WRITE(*,*)""
           CALL TIMEDATE_TAG("LATTE started at : ")
+
+#ifdef PROGRESSON
+          WRITE(*,*)""
+          WRITE(*,*)"Using PROGRESS and BML ..."
+#endif
+
        ENDIF
 
        CALL READTB
