@@ -192,11 +192,7 @@ SUBROUTINE SPINRHOEVECSPRG
      ENTE = -KBT*S
 
      ! Building diagonal
-<<<<<<< HEAD
-
-=======
      FDIRACUP = 0.0_dp ; FDIRACDOWN = 0.0_dp 
->>>>>>> 84b3c7caeab06b7548efae23ce7443d1d1634c4d
      DO I = 1, HDIM
 
         FDIRACARG = (UPEVALS(I) - CHEMPOT)/KBT
@@ -222,26 +218,17 @@ SUBROUTINE SPINRHOEVECSPRG
 
      ! See whether we occupy spin up or down first
 
-<<<<<<< HEAD
-=======
      FDIRACUP = 0.0_dp ; FDIRACDOWN = 0.0_dp
->>>>>>> 84b3c7caeab06b7548efae23ce7443d1d1634c4d
      IF (UPEVALS(1) .LT. DOWNEVALS(1)) THEN
         UPNE = 1
         DOWNNE = 0
         CHEMPOT = UPEVALS(1)
-<<<<<<< HEAD
-=======
         FDIRACUP(1) = 1.0_dp 
->>>>>>> 84b3c7caeab06b7548efae23ce7443d1d1634c4d
      ELSE
         UPNE = 0
         DOWNNE = 1
         CHEMPOT = DOWNEVALS(1)
-<<<<<<< HEAD
-=======
         FDIRACDOWN(1) = 1.0_dp 
->>>>>>> 84b3c7caeab06b7548efae23ce7443d1d1634c4d
      ENDIF
 
      ! Go through the eigenvalues and occupy if
@@ -253,10 +240,6 @@ SUBROUTINE SPINRHOEVECSPRG
      ! Works with O and O2.
 
      BREAKLOOP = 0
-<<<<<<< HEAD
-
-=======
->>>>>>> 84b3c7caeab06b7548efae23ce7443d1d1634c4d
      DO WHILE ( BREAKLOOP .EQ. 0 )
 
         IF (UPEVALS(UPNE + 1) .LE. DOWNEVALS(DOWNNE + 1)) THEN
@@ -265,10 +248,7 @@ SUBROUTINE SPINRHOEVECSPRG
            FDIRACUP(UPNE) = 1.0_dp 
         ENDIF
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 84b3c7caeab06b7548efae23ce7443d1d1634c4d
         IF ( UPNE + DOWNNE .EQ. INT(TOTNE) ) BREAKLOOP = 1
 
         IF (BREAKLOOP .EQ. 0 .AND. &
@@ -361,10 +341,6 @@ SUBROUTINE SPINRHOEVECSPRG
   DEALLOCATE(FDIRACDOWN)
 
   RETURN
-<<<<<<< HEAD
-
-=======
->>>>>>> 84b3c7caeab06b7548efae23ce7443d1d1634c4d
 #endif
 
 END SUBROUTINE SPINRHOEVECSPRG
