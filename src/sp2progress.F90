@@ -38,17 +38,15 @@ MODULE SP2PROGRESS
   USE CONSTANTS_MOD
   USE NONOARRAY
   USE MYPRECISION
-#endif
+  USE SPARSEARRAY
 
   PRIVATE
 
   PUBLIC :: SP2PRG
 
-#ifdef PROGRESSON
   LOGICAL, PUBLIC                           :: SP2INIT = .FALSE.!COUTER TO KEEP TRACK OF THE TIMES ZMAT IS COMPUTED.
   TYPE(BML_MATRIX_T)                        :: ORTHOH_BML, ORTHOX_BML
   TYPE(SP2DATA_TYPE), PUBLIC                :: SP2D
-#endif
 
 CONTAINS
 
@@ -58,14 +56,23 @@ CONTAINS
   SUBROUTINE SP2PRG()
     IMPLICIT NONE
 
-#ifdef PROGRESSON
-
     IF(VERBOSE .GE. 1) WRITE(*,*) "In SP2PRG ..."
 
     !> Parsing sp2 input paramenters. this will read the variables in the input file.
     !  sp2 is the "SP2DATA_TYPE".
     IF(.NOT.SP2INIT)THEN
-       CALL PRG_PARSE_SP2(SP2D,LATTEINNAME)
+       IF(LATTEINEXISTS)THEN 
+         CALL PRG_PARSE_SP2(SP2D,LATTEINNAME)
+       ELSE 
+         SP2D%MDIM = MSPARSE
+         SP2D%THRESHOLD = NUMTHRESH
+         SP2D%MINSP2ITER = MINSP2ITER
+         SP2D%MAXSP2ITER = 100
+         SP2D%SP2CONV = SP2CONV
+         SP2D%SP2TOL = BREAKTOL
+         SP2D%VERBOSE = -1
+         SP2D%FLAVOR = "Alg1"
+       ENDIF
        SP2INIT = .TRUE.
     ENDIF
 
