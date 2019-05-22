@@ -33,12 +33,12 @@ CONTAINS
        KEYVECTOR_LOG,VALVECTOR_LOG,FILENAME,STARTSTOP)
     IMPLICIT NONE
     CHARACTER(1), ALLOCATABLE              ::  tempc(:)
-    CHARACTER(100), ALLOCATABLE            ::  vect(:,:)
+    CHARACTER(1000), ALLOCATABLE           ::  vect(:,:)
     CHARACTER(50)                          ::  keyvector_char(:), keyvector_int(:), keyvector_log(:), keyvector_re(:)
-    CHARACTER(1000)                         ::  valvector_char(:)
+    CHARACTER(1000)                        ::  valvector_char(:)
     CHARACTER(LEN=*)                       ::  FILENAME
     CHARACTER(LEN=*), INTENT(IN), OPTIONAL ::  STARTSTOP(2)
-    CHARACTER(LEN=100)                      ::  TEMPCFLEX
+    CHARACTER(LEN=100)                     ::  TEMPCFLEX
     INTEGER                                ::  i, io_control, ios, j
     INTEGER                                ::  k, l, lenc, nkey_char
     INTEGER                                ::  nkey_int, nkey_log, nkey_re, readmaxi
