@@ -64,9 +64,9 @@ CONTAINS
   !! The file is formated as follows:
   !!
   !! 3 #Number of freezed atoms
-  !! 10 1 0 0 #We are freezing the y and z coordinates of atom 10
-  !! 20 0 0 0  #We are freezing all the coordinates of atom 10
-  !! 40 1 1 0  #We are freezing the z coordinate of atom 10
+  !! 10 1 0 0 #We are freezing the x coordinate of atom 10
+  !! 20 1 1 1  #We are freezing all the coordinates of atom 10
+  !! 40 0 0 1  #We are freezing the z coordinate of atom 10
   !!
   !! \param FTOT Total forces. FTOT(1,3) gives the force on x direction for atom 3.
   !! \param VEL Velocities. VEL(1,3) gives the velocity on x direction for atom 3.
@@ -74,7 +74,7 @@ CONTAINS
   SUBROUTINE FREEZE_ATOMS(FTOT,VEL)
 
     INTEGER, SAVE :: NFREEZE
-    INTEGER, SAVE, ALLOCATABLE :: FREEZEID(:)
+    INTEGER, SAVE, ALLOCATABLE :: FREEZEID(:), FREEZEIDX(:), FREEZEIDY(:), FREEZEIDZ(:)
     INTEGER :: I
     REAL(DP), OPTIONAL, INTENT(INOUT) :: VEL(:,:)
     REAL(DP), INTENT(INOUT) :: FTOT(:,:)
@@ -84,25 +84,28 @@ CONTAINS
        READ(444,*)NFREEZE
        ALLOCATE(FREEZEID(NFREEZE))
        DO I = 1,NFREEZE
-          READ(444,*)FREEZEID(I), FREEZEIDX(I), FREEZEIDY(I), FREEZEIDZ(I) 
+          READ(444,*)FREEZEID(I), FREEZEIDX(I), FREEZEIDY(I), FREEZEIDZ(I)
+          FREEZEIDX(I) = 1 - FREEZEIDX(I)
+          FREEZEIDY(I) = 1 - FREEZEIDY(I)
+          FREEZEIDZ(I) = 1 - FREEZEIDZ(I)
        ENDDO
        CLOSE(444)
     ENDIF
 
     IF(PRESENT(VEL))THEN
        DO I = 1,NFREEZE
-          VEL(1,FREEZEID(I)) = FREEZEIDX(I)*VEL(1,FREEZEID(I))
-          FTOT(1,FREEZEID(I)) = FREEZEIDX(I)*FTOT(1,FREEZEID(I))
-          VEL(2,FREEZEID(I)) = FREEZEIDY(I)*VEL(2,FREEZEID(I))
-          FTOT(2,FREEZEID(I)) = FREEZEIDY(I)*FTOT(2,FREEZEID(I))
-          VEL(3,FREEZEID(I)) = FREEZEIDZ(I)*VEL(3,FREEZEIDZ(I))
-          FTOT(3,FREEZEID(I)) = FREEZEIDZ(I)*FTOT(3,FREEZEID(I))
+          VEL(1,FREEZEID(I)) = REAL(FREEZEIDX(I),DP)*VEL(1,FREEZEID(I))
+          FTOT(1,FREEZEID(I)) = REAL(FREEZEIDX(I),DP)*FTOT(1,FREEZEID(I))
+          VEL(2,FREEZEID(I)) = REAL(FREEZEIDY(I),DP)*VEL(2,FREEZEID(I))
+          FTOT(2,FREEZEID(I)) = REAL(FREEZEIDY(I),DP)*FTOT(2,FREEZEID(I))
+          VEL(3,FREEZEID(I)) = REAL(FREEZEIDZ(I),DP)*VEL(3,FREEZEIDZ(I))
+          FTOT(3,FREEZEID(I)) = REAL(FREEZEIDZ(I),DP)*FTOT(3,FREEZEID(I))
        ENDDO
     ELSE
        DO I = 1,NFREEZE
-          FTOT(1,FREEZEID(I)) = FREEZEIDX(I)*FTOT(1,FREEZEID(I))
-          FTOT(2,FREEZEID(I)) = FREEZEIDY(I)*FTOT(2,FREEZEID(I))
-          FTOT(3,FREEZEID(I)) = FREEZEIDZ(I)*FTOT(3,FREEZEID(I))
+          FTOT(1,FREEZEID(I)) = REAL(FREEZEIDX(I),DP)*FTOT(1,FREEZEID(I))
+          FTOT(2,FREEZEID(I)) = REAL(FREEZEIDY(I),DP)*FTOT(2,FREEZEID(I))
+          FTOT(3,FREEZEID(I)) = REAL(FREEZEIDZ(I),DP)*FTOT(3,FREEZEID(I))
        ENDDO
     ENDIF
 
