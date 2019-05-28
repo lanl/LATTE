@@ -64,10 +64,9 @@ CONTAINS
   !! The file is formated as follows:
   !!
   !! 3 #Number of freezed atoms
-  !! 10  #We are freezing all the coordinates of atom 10
-  !! 20  #We are freezing all the coordinates of atom 10
-  !! 40  #We are freezing all the coordinates of atom 10
-  !! \todo Generalize this to have constrains to different coordinates.
+  !! 10 1 0 0 #We are freezing the y and z coordinates of atom 10
+  !! 20 0 0 0  #We are freezing all the coordinates of atom 10
+  !! 40 1 1 0  #We are freezing the z coordinate of atom 10
   !!
   !! \param FTOT Total forces. FTOT(1,3) gives the force on x direction for atom 3.
   !! \param VEL Velocities. VEL(1,3) gives the velocity on x direction for atom 3.
@@ -85,19 +84,25 @@ CONTAINS
        READ(444,*)NFREEZE
        ALLOCATE(FREEZEID(NFREEZE))
        DO I = 1,NFREEZE
-          READ(444,*)FREEZEID(I)
+          READ(444,*)FREEZEID(I), FREEZEIDX(I), FREEZEIDY(I), FREEZEIDZ(I) 
        ENDDO
        CLOSE(444)
     ENDIF
 
     IF(PRESENT(VEL))THEN
        DO I = 1,NFREEZE
-          VEL(:,FREEZEID(I)) = 0.0d0
-          FTOT(:,FREEZEID(I)) = 0.0d0
+          VEL(1,FREEZEID(I)) = FREEZEIDX(I)*VEL(1,FREEZEID(I))
+          FTOT(1,FREEZEID(I)) = FREEZEIDX(I)*FTOT(1,FREEZEID(I))
+          VEL(2,FREEZEID(I)) = FREEZEIDY(I)*VEL(2,FREEZEID(I))
+          FTOT(2,FREEZEID(I)) = FREEZEIDY(I)*FTOT(2,FREEZEID(I))
+          VEL(3,FREEZEID(I)) = FREEZEIDZ(I)*VEL(3,FREEZEIDZ(I))
+          FTOT(3,FREEZEID(I)) = FREEZEIDZ(I)*FTOT(3,FREEZEID(I))
        ENDDO
     ELSE
        DO I = 1,NFREEZE
-          FTOT(:,FREEZEID(I)) = 0.0d0
+          FTOT(1,FREEZEID(I)) = FREEZEIDX(I)*FTOT(1,FREEZEID(I))
+          FTOT(2,FREEZEID(I)) = FREEZEIDY(I)*FTOT(2,FREEZEID(I))
+          FTOT(3,FREEZEID(I)) = FREEZEIDZ(I)*FTOT(3,FREEZEID(I))
        ENDDO
     ENDIF
 
