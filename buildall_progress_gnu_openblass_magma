@@ -3,11 +3,11 @@ mypath=`pwd`
 module load cmake cuda/10.1.168 gcc/7.4.0 openblas/0.3.6-omp
 
 cd ../bml
-./example_build_gnu_openblass_mgma.sh
+./example_build_gnu_openblass.sh
 cd build; make -j; make install
 cd $mypath
 cd ../qmd-progress
-./example_build_gnu_openblassi_mgma.sh 
+./example_build_gnu_openblass_mgma.sh 
 cd build; make -j; make install
 cd $mypath; cd ../LATTE
 make clean 
