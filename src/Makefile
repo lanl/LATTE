@@ -103,10 +103,16 @@ endif
 endif
 
 
-ifeq ($(MAKELIB), ON)
+ifeq ($(MAKELIB), ON) 
+ifeq ($(GPUOPT), ON)
+		$(AR) ../liblatte.a latte_lib.o $(XMYMODULES) $(XMYSUBS) 
+		$(RANLIB) ../liblatte.a  
+		$(FC) $(FFLAGS) -c latte_c_bind.F90  $(GPU_LINKFLAG) $(GPU_LIB)
+else
 		$(AR) ../liblatte.a latte_lib.o $(XMYMODULES) $(XMYSUBS)
 		$(RANLIB) ../liblatte.a
 		$(FC) $(FFLAGS) -c latte_c_bind.F90
+endif
 endif
 
 
