@@ -32,6 +32,7 @@ SUBROUTINE XBO(ITER)
   USE XBOARRAY
   USE SETUPARRAY
   USE MYPRECISION
+  USE COULOMBARRAY  !! ANDERS_CHANGE
 
   IMPLICIT NONE
 
@@ -173,8 +174,17 @@ SUBROUTINE XBO(ITER)
 
            DO I = 1, NATS
 
+	     IF(DOKERNEL)THEN  
+
+              DELTAQ(I) =  TWO*PNK(1,I) - PNK(2,I) + &           !! ANDERS_CHANGE ANDERS CHANGE
+                   KAPPA_XBO*dn2dt2(I)                           !! ANDERS_CHANGE RANK-N KERNEL
+             ELSE
+
               DELTAQ(I) =  TWO*PNK(1,I) - PNK(2,I) + &
                    KAPPA_SCALE*KAPPA_XBO*(DELTAQ(I) - PNK(1,I))
+
+	     ENDIF 
+
 
               DO J = 1, XBODISORDER+1
 

@@ -14,7 +14,7 @@ AR = /usr/bin/ar cq
 RANLIB = /usr/bin/ranlib
 
 # Use PROGRESS and BML libraries
-PROGRESS = OFF
+PROGRESS = ON
 PROGRESS_PATH= $(HOME)/qmd-progress/install/lib64
 BML_PATH= $(HOME)/bml/install/lib64
 MAGMA_PATH = $(HOME)/magma-2.5.1
@@ -22,7 +22,7 @@ MAGMA_PATH = $(HOME)/magma-2.5.1
 
 # Use METIS library for graph partitioning
 METIS = OFF
-METIS_PATH= $(HOME)/metis/metis-5.1.0/install
+METIS_PATH= $(MEMBERWORK)/metis/metis-5.1.0/install
 
 # GPU available - OFF or ON
 GPUOPT = OFF

@@ -30,7 +30,7 @@ SUBROUTINE RHOZERO
 
   IMPLICIT NONE
 
-  INTEGER :: I, K, SUBI, INDEX
+  INTEGER :: I, J, K, SUBI, INDEX
   REAL(LATTEPREC) :: STOT, PTOT, NUMPERORB
   REAL(LATTEPREC) :: SUP, SDOWN, PUP, PDOWN, DUP, DDOWN, FUP, FDOWN
   REAL(LATTEPREC) :: NUMPERS, NUMPERP, NUMPERD, NUMPERF
@@ -465,6 +465,8 @@ SUBROUTINE RHOZERO
 
               NUMPERS = MIN(TWO, ATOCC(ELEMPOINTER(I)))
 
+              NUMPERF = MIN(TWO, (ATOCC(ELEMPOINTER(I)) - TWO)/SEVEN)
+
               IF (NUMPERF .LT. ZERO) NUMPERF = ZERO
 
               NUMPERD = MIN(TWO, (ATOCC(ELEMPOINTER(I)) - 16.0D0)/FIVE)
@@ -720,7 +722,6 @@ SUBROUTINE RHOZERO
         END SELECT
 
      ENDDO
-
 
      IF (KON .EQ. 0) THEN ! Real-space
 
@@ -1228,72 +1229,127 @@ SUBROUTINE RHOZERO
 
         CASE("spd")
 
+           IF (HES(ELEMPOINTER(I)) .LT. HED(ELEMPOINTER(I))) THEN
            ! s, then d, then p...
 
-           IF (ATOCC(ELEMPOINTER(I)) .LE. SPINMAXS) THEN
+              IF (ATOCC(ELEMPOINTER(I)) .LE. SPINMAXS) THEN
+                 
+                 SUP = ATOCC(ELEMPOINTER(I))
+                 SDOWN = ZERO
+                 DUP = ZERO
+                 DDOWN = ZERO
+                 PUP = ZERO
+                 PDOWN = ZERO
+                 
+              ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. SPINMAXS .AND. &
+                   ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXS) THEN
+                 
+                 SUP = ONE
+                 SDOWN = ATOCC(ELEMPOINTER(I)) - SPINMAXS
+                 DUP = ZERO
+                 DDOWN = ZERO
+                 PUP = ZERO
+                 PDOWN = ZERO
+                 
+              ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXS .AND. &
+                   ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXS + SPINMAXD) THEN
+                 
 
-              SUP = ATOCC(ELEMPOINTER(I))
-              SDOWN = ZERO
-              DUP = ZERO
-              DDOWN = ZERO
-              PUP = ZERO
-              PDOWN = ZERO
+                 SUP = ONE
+                 SDOWN = ONE
+                 DUP = (ATOCC(ELEMPOINTER(I)) - TWO*SPINMAXS)/SPINMAXD
+                 DDOWN = ZERO
+                 PUP = ZERO
+                 PDOWN = ZERO
+                 
+              ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXS + SPINMAXD .AND. &
+                   ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXS + TWO*SPINMAXD) THEN
+                 
+                 SUP = ONE
+                 SDOWN = ONE
+                 DUP = ONE
+                 DDOWN = (ATOCC(ELEMPOINTER(I)) - &
+                      (TWO*SPINMAXS + SPINMAXD))/SPINMAXD
+                 PUP = ZERO
+                 PDOWN = ZERO
+                 
+              ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXS + TWO*SPINMAXD &
+                   .AND. ATOCC(ELEMPOINTER(I)) .LE. &
+                   TWO*SPINMAXS + TWO*SPINMAXD + SPINMAXP ) THEN
+                 
+                 SUP = ONE
+                 SDOWN = ONE
+                 DUP = ONE
+                 DDOWN = ONE
+                 PUP = (ATOCC(ELEMPOINTER(I)) - &
+                      (TWO*SPINMAXS + TWO*SPINMAXD))/SPINMAXP
+                 PDOWN = ZERO
+                 
+              ELSE
+                 
+                 SUP = ONE
+                 SDOWN = ONE
+                 DUP = ONE
+                 DDOWN = ONE
+                 PUP = ONE
+                 PDOWN = (ATOCC(ELEMPOINTER(I)) - &
+                      (TWO*SPINMAXS + TWO*SPINMAXD + SPINMAXP))/SPINMAXP
+                 
+              ENDIF
 
-           ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. SPINMAXS .AND. &
-                ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXS) THEN
+           ELSE ! ED < ES
 
-              SUP = ONE
-              SDOWN = ATOCC(ELEMPOINTER(I)) - SPINMAXS
-              DUP = ZERO
-              DDOWN = ZERO
-              PUP = ZERO
-              PDOWN = ZERO
-
-           ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXS .AND. &
-                ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXS + SPINMAXD) THEN
-
-
-              SUP = ONE
-              SDOWN = ONE
-              DUP = (ATOCC(ELEMPOINTER(I)) - TWO*SPINMAXS)/SPINMAXD
-              DDOWN = ZERO
-              PUP = ZERO
-              PDOWN = ZERO
-
-           ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXS + SPINMAXD .AND. &
-                ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXS + TWO*SPINMAXD) THEN
-
-              SUP = ONE
-              SDOWN = ONE
-              DUP = ONE
-              DDOWN = (ATOCC(ELEMPOINTER(I)) - &
-                   (TWO*SPINMAXS + SPINMAXD))/SPINMAXD
-              PUP = ZERO
-              PDOWN = ZERO
-
-           ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXS + TWO*SPINMAXD &
-                .AND. ATOCC(ELEMPOINTER(I)) .LE. &
-                TWO*SPINMAXS + TWO*SPINMAXD + SPINMAXP ) THEN
-
-              SUP = ONE
-              SDOWN = ONE
-              DUP = ONE
-              DDOWN = ONE
-              PUP = (ATOCC(ELEMPOINTER(I)) - &
-                   (TWO*SPINMAXS + TWO*SPINMAXD))/SPINMAXP
-              PDOWN = ZERO
-
-           ELSE
-
-              SUP = ONE
-              SDOWN = ONE
-              DUP = ONE
-              DDOWN = ONE
-              PUP = ONE
-              PDOWN = (ATOCC(ELEMPOINTER(I)) - &
-                   (TWO*SPINMAXS + TWO*SPINMAXD + SPINMAXP))/SPINMAXP
+              IF (ATOCC(ELEMPOINTER(I)) .LE. SPINMAXD) THEN
+                 SUP = ZERO
+                 SDOWN = ZERO
+                 DUP = ATOCC(ELEMPOINTER(I))/SPINMAXD
+                 DDOWN = ZERO
+                 PUP = ZERO
+                 PDOWN = ZERO
+              ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. SPINMAXD .AND. &
+                   ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXD) THEN
+                 SUP = ZERO
+                 SDOWN = ZERO
+                 DUP = ONE
+                 DDOWN = (ATOCC(ELEMPOINTER(I)) - SPINMAXD)/SPINMAXD
+                 PUP = ZERO
+                 PDOWN = ZERO
+              ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXD .AND. &
+                   ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXD + SPINMAXS) THEN
+                 SUP = (ATOCC(ELEMPOINTER(I)) - TWO*SPINMAXD)/SPINMAXS
+                 SDOWN = ZERO
+                 DUP = ONE
+                 DDOWN = ONE
+                 PUP = ZERO
+                 PDOWN = ZERO
+              ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXD + SPINMAXS .AND. &
+                   ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXD + TWO*SPINMAXS) THEN
+                 SUP = ONE
+                 SDOWN = (ATOCC(ELEMPOINTER(I)) - TWO*SPINMAXD - SPINMAXS)/SPINMAXS
+                 DUP = ONE
+                 DDOWN = ONE
+                 PUP = ZERO
+                 PDOWN = ZERO
+              ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXD + TWO+SPINMAXS .AND. &
+                   ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXD + TWO*SPINMAXS + SPINMAXP) THEN
+                 SUP = ONE
+                 SDOWN = ONE
+                 DUP = ONE
+                 DDOWN = ONE
+                 PUP = (ATOCC(ELEMPOINTER(I)) - TWO*SPINMAXD + TWO+SPINMAXS)/SPINMAXP
+                 PDOWN = ZERO
+              ELSEIF (ATOCC(ELEMPOINTER(I)) .GT. TWO*SPINMAXD + TWO*SPINMAXS + SPINMAXP .AND. &
+                   ATOCC(ELEMPOINTER(I)) .LE. TWO*SPINMAXD + TWO*SPINMAXS + TWO*SPINMAXP) THEN
+                 SUP = ONE
+                 SDOWN = ONE
+                 DUP = ONE
+                 DDOWN = ONE
+                 PUP = ONE
+                 PDOWN = (ATOCC(ELEMPOINTER(I)) - TWO*SPINMAXD + TWO+SPINMAXS + SPINMAXP)/SPINMAXP
+              ENDIF
 
            ENDIF
+                 
 
            RHOUPZERO(INDEX + 1) = SUP
            RHOUPZERO(INDEX + 2) = PUP
@@ -1760,22 +1816,49 @@ SUBROUTINE RHOZERO
         ! Let's initialize our self-consistent spin densities as those for
         ! free atoms
         !
+        IF (KON .EQ. 0) THEN
 
-        DO I = 1, HDIM
+           DO I = 1, HDIM
+              
+              RHOUP(I,I) = RHOUPZERO(I)
+              RHODOWN(I,I) = RHODOWNZERO(I)
+              
+           ENDDO
 
-           RHOUP(I,I) = RHOUPZERO(I)
-           RHODOWN(I,I) = RHODOWNZERO(I)
+        ELSE
 
-        ENDDO
+           DO I = 1, NKTOT
+              DO J = 1, HDIM
+                 KRHOUP(J,J,I) = RHOUPZERO(J)
+                 KRHODOWN(J,J,I) = RHODOWNZERO(J)
+              ENDDO
+           ENDDO
+
+        ENDIF
+
+              
 
      ELSEIF (RESTART .EQ. 1) THEN
 
-        DO I = 1, HDIM
+        IF (KON .EQ. 0) THEN
 
-           RHOUP(I,I) = TMPRHOUP(I)
-           RHODOWN(I,I) = TMPRHODOWN(I)
+           DO I = 1, HDIM
+              
+              RHOUP(I,I) = TMPRHOUP(I)
+              RHODOWN(I,I) = TMPRHODOWN(I)
+              
+           ENDDO
 
-        ENDDO
+        ELSE
+
+           DO I = 1, NKTOT
+              DO J = 1, HDIM
+                 KRHOUP(J,J,I) = TMPRHOUP(J)
+                 KRHODOWN(J,J,I) = TMPRHODOWN(J)
+              ENDDO
+           ENDDO
+           
+        ENDIF
 
         DEALLOCATE(TMPRHOUP, TMPRHODOWN)
 

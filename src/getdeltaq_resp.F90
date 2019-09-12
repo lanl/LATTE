@@ -19,7 +19,7 @@
 ! Public License for more details.                                         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SUBROUTINE GETDELTAQ
+SUBROUTINE GETDELTAQ_RESP
 
   USE CONSTANTS_MOD
   USE SETUPARRAY
@@ -197,7 +197,7 @@ SUBROUTINE GETDELTAQ
 
      END SELECT
 
-     !     MYCHARGE = ZERO
+     MYCHARGE = ZERO
      DO J = 1, NUMORB
 
         INDEX = INDEX + 1
@@ -205,12 +205,11 @@ SUBROUTINE GETDELTAQ
 
      ENDDO
 
-     DELTAQ(I) = MYCHARGE(I) - ATOCC(ELEMPOINTER(I))
+     DELTAQ(I) = MYCHARGE(I)
 
   ENDDO
   !  deallocate(tmpq)
 
-  write(*,*)"Total charge",SUM(DELTAQ(:))
   RETURN
 
-END SUBROUTINE GETDELTAQ
+END SUBROUTINE GETDELTAQ_RESP
