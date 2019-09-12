@@ -166,6 +166,8 @@ SUBROUTINE BOEVECS
         CALL SGER(HDIM, HDIM, FDIRAC, EVECS(:,I), 1, EVECS(:,I), 1, BO, HDIM)
 #endif
 
+     FERMIOCC(I) = FDIRAC  !! ANDERS_CHANGE SAVE FOR RESPONSE CALCULATIONS
+
      ENDDO
 
   ELSE ! This bit is for zero electronic temperature

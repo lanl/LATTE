@@ -123,7 +123,7 @@ CONTAINS
     USE FERMICOMMON
 
     IMPLICIT NONE
-    INTEGER, PARAMETER :: NKEY_CHAR = 8, NKEY_INT = 53, NKEY_RE = 21, NKEY_LOG = 2
+    INTEGER, PARAMETER :: NKEY_CHAR = 8, NKEY_INT = 53, NKEY_RE = 21, NKEY_LOG = 3
     CHARACTER(LEN=*) :: FILENAME
 
     !Library of keywords with the respective defaults.
@@ -162,9 +162,9 @@ CONTAINS
          1.0e-7,1000.0,0.2,1000.0,0.01,1.0/)
 
     CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_LOG(NKEY_LOG) = [CHARACTER(LEN=100) :: &
-         'LIBINIT=','STOPATMAXSCF=']
+         'LIBINIT=','STOPATMAXSCF=','DOKERNEL=']
     LOGICAL :: VALVECTOR_LOG(NKEY_LOG) = (/&
-         .FALSE.,.FALSE./)
+         .FALSE.,.FALSE.,.FALSE./)
 
     !Start and stop characters
     CHARACTER(LEN=50), PARAMETER :: STARTSTOP(2) = [CHARACTER(LEN=50) :: &
@@ -512,6 +512,9 @@ CONTAINS
 
     ! Output file 
     OUTFILE = VALVECTOR_CHAR(8)
+
+    !Do Kernel
+    DOKERNEL = VALVECTOR_LOG(3)
 
   END SUBROUTINE PARSE_CONTROL
 

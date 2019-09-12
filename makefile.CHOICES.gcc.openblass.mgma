@@ -15,9 +15,9 @@ RANLIB = /usr/bin/ranlib
 
 # Use PROGRESS and BML libraries
 PROGRESS = ON
-PROGRESS_PATH= $(MEMBERWORK)/csc304/qmd-progress/install/lib64
-BML_PATH= $(MEMBERWORK)/csc304/bml/install/lib64
-MAGMA_PATH = $(MEMBERWORK)/csc304/magma-2.5.0/
+PROGRESS_PATH= $(HOME)/qmd-progress/install/lib64
+BML_PATH= $(HOME)/bml/install/lib64
+MAGMA_PATH = $(HOME)/magma-2.5.1
 
 
 # Use METIS library for graph partitioning
@@ -40,7 +40,7 @@ MPIOPT = OFF
 #FC = xlf90_r
 #FC = xlf
 #FC = mpif90
-FC = gfortran
+FC = gfortran -fbacktrace 
 FCL = $(FC)
 
 FFLAGS =  -ffree-line-length-none -fopenmp -lpthread -I${OLCF_OPENBLAS_ROOT}/include 
@@ -48,7 +48,7 @@ FFLAGS =  -ffree-line-length-none -fopenmp -lpthread -I${OLCF_OPENBLAS_ROOT}/inc
 LINKFLAG = -fopenmp
 
 #BLAS/LAPACK libraries:
-LIB = -fopenmp -L${BML_LIB}/lib64/ -lbml_fortran -lbml -fopenmp -fopenmp -lpthread -L${OLCF_OPENBLAS_ROOT}/lib -lopenblas
+LIB = -fopenmp -lpthread -L${OLCF_OPENBLAS_ROOT}/lib -lopenblas
 LIB += -L${OLCF_CUDA_ROOT}/lib64/ -lcublas -lcudart
 LIB += -L${MAGMA_PATH}/lib -lmagma
 
