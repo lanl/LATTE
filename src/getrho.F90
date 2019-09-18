@@ -47,10 +47,10 @@ MLSI = TIME_MLS()
   IF (CONTROL .EQ. 1) THEN
 #ifdef PROGRESSON
     IF (SPINON .EQ. 0) THEN
-      !CALL BOEVECSPRG()      
-      CALL DIAGMYH()
-      CALL BOEVECS()
-      WRITE(*,*)"WARNING: Progress DM construction was dissabled"
+      CALL BOEVECSPRG()      
+      !CALL DIAGMYH()
+      !CALL BOEVECS()
+      !WRITE(*,*)"WARNING: Progress DM construction was dissabled"
     ELSE
       CALL DIAGMYHPRG()
       CALL SPINRHOEVECSPRG()
