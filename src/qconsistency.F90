@@ -274,7 +274,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 #ifdef PROGRESSON
            IF(MX%MIXERON)THEN
               CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
-              WRITE(*,*)"ALLLL"
            ELSE
               DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
            ENDIF
