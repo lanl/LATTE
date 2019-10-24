@@ -799,7 +799,7 @@ CONTAINS
        ENDIF
 #endif
 
-       IF(VERBOSE >= 1  .AND. CONTROL == 1)THEN
+       IF(VERBOSE >= 1  .AND. CONTROL == 1 .AND. KON == 0)THEN
           IF(SPINON == 0) THEN
              HOMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM)))
              LUMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1)
