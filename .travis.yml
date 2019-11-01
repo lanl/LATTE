@@ -29,7 +29,7 @@ before_install:
   - cd; cd lammps/lib/latte; cp Makefile.lammps.gfortran Makefile.lammps
   - cd; cd lammps/lib/latte; echo "latte_SYSLIB  += -fprofile-arcs -ftest-coverage -O0" >> Makefile.lammps  
   - cd; cd lammps/src/; if [[ ${LATTE_CMAKE} != yes ]]; then make yes-latte; make yes-molecule; fi
-  - cd; cd lammps/src/; if [[ ${LATTE_CMAKE} != yes ]]; then sed -i "s/# -DLAMMPS_CXX98/ -DLAMMPS_CXX98/g"; fi
+  - cd; cd lammps/src/; if [[ ${LATTE_CMAKE} != yes ]]; then sed -i "s/# -DLAMMPS_CXX98/ -DLAMMPS_CXX98/g" MAKE/Makefile.serial; fi
 
 before_script:
   - cd; cd $LATTEPATH
