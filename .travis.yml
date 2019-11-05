@@ -29,7 +29,7 @@ before_install:
   - cd; cd lammps/lib/latte; cp Makefile.lammps.gfortran Makefile.lammps
   - cd; cd lammps/lib/latte; echo "latte_SYSLIB  += -fprofile-arcs -ftest-coverage -O0" >> Makefile.lammps  
   - cd; cd lammps/src/; if [[ ${LATTE_CMAKE} != yes ]]; then make yes-latte; make yes-molecule; fi
-  - cd; cd lammps/src/; if [[ ${LATTE_CMAKE} != yes ]]; then sed -i "s/# -DLAMMPS_CXX98/ -DLAMMPS_CXX98/g" MAKE/Makefile.serial; fi
+  - cd; cd lammps/src/; if [[ ${LATTE_CMAKE} != yes ]]; then sed -i "s/-g -O3/-g -O3 -std=c++11/g" MAKE/Makefile.serial; fi
 
 before_script:
   - cd; cd $LATTEPATH
@@ -50,7 +50,7 @@ script:
      else
        mkdir build && cd build && cmake ../cmake -DCMAKE_INSTALL_PREFIX=$HOME/latte/install -DPROGRESS=${CMAKE_WITH_PROGRESS} -DOPENMP=${CMAKE_WITH_PROGRESS} -DCMAKE_PREFIX_PATH="$HOME/bml/install;$HOME/qmd-progress/install" && make && make install && 
        if [[ ${LAMMPS_CMAKE} ]]; then
-         cd $HOME/lammps && mkdir build && cd build && cmake ../cmake -DPKG_MOLECULE=ON -DPKG_LATTE=ON -DCMAKE_PREFIX_PATH=$HOME/latte/install && sed -i "s/-DLAMMPS_SMALLBIG/-DLAMMPS_SMALLBIG -DLAMMPS_CXX98/g" CMakeFiles/lmp.dir/flags.make && make;
+         cd $HOME/lammps && mkdir build && cd build && cmake ../cmake -DPKG_MOLECULE=ON -DPKG_LATTE=ON -DCMAKE_PREFIX_PATH=$HOME/latte/install -DCMAKE_CXX_STANDARD=11 && make;
        fi
      fi
 
