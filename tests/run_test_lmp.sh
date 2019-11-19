@@ -28,12 +28,13 @@ for name in 0scf 2scf fullscf 0scf.wrtrestart 0scf.rdrestart ; do
   echo -e "\nTesting for "$name" \n"
 
   time $RUN < $INLAMMPSFILE >  out
-  grep Energy out | sed -e s/"Total Energy ="/""/g >  energy.out
+  grep -A1000 -e "Step Temp E_pair E_mol TotEng Press" out > out1
+  grep Energy out1 | sed -e s/"Total Energy ="/""/g >  energy.out
   echo ""
 
-  grep Energy out | sed -e s/"PAR"/$STRR/g  >  input_tmp.in
+  grep Energy out1 | sed -e s/"PAR"/$STRR/g  >  input_tmp.in
   python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.000001
-
+  echo "done"
 done
 
 # Tests for geometry optimizations 
@@ -61,6 +62,6 @@ for name in opt opt.boxrel ; do
 done
 
 cp latte.tmp latte.in
-rm *.in *.out out *.lmp in.* log.* restart.* latte.tmp
+rm *.in *.out out out1 *.lmp in.* log.* restart.* latte.tmp
 
 echo -e "\nEnd of run and test"
