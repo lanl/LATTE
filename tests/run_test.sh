@@ -185,7 +185,7 @@ for name in fittingoutput.dat ; do
         
         for(i=1;i<=NF;i++){
           # Here is possible to include a filter to compare only numbers in case the files are more complex
-          if( sqrt((arr[i]-$i)**2)>'$tol' ){
+	  if( sqrt((arr[i]-$i)*(arr[i]-$i))>'$tol' ){
             print 1
             loc=1
             exit
