@@ -54,6 +54,11 @@ SUBROUTINE BOEVECSPRG
 
   !! Convert Hamiltonian to bml format
   !! H should be in orthogonal form, ORTHOH
+
+  IF (BASISTYPE == "ORTHO") THEN
+      ORTHOH = H 
+  ENDIF 
+
   CALL BML_ZERO_MATRIX(BML_MATRIX_DENSE, BML_ELEMENT_REAL, &
        LATTEPREC, HDIM, HDIM, ORTHOH_BML)
   CALL BML_ZERO_MATRIX(BML_MATRIX_DENSE, BML_ELEMENT_REAL, &
@@ -94,6 +99,35 @@ SUBROUTINE BOEVECSPRG
   ! BO = TWO * BO
 
   OCC =  BNDFIL*FLOAT(HDIM)
+
+
+     S = ZERO
+
+     IF (MDON .EQ. 0 .OR. &
+          (MDON .EQ. 1 .AND. MOD(ENTROPYITER, WRTFREQ) .EQ. 0 )) THEN
+
+        DO I = 1, HDIM
+
+           FDIRACARG = (EVALS(I) - CHEMPOT)/KBT
+
+           FDIRACARG = MAX(FDIRACARG, -EXPTOL)
+           FDIRACARG = MIN(FDIRACARG, EXPTOL)
+
+           FDIRAC = ONE/(ONE + EXP(FDIRACARG))
+
+           OCCLOGOCC_ELECTRONS = FDIRAC * LOG(FDIRAC)
+
+           OCCLOGOCC_HOLES = (ONE - FDIRAC) * LOG(ONE - FDIRAC)
+
+           S = S + TWO*(OCCLOGOCC_ELECTRONS + OCCLOGOCC_HOLES)
+
+        ENDDO
+
+      ENDIF
+
+      ENTE = -KBT*S
+
+        ! Compute the gap only when we have to...
 
   IF (MOD(INT(TOTNE),2) .EQ. 0) THEN
      EGAP = EVALS(INT(OCC) + 1) - EVALS(INT(OCC))

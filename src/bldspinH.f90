@@ -318,7 +318,7 @@ SUBROUTINE BLDSPINH
      
         HUP = H
         HDOWN = H
-        
+
         DO I = 1, HDIM
            HUP(I,I) = HUP(I,I) + H2VECT(I)
            HDOWN(I,I) = HDOWN(I,I) - H2VECT(I)
@@ -346,11 +346,11 @@ SUBROUTINE BLDSPINH
 
            ENDDO
         ENDDO
-        
+
         ! H_up = H + SH2 ; H_down = H = SH2
-        
+
         HUP = H + SH2
-        
+
         HDOWN = H - SH2
 
      ELSE ! Now we're doing kspace
