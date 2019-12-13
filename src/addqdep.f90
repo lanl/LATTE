@@ -314,6 +314,7 @@ SUBROUTINE ADDQDEP
      ! Orthogonal basis only at the moment
 
      IF ( BASISTYPE .EQ. "ORTHO") THEN
+
         DO K = 1, NKTOT
 
            INDEX = 0

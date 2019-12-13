@@ -22,7 +22,7 @@
 FUNCTION BM(M, ALPHA)
 
   ! Build Bm function defined in eqn. (6) of PRB 72 165107
-  
+
   USE WIGNERARRAY
   USE MYPRECISION
 

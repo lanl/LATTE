@@ -74,7 +74,7 @@ SUBROUTINE TOTENG
         TRRHOH = REAL(ZTRRHOH)/REAL(NKTOT)
 
      ENDIF
-     
+
   ELSE
 
      !
@@ -93,17 +93,16 @@ SUBROUTINE TOTENG
 
         DO I = 1, HDIM
            DO J = 1, HDIM
-              
+
               TRRHOH = TRRHOH + (RHOUP(J,I) + RHODOWN(J,I))*H(J,I)
-              
+
            ENDDO
 
            TRRHOH = TRRHOH - (RHOUPZERO(I) + RHODOWNZERO(I))*H(I,I)
-           
+
         ENDDO
 
      ELSE
-
         DO K = 1, NKTOT
            DO I = 1, HDIM
               DO J = 1, HDIM
