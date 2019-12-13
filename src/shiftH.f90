@@ -143,7 +143,7 @@ SUBROUTINE SHIFTH(CHI)
            DO J = 1, HDIM
 
               H(J,I) = H0(J,I) + SMAT(J,I)*(HJJ(I) + HJJ(J))/TWO
-              
+
            ENDDO
         ENDDO
 

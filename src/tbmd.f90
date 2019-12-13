@@ -32,7 +32,7 @@ SUBROUTINE TBMD
   USE NONOARRAY
   USE RELAXCOMMON
   USE MYPRECISION
-  USE LATTEPARSER_LATTE_MOD
+  USE LATTEPARSER
 
   IMPLICIT NONE
 
@@ -50,7 +50,7 @@ SUBROUTINE TBMD
   ! Read MDcontroller to determine what kind of MD simulation to do
   !
   IF (LATTEINEXISTS) THEN
-     CALL PARSE_MD("latte.in")
+     CALL PARSE_MD(LATTEINNAME)
   ELSE
      CALL READMDCONTROLLER
   ENDIF
@@ -86,7 +86,8 @@ SUBROUTINE TBMD
 
   IF (RESTART .EQ. 0) THEN
 
-     ALLOCATE (V(3,NATS))
+     !ALLOCATE (V(3,NATS))
+     IF(.NOT. ALLOCATED(V)) ALLOCATE (V(3,NATS))
 
      !
      ! Initialize velocities if TOINITTEMP = 1
@@ -411,13 +412,13 @@ SUBROUTINE TBMD
 
               IF (NVTON .NE. 4) THEN
 
-                 WRITE(6,99) THETIME, TOTE, TEMPERATURE, PRESSURE, EGAP, &
+                 WRITE(6,99)"Data", THETIME, TOTE, TEMPERATURE, PRESSURE, EGAP, &
                       CHEMPOT !, TRRHOH, EREP, KEE, ECOUL, REAL(NUMSCF)
 
               ELSE
 
                  ! Special case for Nose Hoover
-                 WRITE(6,99) THETIME, TOTE, TOTE+CONSMOT, TEMPERATURE, PRESSURE, &
+                 WRITE(6,99)"Data", THETIME, TOTE, TOTE+CONSMOT, TEMPERATURE, PRESSURE, &
                       EGAP, CHEMPOT !, STRTEN(1), STRTEN(2), STRTEN(3), STRTEN(4), &
                  !STRTEN(5), STRTEN(6)
 
@@ -427,14 +428,14 @@ SUBROUTINE TBMD
 
            IF (NVTON .EQ. 0 .AND. NPTON .EQ. 0 .AND. GETHUG .EQ. 0) THEN
 
-              WRITE(6,99) THETIME, TOTE, TEMPERATURE, PRESSURE, EGAP, &
+              WRITE(6,99)"Data", THETIME, TOTE, TEMPERATURE, PRESSURE, EGAP, &
                    CHEMPOT
 
            ENDIF
 
            IF (NPTON .NE. 0 .AND. NVTON .EQ. 0 .AND. GETHUG .EQ. 0) THEN
 
-              WRITE(6,99) THETIME, TOTE, TEMPERATURE, PRESSURE, &
+              WRITE(6,99)"Data", THETIME, TOTE, TEMPERATURE, PRESSURE, &
                    EGAP, MASSDEN, BOX(1,1), BOX(2,2), BOX(3,3), &
                    SYSVOL
 
@@ -442,7 +443,7 @@ SUBROUTINE TBMD
 
            IF (GETHUG .EQ. 1 .AND. NVTON .EQ. 0 .AND. NPTON .EQ. 0) THEN
 
-              WRITE(6,99) THETIME, TOTE, TEMPERATURE, PRESSURE, &
+              WRITE(6,99)"Data", THETIME, TOTE, TEMPERATURE, PRESSURE, &
                    EGAP, MASSDEN, HG, TTARGET, BOX(1,1), BOX(2,2), BOX(3,3), &
                    SYSVOL
 
@@ -457,7 +458,7 @@ SUBROUTINE TBMD
         ENDIF
 
 
-99      FORMAT(20G18.9)
+99      FORMAT(A4,20G18.9)
 
 16      FORMAT(F12.5, F20.8, 1X, F9.1, 1X, F12.3, 1X, G18.9, 1X, G18.9)
 
