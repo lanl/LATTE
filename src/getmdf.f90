@@ -27,25 +27,57 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   USE XBOARRAY
   USE MYPRECISION
   USE COULOMBARRAY
+  USE TIMER_MOD
+  USE MIXER_MOD
 
   IMPLICIT NONE
 
-  INTEGER :: SWITCH, CURRITER, I
+  INTEGER :: SWITCH, CURRITER, I, MLSI
   REAL(LATTEPREC) :: ZEROSCFMOD
   IF (EXISTERROR) RETURN
+
+
+  !!! ANDERS_CHANGE START
+  IF(DOKERNEL .EQV. .TRUE.)THEN 
+     NRANK = MIN(NORECS,NATS)
+     !!CALL KERNELPROPAGATION(CURRITER,NRANK)
+     IF ((CURRITER.GE.9).AND.(CURRITER.LT.12)) THEN
+       WRITE(*,*) '# FULL K CURRITER = ', CURRITER
+       CALL FULLKERNELPROPAGATION(CURRITER)
+     ELSEIF (MOD(CURRITER,200).EQ.1) THEN
+       WRITE(*,*) '# FULL K CURRITER = ', CURRITER
+       CALL FULLKERNELPROPAGATION(CURRITER)
+     ELSE
+       WRITE(*,*) '# RANK_N K CURRITER = ', CURRITER
+       CALL PRECONDKERNELPROPAGATION(CURRITER,NRANK)
+     ENDIF
+  ENDIF 
+
+  !!! ANDERS_CHANGE END
+
   !
   ! The atoms have moved, so we have to build a new H (and overlap matrix)
-  !
+  
+  MLSI = TIME_MLS()
+  
   IF (KON .EQ. 0) THEN
-     
-     CALL BLDNEWHS
+     IF(VERBOSE >= 1)WRITE(*,*)"KON = 0 ..."
+     IF (SPONLY .EQ. 0) THEN
+        CALL BLDNEWHS_SP
+     ELSE
+        CALL BLDNEWHS
+     ENDIF
 
   ELSE
-
+     IF(VERBOSE >= 1)WRITE(*,*)"KON = 1 ..."
      CALL KBLDNEWH
 
   ENDIF
+  FLUSH(6)
 
+  WRITE(*,*) "Time get H",  TIME_MLS() - MLSI
+
+  MLSI = TIME_MLS()
 
   ! Broken?
 
@@ -102,6 +134,8 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
      FLUSH(6)
   ENDIF
 
+  WRITE(*,*) "Time for PROPCHEMPOT XBO GETDELTASPIN",  TIME_MLS() - MLSI
+  MLSI = TIME_MLS()
   !
   ! If SWITCH = 0, then we don't have a set of partials charges
   ! yet and we'll have to get them from the charge-independent
@@ -113,11 +147,14 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   !
 
   IF (ELECTRO .EQ. 0) THEN
+     IF(VERBOSE >= 1)WRITE(*,*)"Doing QNEUTRAL ..."
      CALL QNEUTRAL(SWITCH, CURRITER) ! Local charge neutrality
   ELSE
+     IF(VERBOSE >= 1)WRITE(*,*)"Doing QCONSISTENCY ..."
      CALL QCONSISTENCY(SWITCH, CURRITER) ! Self consistent charge transfer
   ENDIF
 
+  WRITE(*,*) "Time for QNEUTRAL QCONSISTENCY ",  TIME_MLS() - MLSI
   ! Run to self-consistency QITER = 0 -> only H(P) + D calculated ANDERS
 
   !
@@ -143,6 +180,8 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
   ENDIF
 
+
+  MLSI = TIME_MLS()
   ! Setting up the XBO arrays
 
   FLUSH(6)
@@ -153,7 +192,12 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   ! When we're done with qconsistency we have the non-orthogonal density
   ! matrix so we don't have to de-orthogonalize again here
 
+  IF(VERBOSE >= 1)WRITE(*,*)"Getting forces ..."
   CALL GETFORCE
+
+  WRITE(*,*) "Time for GETFORCE  ",  TIME_MLS() - MLSI
+
+  MLSI = TIME_MLS()
 
   IF (ELECTRO .EQ. 1 .AND. QITER .EQ. 0) THEN
 
@@ -170,7 +214,8 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
         FCOUL(1,I) = FCOUL(1,I)*ZEROSCFMOD
         FCOUL(2,I) = FCOUL(2,I)*ZEROSCFMOD
         FCOUL(3,I) = FCOUL(3,I)*ZEROSCFMOD
-        ECOUL = ECOUL + (TWO*DELTAQ(I) - OLDDELTAQS(I)) * &
+        !ECOUL = ECOUL + OLDDELTAQS(I)* &    ! Orig, ecp
+        ECOUL = ECOUL + (TWO*DELTAQ(I) - OLDDELTAQS(I)) * &  ! skimLATTE
              (HUBBARDU(ELEMPOINTER(I))*OLDDELTAQS(I) + COULOMBV(I))
 
      ENDDO
@@ -180,6 +225,11 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
      FTOT = FTOT + FCOUL
 
   ENDIF
+  
+  WRITE(*,*)"Time for GETMDF", TIME_MLS()-MLSI
+
+
+  FLUSH(6)
 
   RETURN
 
