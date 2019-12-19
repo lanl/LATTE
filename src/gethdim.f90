@@ -133,13 +133,12 @@ SUBROUTINE GETHDIM
 
      ! With spins, we need spin-up and spin-down density matrices
 
-
      IF (KON .EQ. 0) THEN 
 
         ALLOCATE(HUP(HDIM, HDIM), HDOWN(HDIM, HDIM))
         ALLOCATE(RHOUP(HDIM, HDIM), RHODOWN(HDIM, HDIM))
         ALLOCATE(H2VECT(HDIM))
-        
+
         HUP = ZERO
         HDOWN = ZERO
         RHOUP = ZERO
@@ -219,8 +218,7 @@ SUBROUTINE GETHDIM
            ALLOCATE(SPINLIST(HDIM), ZSPINLIST(HDIM))
         ENDIF
      ENDIF
-        
-           
+
      ALLOCATE(DELTASPIN(DELTADIM), OLDDELTASPIN(DELTADIM))
 
      DELTASPIN = ZERO

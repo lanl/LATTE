@@ -36,7 +36,7 @@ SUBROUTINE GETDELTAQ
   COMPLEX(LATTEPREC), ALLOCATABLE :: TMPQ(:)
 
   IF (EXISTERROR) RETURN
-  
+
   ALLOCATE(TMPQ(HDIM))
 
   INDEX = 0
@@ -111,13 +111,13 @@ SUBROUTINE GETDELTAQ
         ENDIF
 
         QLIST = QLIST/REAL(NKTOT)
-        
+
      ELSE
 
         !        TMPQ = (ZERO, ZERO)
 
         IF (SPINON .EQ. 0) THEN
-           
+
            DO K = 1, NKTOT
               DO I = 1, HDIM
                  DO J = 1, HDIM
@@ -134,7 +134,7 @@ SUBROUTINE GETDELTAQ
            !        TMPQ = TMPQ/REAL(NKTOT)
 
            QLIST = QLIST/REAL(NKTOT)
-          
+
         ELSE
 
            TMPQ = ZERO
@@ -154,7 +154,7 @@ SUBROUTINE GETDELTAQ
 
         ENDIF
 
-           
+
         !         DO I =1, HDIM
         !           PRINT*, I, TMPQ(I), QLIST(I)
         !        ENDDO
