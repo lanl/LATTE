@@ -44,12 +44,12 @@ SUBROUTINE KDEORTHOMYRHO
   IF (SPINON .EQ. 0) THEN
 
      DO I = 1, NKTOT
-        
+
         CALL ZGEMM('N','N', HDIM, HDIM, HDIM, ALPHA, KXMAT(:,:,I), HDIM, &
              KBO(:,:,I), HDIM, BETA, KTMP, HDIM)
         CALL ZGEMM('N', 'C', HDIM, HDIM, HDIM, ALPHA, KTMP, HDIM, &
              KXMAT(:,:,I), HDIM, BETA, KBO(:,:,I), HDIM)
-        
+
      ENDDO
 
   ELSE

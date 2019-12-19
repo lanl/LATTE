@@ -55,7 +55,6 @@ SUBROUTINE KGENX
 #endif
 
   ALLOCATE(UK(HDIM, HDIM), EVAL(HDIM), KTMPMAT(HDIM, HDIM))
-
   !
   ! X = U s^-1/2 U^dag
   !

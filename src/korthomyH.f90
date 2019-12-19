@@ -43,12 +43,12 @@ SUBROUTINE KORTHOMYH
   IF (SPINON .EQ. 0) THEN
      
      DO II = 1, NKTOT
-        
+
         CALL ZGEMM('C', 'N', HDIM, HDIM, HDIM, ALPHA, KXMAT(:,:,II), &
              HDIM, HK(:,:,II), HDIM, BETA, KTMP, HDIM)
         CALL ZGEMM('N', 'N', HDIM, HDIM, HDIM, ALPHA, KTMP, HDIM, &
              KXMAT(:,:,II), HDIM, BETA, KORTHOH(:,:,II), HDIM)
-        
+
      ENDDO
 
   ELSE

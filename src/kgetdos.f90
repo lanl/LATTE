@@ -67,11 +67,11 @@ SUBROUTINE KGETDOS
 
         DO K = 1, NKTOT
            DO J = 1, HDIM
-              
+
               CMPARG = ONE/(ENERGY - KEVALS(J,K) + CMPLX(ZERO,ETA))
-              
+
               DOS(I) = DOS(I) - (ONE/PI)*AIMAG(CMPARG)
-              
+
            ENDDO
         ENDDO
         
@@ -107,16 +107,16 @@ SUBROUTINE KGETDOS
   DO I = 1, NATS
      NUME = NUME + ATOCC(ELEMPOINTER(I))
   ENDDO
-  
+
 
   IF (SPINON .EQ. 0) THEN
      
      INTDOS = ZERO
      COUNT = 0
      DO I = 1, NDOSBINS
-        
+
         ENERGY = DOSMIN + REAL(I-1)*EWINDOW
-        
+
         IF (ENERGY .LE. CHEMPOT) THEN
            COUNT = COUNT + 1
            IF (MOD(I,2) .EQ. 0) THEN
@@ -125,9 +125,9 @@ SUBROUTINE KGETDOS
               INTDOS = INTDOS + TWO*DOS(I)
            ENDIF
         ENDIF
-        
+
      ENDDO
-     
+
      INTDOS = INTDOS - DOS(1) - DOS(COUNT)
 
      INTDOS = INTDOS*EWINDOW/THREE

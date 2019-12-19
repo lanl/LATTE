@@ -56,7 +56,7 @@ SUBROUTINE KBOEVECS
 #endif
 
   ZONE = CMPLX(ONE)
-!  KBO = CMPLX(ZERO) ! Initialize the density matrix
+  KBO = CMPLX(ZERO) ! Initialize the density matrix
 
   OCCTARGET = BNDFIL*REAL(HDIM*NKTOT)
 
@@ -95,21 +95,19 @@ SUBROUTINE KBOEVECS
 
            DO K = 1, NKTOT
               DO I = 1, HDIM
-                 
+
                  FDIRACARG = (KEVALS(I, K) - CHEMPOT)/KBT
-                 
+
                  FDIRACARG = MAX(FDIRACARG, -EXPTOL)
                  FDIRACARG = MIN(FDIRACARG, EXPTOL)
-                 
+
                  EXPARG = EXP(FDIRACARG)
                  FDIRAC = ONE/(ONE + EXPARG)
                  OCC = OCC + FDIRAC
                  DFDIRAC = DFDIRAC + EXPARG*FDIRAC*FDIRAC
-                 
+
               ENDDO
            ENDDO
-
-           
 
 !$OMP END PARALLEL DO
 
@@ -162,7 +160,6 @@ SUBROUTINE KBOEVECS
 
         CHEMPOT = CHEMPOT + SHIFTCP
 
-
      ENDDO
 
      IF (ITER .EQ. 100) THEN
@@ -185,19 +182,19 @@ SUBROUTINE KBOEVECS
 
            DO K = 1, NKTOT
               DO I = 1, HDIM
-                 
+
                  FDIRACARG = (KEVALS(I, K) - CHEMPOT)/KBT
-                 
+
                  FDIRACARG = MAX(FDIRACARG, -EXPTOL)
                  FDIRACARG = MIN(FDIRACARG, EXPTOL)
-                 
+
                  FDIRAC = ONE/(ONE + EXP(FDIRACARG))
-                 
+
                  OCCLOGOCC_ELECTRONS = FDIRAC * LOG(FDIRAC)
                  OCCLOGOCC_HOLES = (ONE - FDIRAC) * LOG(ONE - FDIRAC)
-                 
+
                  S = S + TWO*(OCCLOGOCC_ELECTRONS + OCCLOGOCC_HOLES)
-                 
+
               ENDDO
            ENDDO
 
@@ -237,7 +234,7 @@ SUBROUTINE KBOEVECS
            ENDDO
            
         ENDIF
-        
+
         S = S/REAL(NKTOT)
 
         ! Compute the gap only when we have to...
@@ -262,16 +259,16 @@ SUBROUTINE KBOEVECS
      
         DO K = 1, NKTOT
            DO I = 1, HDIM
-              
+
               FDIRACARG = (KEVALS(I,K) - CHEMPOT)/KBT
-              
+
               FDIRACARG = MAX(FDIRACARG, -EXPTOL)
               FDIRACARG = MIN(FDIRACARG, EXPTOL)
-              
+
               ZFDIRAC = CMPLX(ONE/(ONE + EXP(FDIRACARG)))
-              
+
               CALL ZGERC(HDIM, HDIM, ZFDIRAC, KEVECS(:,I,K), 1, KEVECS(:,I,K), 1, KBO(:,:,K), HDIM)
-              
+
            ENDDO
         ENDDO
 

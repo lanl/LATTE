@@ -88,7 +88,7 @@ SUBROUTINE KDIAGMYH
         CALL ZHEEVD('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
              ZHEEVD_WORK, ZHEEVD_LWORK, ZHEEVD_RWORK, ZHEEVD_LRWORK, &
              ZHEEVD_IWORK, ZHEEVD_LIWORK, INFO)
-        
+
         IF (INFO .NE. 0) CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
              DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
 
@@ -139,7 +139,7 @@ SUBROUTINE KDIAGMYH
 
            CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
                 DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
-           
+
 #elif defined(XHEEVD)
         
            CALL ZHEEVD('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
@@ -148,7 +148,7 @@ SUBROUTINE KDIAGMYH
 
            IF (INFO .NE. 0) CALL ZHEEV('V', 'U', HDIM, KEVECS(:,:,I), HDIM, KEVALS(:,I), &
                 DIAG_ZWORK, DIAG_LZWORK, DIAG_RWORK, INFO)
-           
+        
 #endif
 
         ELSE ! Spin polarized
@@ -280,7 +280,6 @@ SUBROUTINE KDIAGMYH
 
 #endif
 
-  
   RETURN
 
 END SUBROUTINE KDIAGMYH

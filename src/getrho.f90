@@ -49,9 +49,11 @@ MLSI = TIME_MLS()
     IF (SPINON .EQ. 0) THEN
       CALL BOEVECSPRG()
     ELSE
-      CALL DIAGMYH()
-      CALL SPINRHOEVECS
-      WRITE(*,*)"This is using the original LATTE routine. Spin-polarized non yet with PROGRESS/BML"
+      !CALL DIAGMYH()
+      !CALL SPINRHOEVECS
+      !WRITE(*,*)"This is using the original LATTE routine. Spin-polarized non yet with PROGRESS/BML"
+      CALL DIAGMYHPRG()
+      CALL SPINRHOEVECSPRG()
     ENDIF
 #elif defined(PROGRESSOFF)
      CALL DIAGMYH()
