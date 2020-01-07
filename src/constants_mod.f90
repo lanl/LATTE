@@ -48,7 +48,7 @@ MODULE CONSTANTS_MOD
   INTEGER :: CHARGE
   INTEGER :: KON ! K-SPACE FLAG
   INTEGER :: COMPFORCE
-!  INTEGER :: SPONLY ! If we only have sp-bonded elements: faster gradH
+  INTEGER :: SPONLY ! If we only have sp-bonded elements: faster gradH
   INTEGER :: DOSFITON, INT2FIT, NFITSTEP, QFIT ! For the simulated annealing
   INTEGER :: PP2FIT, BINT2FIT, PPNFITSTEP, PPNMOL, PPNGEOM, BINFITSTEP
   INTEGER :: PPFITON, ALLFITON

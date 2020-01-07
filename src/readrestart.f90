@@ -82,7 +82,16 @@ SUBROUTINE READRESTART
 
   IF (PLUSDON .EQ. 1) ALLOCATE(FPLUSD(3,NATS))
 
-  IF (BASISTYPE .EQ. "NONORTHO") ALLOCATE(FPUL(3,NATS))
+  IF (BASISTYPE .EQ. "NONORTHO") THEN
+
+     IF (ELECTRO .EQ. 0) ALLOCATE(FSLCN(3,NATS))
+
+     IF (SPINON .EQ. 0) THEN
+        ALLOCATE(FPUL(3,NATS), FSCOUL(3,NATS))
+     ELSE
+        ALLOCATE(FPUL(3,NATS), FSCOUL(3,NATS), FSSPIN(3,NATS))
+     ENDIF
+  ENDIF
 
   IF (KON .EQ. 1) ALLOCATE(KF(3,NATS))
 
@@ -91,6 +100,9 @@ SUBROUTINE READRESTART
   READ(12,*) BOX(1,1), BOX(1,2), BOX(1,3)
   READ(12,*) BOX(2,1), BOX(2,2), BOX(2,3)
   READ(12,*) BOX(3,1), BOX(3,2), BOX(3,3)
+
+
+  !  READ(12,*) (ATELE(I), CR(1,I), CR(2,I), CR(3,I), I = 1, NATS)
 
   DO I = 1, NATS
      READ(12,*) ATELE(I), CR(1,I), CR(2,I), CR(3,I)
@@ -110,7 +122,22 @@ SUBROUTINE READRESTART
      SUMMASS = SUMMASS + MASS(ELEMPOINTER(I))
   ENDDO
 
+  ! Let's check whether we have only sp elements. If so, we can
+  ! use a much faster verison of gradH
+
+  ! SPONLY = 0: use GRADHSP
+  ! SPONLY = 1: use Josh Coe's implementation of the automatic H build
+
+  SPONLY = 0
+  DO I = 1, NATS
+     IF (BASIS(ELEMPOINTER(I)) .NE. "s" .AND. &
+          BASIS(ELEMPOINTER(I)) .NE. "sp") SPONLY = 1
+  ENDDO
+
+  IF (SCLTYPE .EQ. "TABLE") SPONLY = 1
+
   READ(12,*) CHEMPOT
+  !  PRINT*, CHEMPOT
 
   IF (SPINON .EQ. 0) THEN
 

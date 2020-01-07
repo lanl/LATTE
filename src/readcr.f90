@@ -63,6 +63,13 @@ SUBROUTINE READCR
 
      IF (KON .EQ. 1) ALLOCATE(KF(3,NATS))
 
+     IF (BASISTYPE .EQ. "NONORTHO") THEN
+        ALLOCATE(FPUL(3,NATS))
+        IF (ELECTRO .EQ. 0) ALLOCATE(FSLCN(3,NATS))
+        IF (ELECTRO .EQ. 1) ALLOCATE(FSCOUL(3,NATS))
+        IF (SPINON .EQ. 1) ALLOCATE(FSSPIN(3,NATS))
+     ENDIF
+
      READ(12,*) BOX(1,1), BOX(1,2), BOX(1,3)
      READ(12,*) BOX(2,1), BOX(2,2), BOX(2,3)
      READ(12,*) BOX(3,1), BOX(3,2), BOX(3,3)
@@ -75,6 +82,7 @@ SUBROUTINE READCR
                 RELAXATOM(1,I), RELAXATOM(2,I), RELAXATOM(3,I)
         ENDIF
      ENDDO
+
      CLOSE(12)
 
   ELSE
@@ -89,6 +97,14 @@ SUBROUTINE READCR
      ENDIF
 
      IF (KON .EQ. 1) ALLOCATE(KF(3,NATS))
+
+     IF (BASISTYPE .EQ. "NONORTHO") THEN
+        IF (SPINON .EQ. 0) THEN
+           ALLOCATE(FPUL(3,NATS), FSCOUL(3,NATS))
+        ELSE
+           ALLOCATE(FPUL(3,NATS), FSCOUL(3,NATS), FSSPIN(3,NATS))
+        ENDIF
+     ENDIF
 
   ENDIF
 
@@ -113,9 +129,31 @@ SUBROUTINE READCR
   ! Let's check whether we have only sp elements. If so, we can
   ! use a much faster verison of gradH
 
-  IF (BASISTYPE .EQ. "NONORTHO") THEN
-     ALLOCATE(FPUL(3,NATS))
+  ! SPONLY = 0: use GRADHSP
+  ! SPONLY = 1: use Josh Coe's implementation of the automatic H build
+
+  SPONLY = 0
+  DO I = 1, NATS
+     IF (BASIS(ELEMPOINTER(I)) .NE. "s" .AND. &
+          BASIS(ELEMPOINTER(I)) .NE. "sp") SPONLY = 1
+  ENDDO
+
+  ! At the moment we must run Josh's implementation if we do tabulated integrals
+
+  IF (SCLTYPE .EQ. "TABLE") SPONLY = 1
+
+  ! Print a warning
+
+  IF (SPONLY .EQ. 1) THEN
+     PRINT*, "#FYI: d or f orbitals detected so we're using the"
+     PRINT*, "#slower, general SK expansions"
   ENDIF
+
+  !  SPONLY = 1
+
+  ! If we're enforcing LCN and we're using diagonalization
+
+  IF (CONTROL .EQ. 1 .AND. ELECTRO .EQ. 0) ALLOCATE(RESPCHI(NATS))
 
 !  CALL BUILD_INTEGRAL_MAP ! This helps us figure out which bond integral is which later on
 

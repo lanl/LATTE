@@ -40,7 +40,7 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
   ! If FULLQCONV = 1, then we're going to iterate until all charges are within
   ! QTOL.
   !
-  ! If FULLQCONV = 0, then we're going to run only a user specified number 
+  ! If FULLQCONV = 0, then we're going to run only a user specified number
   ! of iterations (= QITER)
   !
   ! If SWITCH = 0, then we don't have any partial charges defined yet so
@@ -113,7 +113,7 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
         CALL GETDELTAQ
 
         IF (SPINON .EQ. 1) CALL GETDELTASPIN
-        
+
      ENDIF
 
      !
@@ -121,7 +121,6 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
      !
 
      ALLOK = 1
-
      ITER = 0
 
      IF (SPINON .EQ. 1) ALLOCATE(SPINDIFF(DELTADIM))
@@ -194,7 +193,7 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
            CALL GETDELTASPIN
 
            SPINDIFF = ABS(DELTASPIN - OLDDELTASPIN)
-           
+
            ALLOKM = 0
            IF (MAXVAL(SPINDIFF) .GT. SPINTOL)  ALLOKM = 1
 
@@ -213,6 +212,8 @@ SUBROUTINE QNEUTRAL(SWITCH, MDITER)
            WRITE(6,*) "Continuing anyway, but be very careful... "
 
            ALLOK = 0
+
+           IF (STOPATMAXSCF) CALL ERRORS("qneutral","The SCF procedure has not converged")
 
         ENDIF
 

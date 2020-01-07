@@ -401,7 +401,6 @@ SUBROUTINE GETDELTASPIN
 
      ENDDO
 
-
   ELSEIF (BASISTYPE .EQ. "NONORTHO") THEN
 
      ! Mulliken spin densities in non-orthogonal basis:
@@ -413,15 +412,15 @@ SUBROUTINE GETDELTASPIN
      IF (KON .EQ. 0) THEN
 
         SPINLIST = ZERO
-        
+
         DO I = 1, HDIM
            DO J = 1, HDIM
-              
+
               SPINLIST(I) = SPINLIST(I) + (RHOUP(J,I) - RHODOWN(J,I))*SMAT(J,I)
-              
+
            ENDDO
         ENDDO
-        
+
      ELSE ! If we're doing magnetic TB in k-space
         
         ZSPINLIST = (ZERO, ZERO)
@@ -442,7 +441,6 @@ SUBROUTINE GETDELTASPIN
         SPINLIST = REAL(ZSPINLIST)
 
      ENDIF
-
      DO I = 1, NATS
 
         SELECT CASE(BASIS(ELEMPOINTER(I)))

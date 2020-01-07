@@ -134,6 +134,7 @@ SUBROUTINE SHIFTH(CHI)
               
               INDEX = INDEX + 1
               HJJ(INDEX) = LCNSHIFT(I)
+!              H(INDEX, INDEX) = HDIAG(INDEX) + LCNSHIFT(I)
                            
            ENDDO
            
