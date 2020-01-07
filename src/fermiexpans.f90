@@ -72,7 +72,6 @@ SUBROUTINE FERMIEXPANS
            BO = -BOVER2M*ORTHOH
         ENDIF
 
-           
 	HFACT = HALF + BOVER2M*CHEMPOT
 
 	DO I = 1, HDIM

@@ -46,10 +46,12 @@ SUBROUTINE BOEVECS
   BO = ZERO
 
   OCCTARGET = BNDFIL*REAL(HDIM)
-  NE = 0.0D0
-  DO I = 1, NATS
-     NE = NE + ATOCC(ELEMPOINTER(I))
-  ENDDO
+
+  ! it seems NE is not used anymore !ZY
+  !NE = 0.0D0
+  !DO I = 1, NATS
+  !   NE = NE + ATOCC(ELEMPOINTER(I))
+  !ENDDO
 
 !  PRINT*, NE, OCCTARGET
 
@@ -199,6 +201,20 @@ SUBROUTINE BOEVECS
         CALL SGER(HDIM, HDIM, ONE, EVECS(:,I), 1, EVECS(:,I), 1, BO, HDIM)
 #endif
      ENDDO
+
+  ENDIF
+
+  IF (MDON .EQ. 1 .AND. MDADAPT .EQ. 1) THEN
+
+     FULLQCONV = 0
+
+     IF (EGAP .LT. 1.0D0) THEN
+        FULLQCONV = 1
+        MDMIX = 0.1
+     ELSE
+        QITER = 1
+        MDMIX = 0.25
+     ENDIF
 
   ENDIF
 
