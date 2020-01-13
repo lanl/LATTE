@@ -9,7 +9,7 @@
 !!   where num is the position of the new keyword in the vector.
 !! - Use DUMMY= as a placeholder. This variable will be ignored by not searched by the parser.
 !!
-MODULE LATTEPARSER_LATTE_MOD
+MODULE LATTEPARSER
 
   USE CONSTANTS_MOD
   USE SETUPARRAY
@@ -123,15 +123,15 @@ CONTAINS
     USE FERMICOMMON
 
     IMPLICIT NONE
-    INTEGER, PARAMETER :: NKEY_CHAR = 7, NKEY_INT = 53, NKEY_RE = 21, NKEY_LOG = 1
+    INTEGER, PARAMETER :: NKEY_CHAR = 8, NKEY_INT = 53, NKEY_RE = 21, NKEY_LOG = 3
     CHARACTER(LEN=*) :: FILENAME
 
     !Library of keywords with the respective defaults.
     CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_CHAR(NKEY_CHAR) = [CHARACTER(LEN=100) :: &
          'JOBNAME=','BASISTYPE=','SP2CONV=','RELAXTYPE=','PARAMPATH=','COORDSFILE=',&
-         'SCLTYPE=']
+         'SCLTYPE=','OUTFILE=']
     CHARACTER(LEN=100) :: VALVECTOR_CHAR(NKEY_CHAR) = [CHARACTER(LEN=100) :: &
-         'MyJob','NONORTHO','REL','SD','./TBparam','./bl/inputblock.dat','EXP']
+         'MyJob','NONORTHO','REL','SD','./TBparam','./bl/inputblock.dat','EXP','log.latte']
 
     CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_INT(NKEY_INT) = [CHARACTER(LEN=50) :: &
          'XCONTROL=','DEBUGON=','FERMIM=','CGORLIB=','NORECS=','ENTROPYKIND=',&
@@ -162,9 +162,9 @@ CONTAINS
          1.0e-7,1000.0,0.2,1000.0,0.01,1.0/)
 
     CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_LOG(NKEY_LOG) = [CHARACTER(LEN=100) :: &
-         'LIBINIT=']
+         'LIBINIT=','STOPATMAXSCF=','DOKERNEL=']
     LOGICAL :: VALVECTOR_LOG(NKEY_LOG) = (/&
-         .FALSE./)
+         .FALSE.,.FALSE.,.FALSE./)
 
     !Start and stop characters
     CHARACTER(LEN=50), PARAMETER :: STARTSTOP(2) = [CHARACTER(LEN=50) :: &
@@ -492,7 +492,6 @@ CONTAINS
 
     PARAMPATH = VALVECTOR_CHAR(5)
     COORDSFILE = VALVECTOR_CHAR(6)
-    SCLTYPE = VALVECTOR_CHAR(7)
 
     ! If latte_lib has to be restarted
 
@@ -506,6 +505,16 @@ CONTAINS
       CALL ERRORS("latteparser_latte_mod","If CONTROL{ELECTRO= 1 ELECMETH= 1} &
       &then CONTROL{PBCON= 0}")
     END IF
+
+    SCLTYPE = VALVECTOR_CHAR(7)
+
+    STOPATMAXSCF = VALVECTOR_LOG(2)
+
+    ! Output file 
+    OUTFILE = VALVECTOR_CHAR(8)
+
+    !Do Kernel
+    DOKERNEL = VALVECTOR_LOG(3)
 
   END SUBROUTINE PARSE_CONTROL
 
@@ -600,6 +609,10 @@ CONTAINS
     !
 
     WRTFREQ = VALVECTOR_INT(5)
+    IF ( WRTFREQ <= 0 ) THEN
+      CALL ERRORS("latteparser_latte_mod","You cannot have WRTFREQ <= 0.&
+                   &Set this variable to a very high value to avoid frequent printing")
+    ENDIF
     !   write(*,*)"WRTFREQ",WRTFREQ
     !
     ! TOINITTEMP: Whether or not we are going to initialize velocities
@@ -734,4 +747,4 @@ CONTAINS
   END SUBROUTINE PARSE_KMESH
 
 
-END MODULE LATTEPARSER_LATTE_MOD
+END MODULE LATTEPARSER

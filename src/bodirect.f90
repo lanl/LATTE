@@ -47,14 +47,13 @@ SUBROUTINE BOEVECS
 
   OCCTARGET = BNDFIL*REAL(HDIM)
 
-  ! it seems NE is not used anymore !ZY
+  ! it seems NE is no longer used! ZY
   !NE = 0.0D0
   !DO I = 1, NATS
   !   NE = NE + ATOCC(ELEMPOINTER(I))
   !ENDDO
 
 !  PRINT*, NE, OCCTARGET
-
 
   !  PRINT*, TOTNE, OCCTARGET
 
