@@ -26,7 +26,7 @@ DBCSRMODS = dbcsr_var_mod.f90 init_dbcsr.f90 shutdown_dbcsr.f90
 
 MYSUBS = allocatediag.f90 allocatenono.f90 allocatepure.f90 bodirect.f90 \
 deallocatediag.f90 deallocatepure.f90 deorthomyrho.f90 deallocatenono.f90 \
-diagmyh.f90 entropy.f90 fermiexpans.f90 genX.f90  latte.f90 orthomyH.f90 \
+diagmyh.f90 diagmyhprogress.f90 entropy.f90 fermiexpans.f90 genX.f90  latte.f90 orthomyH.f90 \
  orthomyrho.f90  pulay.f90  solvematcg.f90 solvematlapack.f90 \
 sp2T.f90 pulay_spprogress.f90 \
 sp2fermi.f90 sp2fermi_init.f90 sp2pure.f90 sp2pure_sparse.f90 kdiagmyh.f90 \
@@ -46,8 +46,8 @@ neblists.f90 noelec.f90 norms.f90 nptrescale.f90  nvtrescale.f90 \
 pairpot.f90 panic.f90 plot_ppot.f90 plot_univ.f90 printsparse.f90 \
  propchempot_xbo.f90 propspins_xbo.f90 qconsistency.f90 readcontrols.f90 \
 readcr.f90 readmdcontroller.f90 readppot.f90  readtb.f90 resetprodhd.f90 \
-rhozero.f90 shockcomp.f90  spinrhodirect.f90 stdescent.f90 \
-summary.f90 tbmd.f90 toteng.f90 univscaling_function.f90 univtailcoef.f90  \
+rhozero.f90 shockcomp.f90  spinrhodirect.f90 spinrhodirectprogress.f90 stdescent.f90 \
+summary.f90 tbmd.f90 toteng.f90 univscaling.f90 univscaling_function.f90 univtailcoef.f90  \
 vdwtailcoef.f90 velverlet.f90  xbo.f90 am.f90 bm.f90  \
  wignerd.f90 dfdx.f90 \
  gradH.f90 kbldnewh.f90  kgetrho.f90 kgradH.f90  \
@@ -65,7 +65,8 @@ readppotspline.f90 pairpotspline.f90 errors.f90 initcoulombklist.f90 \
   dosfittab.f90 \
 readppotD.f90 pairpot_plusD.f90  tbfit.f90 fire.f90 angfactor.f90 \
 build_integral_map.f90 tb_forces.f90 dfdx_HS.f90 genorbitallist.f90 \
-ktb_forces.f90 genHonsite.f90 gencutofflist.f90 getcorrs.f90
+ktb_forces.f90 genHonsite.f90 gencutofflist.f90 getcorrs.f90 \
+can_resp.f90 getdeltaq_resp.f90  bldnewHS_sp.f90
 
 # dependencies
 # DEP_FILE = makefile.dep

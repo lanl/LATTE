@@ -22,8 +22,8 @@
 FUNCTION DWIGNERDDB(L, M, MP, COSBETA)
 
   ! Build derivative defined in PRB 72 165107 eqn. (21)
-  
-  USE WIGNERARRAY
+
+  !USE WIGNERARRAY
   USE MYPRECISION
 
   IMPLICIT NONE
@@ -32,10 +32,13 @@ FUNCTION DWIGNERDDB(L, M, MP, COSBETA)
   REAL(LATTEPREC) :: COSBETA, DWIGNERDDB
   REAL(LATTEPREC), EXTERNAL :: WIGNERD
 
-  DWIGNERDDB = HALF * MYSQRT(L+MP) * MYSQRT(L - MP + 1) * &
-       WIGNERD(L, M, MP - 1, COSBETA) - &
-       HALF * MYSQRT(L - MP) * MYSQRT(L + MP + 1) * &
-       WIGNERD(L, M, MP + 1, COSBETA)
+  DWIGNERDDB = HALF * SQRT(REAL((L + MP) * (L - MP + 1))) * &
+       WIGNERD(L, M, MP - 1, COSBETA) - HALF * SQRT(REAL((L - MP) * &
+       (L + MP + 1))) * WIGNERD(L, M, MP + 1, COSBETA)
+  !DWIGNERDDB = HALF * MYSQRT(L+MP) * MYSQRT(L - MP + 1) * &
+  !     WIGNERD(L, M, MP - 1, COSBETA) - &
+  !     HALF * MYSQRT(L - MP) * MYSQRT(L + MP + 1) * &
+  !     WIGNERD(L, M, MP + 1, COSBETA)
 
   
 !  DWIGNERDDB = HALF * SQRT(REAL((L + MP) * (L - MP + 1))) * &

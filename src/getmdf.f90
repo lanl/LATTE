@@ -62,11 +62,11 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   
   IF (KON .EQ. 0) THEN
      IF(VERBOSE >= 1)WRITE(*,*)"KON = 0 ..."
-     IF (SPONLY .EQ. 0) THEN
-        CALL BLDNEWHS_SP
-     ELSE
+     !IF (SPONLY .EQ. 0) THEN
+     !   CALL BLDNEWHS_SP
+     !ELSE
         CALL BLDNEWHS
-     ENDIF
+     !ENDIF
 
   ELSE
      IF(VERBOSE >= 1)WRITE(*,*)"KON = 1 ..."

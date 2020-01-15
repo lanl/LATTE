@@ -46,13 +46,12 @@ SUBROUTINE GETFORCE
 
      ENDIF
 
-     
   ELSEIF (KON .EQ. 1) THEN
 
      IF (BASISTYPE .EQ. "ORTHO") THEN
-        
+
         CALL KGRADH
-        
+
         FTOT = TWO*F
 
      ELSEIF (BASISTYPE .EQ. "NONORTHO") THEN
@@ -64,7 +63,7 @@ SUBROUTINE GETFORCE
      ENDIF
 
   ENDIF
-  
+
   IF (PPOTON .EQ. 1) THEN
      CALL PAIRPOT
      FTOT = FTOT + FPP
