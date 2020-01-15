@@ -107,7 +107,7 @@ CONTAINS
   !! \brief Note: All units are LATTE units by default. See https://github.com/losalamos/LATTE/blob/master/Manual/LATTE_manual.pdf
   !!
   SUBROUTINE LATTE(NTYPES, TYPES, CR_IN, MASSES_IN, XLO, XHI, XY, XZ, YZ, FTOT_OUT, &
-       MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIAL_INOUT, NEWSYSTEM, EXISTERROR_INOUT)
+       MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIAL_INOUT, NEWSYSTEM, EXISTERROR_INOUT, FNAME)
 
     USE CONSTANTS_MOD, ONLY: EXISTERROR
 
@@ -118,7 +118,7 @@ CONTAINS
     INTEGER :: MYID = 0
     REAL :: TARRAY(2), RESULT, SYSTDIAG, SYSTPURE
     REAL(LATTEPREC) :: DBOX
-    CHARACTER(LEN=50) :: FLNM
+    REAL(LATTEPREC) :: MLSI, LUMO, HOMO
 
     REAL(LATTEPREC), INTENT(IN)  :: CR_IN(:,:),VEL_IN(:,:), MASSES_IN(:),XLO(3),XHI(3)
     REAL(LATTEPREC), INTENT(IN)  :: DT_IN, XY, XZ, YZ
@@ -126,8 +126,8 @@ CONTAINS
     REAL(LATTEPREC), INTENT(OUT) :: VIRIAL_INOUT(6)
     INTEGER, INTENT(IN) ::  NTYPES, TYPES(:), MAXITER_IN
     LOGICAL(1), INTENT(INOUT) :: EXISTERROR_INOUT
-    REAL(LATTEPREC) :: MLSI, LUMO, HOMO
     INTEGER, INTENT(INOUT) :: NEWSYSTEM
+    CHARACTER(LEN=*), OPTIONAL, INTENT(IN) :: FNAME
 
 #ifdef PROGRESSON
     TYPE(SYSTEM_TYPE) :: SY
@@ -150,16 +150,9 @@ CONTAINS
 
        LIBCALLS = 0 ; MAXITER = -10
 
-       OPEN(UNIT=6, FILE="log.latte", FORM="formatted")
-
-       IF(VERBOSE >= 1)THEN
-          WRITE(*,*)"# The log file for latte_lib"
-          WRITE(*,*)""
-          CALL TIMEDATE_TAG("LATTE started at : ")
-       ENDIF
-
-       INQUIRE( FILE="animate/.", exist=LATTEINEXISTS)
-       IF (.NOT. LATTEINEXISTS) CALL SYSTEM("mkdir animate")
+      ! Only LATTE main code will create the animate folder
+      ! INQUIRE( FILE="animate/.", exist=LATTEINEXISTS)
+      ! IF (.NOT. LATTEINEXISTS) CALL SYSTEM("mkdir animate")
 
        NUMSCF = 0
        CHEMPOT = ZERO
@@ -168,17 +161,39 @@ CONTAINS
        TX = INIT_TIMER()
        TX = START_TIMER(LATTE_TIMER)
 
-       INQUIRE( FILE="latte.in", exist=LATTEINEXISTS )
+       IF(PRESENT(FNAME))THEN
+          LATTEINNAME = TRIM(ADJUSTL(FNAME))
+       ENDIF
+
+       INQUIRE( FILE=LATTEINNAME, exist=LATTEINEXISTS )
 
        IF (LATTEINEXISTS) THEN
-          CALL PARSE_CONTROL("latte.in")
+          CALL PARSE_CONTROL(LATTEINNAME)
 
 #ifdef PROGRESSON
-          CALL PRG_PARSE_MIXER(MX,"latte.in")
+          CALL PRG_PARSE_MIXER(MX,LATTEINNAME)
 #endif
 
        ELSE
           CALL READCONTROLS
+       ENDIF
+
+       IF(VERBOSE <= 0)THEN
+          OPEN(UNIT=6, FILE="/dev/null", FORM="formatted")
+       ELSE
+          OPEN(UNIT=6, FILE=OUTFILE, FORM="formatted")
+       ENDIF
+
+       IF(VERBOSE >= 1)THEN
+          WRITE(*,*)"# The log file for latte_lib"
+          WRITE(*,*)""
+          CALL TIMEDATE_TAG("LATTE started at : ")
+
+#ifdef PROGRESSON
+          WRITE(*,*)""
+          WRITE(*,*)"Using PROGRESS and BML ..."
+#endif
+
        ENDIF
 
        CALL READTB
@@ -463,10 +478,10 @@ CONTAINS
              ! Coe implemented
 
           CALL PULAY
-          
+
           FTOT = FTOT + FPUL
 
-          !             CALL FCOULNONO
+!             CALL FCOULNONO
 !             CALL PULAY
 !             IF (SPINON .EQ. 1) CALL FSPINNONO
           
@@ -516,7 +531,12 @@ CONTAINS
        !
 
        TX = STOP_TIMER(LATTE_TIMER)
+
+
+#ifndef FCIDxlf
        CALL DTIME(TARRAY, RESULT)
+#endif
+
        CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
 
        CALL GETPRESSURE
@@ -604,7 +624,10 @@ CONTAINS
           ! Start the timers
           IF (VERBOSE >= 1)WRITE(*,*)"Starting timers ..."
           CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
+
+#ifndef FCIDxlf
           CALL DTIME(TARRAY, RESULT)
+#endif
 
           IF (VERBOSE >= 1)WRITE(*,*)"Setting up TBMD ..."
           CALL SETUPTBMD(NEWSYSTEM)
@@ -713,34 +736,55 @@ CONTAINS
 
 #ifdef PROGRESSON
        IF(MOD(LIBCALLS,WRTFREQ) == 0)THEN
-          IF(VERBOSE >= 1)WRITE(*,*)"Writing trajectory into trajectory.pdb ..."
-          SY%NATS = NATS
-          IF(.NOT. ALLOCATED(SY%COORDINATE))ALLOCATE(SY%COORDINATE(3,NATS))
-          SY%COORDINATE = CR
-          SY%SYMBOL = ATELE
-          SY%LATTICE_VECTOR = BOX
-          SY%NET_CHARGE = DELTAQ
-          CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT_IN,"trajectory","pdb")
-          CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT_IN,"trajectory","xyz")
+          IF(VERBOSE >= 1) THEN
+             WRITE(*,*)"Writing trajectory into trajectory.pdb ..."
+             SY%NATS = NATS
+             IF(.NOT. ALLOCATED(SY%COORDINATE))ALLOCATE(SY%COORDINATE(3,NATS))
+             SY%COORDINATE = CR
+             SY%SYMBOL = ATELE
+             SY%LATTICE_VECTOR = BOX
+             SY%NET_CHARGE = DELTAQ
+             CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT_IN,"trajectory","pdb")
+             CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT_IN,"trajectory","xyz")
+
+             WRITE(*,*)"Writing trajectory into trajectory.xyz ..."
+             IF(LIBCALLS .EQ. 0)THEN
+                OPEN(UNIT=20,FILE="trajectory.xyz",STATUS='unknown')
+             ELSE
+                OPEN(UNIT=20,FILE="trajectory.xyz",POSITION='append',STATUS='old')
+             ENDIF
+             !Extended xyz file.
+             WRITE(20,*)NATS
+             WRITE(20,*) 'Lattice="',BOX(1,1),BOX(1,2),BOX(1,3),&
+                  &BOX(2,1),BOX(2,2),BOX(2,3),BOX(3,1),BOX(3,2),BOX(3,3),'"',&
+                  &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT_IN
+             DO I=1,NATS
+                WRITE(20,*)ATELE(I),CR(1,I),CR(2,I),CR(3,I),V(1,I),V(2,I),V(3,I),&
+                     &FTOT(1,I),FTOT(2,I),FTOT(3,I),-DELTAQ(I)
+             ENDDO
+             CLOSE(20)
+          ENDIF
        ENDIF
 #else
        IF(MOD(LIBCALLS,WRTFREQ) == 0)THEN
-          IF(VERBOSE >= 1)WRITE(*,*)"Writing trajectory into trajectory.xyz ..."
-          IF(LIBCALLS .EQ. 0)THEN
-             OPEN(UNIT=20,FILE="trajectory.xyz",STATUS='unknown')
-          ELSE
-             OPEN(UNIT=20,FILE="trajectory.xyz",ACCESS='append',STATUS='old')
+          IF(VERBOSE >= 1) THEN
+             WRITE(*,*)"Writing trajectory into trajectory.xyz ..."
+             IF(LIBCALLS .EQ. 0)THEN
+                OPEN(UNIT=20,FILE="trajectory.xyz",STATUS='unknown')
+             ELSE
+                OPEN(UNIT=20,FILE="trajectory.xyz",ACCESS='append',STATUS='old')
+             ENDIF
+             !Extended xyz file.
+             WRITE(20,*)NATS
+             WRITE(20,*) 'Lattice="',BOX(1,1),BOX(1,2),BOX(1,3),&
+                  &BOX(2,1),BOX(2,2),BOX(2,3),BOX(3,1),BOX(3,2),BOX(3,3),'"',&
+                  &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT_IN
+             DO I=1,NATS
+                WRITE(20,*)ATELE(I),CR(1,I),CR(2,I),CR(3,I),V(1,I),V(2,I),V(3,I),&
+                     &FTOT(1,I),FTOT(2,I),FTOT(3,I),-DELTAQ(I)
+             ENDDO
+             CLOSE(20)
           ENDIF
-          !Extended xyz file.
-          WRITE(20,*)NATS
-          WRITE(20,*) 'Lattice="',BOX(1,1),BOX(1,2),BOX(1,3),&
-               &BOX(2,1),BOX(2,2),BOX(2,3),BOX(3,1),BOX(3,2),BOX(3,3),'"',&
-               &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT_IN
-          DO I=1,NATS
-             WRITE(20,*)ATELE(I),CR(1,I),CR(2,I),CR(3,I),V(1,I),V(2,I),V(3,I),&
-                  &FTOT(1,I),FTOT(2,I),FTOT(3,I),-DELTAQ(I)
-          ENDDO
-          CLOSE(20)
        ENDIF
 #endif
 
@@ -759,7 +803,7 @@ CONTAINS
        ENDIF
 
        IF (MOD(LIBCALLS, RSFREQ) .EQ. 0)THEN
-          CALL WRTRESTARTLIB(LIBCALLS)
+          IF(VERBOSE >= 0) CALL WRTRESTARTLIB(LIBCALLS)
        ENDIF
 
        IF(RESTARTLIB == 1 .AND. LIBCALLS == 0)THEN
@@ -795,7 +839,10 @@ CONTAINS
        ! Start the timers
 
        CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
+
+#ifndef FCIDxlf
        CALL DTIME(TARRAY, RESULT)
+#endif
 
        !
        ! Call TBMD
@@ -809,7 +856,10 @@ CONTAINS
 
        ! Stop the timers
 
+#ifndef FCIDxlf
        CALL DTIME(TARRAY, RESULT)
+#endif
+
        CALL SYSTEM_CLOCK(STOP_CLOCK, CLOCK_RATE, CLOCK_MAX)
 
        CALL SUMMARY

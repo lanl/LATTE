@@ -692,9 +692,9 @@ SUBROUTINE PULAY
                           CALL DFDX(I, J, LBRA, LKET, MBRA, &
                                MKET, MAGR, PI/TWO, COSBETA, "S", &
                                MYDFDA, MYDFDB, MYDFDR)
-                          
+
                           MYDFDB = MYDFDB/MAGR
-                          
+
                           FTMP_PULAY(2) = FTMP_PULAY(2) - X2HRHO(L, K) * (COSBETA * MYDFDB)
 
                           FTMP_COUL(2) = FTMP_COUL(2) - RHO * (COSBETA * MYDFDB)
