@@ -168,10 +168,10 @@ SUBROUTINE MSRELAX
         IF ( RELTYPE .EQ. "SD" ) THEN
            CALL STDESCENT(ITER, DELTAENERGY, DELTAF)
         ELSEIF ( RELTYPE .EQ. "CG" ) THEN
-           PRINT*, "Conjugate gradient minimizer broken"
-           PRINT*, "Use FIRE or steepest descent instead"
-           STOP
-!           CALL CONJGRADIENT(ITER, DELTAENERGY)
+           !PRINT*, "Conjugate gradient minimizer broken"
+           !PRINT*, "Use FIRE or steepest descent instead"
+           !STOP
+           CALL CONJGRADIENT(ITER, DELTAENERGY)
         ENDIF
 
         IF (ABS(MAXF) .LE. RLXFTOL .OR. ITER .GT. MXRLX ) BREAKLOOP = 1
