@@ -40,6 +40,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   REAL(LATTEPREC), ALLOCATABLE :: QDIFF(:), SPINDIFF(:)
   REAL(LATTEPREC), ALLOCATABLE :: QDIFF_DIIS(:,:), BMAT_DIIS(:,:), DIIS_RHS(:)
   REAL(LATTEPREC), ALLOCATABLE :: QHIST(:,:)
+
   IF (EXISTERROR) RETURN
 
   ALLOCATE(QDIFF_DIIS(NATS, MAXSCF), QHIST(NATS, MAXSCF))
@@ -61,7 +62,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   ITERACC = 0
 
   NEW_MIXER = 0
-
 
   IF (FULLQCONV .EQ. 1 .OR. MDITER .LE. 10) THEN
 
@@ -261,7 +261,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ! Get a new set of charges for our system
         !
 
-       
         CALL GETDELTAQ
 
         !
@@ -296,7 +295,15 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
            ! Run linear mixing for a bit until we start to converge
 
+#ifdef PROGRESSON
+           IF(MX%MIXERON)THEN
+              CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
+           ELSE
+              DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
+           ENDIF
+#elif defined(PROGRESSOFF)
            DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
+#endif
 
         ELSE
 
@@ -439,8 +446,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
      ENDIF
 
-
-
      FLUSH(6)
 
   ELSEIF (FULLQCONV .EQ. 0 .AND. MDON .EQ. 1 .AND. MDITER .GT. 10) THEN
@@ -462,8 +467,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
 
      ENDIF
-     
-
 
      ! Now we're doing MD
 
