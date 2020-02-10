@@ -100,12 +100,19 @@ SUBROUTINE NEBLISTS(AMIALLO)
 
         DO K = 1, NOPPS
 
-           IF (PPOTON .EQ. 1 .AND. POTCOEF(10,K) .GT. PPMAX ) PPMAX = POTCOEF(10,K)
+           IF (PPOTON .EQ. 1) THEN
+              ! POTCOEF is not allocated if PPOTON .ne. 1
+              IF ( POTCOEF(10,K) .GT. PPMAX ) PPMAX = POTCOEF(10,K)
+           ENDIF
 
-           IF (PPOTON .EQ. 2 .AND. PPR(PPTABLENGTH(K), K) .GT. PPMAX) &
+           IF (PPOTON .EQ. 2) THEN
+                IF (PPR(PPTABLENGTH(K), K) .GT. PPMAX) &
                 PPMAX = PPR(PPTABLENGTH(K), K)
+           ENDIF
 
-           IF (PPOTON .EQ. 3 .AND. PPRK(1,K) .GT. PPMAX) PPMAX = PPRK(1,K)
+           IF (PPOTON .EQ. 3) THEN
+              IF (PPRK(1,K) .GT. PPMAX) PPMAX = PPRK(1,K)
+           ENDIF
 
         ENDDO
 

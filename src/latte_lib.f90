@@ -239,6 +239,10 @@ CONTAINS
 
        ENDIF
 
+       CALL GENORBITALLIST
+
+       CALL GENCUTOFFLIST
+
        IF (VERBOSE >= 1) WRITE(*,*)"Reading ppots from file (if PPOTON >= 1) ..."
        IF (PPOTON .EQ. 1) CALL READPPOT
        IF (PPOTON .EQ. 2) CALL READPPOTTAB
@@ -256,7 +260,11 @@ CONTAINS
        IF (VERBOSE >= 1) WRITE(*,*)"Getting rho0 ..."
        CALL RHOZERO
 
+       CALL GENHONSITE
+
        CALL GETBNDFIL()
+  
+       CALL BUILD_INTEGRAL_MAP 
 
        FLUSH(6)
 
