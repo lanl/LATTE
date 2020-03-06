@@ -41,7 +41,7 @@ MODULE MIXER_MOD
 #endif
 
   PUBLIC :: KERNELMIXER, KERNELPROPAGATION, FULLKERNELPROPAGATION
-  PUBLIC :: PRECONDKERNELPROPAGATION
+  PUBLIC :: PRECONDKERNELPROPAGATION, ADAPTPRECONDKERNEL
 
   !For mixing scheme
   LOGICAL, PUBLIC                      ::  MIXINIT = .FALSE.
@@ -97,7 +97,8 @@ CONTAINS
            call orthomyh
            Nocc = BNDFIL*float(HDIM)
            beta = 1.D0/KBT
-           call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+           !call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+           call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
            BO = 2.D0*BO
            call deorthomyrho
            call getdeltaq_resp
@@ -189,11 +190,12 @@ CONTAINS
            call orthomyh
            Nocc = BNDFIL*float(HDIM)
            beta = 1.D0/KBT
-           call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+           !call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+           call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
            BO = 2.D0*BO
            call deorthomyrho
            call getdeltaq_resp
-           dq_dv = DELTAQ
+           dq_dv = DELTAQ ! v_{i+1} = paritla f(n+\lambda v_i} \partial lambda, eq 42
            dr = dq_dv - v
            dr = MATMUL(FULL_K,dr)
            ri(:,I) = dr
@@ -226,6 +228,113 @@ CONTAINS
     DELTAQ = DELTAQ_SAVE
   END SUBROUTINE PRECONDKERNELPROPAGATION
 
+  SUBROUTINE ADAPTPRECONDKERNEL(MDITER,LL)
+    implicit none
+    INTEGER, INTENT(IN) :: MDITER,LL
+    INTEGER :: I, J, N, II, JJ, K
+    REAL(LATTEPREC) :: Res(NATS), dr(NATS), vi(NATS,LL), wi(NATS,LL), ui(NATS,LL)
+    REAL(LATTEPREC) :: su(NATS), wv(NATS), dq_dv(NATS), dq_v(NATS), v(NATS), ri(NATS,LL)
+    REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS), Coulomb_Pot_dq_v(NATS)
+    REAL(LATTEPREC) :: H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM), H_SAVE(HDIM,HDIM)
+    REAL(LATTEPREC) :: D_dq_dv(HDIM,HDIM), Nocc, beta, eps, FCOUL_SAVE(3,NATS), T12(HDIM,HDIM)
+    REAL(LATTEPREC) :: X(HDIM,HDIM), YY(HDIM,HDIM), ORTHOH_SAVE(HDIM,HDIM)
+    REAL(LATTEPREC) :: ri_t(LL,NATS), IDENTRES(NATS)
+    REAL(LATTEPREC) :: WORK(LL+LL*LL)
+    REAL(LATTEPREC) :: RESNORM, FEL, CRIT, DTMP
+    INTEGER         :: INFO, RANK
+    REAL(LATTEPREC), ALLOCATABLE :: FO(:,:), FM(:,:)
+    INTEGER,         ALLOCATABLE :: IPIV(:)
+    !
+    DELTAQ_SAVE = DELTAQ
+    COULOMBV_SAVE = COULOMBV
+    FCOUL_SAVE = FCOUL
+    BO_SAVE = BO
+    ORTHOH_SAVE = ORTHOH
+    H_SAVE = H
+    H_0 = H0
+    H0 = 0.D0
+
+    Res = DELTAQ - PNK(1,:)
+
+    CRIT = 0.1D0
+    RESNORM = NORM2(RES) / SQRT(DBLE(NATS)) 
+   
+    write(6,*) 'MDITER', MDITER, RESNORM
+    IF (MDITER == 1) THEN
+       CALL FULLKERNELPROPAGATION(MDITER)
+    ELSE
+        Res = MATMUL(FULL_K,Res) !! FULL_KK is the preconditioner
+        dr = Res
+
+        I = 0
+        FEL = 1.D0
+        DO WHILE (FEL > CRIT)  !! LL is the number of rank-1 updates  LL = 0 means preconditioning only!
+           I = I + 1
+           vi(:,I) = dr/norm2(dr)
+           do J = 1,I-1
+              vi(:,I) = vi(:,I) - dot_product(vi(:,I),vi(:,J))*vi(:,J)
+           enddo
+           vi(:,I) = vi(:,I)/norm2(vi(:,I))
+           v(:) = vi(:,I)
+           !!!! Calculated dq_dv, which is the response in q(n) from change in input charge n = v
+           dq_dv = ZERO
+           dq_v = v/norm2(v)
+           DELTAQ = dq_v
+           call coulombrspace
+           call coulombewald
+           call addqdep
+           call orthomyh
+           Nocc = BNDFIL*float(HDIM)
+           beta = 1.D0/KBT
+           call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+           BO = 2.D0*BO
+           call deorthomyrho
+           call getdeltaq_resp
+           dq_dv = DELTAQ
+           dr = dq_dv - v
+           dr = MATMUL(FULL_K,dr)
+           ri(:,I) = dr
+
+           RANK = I
+           ALLOCATE(FO(RANK, RANK), FM(RANK, RANK), IPIV(RANK))
+
+           DO J = 1, RANK
+              DO K = 1, RANK
+                FO(K,J) = DOT_PRODUCT(RI(:,K), RI(:,J))
+              ENDDO
+           ENDDO
+
+           CALL DGETRF(RANK, RANK, FO, RANK, IPIV, INFO)
+           CALL DGETRI(RANK, FO, RANK, IPIV, WORK, LL+LL*LL, INFO)
+
+           FM = FO
+           DN2DT2 = 0.D0
+           IDENTRES = 0.D0
+           DO K = 1,RANK
+           DO J = 1,RANK
+             DTMP = FM(K,J)*dot_product(RI(:,J),RES)
+             IdentRes = IdentRes + DTMP*RI(:,K)
+             dn2dt2 = dn2dt2 - DTMP*VI(:,K)
+           ENDDO
+           ENDDO
+           FEL = NORM2(IDENTRES - RES) / NORM2(RES)
+           DEALLOCATE(FO, FM, IPIV)
+        ENDDO 
+
+        IF (RANK == LL ) THEN
+           CALL FULLKERNELPROPAGATION(MDITER)
+        ENDIF
+    endif
+    COULOMBV = COULOMBV_SAVE
+    BO = BO_SAVE
+    H0 = H_0
+    H = H_SAVE
+    FCOUL = FCOUL_SAVE
+    ORTHOH = ORTHOH_SAVE
+    DELTAQ = DELTAQ_SAVE
+  END SUBROUTINE ADAPTPRECONDKERNEL
+
+
   SUBROUTINE KERNELPROPAGATION(MDITER,LL)
     INTEGER, INTENT(IN) :: MDITER,LL
     INTEGER :: I, J, N, ii, jj
@@ -246,9 +355,10 @@ CONTAINS
     H0 = 0.D0
 
     Res = DELTAQ - PNK(1,:)
-!    if  (MDITER <= 0) then  !! typical choice <= 1, for really really hard cases <= 20
-!     dn2dt2 = MDMIX*Res
-!    else
+!   if (norm2(Res) >= 0.00001D0) then
+    if  (MDITER <= 0) then  !! typical choice <= 1, for really really hard cases <= 20
+     dn2dt2 = MDMIX*Res
+    else
         dr = Res
         do I = 1,LL !! LL is the number of rank-1 updates  LL = 0 means linear mixing
            vi(:,I) = dr/norm2(dr)
@@ -267,7 +377,8 @@ CONTAINS
            call orthomyh
            Nocc = BNDFIL*float(HDIM)
            beta = 1.D0/KBT
-           call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+           !call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+           call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
            BO = 2.D0*BO
            call deorthomyrho
            call getdeltaq_resp
@@ -289,7 +400,7 @@ CONTAINS
            !DELTAQ = DELTAQ + dot_product(wi(:,I),Res)*ui(:,I)
            dn2dt2 = dn2dt2 + dot_product(wi(:,I),Res)*ui(:,I)
         enddo
-!    endif
+    endif
     COULOMBV = COULOMBV_SAVE
     BO = BO_SAVE
     H0 = H_0
@@ -342,7 +453,8 @@ CONTAINS
            call orthomyh
            Nocc = BNDFIL*float(HDIM)
            beta = 1.D0/KBT
-           call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+           !call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+           call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
            BO = 2.D0*BO
            call deorthomyrho
            call getdeltaq_resp

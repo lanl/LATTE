@@ -1,7 +1,7 @@
 subroutine  can_resp(H1,Nocc,beta,Q,ev,fe,mu0,eps,HDIM)
 
-!implicit none
 USE SETUPARRAY
+implicit none
 
 integer, parameter      :: PREC = 8
 integer, intent(in)     :: HDIM, Nocc
@@ -15,6 +15,8 @@ real(PREC)              :: ID0(HDIM,HDIM), T12(HDIM,HDIM), DDT(HDIM,HDIM)
 real(PREC), intent(in)  :: beta, eps
 real(PREC), intent(inout)  :: mu0
 real(PREC)              ::  OccErr, TrdPdmu, TrP0, TrP1
+real(PREC)              :: trX, trDDT
+real(PREC)              :: mu1, y
 integer                 :: N, Cnt, i, j, k,l, ind, ind2, fact
 
   N = HDIM
@@ -41,8 +43,8 @@ integer                 :: N, Cnt, i, j, k,l, ind, ind2, fact
         endif
      end do
   end do
-  do i = 1,N
-    do j = 1,N
+  do j = 1,N
+    do i = 1,N
       X(i,j) = DDT(i,j)*T12(i,j) 
     end do
   end do

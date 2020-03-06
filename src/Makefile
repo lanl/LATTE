@@ -66,7 +66,7 @@ readppotspline.f90 pairpotspline.f90 errors.f90 initcoulombklist.f90 \
 readppotD.f90 pairpot_plusD.f90  tbfit.f90 fire.f90 angfactor.f90 \
 build_integral_map.f90 tb_forces.f90 dfdx_HS.f90 genorbitallist.f90 \
 ktb_forces.f90 genHonsite.f90 gencutofflist.f90 getcorrs.f90 \
-can_resp.f90 getdeltaq_resp.f90  bldnewHS_sp.f90
+Canon_DM_PRT.f90 can_resp.f90 getdeltaq_resp.f90  bldnewHS_sp.f90
 
 # dependencies
 # DEP_FILE = makefile.dep

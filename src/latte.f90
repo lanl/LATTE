@@ -176,7 +176,11 @@ PROGRAM LATTE
 
      IF (KON .EQ. 0) THEN
 
-        CALL BLDNEWHS
+        !IF (SPONLY .EQ. 0) THEN
+        !   CALL BLDNEWHS_SP
+        !ELSE
+           CALL BLDNEWHS
+        !ENDIF
 
      ELSE
 
