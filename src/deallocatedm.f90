@@ -19,20 +19,32 @@
 ! Public License for more details.                                         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-MODULE XBOARRAY
+SUBROUTINE DEALLOCATEDM
 
+  USE CONSTANTS_MOD
+!  USE XBOARRAY
+!  USE SPINARRAY
   USE MYPRECISION
+  USE DMARRAY
 
   IMPLICIT NONE
-  SAVE
 
-  REAL(LATTEPREC), ALLOCATABLE :: PNK(:,:)
-  REAL(LATTEPREC), ALLOCATABLE :: CHEMPOT_PNK(:)
-  REAL(LATTEPREC), ALLOCATABLE :: SPIN_PNK(:,:)
-  REAL(LATTEPREC), ALLOCATABLE :: d2PO(:,:)  ! ANDERS CHANGE
-  REAL(LATTEPREC) :: LASTGUESS_CHEMPOT, PREVLASTGUESS_CHEMPOT
+  IF (EXISTERROR) RETURN
 
-  REAL(LATTEPREC) :: ALPHA_XBO, KAPPA_XBO, KAPPA_SCALE
-  REAL(LATTEPREC) :: CNK(10)
+  !
+  ! This depends on whether we're propagating the
+  ! on-site H matrix elements (in the case of LCN calculations)
+  ! or the atomic partial charges (full SCC-TB)
 
-END MODULE XBOARRAY
+
+  DEALLOCATE(PNO,PO_0, PO_1, PO_2, PO_3)
+  DEALLOCATE(PO_4, PO_5, PO_6, PO_7)
+  DEALLOCATE(POrth, DOrth, DOrth_old, IXMAT)
+  DEALLOCATE(H_INDEX_START, H_INDEX_END, DELTAQDM, DFTB_U)
+  DEALLOCATE(PS, SU, Delta_DS)
+  DEALLOCATE(HubForce,AHub)
+
+  RETURN
+
+END SUBROUTINE DEALLOCATEDM
+

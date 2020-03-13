@@ -1,6 +1,4 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! Copyright 2010.  Los Alamos National Security, LLC. This material was    !
-! produced under U.S. Government contract DE-AC52-06NA25396 for Los Alamos !
 ! National Laboratory (LANL), which is operated by Los Alamos National     !
 ! Security, LLC for the U.S. Department of Energy. The U.S. Government has !
 ! rights to use, reproduce, and distribute this software.  NEITHER THE     !
@@ -19,20 +17,20 @@
 ! Public License for more details.                                         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-MODULE XBOARRAY
+MODULE DMARRAY
 
   USE MYPRECISION
 
   IMPLICIT NONE
   SAVE
 
-  REAL(LATTEPREC), ALLOCATABLE :: PNK(:,:)
-  REAL(LATTEPREC), ALLOCATABLE :: CHEMPOT_PNK(:)
-  REAL(LATTEPREC), ALLOCATABLE :: SPIN_PNK(:,:)
-  REAL(LATTEPREC), ALLOCATABLE :: d2PO(:,:)  ! ANDERS CHANGE
-  REAL(LATTEPREC) :: LASTGUESS_CHEMPOT, PREVLASTGUESS_CHEMPOT
+  REAL(LATTEPREC), ALLOCATABLE :: PO_0(:,:), PO_1(:,:), PO_2(:,:), PO_3(:,:)  ! For DM integration
+  REAL(LATTEPREC), ALLOCATABLE :: PO_4(:,:), PO_5(:,:), PO_6(:,:), PO_7(:,:)  ! For DM integration
+  REAL(LATTEPREC), ALLOCATABLE :: POrth(:,:), DOrth(:,:), DELTAQDM(:) !, C_DFTB_U ! C_DFTB_U is the chosen Hubbard U for the DM term
+  REAL(LATTEPREC), ALLOCATABLE :: PNO(:,:)
+  REAL(LATTEPREC), ALLOCATABLE :: DFTB_U(:), IXMAT(:,:), PS(:,:),SU(:,:), Delta_DS(:,:)
+  REAL(LATTEPREC), ALLOCATABLE :: HubForce(:,:), DOrth_old(:,:), AHub(:,:)
+  REAL(LATTEPREC) :: EHub 
+  INTEGER, ALLOCATABLE :: H_INDEX_START(:), H_INDEX_END(:) ! Index list of start and end position of matrix elements of atom I
 
-  REAL(LATTEPREC) :: ALPHA_XBO, KAPPA_XBO, KAPPA_SCALE
-  REAL(LATTEPREC) :: CNK(10)
-
-END MODULE XBOARRAY
+END MODULE DMARRAY

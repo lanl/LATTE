@@ -31,6 +31,7 @@ MODULE MIXER_MOD
   USE NONOARRAY
   USE DIAGARRAY    ! CHANGE ANDERS_CHANGE
   USE XBOARRAY     ! CHANGE ANDERS_CHANGE
+  USE DMARRAY     ! CHANGE ANDERS
 #ifdef PROGRESSON
   USE PRG_PULAYMIXER_MOD
 #endif
@@ -482,6 +483,193 @@ CONTAINS
     FCOUL = FCOUL_SAVE
     ORTHOH = ORTHOH_SAVE
   END SUBROUTINE KERNELMIXER        
+
+!!! ANDERS CHANGE ADD NEW SUBROUTINE
+  SUBROUTINE DMKERNELPROPAGATION(PITER)  !! ANDERS CHANGE NEW SUBROUTINE
+    INTEGER, INTENT(IN) :: PITER
+    INTEGER :: I, J, N, ii, jj
+    REAL(LATTEPREC) :: Res(NATS), dr(NATS) !, vi(NATS,LL), wi(NATS,LL), ui(NATS,LL)
+    REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS)  !, Coulomb_Pot_dq_v(NATS)
+    REAL(LATTEPREC) :: H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM), H_SAVE(HDIM,HDIM)
+    REAL(LATTEPREC) :: D_dq_dv(HDIM,HDIM), Nocc, beta, eps, FCOUL_SAVE(3,NATS)
+    REAL(LATTEPREC) :: X(HDIM,HDIM), YY(HDIM,HDIM), ORTHOH_SAVE(HDIM,HDIM)
+    REAL(LATTEPREC) :: Delta_DO(HDIM,HDIM), nDelta_DO(HDIM,HDIM),nDO, Delta_DS(HDIM,HDIM)
+    REAL(LATTEPREC) :: SU(HDIM,HDIM), H_1(HDIM,HDIM),H1(HDIM,HDIM), ndDO_dU, dU(HDIM,HDIM)
+!    !
+    DELTAQ_SAVE = DELTAQ
+    COULOMBV_SAVE = COULOMBV
+    FCOUL_SAVE = FCOUL
+    BO_SAVE = BO
+    ORTHOH_SAVE = ORTHOH
+    H_SAVE = H
+    H_0 = H0
+    H0 = 0.D0  ! SUCH THAT ADDQDEP ONLY INCLUDES RESPONSE PART
+!
+    Delta_DO = DOrth-PO_0
+    nDO = 0.D0
+    do I = 1, HDIM
+      nDO = nDO + dot_product(Delta_DO(:,I),Delta_DO(:,I))
+    enddo
+    nDO =sqrt(nDO)  ! Twice the nDO in Developers version
+    nDelta_DO = Delta_DO/nDO
+!
+    call DGEMM('N','N',HDIM,HDIM,HDIM,ONE,XMAT,HDIM,Delta_DO,HDIM,ZERO,YY,HDIM)
+    call DGEMM('N','T',HDIM,HDIM,HDIM,ONE,YY,HDIM,XMAT,HDIM,ZERO,X,HDIM)
+    call DGEMM('N','N',HDIM,HDIM,HDIM,ONE,X,HDIM,SMAT,HDIM,ZERO,Delta_DS,HDIM)
+!
+    do I = 1, NATS
+      Res(I) = 0.D0
+      do K = H_INDEX_START(I), H_INDEX_END(I)
+        Res(I) = Res(I) + Delta_DS(K,K)
+      enddo
+    enddo
+!
+    do I = 1, HDIM
+    do J = 1, HDIM
+       SU(I,J) = SMAT(I,J)*DFTB_U(J)
+    enddo
+    enddo
+!
+    call DGEMM('T','N',HDIM,HDIM,HDIM,ONE,Delta_DS,HDIM,SU,HDIM,ZERO,X,HDIM)
+    call DGEMM('N','N',HDIM,HDIM,HDIM,ONE,SU,HDIM,Delta_DS,HDIM,ZERO,YY,HDIM)
+    H1 = -0.25D0*(X+YY)/nDO   
+    do I = 1,HDIM
+    do J = 1,HDIM
+       H_1(I,J) = H1(I,J) + H1(J,I)  ! Response in H from the Hubbard energy term
+    enddo
+    enddo
+    DELTAQ = 2.D0*Res/nDO
+    call coulombrspace
+    call coulombewald
+    call addqdep
+    H = H + H_1  ! Total perturbation
+    call orthomyh   ! ORTHOH is now the perturbation
+    Nocc = BNDFIL*float(HDIM)
+    beta = 1.D0/KBT
+    call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+    !!! BO is now the DM response matrix with respect to the residual perturbation
+
+    dU = BO + ((1-QMIX)/QMIX)*nDelta_DO  
+
+    ndDO_dU = 0.D0
+    do I = 1, HDIM
+      ndDO_dU = ndDO_dU + dot_product(nDelta_DO(:,I),dU(:,I))
+    enddo
+
+    d2PO = QMIX*Delta_DO + (QMIX*QMIX*nDO/(1.D0-QMIX*ndDO_dU))*dU
+
+    COULOMBV = COULOMBV_SAVE
+    BO = BO_SAVE  
+    DELTAQ = DELTAQ_SAVE
+    H0 = H_0
+    H = H_SAVE
+    FCOUL = FCOUL_SAVE
+    ORTHOH = ORTHOH_SAVE
+  END SUBROUTINE DMKERNELPROPAGATION
+
+!!! ANDERS CHANGE END NEW SUBROUTINE
+
+
+  SUBROUTINE DMKERNELMIXER(PITER,MAXDQ)  !! ANDERS CHANGE NEW SUBROUTINE
+    IMPLICIT NONE
+    INTEGER, INTENT(IN) :: PITER
+    REAL(LATTEPREC), INTENT(IN) :: MAXDQ
+    !
+    INTEGER :: I, J, N, ii, jj
+    INTEGER :: K
+    REAL(LATTEPREC) :: Res(NATS), dr(NATS) !, vi(NATS,LL), wi(NATS,LL), ui(NATS,LL)
+    REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS)  !, Coulomb_Pot_dq_v(NATS)
+    REAL(LATTEPREC) :: H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM), H_SAVE(HDIM,HDIM)
+    REAL(LATTEPREC) :: D_dq_dv(HDIM,HDIM), Nocc, beta, eps, FCOUL_SAVE(3,NATS)
+    REAL(LATTEPREC) :: X(HDIM,HDIM), YY(HDIM,HDIM), ORTHOH_SAVE(HDIM,HDIM)
+    REAL(LATTEPREC) :: Delta_DO(HDIM,HDIM), nDelta_DO(HDIM,HDIM),nDO, Delta_DS(HDIM,HDIM)
+    REAL(LATTEPREC) :: SU(HDIM,HDIM), H_1(HDIM,HDIM),H1(HDIM,HDIM), ndDO_dU, dU(HDIM,HDIM)
+!    !
+    DELTAQ_SAVE = DELTAQ
+    COULOMBV_SAVE = COULOMBV
+    FCOUL_SAVE = FCOUL
+!    BO_SAVE = BO
+    ORTHOH_SAVE = ORTHOH
+    H_SAVE = H
+    H_0 = H0
+    H0 = 0.D0  ! SUCH THAT ADDQDEP ONLY INCLUDES RESPONSE PART
+!
+    Delta_DO = DOrth-DOrth_old
+    !write(*,*) ' Delta_DO = ', Delta_DO(1,:)/2.D0
+    nDO = 0.D0
+    do I = 1, HDIM
+      nDO = nDO + dot_product(Delta_DO(:,I),Delta_DO(:,I))
+    enddo
+    nDO =sqrt(nDO)
+    nDelta_DO = Delta_DO/nDO
+!
+    call DGEMM('N','N',HDIM,HDIM,HDIM,ONE,XMAT,HDIM,Delta_DO,HDIM,ZERO,YY,HDIM)
+    call DGEMM('N','T',HDIM,HDIM,HDIM,ONE,YY,HDIM,XMAT,HDIM,ZERO,X,HDIM)
+    call DGEMM('N','N',HDIM,HDIM,HDIM,ONE,X,HDIM,SMAT,HDIM,ZERO,Delta_DS,HDIM)
+!
+    do I = 1, NATS
+      Res(I) = 0.D0
+      do K = H_INDEX_START(I), H_INDEX_END(I)
+        Res(I) = Res(I) + Delta_DS(K,K)
+      enddo
+    enddo
+    !write(*,*) ' Res = ', Res(:)
+!
+    do I = 1, HDIM
+    do J = 1, HDIM
+       SU(I,J) = SMAT(I,J)*DFTB_U(J)
+    enddo
+    enddo
+!
+    call DGEMM('T','N',HDIM,HDIM,HDIM,ONE,Delta_DS,HDIM,SU,HDIM,ZERO,X,HDIM)
+    call DGEMM('N','N',HDIM,HDIM,HDIM,ONE,SU,HDIM,Delta_DS,HDIM,ZERO,YY,HDIM)
+    H1 = -0.25D0*(X+YY)/nDO   !! OR 0.25????  ANDERS
+    do I = 1,HDIM
+    do J = 1,HDIM
+       H_1(I,J) = H1(I,J) + H1(J,I)  ! Response in H from the Hubbard energy term
+    enddo
+    enddo
+    !write(*,*) ' H_1 = ', H_1(1,:)
+    !write(*,*) ' nDO = ', nDO
+
+    DELTAQ = 2.D0*Res/nDO
+    call coulombrspace
+    call coulombewald
+    call addqdep
+    H = H + H_1  ! Total perturbation
+    call orthomyh
+    Nocc = BNDFIL*float(HDIM)
+    beta = 1.D0/KBT
+    call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+
+    dU = BO + ((1-QMIX)/QMIX)*nDelta_DO  ! Maybe 2*BO?
+
+    ndDO_dU = 0.D0
+    do I = 1, HDIM
+      ndDO_dU = ndDO_dU + dot_product(nDelta_DO(:,I),dU(:,I))
+    enddo
+
+!    if (MAXDQ > 0.1D0) then
+    if (PITER <= 10) then
+      write(*,*) ' LINEAR MIX MIXER_MOD'
+      BO = DOrth_old + QMIX*Delta_DO
+    else
+      write(*,*) ' RESPONSE MIX MIXER_MOD'
+      BO = DOrth_old + QMIX*Delta_DO + (QMIX*QMIX*nDO/(1.D0-QMIX*ndDO_dU))*dU
+    endif
+
+    COULOMBV = COULOMBV_SAVE
+!    BO = BO_SAVE  ! NOTE BO Has been replaced by the dD/dDelta_DO
+    DELTAQ = DELTAQ_SAVE
+    H0 = H_0
+    H = H_SAVE
+    FCOUL = FCOUL_SAVE
+    ORTHOH = ORTHOH_SAVE
+  END SUBROUTINE DMKERNELMIXER
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
 
 
   SUBROUTINE QMIXPRG(PITER)

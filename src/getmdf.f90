@@ -32,10 +32,11 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
   IMPLICIT NONE
 
-  INTEGER :: SWITCH, CURRITER, I, MLSI
+  INTEGER :: SWITCH, CURRITER, I, MLSI0, MLSI
   REAL(LATTEPREC) :: ZEROSCFMOD
   IF (EXISTERROR) RETURN
 
+  MLSI0 = TIME_MLS()
 
   !!! ANDERS_CHANGE START
   if (SWITCH .NE. 0) THEN
@@ -122,6 +123,10 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
         ! Propagating partial charges or diagonal elements of H
         IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."
+        !! ANDERS CHANGE, check back later, ZY
+        !CALL DMKERNELPROPAGATION(CURRITER)  !!! ANDERS CHANGE Create d2PO using rank-1 update
+        !CALL XBODM(CURRITER) ! ANDERS CHANGE Propagate DM's
+
         CALL XBO(CURRITER) ! Propagate q's
 
         !
@@ -235,7 +240,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
   ENDIF
   
-  WRITE(*,*)"Time for GETMDF", TIME_MLS()-MLSI
+  WRITE(*,*)"Time for GETMDF", TIME_MLS()-MLSI0
 
 
   FLUSH(6)

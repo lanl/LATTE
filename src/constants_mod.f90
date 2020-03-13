@@ -76,6 +76,10 @@ MODULE CONSTANTS_MOD
   REAL(LATTEPREC) :: MCBETA, MCSIGMA ! Temperature in simulated annealing
   REAL(LATTEPREC) :: PPBETA, PPSIGMA
   REAL(LATTEPREC) :: MINGAP ! Minimum gap for adaptive SCF
+  REAL(LATTEPREC) :: S_DFTB_U ! S_DFTB_U is the chosen Hubbard U for the DM term
+  REAL(LATTEPREC) :: P_DFTB_U ! P_DFTB_U is the chosen Hubbard U for the DM term
+  REAL(LATTEPREC) :: D_DFTB_U ! D_DFTB_U is the chosen Hubbard U for the DM term
+  REAL(LATTEPREC) :: F_DFTB_U ! F_DFTB_U is the chosen Hubbard U for the DM term
   CHARACTER(LEN = 3) :: SP2CONV
   CHARACTER(LEN = 20) :: BASISTYPE, SCLTYPE !scltype controls whether we do exp or tabular integrals
 
@@ -95,6 +99,7 @@ MODULE CONSTANTS_MOD
   CHARACTER(LEN = 1000) :: OUTFILE = "log.latte"
   LOGICAL :: LATTEINEXISTS
   LOGICAL :: DOKERNEL
+  LOGICAL :: DFTBU
 
   !! For truncated SP2 and entropy calculation
   INTEGER :: SCFSTEP = 0

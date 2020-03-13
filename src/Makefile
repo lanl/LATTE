@@ -19,13 +19,14 @@ nonoarray.f90 ppotarray.f90 purearray.f90 relaxcommon.f90 restartarray.f90 \
 sparsearray.f90 spinarray.f90 univarray.f90 virialarray.f90 xboarray.f90 \
 kspacearray.f90 timer_mod.f90 subgraph.f90 matrixio.f90 sparsemath.f90 \
 sparsesp2.f90 subgraphsp2.f90 homolumo.f90 openfiles_mod.f90 kernelparser_mod.f90 \
-latteparser_latte_mod.f90 mixer_mod.f90 sp2progress.f90 genXprogress.f90  \
-bodirectprogress.f90 constraints_mod.f90 latte_lib.f90 wignerarray.f90
+latteparser_latte_mod.f90 dmarray.f90 mixer_mod.f90 sp2progress.f90 genXprogress.f90  \
+bodirectprogress.f90 constraints_mod.f90 latte_lib.f90 wignerarray.f90 
 
 DBCSRMODS = dbcsr_var_mod.f90 init_dbcsr.f90 shutdown_dbcsr.f90
 
 MYSUBS = allocatediag.f90 allocatenono.f90 allocatepure.f90 bodirect.f90 \
 deallocatediag.f90 deallocatepure.f90 deorthomyrho.f90 deallocatenono.f90 \
+allocatedm.f90 deallocatedm.f90 initiatedm.f90 adddftbu.f90 xbodm.f90 \
 diagmyh.f90 diagmyhprogress.f90 entropy.f90 fermiexpans.f90 genX.f90  latte.f90 orthomyH.f90 \
  orthomyrho.f90  pulay.f90  solvematcg.f90 solvematlapack.f90 \
 sp2T.f90 pulay_spprogress.f90 \

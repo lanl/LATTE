@@ -28,11 +28,12 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   USE TIMER_MOD
   USE MYPRECISION
   USE MIXER_MOD
+  USE DMARRAY ! CHANGE ANDERS
 
   IMPLICIT NONE
 
   INTEGER :: I, J, K, SWITCH, MDITER, ITER, II, DIIS_DIM, INFO
-  INTEGER :: ALLOKQ, ALLOKM, ALLOK, NEW_MIXER
+  INTEGER :: ALLOKQ, ALLOKM, ALLOK, NEW_MIXER, MDSOFT
   INTEGER :: START_CLOCK, STOP_CLOCK, CLOCK_RATE, CLOCK_MAX, ITERACC, DIIS_M
   INTEGER, ALLOCATABLE :: IPIV(:)
   REAL(4) :: TIMEACC
@@ -40,6 +41,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   REAL(LATTEPREC), ALLOCATABLE :: QDIFF(:), SPINDIFF(:)
   REAL(LATTEPREC), ALLOCATABLE :: QDIFF_DIIS(:,:), BMAT_DIIS(:,:), DIIS_RHS(:)
   REAL(LATTEPREC), ALLOCATABLE :: QHIST(:,:)
+
+  MDSOFT = 1   ! CHANGE ANDERS
 
   IF (EXISTERROR) RETURN
 
@@ -96,6 +99,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ELSE
            CALL KGETRHO
         ENDIF
+
+        DOrth_old = BO  ! ANDERS CHANGE
 
         TX = STOP_TIMER(DMBUILD_TIMER)
 
@@ -184,6 +189,14 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         CALL ADDQDEP
 
+        !----------------------------------------------------------------------------------------
+        ! ANDERS CHANGE Input of Hubbard parameters fo s and p, HARD INPUT NOT YET FROM LATTE.IN
+        IF (DFTBU) THEN
+          CALL ADDDFTBU_INIT 
+          !STOP !zy
+        ENDIF
+        !----------------------------------------------------------------------------------------
+
         ! Got to add the electrostatic potential to
         ! the Slater-Koster H before adding H_2 to form
         ! H_up and H_down
@@ -226,6 +239,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ELSE
            CALL KGETRHO
         ENDIF
+
+        DOrth = BO  ! ANDERS CHANGE
 
         TX = STOP_TIMER(DMBUILD_TIMER)
 
@@ -377,6 +392,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            
         ENDIF
 
+        DOrth = DOrth_old  ! ANDERS CHANGE
 
         IF(VERBOSE >= 1)WRITE(*,*)"SCF error (MAXDQ) =",MAXDQ
 
@@ -486,6 +502,11 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         CALL ADDQDEP
 
+        !---------------------------------------------------
+        ! ANDERS CHANGE INCLUDE THE ADDITIONAL DFTB+U TERM
+        !---------------------------------------------------
+        IF (DFTBU) CALL ADDDFTBU  
+
         !
         ! Building the spin up and spin down H's after we've
         ! added the electrostatic potential to the Slater-Koster one,
@@ -527,6 +548,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         OLDDELTAQS = DELTAQ
+        DOrth = BO  ! ANDERS CHANGE The optimized DM of the linearized shadow functional (in a single step!)
 
         !
         ! Get a new set of charges for our system
@@ -556,6 +578,12 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
 
+        ! ANDERS CHANGE Here we do DM mixing instead of charge mixing
+        BO = DOrth_old + QMIX*(DOrth - DOrth_old)  ! ANDERS CHANGE
+        DOrth_old = BO                             ! ANDERS CHANGE
+        CALL DEORTHOMYRHO
+        CALL GETDELTAQ         ! INCLUDED_GETDELTAQ
+
         !        PRINT*, DELTAQ(1)
 
         IF (SPINON .EQ. 1) THEN
@@ -584,6 +612,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
      ENDIF
 
      CALL ADDQDEP
+     CALL ADDDFTBU  ! ANDERS CHANGE  Include the extra DFTB+U part
 
      ! This is the right order
 
@@ -620,6 +649,9 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
      ELSE
         CALL KGETRHO
      ENDIF
+
+     DOrth_old = DOrth
+     DOrth = BO
 
      IF (BASISTYPE .EQ. "NONORTHO") THEN
         IF (KON .EQ. 0) THEN

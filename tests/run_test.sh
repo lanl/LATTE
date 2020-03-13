@@ -145,8 +145,7 @@ for name in tableread 0scf 2scf fullscf fullscf.ortho fullscf.etemp sp2 sp2.spar
 
   relativeTime=`echo "$time/$timeRef" | bc -l | awk '{printf("%.3f",$1)}'`
   echo -n "(${time}s,$relativeTime) "
-  #python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.00001
-  python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.0001 #zy
+  python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.00001
 
   if [ "$LATTE_PERFORMANCE" = "yes" ]
   then
@@ -175,7 +174,7 @@ for name in fittingoutput.dat ; do
   time=`( /usr/bin/time -f "%U" $RUN > out ) 2>&1 > /dev/null`
   
   tol=0.001 #zy
-  #tol=0.0001
+  tol=0.0001
   
   check=`
     awk '
@@ -253,8 +252,7 @@ for name in 0scf fullscf sp2 ; do
   
   relativeTime=`echo "$time/$timeRef" | bc -l | awk '{printf("%.3f",$1)}'`
   echo -n "(${time}s,$relativeTime) "
-  #python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.00001
-  python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.0001  #zy
+  python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.00001
   
   if [ "$LATTE_PERFORMANCE" = "yes" ]
   then
