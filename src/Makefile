@@ -5,11 +5,13 @@
 
 include ../makefile.CHOICES
 
+FCID = $(shell echo $(FC) | head -c 3)
+
 PPFLAGS = -DXSYEVD -DXHEEVD -D$(PRECISION)PREC -DGPU$(GPUOPT) -DDBCSR_$(DBCSR_OPT) -DMPI_$(MPIOPT)
-PPFLAGS += -DPROGRESS$(PROGRESS)
+PPFLAGS += -DPROGRESS$(PROGRESS) -DFCID$(FCID)
 
 # Flags for linking GPU libraries
-GPU_LINKFLAG = -L../MATRIX -lgfortran -lstdc++
+#GPU_LINKFLAG = -I../MATRIX -lstdc++ $(GPU_LINK_LIB)
 GPU_LIB = -L../MATRIX -lmatrix_cuda.$(PRECISION) $(GPU_CUDA_LIB)
 
 
@@ -104,10 +106,16 @@ endif
 endif
 
 
-ifeq ($(MAKELIB), ON)
+ifeq ($(MAKELIB), ON) 
+ifeq ($(GPUOPT), ON)
+		$(AR) ../liblatte.a latte_lib.o $(XMYMODULES) $(XMYSUBS) 
+		$(RANLIB) ../liblatte.a  
+		$(FC) $(FFLAGS) -c latte_c_bind.f90  $(GPU_LINKFLAG) $(GPU_LIB)
+else
 		$(AR) ../liblatte.a latte_lib.o $(XMYMODULES) $(XMYSUBS)
 		$(RANLIB) ../liblatte.a
 		$(FC) $(FFLAGS) -c latte_c_bind.f90
+endif
 endif
 
 
