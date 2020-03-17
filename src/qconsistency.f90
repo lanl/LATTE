@@ -189,13 +189,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         CALL ADDQDEP
 
-        !----------------------------------------------------------------------------------------
-        ! ANDERS CHANGE Input of Hubbard parameters fo s and p, HARD INPUT NOT YET FROM LATTE.IN
-        IF (DFTBU) THEN
-          CALL ADDDFTBU_INIT 
-          !STOP !zy
-        ENDIF
-        !----------------------------------------------------------------------------------------
+        !IF (DFTBU) CALL ADDDFTBU_INIT 
+        IF (DFTBU) CALL ADDDFTBU(.true.) 
 
         ! Got to add the electrostatic potential to
         ! the Slater-Koster H before adding H_2 to form
@@ -505,7 +500,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         !---------------------------------------------------
         ! ANDERS CHANGE INCLUDE THE ADDITIONAL DFTB+U TERM
         !---------------------------------------------------
-        IF (DFTBU) CALL ADDDFTBU  
+        !IF (DFTBU) CALL ADDDFTBU  
+        IF (DFTBU) CALL ADDDFTBU(.false.) 
 
         !
         ! Building the spin up and spin down H's after we've
@@ -612,7 +608,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
      ENDIF
 
      CALL ADDQDEP
-     CALL ADDDFTBU  ! ANDERS CHANGE  Include the extra DFTB+U part
+     !IF (DFTBU) CALL ADDDFTBU  
+     IF (DFTBU) CALL ADDDFTBU(.false.) 
 
      ! This is the right order
 

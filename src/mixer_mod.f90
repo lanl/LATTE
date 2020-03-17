@@ -287,7 +287,8 @@ CONTAINS
            call orthomyh
            Nocc = BNDFIL*float(HDIM)
            beta = 1.D0/KBT
-           call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+           !call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+           call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
            BO = 2.D0*BO
            call deorthomyrho
            call getdeltaq_resp
@@ -546,7 +547,8 @@ CONTAINS
     call orthomyh   ! ORTHOH is now the perturbation
     Nocc = BNDFIL*float(HDIM)
     beta = 1.D0/KBT
-    call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+    !call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+    call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
     !!! BO is now the DM response matrix with respect to the residual perturbation
 
     dU = BO + ((1-QMIX)/QMIX)*nDelta_DO  
@@ -640,7 +642,8 @@ CONTAINS
     call orthomyh
     Nocc = BNDFIL*float(HDIM)
     beta = 1.D0/KBT
-    call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+    !call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+    call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
 
     dU = BO + ((1-QMIX)/QMIX)*nDelta_DO  ! Maybe 2*BO?
 
