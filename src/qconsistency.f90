@@ -100,7 +100,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            CALL KGETRHO
         ENDIF
 
-        DOrth_old = BO  ! ANDERS CHANGE
+        !DOrth_old = BO  ! ANDERS CHANGE
 
         TX = STOP_TIMER(DMBUILD_TIMER)
 
@@ -235,7 +235,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            CALL KGETRHO
         ENDIF
 
-        DOrth = BO  ! ANDERS CHANGE
+        !DOrth = BO  ! ANDERS CHANGE
 
         TX = STOP_TIMER(DMBUILD_TIMER)
 
@@ -387,7 +387,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            
         ENDIF
 
-        DOrth = DOrth_old  ! ANDERS CHANGE
+        !DOrth = DOrth_old  ! ANDERS CHANGE
 
         IF(VERBOSE >= 1)WRITE(*,*)"SCF error (MAXDQ) =",MAXDQ
 
@@ -544,7 +544,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         OLDDELTAQS = DELTAQ
-        DOrth = BO  ! ANDERS CHANGE The optimized DM of the linearized shadow functional (in a single step!)
+        !DOrth = BO  ! ANDERS CHANGE The optimized DM of the linearized shadow functional (in a single step!)
 
         !
         ! Get a new set of charges for our system
@@ -575,10 +575,10 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
 
         ! ANDERS CHANGE Here we do DM mixing instead of charge mixing
-        BO = DOrth_old + QMIX*(DOrth - DOrth_old)  ! ANDERS CHANGE
-        DOrth_old = BO                             ! ANDERS CHANGE
-        CALL DEORTHOMYRHO
-        CALL GETDELTAQ         ! INCLUDED_GETDELTAQ
+        !BO = DOrth_old + QMIX*(DOrth - DOrth_old)  ! ANDERS CHANGE
+        !DOrth_old = BO                             ! ANDERS CHANGE
+        !CALL DEORTHOMYRHO
+        !CALL GETDELTAQ         ! INCLUDED_GETDELTAQ
 
         !        PRINT*, DELTAQ(1)
 
@@ -647,8 +647,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         CALL KGETRHO
      ENDIF
 
-     DOrth_old = DOrth
-     DOrth = BO
+     !DOrth_old = DOrth
+     !DOrth = BO
 
      IF (BASISTYPE .EQ. "NONORTHO") THEN
         IF (KON .EQ. 0) THEN
