@@ -30,7 +30,13 @@ MODULE DMARRAY
   REAL(LATTEPREC), ALLOCATABLE :: PNO(:,:)
   REAL(LATTEPREC), ALLOCATABLE :: DFTB_U(:), IXMAT(:,:), PS(:,:),SU(:,:), Delta_DS(:,:)
   REAL(LATTEPREC), ALLOCATABLE :: HubForce(:,:), DOrth_old(:,:), AHub(:,:)
+  REAL(LATTEPREC), ALLOCATABLE :: H_U(:,:)
   REAL(LATTEPREC) :: EHub 
   INTEGER, ALLOCATABLE :: H_INDEX_START(:), H_INDEX_END(:) ! Index list of start and end position of matrix elements of atom I
 
+  ! kspace array
+  COMPLEX(LATTEPREC), ALLOCATABLE :: SUK(:,:,:)
+  COMPLEX(LATTEPREC), ALLOCATABLE :: HK_U(:,:)
+  COMPLEX(LATTEPREC), ALLOCATABLE :: XK(:,:), YK(:,:), PSK(:,:), HUK(:,:)
+  
 END MODULE DMARRAY

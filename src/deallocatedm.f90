@@ -36,13 +36,20 @@ SUBROUTINE DEALLOCATEDM
   ! on-site H matrix elements (in the case of LCN calculations)
   ! or the atomic partial charges (full SCC-TB)
 
-
-  DEALLOCATE(PNO,PO_0, PO_1, PO_2, PO_3)
-  DEALLOCATE(PO_4, PO_5, PO_6, PO_7)
-  DEALLOCATE(POrth, DOrth, DOrth_old, IXMAT)
   DEALLOCATE(H_INDEX_START, H_INDEX_END, DELTAQDM, DFTB_U)
-  DEALLOCATE(PS, SU, Delta_DS)
-  DEALLOCATE(HubForce,AHub)
+
+  IF(KON .EQ. 0) THEN
+
+     DEALLOCATE(PNO,PO_0, PO_1, PO_2, PO_3)
+     DEALLOCATE(PO_4, PO_5, PO_6, PO_7)
+     DEALLOCATE(POrth, DOrth, DOrth_old, IXMAT)
+     DEALLOCATE(PS, SU, Delta_DS)
+     DEALLOCATE(HubForce,AHub)
+     DEALLOCATE(H_U)
+
+  ELSE
+    DEALLOCATE(SUK, HK_U, XK, YK, HUK, PSK)
+  ENDIF
 
   RETURN
 
