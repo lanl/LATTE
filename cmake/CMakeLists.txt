@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9)
-project(latte Fortran)
+project(latte VERSION 1.2.2 LANGUAGES Fortran)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_Fortran_FLAGS)
   #release comes with -O3 by default
