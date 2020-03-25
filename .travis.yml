@@ -1,7 +1,6 @@
 language: c
 
 sudo: required
-dist: trusty
 
 sources:
   - ubuntu-toolchain-r-test
