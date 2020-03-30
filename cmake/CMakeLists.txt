@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.1)
-project(latte Fortran)
+cmake_minimum_required(VERSION 3.9)
+project(latte VERSION 1.2.2 LANGUAGES Fortran)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_Fortran_FLAGS)
   #release comes with -O3 by default
@@ -135,7 +135,12 @@ add_library(latte ${MYMODULES_SOURCES} ${MYSUBS_SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/../src/latte_c_bind.F90
 )
 target_compile_options(latte PRIVATE -cpp ${OpenMP_Fortran_FLAGS})
-install(TARGETS latte LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS latte EXPORT LATTE_Targets LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(EXPORT LATTE_Targets FILE LATTE_Targets.cmake NAMESPACE LATTE:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/LATTE)
+include(CMakePackageConfigHelpers)
+configure_file(LATTEConfig.cmakein ${CMAKE_CURRENT_BINARY_DIR}/LATTEConfig.cmake @ONLY)
+write_basic_package_version_file("LATTEConfigVersion.cmake" VERSION ${PROJECT_VERSION} COMPATIBILITY ExactVersion)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/LATTEConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/LATTEConfigVersion.cmake" DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/LATTE)
 target_link_libraries(latte PRIVATE
   ${LAPACK_LIBRARIES}
   ${BLAS_LIBRARIES}
