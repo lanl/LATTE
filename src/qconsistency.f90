@@ -189,7 +189,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         CALL ADDQDEP
 
-        !IF (DFTBU) CALL ADDDFTBU_INIT 
         IF (DFTBU) CALL ADDDFTBU(.true.) 
 
         ! Got to add the electrostatic potential to
@@ -280,6 +279,9 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ALLOKQ = 0
 
         QDIFF = (DELTAQ - OLDDELTAQS)
+
+        MAXDQ = MAXVAL(QDIFF)
+        IF (MAXDQ .GT. ELEC_QTOL) ALLOKQ = 1
 
         IF (ITER .GT. 1) THEN
            DELTA_DIFF = MAG_DIFF

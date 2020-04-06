@@ -207,6 +207,12 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   ! matrix so we don't have to de-orthogonalize again here
 
   IF(VERBOSE >= 1)WRITE(*,*)"Getting forces ..."
+
+  IF (DFTBU) THEN
+    call HUBBARDFORCE
+
+  ENDIF
+
   CALL GETFORCE
 
   WRITE(*,*) "Time for GETFORCE  ",  TIME_MLS() - MLSI

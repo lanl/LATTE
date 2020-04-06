@@ -33,6 +33,7 @@ SUBROUTINE TBMD
   USE RELAXCOMMON
   USE MYPRECISION
   USE LATTEPARSER
+  USE DMARRAY,     ONLY : EHUB
 
   IMPLICIT NONE
 
@@ -389,7 +390,11 @@ SUBROUTINE TBMD
 
         ENDIF
 
+        EHUB = 0.D0
+        IF (DFTBU) CALL HUBBARDFORCE  ! ANDERS CHANGE  (Calculates hubbard forces) and energy contributions
+
         TOTE = TRRHOH + EREP + KEE - ENTE - ECOUL + ESPIN + EPLUSD
+        IF(DFTBU)TOTE = TRRHOH0 + EREP + KEE - ENTE + ECOUL + ESPIN + EPLUSD + 2.D0*EHUB  ! ANDERS CHANGE TO BE CONSISTENT WITH HUBBARD U works also without Hubbard U's
 
         !         write(*,*)"Ekin", KEE
         !         write(*,*)"Epot", TRRHOH + EREP - ENTE - ECOUL + ESPIN
