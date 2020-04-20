@@ -42,7 +42,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   REAL(LATTEPREC), ALLOCATABLE :: QDIFF_DIIS(:,:), BMAT_DIIS(:,:), DIIS_RHS(:)
   REAL(LATTEPREC), ALLOCATABLE :: QHIST(:,:)
 
-  MDSOFT = 1   ! CHANGE ANDERS
+  MDSOFT = 10
+  IF (DFTBU) MDSOFT = 1 !00
 
   IF (EXISTERROR) RETURN
 
@@ -89,7 +90,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            ENDIF
         ENDIF
 
-
         ! Compute the density matrix
 
         TX = START_TIMER(DMBUILD_TIMER)
@@ -100,7 +100,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            CALL KGETRHO
         ENDIF
 
-        !DOrth_old = BO  ! ANDERS CHANGE
+        IF (DFTBU) DOrth_old = BO  ! ANDERS CHANGE
 
         TX = STOP_TIMER(DMBUILD_TIMER)
 
@@ -234,7 +234,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            CALL KGETRHO
         ENDIF
 
-        !DOrth = BO  ! ANDERS CHANGE
+        IF (DFTBU) DOrth = BO  ! ANDERS CHANGE
 
         TX = STOP_TIMER(DMBUILD_TIMER)
 
@@ -307,6 +307,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
            ! Run linear mixing for a bit until we start to converge
 
+        IF (MDITER .LE. MDSOFT) THEN
+          IF (.NOT.DFTBU) THEN
 #ifdef PROGRESSON
            IF(MX%MIXERON)THEN
               CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
@@ -316,10 +318,19 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 #elif defined(PROGRESSOFF)
            DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
 #endif
+          ELSE
+!           BO = DOrth_old + QMIX*(DOrth - DOrth_old)    ! ANDERS CHANGE Simple linear mixing
+            CALL DMKERNELMIXER(ITER,MAXDQ)               ! ANDERS CHANGE Rank1-1 updated DM kernel mixer
+            DOrth_old = BO                               ! ANDERS CHANGE
 
+            CALL DEORTHOMYRHO
+            OLDDELTAQS = DELTAQ
+            CALL GETDELTAQ
+            SCF_ERR = norm2(DELTAQ - OLDDELTAQS)/sqrt(ONE*NATS) ! ANDERS CHANGE SCF_ERR TO COMPARE TO Dev Verison
+          ENDIF
         ELSE
 
-
+          IF (.NOT.DFTBU) THEN
            ! Flip this flag so we don't go back into linear mixing
 
            NEW_MIXER = 1
@@ -387,9 +398,16 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
               
            ENDIF
            
+          ELSE
+             BO = DOrth_old + QMIX*(DOrth - DOrth_old)  ! ANDERS CHANGE
+             DOrth_old = BO                             ! ANDERS CHANGE
+             CALL DEORTHOMYRHO
+             CALL GETDELTAQ      ! INCLUDED_GETDELTAQ Probably not to comment out ANDERS?
+          ENDIF
+
         ENDIF
 
-        !DOrth = DOrth_old  ! ANDERS CHANGE
+        IF (DFTBU) THEN  DOrth = DOrth_old
 
         IF(VERBOSE >= 1)WRITE(*,*)"SCF error (MAXDQ) =",MAXDQ
 
@@ -546,7 +564,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         OLDDELTAQS = DELTAQ
-        !DOrth = BO  ! ANDERS CHANGE The optimized DM of the linearized shadow functional (in a single step!)
+        IF (DFTBU) DOrth = BO  ! ANDERS CHANGE The optimized DM of the linearized shadow functional (in a single step!)
 
         !
         ! Get a new set of charges for our system
@@ -577,10 +595,12 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
 
         ! ANDERS CHANGE Here we do DM mixing instead of charge mixing
-        !BO = DOrth_old + QMIX*(DOrth - DOrth_old)  ! ANDERS CHANGE
-        !DOrth_old = BO                             ! ANDERS CHANGE
-        !CALL DEORTHOMYRHO
-        !CALL GETDELTAQ         ! INCLUDED_GETDELTAQ
+        IF (DFTBU) THEN
+          BO = DOrth_old + QMIX*(DOrth - DOrth_old)  ! ANDERS CHANGE
+          DOrth_old = BO                             ! ANDERS CHANGE
+          CALL DEORTHOMYRHO
+          CALL GETDELTAQ         ! INCLUDED_GETDELTAQ
+        ENDIF
 
         !        PRINT*, DELTAQ(1)
 
@@ -610,7 +630,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
      ENDIF
 
      CALL ADDQDEP
-     !IF (DFTBU) CALL ADDDFTBU  
      IF (DFTBU) CALL ADDDFTBU(.false.) 
 
      ! This is the right order
@@ -649,8 +668,10 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         CALL KGETRHO
      ENDIF
 
-     !DOrth_old = DOrth
-     !DOrth = BO
+     IF (DFTBU) THEN
+       DOrth_old = DOrth
+       DOrth = BO
+     ENDIF
 
      IF (BASISTYPE .EQ. "NONORTHO") THEN
         IF (KON .EQ. 0) THEN

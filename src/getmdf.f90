@@ -41,7 +41,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   !!! ANDERS_CHANGE START
   if (SWITCH .NE. 0) THEN
 
-   IF(DOKERNEL .EQV. .TRUE.)THEN 
+   IF(DOKERNEL .EQV. .TRUE. .AND. (.NOT.DFTBU))THEN 
       NRANK = MIN(NORECS,NATS)
       !!CALL KERNELPROPAGATION(CURRITER,NRANK)
       !IF ((CURRITER.GE.9).AND.(CURRITER.LT.12)) THEN
@@ -67,7 +67,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
   !
   ! The atoms have moved, so we have to build a new H (and overlap matrix)
-  
+
   MLSI = TIME_MLS()
   
   IF (KON .EQ. 0) THEN
@@ -122,13 +122,15 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
      IF (XBOON .EQ. 1) THEN ! We will add other types of XBO later
 
         ! Propagating partial charges or diagonal elements of H
-        IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."
-        !! ANDERS CHANGE, check back later, ZY
-        !CALL DMKERNELPROPAGATION(CURRITER)  !!! ANDERS CHANGE Create d2PO using rank-1 update
-        !CALL XBODM(CURRITER) ! ANDERS CHANGE Propagate DM's
-
-        CALL XBO(CURRITER) ! Propagate q's
-
+        IF (DFTBU) THEN
+          IF(VERBOSE >= 1)WRITE(*,*)"Doing XBODM ..."
+          CALL DMKERNELPROPAGATION(CURRITER)  !!! ANDERS CHANGE Create d2PO using rank-1 update
+          CALL XBODM(CURRITER) ! ANDERS CHANGE Propagate DM's
+          DELTAQ = DELTAQDM    ! ANDERS CHANGE UPDATE DELTAQ FROM NEW DELTAQDM
+        ELSE
+          IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."
+          CALL XBO(CURRITER) ! Propagate q's
+        ENDIF
         !
         ! If we are also propagating the chemical potential
         !
@@ -181,8 +183,13 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
      IF (XBOON .EQ. 1) THEN ! Other cases to come
 
-        IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."
-        CALL XBO(1)
+        IF (DFTBU) THEN
+          IF(VERBOSE >= 1)WRITE(*,*)"Doing XBODM ..."
+          CALL XBODM(1)
+        ELSE
+          IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."
+          CALL XBO(1)
+        ENDIF
 
         IF (CONTROL .EQ. 1 .OR. CONTROL .EQ. 3 &
              .OR. CONTROL .EQ. 5) CALL PROPCHEMPOT(1)
@@ -210,7 +217,6 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
   IF (DFTBU) THEN
     call HUBBARDFORCE
-
   ENDIF
 
   CALL GETFORCE
@@ -245,9 +251,8 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
      FTOT = FTOT + FCOUL
 
   ENDIF
-  
-  WRITE(*,*)"Time for GETMDF", TIME_MLS()-MLSI0
 
+  WRITE(*,*)"Time for GETMDF", TIME_MLS()-MLSI0
 
   FLUSH(6)
 
