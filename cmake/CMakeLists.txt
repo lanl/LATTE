@@ -37,19 +37,19 @@ find_package(LAPACK REQUIRED)
 
 message(STATUS "Linking BLAS via ${BLAS_LIBRARIES}")
 message(STATUS "Linking LAPACK via ${LAPACK_LIBRARIES}")
-include(CheckFortranSourceCompiles)
-set(CMAKE_REQUIRED_FLAGS ${OpenMP_Fortran_FLAGS})
-set(CMAKE_REQUIRED_LIBRARIES ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
-check_Fortran_source_compiles("      program blas\n      call dgemm()\n      end program blas" BLAS_WORKS)
-check_Fortran_source_compiles("      program lapack\n      call dsyev()\n      end program lapack" LAPACK_WORKS)
-if(NOT BLAS_WORKS OR NOT LAPACK_WORKS)
-  message(FATAL_ERROR "Can not compile against BLAS/LAPACK. Please see error log.")
-endif()
 
 option(PROGRESS "Use progress library" OFF)
 if(PROGRESS)
-  find_package(BML REQUIRED)
-  find_package(PROGRESS REQUIRED)
+  if(NOT TARGET PROGRESS::progress)
+    find_package(PROGRESS CONFIG QUIET)
+  endif()
+  if(TARGET PROGRESS::progress)
+    set(PROGRESS_LIBRARIES PROGRESS::progress)
+  else()
+    find_package(BML MODULE REQUIRED)
+    find_package(PROGRESS MODULE REQUIRED)
+  endif()
+  message(STATUS "Found PROGRESS: ${PROGRESS_LIBRARIES} ${BML_LIBRARIES}")
 endif()  
 
 option(DBCSR_OPT "Whether to use DBCSR" OFF)
@@ -134,25 +134,27 @@ add_library(latte ${MYMODULES_SOURCES} ${MYSUBS_SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/../src/latte_lib.F90
   ${CMAKE_CURRENT_SOURCE_DIR}/../src/latte_c_bind.F90
 )
-target_compile_options(latte PRIVATE -cpp ${OpenMP_Fortran_FLAGS})
+target_compile_options(latte PRIVATE -cpp)
 install(TARGETS latte EXPORT LATTE_Targets LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(EXPORT LATTE_Targets FILE LATTE_Targets.cmake NAMESPACE LATTE:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/LATTE)
 include(CMakePackageConfigHelpers)
 configure_file(LATTEConfig.cmakein ${CMAKE_CURRENT_BINARY_DIR}/LATTEConfig.cmake @ONLY)
 write_basic_package_version_file("LATTEConfigVersion.cmake" VERSION ${PROJECT_VERSION} COMPATIBILITY ExactVersion)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/LATTEConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/LATTEConfigVersion.cmake" DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/LATTE)
+add_library(LATTE::latte ALIAS latte)
 target_link_libraries(latte PRIVATE
-  ${LAPACK_LIBRARIES}
-  ${BLAS_LIBRARIES}
   ${PROGRESS_LIBRARIES}
   ${BML_LIBRARIES}
   ${CUDA_cublas_LIBRARY}
   ${CUDA_cusparse_LIBRARY}
   ${CUDA_CUDART_LIBRARY}
   ${MPI_Fortran_LIBRARIES}
+  PUBLIC
+  ${LAPACK_LIBRARIES}
+  ${BLAS_LIBRARIES}
 )
 if(OPENMP)
-  target_link_libraries(latte PUBLIC "${OpenMP_Fortran_FLAGS}")
+  target_link_libraries(latte PUBLIC OpenMP::OpenMP_Fortran)
 endif()
 target_include_directories(latte PRIVATE ${MPI_Fortran_INCLUDE_PATH} ${PROGRESS_INCLUDE_DIRS} ${BML_INCLUDE_DIRS})
 
@@ -173,8 +175,7 @@ else()
   set(LATTE LATTE_${PRECISION})
 endif()
 add_executable(${LATTE} ${CMAKE_CURRENT_SOURCE_DIR}/../src/latte.F90)
-target_compile_options(${LATTE} PRIVATE -cpp ${OpenMP_Fortran_FLAGS})
-target_link_libraries(${LATTE} latte)
+target_link_libraries(${LATTE} latte ${PROGRESS_LIBRARIES})
 target_include_directories(${LATTE} PRIVATE ${MPI_Fortran_INCLUDE_PATH} ${PROGRESS_INCLUDE_DIRS} ${BML_INCLUDE_DIRS})
 target_compile_definitions(${LATTE} PRIVATE XSYEV ${PRECISION}PREC GPU${GPUOPT} DBCSR_${DBCSR_OPT} MPI_${DO_MPI} PROGRESS${PROGRESS})
 install(TARGETS ${LATTE} DESTINATION ${CMAKE_INSTALL_BINDIR})
