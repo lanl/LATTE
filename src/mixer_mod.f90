@@ -42,7 +42,7 @@ MODULE MIXER_MOD
 #endif
 
   PUBLIC :: KERNELMIXER, KERNELPROPAGATION, FULLKERNELPROPAGATION
-  PUBLIC :: DMKERNELMIXER, DMKERNELPROPAGATION
+  PUBLIC :: DMKERNELMIXER, DMKERNELPROPAGATION, dP2MD, dP2MIXER
   PUBLIC :: PRECONDKERNELPROPAGATION, ADAPTPRECONDKERNEL
 
   !For mixing scheme
@@ -519,8 +519,8 @@ CONTAINS
     call DGEMM('N','T',HDIM,HDIM,HDIM,ONE,YY,HDIM,XMAT,HDIM,ZERO,X,HDIM)
     call DGEMM('N','N',HDIM,HDIM,HDIM,ONE,X,HDIM,SMAT,HDIM,ZERO,Delta_DS,HDIM)
 !
+    Res = 0.D0
     do I = 1, NATS
-      Res(I) = 0.D0
       do K = H_INDEX_START(I), H_INDEX_END(I)
         Res(I) = Res(I) + Delta_DS(K,K)
       enddo
@@ -673,6 +673,277 @@ CONTAINS
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+
+  SUBROUTINE dP2MD(PITER)  !! ANDERS CHANGE NEW SUBROUTINE
+    IMPLICIT NONE
+    INTEGER, INTENT(IN) :: PITER
+    !
+    INTEGER :: I, J, K, N, ii, jj
+    REAL(LATTEPREC) :: Res(NATS)
+    REAL(LATTEPREC) :: BO_SAVE(HDIM,HDIM)
+    REAL(LATTEPREC) :: X(HDIM,HDIM), YY(HDIM,HDIM)
+    REAL(LATTEPREC) :: Delta_DO(HDIM,HDIM), nDelta_DO(HDIM,HDIM),nDO, Delta_DS(HDIM,HDIM)
+!
+    BO_SAVE = BO
+
+    Delta_DO = DOrth-PO_0
+
+    !call DGEMM('N','N',HDIM,HDIM,HDIM,ONE,XMAT,HDIM,Delta_DO,HDIM,ZERO,YY,HDIM)
+    !call DGEMM('N','T',HDIM,HDIM,HDIM,ONE,YY,HDIM,XMAT,HDIM,ZERO,X,HDIM)
+    !call DGEMM('N','N',HDIM,HDIM,HDIM,ONE,X,HDIM,SMAT,HDIM,ZERO,Delta_DS,HDIM)
+
+    !do I = 1, NATS
+    !  Res(I) = 0.D0
+    !  do K = H_INDEX_START(I), H_INDEX_END(I)
+    !    Res(I) = Res(I) + Delta_DS(K,K)
+    !  enddo
+    !enddo
+    !write(*,*) ' Res = ', Res(:)
+
+    !write(6,*) 'maxval(dDO/dP) called from dP2MD'
+    IF (PITER <= 1) then
+      write(*,*) ' LINEAR MIX MIXER_MOD (MD)'
+      d2PO = Delta_DO
+      !write(6,*) PO_0
+    ELSE
+      write(*,*) ' RESPONSE MIX MIXER_MOD (MD)'
+      call dP2(Delta_DO, d2PO)
+    ENDIF
+
+    BO = BO_SAVE
+
+  END SUBROUTINE dP2MD
+!
+  SUBROUTINE dP2MIXER(PITER,SCF_ERR,MAXDQ)  !! ANDERS CHANGE NEW SUBROUTINE
+    IMPLICIT NONE
+    INTEGER, INTENT(IN) :: PITER
+    REAL(LATTEPREC), INTENT(IN) :: SCF_ERR
+    REAL(LATTEPREC), INTENT(IN) :: MAXDQ
+    !
+    INTEGER :: I, J, K, N, ii, jj
+    REAL(LATTEPREC) :: Res(NATS)
+    REAL(LATTEPREC) :: dU(HDIM,HDIM)
+    REAL(LATTEPREC) :: X(HDIM,HDIM), YY(HDIM,HDIM)
+    REAL(LATTEPREC) :: Delta_DO(HDIM,HDIM), nDelta_DO(HDIM,HDIM),nDO, Delta_DS(HDIM,HDIM)
+!
+    Delta_DO = DOrth-DOrth_old
+    !nDO = 0.D0
+    !do I = 1, HDIM
+    !  nDO = nDO + dot_product(Delta_DO(:,I),Delta_DO(:,I))
+    !enddo
+    !nDO =sqrt(nDO)
+    !nDelta_DO = Delta_DO/nDO
+!
+    !call DGEMM('N','N',HDIM,HDIM,HDIM,ONE,XMAT,HDIM,Delta_DO,HDIM,ZERO,YY,HDIM)
+    !call DGEMM('N','T',HDIM,HDIM,HDIM,ONE,YY,HDIM,XMAT,HDIM,ZERO,X,HDIM)
+    !call DGEMM('N','N',HDIM,HDIM,HDIM,ONE,X,HDIM,SMAT,HDIM,ZERO,Delta_DS,HDIM)
+
+    !do I = 1, NATS
+    !  Res(I) = 0.D0
+    !  do K = H_INDEX_START(I), H_INDEX_END(I)
+    !    Res(I) = Res(I) + Delta_DS(K,K)
+    !  enddo
+    !enddo
+    !write(*,*) ' Res = ', Res(:)
+
+    IF(SCF_ERR > 0.01D0) THEN
+      !write(*,*) ' LINEAR MIX MIXER_MOD', QMIX, SCF_ERR
+      dU = QMIX*Delta_DO
+    ELSE
+      !write(*,*) ' RESPONSE MIX MIXER_MOD', SCF_ERR
+      call dP2(Delta_DO, dU) 
+      !dU = QMIX*Delta_DO
+    ENDIF
+    BO = DOrth_old + dU
+
+
+  END SUBROUTINE dP2MIXER
+
+
+
+  SUBROUTINE dP2(Delta_DO,dP)  !! ANDERS CHANGE NEW SUBROUTINE
+    IMPLICIT NONE
+    REAL(LATTEPREC), intent(in)  :: Delta_DO(HDIM,HDIM)
+    REAL(LATTEPREC), intent(out) :: dP(HDIM,HDIM)
+
+    !
+    INTEGER :: I, J, N, ii, jj
+    INTEGER :: KI, MI, K, L
+    REAL(LATTEPREC) :: ErrDM, Tol, TMP
+    REAL(LATTEPREC) :: IdentResDM(HDIM,HDIM), ErrDMn
+    REAL(LATTEPREC) :: DM_V(HDIM,HDIM,NRANK), UU(HDIM,HDIM,NRANK)
+    REAL(LATTEPREC) :: Res(NATS), dr(NATS) 
+    REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS)  !, Coulomb_Pot_dq_v(NATS)
+    REAL(LATTEPREC) :: H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM), H_SAVE(HDIM,HDIM)
+    REAL(LATTEPREC) :: Nocc, beta, eps, FCOUL_SAVE(3,NATS)
+    REAL(LATTEPREC) :: X(HDIM,HDIM), YY(HDIM,HDIM), ORTHOH_SAVE(HDIM,HDIM)
+    REAL(LATTEPREC) :: nDelta_DO(HDIM,HDIM),nDO, Delta_DS(HDIM,HDIM)
+    REAL(LATTEPREC) :: SU(HDIM,HDIM), H_1(HDIM,HDIM),H1(HDIM,HDIM), ndDO_dU, dU(HDIM,HDIM)
+    REAL(LATTEPREC), allocatable     :: MMX(:,:), MMX_I(:,:)
+!    !
+    DELTAQ_SAVE = DELTAQ
+    COULOMBV_SAVE = COULOMBV
+    FCOUL_SAVE = FCOUL
+    ORTHOH_SAVE = ORTHOH
+    H_SAVE = H
+    H_0 = H0
+    Tol = 0.01_LATTEPREC
+    ErrDM = 100_LATTEPREC
+    eps   = 1.d-7
+
+    dU = Delta_DO
+    ! adpative rank-m, no preconditioning
+
+    do I = 1, HDIM
+    do J = 1, HDIM
+       SU(I,J) = SMAT(I,J)*DFTB_U(J)
+    enddo
+    enddo
+
+    !WRITE(6,*) 'test-dP2: NRANK=', NRANK
+    !write(6,*) 'maxval(dDO)=', maxval(dabs(dU))
+
+    K = 0
+    ALLOCATE(MMX(1,1),MMX_I(1,1))
+    do while ( ErrDM > Tol .AND. K < NRANK) 
+       DEALLOCATE(MMX,MMX_I)
+       H0 = 0.D0  ! SUCH THAT ADDQDEP ONLY INCLUDES RESPONSE PART
+       K = K + 1
+       DM_V(:,:,K) = dU(:,:)
+
+       DO J = 1, K-1
+          TMP = 0.0_LATTEPREC
+          DO I = 1, HDIM
+          DO L = 1, HDIM
+            TMP = TMP + DM_V(L,I,K) * DM_V(L,I,J)
+          ENDDO
+          ENDDO
+          DM_V(:,:,K) = DM_V(:,:,K) - TMP * DM_V(:,:,J)
+       ENDDO
+       
+       TMP = NORM2(DM_V(:,:,K))
+       IF (TMP<1.d-20) TMP = TMP + 1.d-20
+
+       !write(6,*) 'TMP=', K, TMP
+       !TMP = 0.D0
+       !do I = 1, HDIM
+       !do L = 1, HDIM
+       !   TMP = TMP + DM_V(L,I,K)**2
+       !enddo
+       !enddo
+       !write(6,*) 'TMP=', dsqrt(TMP)
+      
+       IF (TMP < 1.D-12) write(6,*) 'TMP is ZERO in dP2!'
+       DM_V(:,:,K) = DM_V(:,:,K)/TMP
+       !DM_V(:,:,K) = DM_V(:,:,K)/sqrt(TMP)
+
+       call DGEMM('N','N',HDIM,HDIM,HDIM,ONE,XMAT,HDIM,DM_V(:,:,K),HDIM,ZERO,YY,HDIM)
+       call DGEMM('N','T',HDIM,HDIM,HDIM,ONE,YY,HDIM,XMAT,HDIM,ZERO,X,HDIM)
+       call DGEMM('N','N',HDIM,HDIM,HDIM,ONE,X,HDIM,SMAT,HDIM,ZERO,Delta_DS,HDIM)
+
+       call DGEMM('T','N',HDIM,HDIM,HDIM,ONE,Delta_DS,HDIM,SU,HDIM,ZERO,X,HDIM)
+       call DGEMM('N','N',HDIM,HDIM,HDIM,ONE,SU,HDIM,Delta_DS,HDIM,ZERO,YY,HDIM)
+
+       H1 = -0.25D0*(X+YY)
+       do I = 1,HDIM
+       do J = 1,HDIM
+          H_1(I,J) = H1(I,J) + H1(J,I)  ! Response in H from the Hubbard energy term
+       enddo
+       enddo
+
+       DELTAQ = 0.0
+       do I = 1,NATS
+         do J = H_INDEX_START(I),H_INDEX_END(I)
+          DELTAQ(I) = DELTAQ(I) + 2*Delta_DS(J,J)
+        enddo
+       enddo
+   
+       call coulombrspace
+       call coulombewald
+       call addqdep
+       H = H + H_1  ! Total perturbation
+       call orthomyh
+       Nocc = BNDFIL*float(HDIM)
+       beta = 1.D0/KBT
+
+       ! call canonical response
+       call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+       !call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
+
+       UU(:,:,K) = BO(:,:) - DM_V(:,:,K)
+       dU(:,:) = UU(:,:,K)
+
+       !---------------
+       !check acccuracy
+       !---------------
+       ALLOCATE(MMX(K,K),MMX_I(K,K))
+       do I = 1,K
+       do J = 1,K
+         TMP = 0.D0
+         do L = 1,HDIM
+         do KI = 1,HDIM
+            TMP = TMP + UU(KI,L,I)*UU(KI,L,J)
+         enddo
+         enddo
+         MMX(I,J) = TMP
+       enddo
+       enddo
+
+       call Invert(MMX,MMX_I,K)
+ 
+       IdentResDM = 0.D0
+       do I = 1,K
+       do J = 1,K
+         TMP = 0.D0
+         do L = 1,HDIM
+         do KI = 1,HDIM
+            TMP = TMP + UU(KI,L,J)*Delta_DO(KI,L)
+         enddo
+         enddo
+         IdentResDM(:,:) = IdentResDM(:,:) + MMX_I(I,J)*TMP*UU(:,:,I)
+       enddo
+       enddo
+       ErrDM = 0.D0
+       ErrDMn = 0.D0
+       do I = 1, HDIM
+       do J = 1, HDIM
+         ErrDM = ErrDM + (IdentResDM(J,I) - Delta_DO(J,I))**2
+         ErrDMn = ErrDMn + (IdentResDM(J,I))**2
+       enddo
+       enddo
+       IF(ErrDMn<1.d-20) ErrDMn = ErrDMn + 1.d-20
+ 
+       ErrDM = sqrt(ErrDM)/sqrt(ErrDMn) ! Relative Error
+       !write(*,*) ' ErrDM = ', ErrDM  !! Should go down as a function of K
+       !-----
+    enddo
+
+    dP = 0.D0
+    do I = 1,K
+    do J = 1,K
+       TMP = 0.D0
+       do L = 1,HDIM
+       do MI = 1,HDIM
+          TMP = TMP + UU(MI,L,J)*Delta_DO(MI,L)
+       enddo
+       enddo
+       dP(:,:) = dP(:,:) - MMX_I(I,J)*TMP*DM_V(:,:,I)
+    enddo
+    enddo
+    DEALLOCATE(MMX,MMX_I)
+
+
+    write(6,*) 'maxval(dP)=', maxval(dabs(dP))
+
+    COULOMBV = COULOMBV_SAVE
+    DELTAQ = DELTAQ_SAVE
+    H0 = H_0
+    H = H_SAVE
+    FCOUL = FCOUL_SAVE
+    ORTHOH = ORTHOH_SAVE
+
+  END SUBROUTINE dP2
+!
 
 
 

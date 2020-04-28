@@ -396,9 +396,10 @@ SUBROUTINE TBMD
         TOTE = TRRHOH + EREP + KEE - ENTE - ECOUL + ESPIN + EPLUSD
         IF(DFTBU)TOTE = TRRHOH0 + EREP + KEE - ENTE + ECOUL + ESPIN + EPLUSD + 2.D0*EHUB  ! ANDERS CHANGE TO BE CONSISTENT WITH HUBBARD U works also without Hubbard U's
 
-                 write(*,*)"Ekin", KEE
-                 write(*,*)"Epot", TRRHOH + EREP - ENTE - ECOUL + ESPIN
-                 write(*,*)"components",TRRHOH, EREP, ENTE, ECOUL
+        !write(*,*)"Ekin", KEE
+        !write(*,*)"Epot", TRRHOH + EREP - ENTE - ECOUL + ESPIN
+        !write(*,*)"Ecoul", ECOUL
+        !write(*,*)"components",TRRHOH, EREP, ENTE, ECOUL
 
         IF (GETHUG .EQ. 1) CALL AVESFORHUG(PRESSURE, TOTE, TEMPERATURE, SYSVOL)
 
