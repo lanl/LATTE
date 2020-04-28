@@ -21,7 +21,7 @@ before_install:
   # Install BML, PROGRESS and LAMMPS
   - cd; cd bml; CC=gcc FC=gfortran CMAKE_BUILD_TYPE=Release BLAS_VENDOR=GNU BML_OPENMP=yes BML_TESTING=no ./build.sh configure
   - cd; cd bml/build; make; make install
-  - cd; cd qmd-progress; CC=gcc FC=gfortran PROGRESS_MPI=no PROGRESS_TESTING=yes BLAS_VENDOR=GNU PKG_CONFIG_PATH=~/bml/install/lib/pkgconfig PROGRESS_OPENMP=yes ./build.sh configure
+  - cd; cd qmd-progress; CC=gcc FC=gfortran PROGRESS_MPI=no PROGRESS_TESTING=yes BLAS_VENDOR=GNU CMAKE_PREFIX_PATH=~/bml/install PROGRESS_OPENMP=yes ./build.sh configure
   - cd; cd qmd-progress/build; make; make install
   # Lammps installation
   - cd; cd lammps/lib/latte; ln -s $LATTEPATH/src/latte_c_bind.o filelink.o ; ln -s $LATTEPATH/src includelink ; ln -s $LATTEPATH liblink
@@ -59,3 +59,7 @@ after_success:
 
 cache:
   - ccache
+
+branches:
+  only:
+  - master
