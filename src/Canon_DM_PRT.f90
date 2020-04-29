@@ -74,7 +74,7 @@ integer                 :: i, j, k, N
   do i = 1, HDIM
     traceBO = traceBO + BO(I,I)
   enddo
-  write(6,*) 'trace of BO (DM) = ', traceBO
+  !write(6,*) 'trace of BO (DM) = ', traceBO
 
 !  call MMult(ONE,Q,P1,ZERO,X,'N','N',HDIM) ! and back transformation of P1, with a total of
 !  call MMult(ONE,X,Q,ZERO,P1,'N','T',HDIM) ! 4 matrix-matrix multiplication dominates the cost

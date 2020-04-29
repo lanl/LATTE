@@ -27,9 +27,9 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   USE XBOARRAY
   USE MYPRECISION
   USE COULOMBARRAY
+  USE DMARRAY, ONLY : HubForce, DELTAQDM
   USE TIMER_MOD
   USE MIXER_MOD
-  USE DMARRAY ! CHANGE ANDERS
 
   IMPLICIT NONE
 
@@ -39,10 +39,10 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
   MLSI0 = TIME_MLS()
 
-  !!! ANDERS_CHANGE START
   if (SWITCH .NE. 0) THEN
 
-   IF(DOKERNEL .EQV. .TRUE. .AND. (.NOT.DFTBU))THEN 
+   IF(DOKERNEL .EQV. .TRUE.) THEN
+   !IF(DOKERNEL .EQV. .TRUE. .AND. (.NOT.DFTBU))THEN 
       NRANK = MIN(NORECS,NATS)
       !!CALL KERNELPROPAGATION(CURRITER,NRANK)
       !IF ((CURRITER.GE.9).AND.(CURRITER.LT.12)) THEN
@@ -64,8 +64,6 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
   ENDIF
  
-  !!! ANDERS_CHANGE END
-
   !
   ! The atoms have moved, so we have to build a new H (and overlap matrix)
 
@@ -86,7 +84,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   ENDIF
   FLUSH(6)
 
-  WRITE(*,*) "Time get H",  TIME_MLS() - MLSI
+  !WRITE(*,*) "Time get H",  TIME_MLS() - MLSI
 
   MLSI = TIME_MLS()
 
@@ -125,10 +123,10 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
         ! Propagating partial charges or diagonal elements of H
         IF (DFTBU) THEN
           IF(VERBOSE >= 1)WRITE(*,*)"Doing XBODM ..."
-          !CALL DMKERNELPROPAGATION(CURRITER)  !!! ANDERS CHANGE Create d2PO using rank-1 update
+          !CALL DMKERNELPROPAGATION(CURRITER)  !!! using rank-1 update
           CALL dP2MD(CURRITER)  !!! rank-m
-          CALL XBODM(CURRITER) ! ANDERS CHANGE Propagate DM's
-          DELTAQ = DELTAQDM    ! ANDERS CHANGE UPDATE DELTAQ FROM NEW DELTAQDM
+          CALL XBODM(CURRITER) ! Propagate DM's
+          DELTAQ = DELTAQDM    ! UPDATE DELTAQ FROM NEW DELTAQDM
         ELSE
           IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."
           CALL XBO(CURRITER) ! Propagate q's
@@ -173,7 +171,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   ENDIF
 
   WRITE(*,*) "Time for QNEUTRAL QCONSISTENCY ",  TIME_MLS() - MLSI
-  ! Run to self-consistency QITER = 0 -> only H(P) + D calculated ANDERS
+  ! Run to self-consistency QITER = 0 -> only H(P) + D calculated 
 
   !
   ! Setting up our XBO arrays after the first iteration
@@ -242,9 +240,13 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
         FCOUL(1,I) = FCOUL(1,I)*ZEROSCFMOD
         FCOUL(2,I) = FCOUL(2,I)*ZEROSCFMOD
         FCOUL(3,I) = FCOUL(3,I)*ZEROSCFMOD
-        !ECOUL = ECOUL + (TWO*DELTAQ(I) - OLDDELTAQS(I)) * &  ! skimLATTE
-        ECOUL = ECOUL + OLDDELTAQS(I)* &    ! Orig, ecp
-             (HUBBARDU(ELEMPOINTER(I))*OLDDELTAQS(I) + COULOMBV(I))
+        IF (DFTBU) THEN
+          ECOUL = ECOUL + (TWO*DELTAQ(I) - OLDDELTAQS(I)) * &    ! Works only with EBand0 energy from TRRHOH0 = Tr[D*H0]
+               (HUBBARDU(ELEMPOINTER(I))*OLDDELTAQS(I) + COULOMBV(I))
+        ELSE
+          ECOUL = ECOUL + OLDDELTAQS(I)* &    ! Orig, ecp Works with regular Eband and TRRHOH = tr[D*H]
+              (HUBBARDU(ELEMPOINTER(I))*OLDDELTAQS(I) + COULOMBV(I))
+        ENDIF
 
      ENDDO
 

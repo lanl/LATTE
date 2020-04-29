@@ -28,7 +28,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   USE TIMER_MOD
   USE MYPRECISION
   USE MIXER_MOD
-  USE DMARRAY ! CHANGE ANDERS
+  USE DMARRAY
 
   IMPLICIT NONE
 
@@ -37,14 +37,16 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   INTEGER :: START_CLOCK, STOP_CLOCK, CLOCK_RATE, CLOCK_MAX, ITERACC, DIIS_M
   INTEGER, ALLOCATABLE :: IPIV(:)
   REAL(4) :: TIMEACC
-  REAL(LATTEPREC) :: SCF_ERR
-  REAL(LATTEPREC) :: MAXDQ, MAG_DIFF, DELTA_DIFF
+  REAL(LATTEPREC) :: MAXDQ, MAG_DIFF, DELTA_DIFF, SCF_ERR, MLSI
   REAL(LATTEPREC), ALLOCATABLE :: QDIFF(:), SPINDIFF(:)
   REAL(LATTEPREC), ALLOCATABLE :: QDIFF_DIIS(:,:), BMAT_DIIS(:,:), DIIS_RHS(:)
   REAL(LATTEPREC), ALLOCATABLE :: QHIST(:,:)
 
   MDSOFT = 10
-  IF (DFTBU) MDSOFT = 1 !00
+  IF (DFTBU) THEN
+    MDSOFT = 1 
+    SCF_ERR = 1.D0
+  ENDIF
 
   IF (EXISTERROR) RETURN
 
@@ -101,7 +103,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            CALL KGETRHO
         ENDIF
 
-        IF (DFTBU) DOrth_old = BO  ! ANDERS CHANGE
+        IF (DFTBU) DOrth_old = BO
 
         TX = STOP_TIMER(DMBUILD_TIMER)
 
@@ -171,7 +173,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
            CALL COULOMBEWALD
 
-
         ELSE
 
            !
@@ -235,7 +236,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            CALL KGETRHO
         ENDIF
 
-        IF (DFTBU) DOrth = BO  ! ANDERS CHANGE
+        IF (DFTBU) DOrth = BO 
 
         TX = STOP_TIMER(DMBUILD_TIMER)
 
@@ -308,7 +309,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
            ! Run linear mixing for a bit until we start to converge
 
-!        IF (MDITER .LE. MDSOFT) THEN
+        !IF (MDITER .LE. MDSOFT) THEN
           IF (.NOT.DFTBU) THEN
 #ifdef PROGRESSON
            IF(MX%MIXERON)THEN
@@ -320,25 +321,30 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
 #endif
           ELSE
-!           BO = DOrth_old + QMIX*(DOrth - DOrth_old)    ! ANDERS CHANGE Simple linear mixing
-            !CALL DMKERNELMIXER(ITER,MAXDQ)               ! ANDERS CHANGE Rank1-1 updated DM kernel mixer
-            CALL dP2MIXER(ITER,SCF_ERR,MAXDQ)               ! ANDERS CHANGE Rank1-1 updated DM kernel mixer
-            DOrth_old = BO                               ! ANDERS CHANGE
-
-            CALL DEORTHOMYRHO
-            OLDDELTAQS = DELTAQ
-            CALL GETDELTAQ
-            SCF_ERR = norm2(DELTAQ - OLDDELTAQS)/sqrt(ONE*NATS) ! ANDERS CHANGE SCF_ERR TO COMPARE TO Dev Verison
+           !CALL DMKERNELMIXER(ITER,MAXDQ)    ! Rank-1 updated DM kernel mixer
+           CALL dP2MIXER(ITER,SCF_ERR,MAXDQ)  ! Rank-m updated DM kernel mixer
+           DOrth_old = BO                   
+           CALL DEORTHOMYRHO
+           OLDDELTAQS = DELTAQ
+           CALL GETDELTAQ
+           SCF_ERR = norm2(DELTAQ - OLDDELTAQS)/sqrt(ONE*NATS)
           ENDIF
+
         ELSE
 
-          IF (.NOT.DFTBU) THEN
            ! Flip this flag so we don't go back into linear mixing
 
            NEW_MIXER = 1
 
-           ! Then switch to DIIS
+           IF (DFTBU) THEN
+             BO = DOrth_old + QMIX*(DOrth - DOrth_old)
+             DOrth_old = BO
+             CALL DEORTHOMYRHO
+             CALL GETDELTAQ      ! INCLUDED_GETDELTAQ Probably not to comment out
+           ELSE
    
+           ! Then switch to DIIS
+
            DIIS_M = DIIS_M + 1
 
 
@@ -355,7 +361,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
               QHIST(:,DIIS_M) = DELTAQ
 
               DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
-              
+           
            ELSE
 
               QDIFF_DIIS(:,DIIS_M) = DELTAQ - OLDDELTAQS
@@ -399,14 +405,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
               DEALLOCATE(BMAT_DIIS, DIIS_RHS, IPIV)
               
            ENDIF
-           
-          ELSE
-             BO = DOrth_old + QMIX*(DOrth - DOrth_old)  ! ANDERS CHANGE
-             DOrth_old = BO                             ! ANDERS CHANGE
-             CALL DEORTHOMYRHO
-             CALL GETDELTAQ      ! INCLUDED_GETDELTAQ Probably not to comment out ANDERS?
-          ENDIF
-
+           ENDIF ! DFTBU
         ENDIF
 
         IF (DFTBU)  DOrth = DOrth_old
@@ -439,6 +438,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            WRITE(6,*) "# Continuing anyway, but be very careful... "
 
            ALLOK = 0
+
+           IF (STOPATMAXSCF) CALL ERRORS("qconsistency","The SCF procedure has not converged")
 
 !           DO I = 1, NATS
 !              PRINT*, ATELE(I), CR(1,I), CR(2,I), CR(3,I)
@@ -518,11 +519,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         CALL ADDQDEP
-
-        !---------------------------------------------------
-        ! ANDERS CHANGE INCLUDE THE ADDITIONAL DFTB+U TERM
-        !---------------------------------------------------
-        !IF (DFTBU) CALL ADDDFTBU  
         IF (DFTBU) CALL ADDDFTBU(.false.) 
 
         !
@@ -566,7 +562,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         OLDDELTAQS = DELTAQ
-        IF (DFTBU) DOrth = BO  ! ANDERS CHANGE The optimized DM of the linearized shadow functional (in a single step!)
+        IF (DFTBU) DOrth = BO  
 
         !
         ! Get a new set of charges for our system
@@ -596,10 +592,10 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
 
-        ! ANDERS CHANGE Here we do DM mixing instead of charge mixing
+        ! Here we do DM mixing instead of charge mixing
         IF (DFTBU) THEN
-          BO = DOrth_old + QMIX*(DOrth - DOrth_old)  ! ANDERS CHANGE
-          DOrth_old = BO                             ! ANDERS CHANGE
+          BO = DOrth_old + QMIX*(DOrth - DOrth_old) 
+          DOrth_old = BO                           
           CALL DEORTHOMYRHO
           CALL GETDELTAQ         ! INCLUDED_GETDELTAQ
         ENDIF
