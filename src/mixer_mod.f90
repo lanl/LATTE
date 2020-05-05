@@ -41,9 +41,10 @@ MODULE MIXER_MOD
   PUBLIC :: QMIXPRG
 #endif
 
-  PUBLIC :: KERNELMIXER, KERNELPROPAGATION, FULLKERNELPROPAGATION
-  PUBLIC :: DMKERNELMIXER, DMKERNELPROPAGATION, dP2MD, dP2MIXER
+  !PUBLIC :: KERNELMIXER  ! this mixer is not used 
+  PUBLIC :: KERNELPROPAGATION, FULLKERNELPROPAGATION
   PUBLIC :: PRECONDKERNELPROPAGATION, ADAPTPRECONDKERNEL
+  PUBLIC :: DMKERNELMIXER, DMKERNELPROPAGATION, dP2MD, dP2MIXER
 
   !For mixing scheme
   LOGICAL, PUBLIC                      ::  MIXINIT = .FALSE.
@@ -59,11 +60,11 @@ CONTAINS
     INTEGER, INTENT(IN) :: MDITER
     INTEGER :: I, J, N, ii, jj
     REAL(LATTEPREC) :: Res(NATS), dr(NATS), vi(NATS,NATS), wi(NATS,NATS), ui(NATS,NATS)
-    REAL(LATTEPREC) :: su(NATS), wv(NATS), dq_dv(NATS), dq_v(NATS), v(NATS), ri(NATS,NATS)
-    REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS), Coulomb_Pot_dq_v(NATS)
+    REAL(LATTEPREC) :: du(NATS), dq_dv(NATS), dq_v(NATS), v(NATS), ri(NATS,NATS)
+    REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS)
     REAL(LATTEPREC) :: H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM), H_SAVE(HDIM,HDIM)
-    REAL(LATTEPREC) :: D_dq_dv(HDIM,HDIM), Nocc, beta, eps, FCOUL_SAVE(3,NATS), T12(HDIM,HDIM)
-    REAL(LATTEPREC) :: X(HDIM,HDIM), YY(HDIM,HDIM), ORTHOH_SAVE(HDIM,HDIM)
+    REAL(LATTEPREC) :: Nocc, beta, eps, FCOUL_SAVE(3,NATS)
+    REAL(LATTEPREC) :: ORTHOH_SAVE(HDIM,HDIM)
     !
     DELTAQ_SAVE = DELTAQ
     COULOMBV_SAVE = COULOMBV
@@ -75,6 +76,7 @@ CONTAINS
     H0 = 0.D0
 
     Res = DELTAQ - PNK(1,:)
+    write(6,*) 'MDITER', MDITER, norm2(Res)
 !    if  (MDITER <= 0) then  !! typical choice <= 1, for really really hard cases <= 20
 !     dn2dt2 = MDMIX*Res
 !    else
@@ -108,15 +110,15 @@ CONTAINS
            dr = dq_dv
            ! ri(:,I) = dr + ((1.D0 - MDMIX)/MDMIX)*vi(:,I)
            ri(:,I) = dr 
-           !su(:) = -MDMIX*ri(:,I)
+           !du(:) = -MDMIX*ri(:,I)
            !wi(:,I) = -MDMIX*vi(:,I)
-           su(:) = -ri(:,I)
+           du(:) = -ri(:,I)
            wi(:,I) = -vi(:,I)
            do J = 1,I-1
-              su(:) = su(:) - dot_product(wi(:,J),ri(:,I))*ui(:,J)
+              du(:) = du(:) - dot_product(wi(:,J),ri(:,I))*ui(:,J)
               wi(:,I) = wi(:,I) - dot_product(ui(:,J),vi(:,I))*wi(:,J)
            enddo
-           ui(:,I) = su/(1.D0 + dot_product(vi(:,I),su))
+           ui(:,I) = du/(1.D0 + dot_product(vi(:,I),du))
            dr(I) = 0.D0
         enddo
         FULL_K = 0.D0*FULL_K
@@ -151,11 +153,11 @@ CONTAINS
     INTEGER, INTENT(IN) :: MDITER,LL
     INTEGER :: I, J, N, ii, jj
     REAL(LATTEPREC) :: Res(NATS), dr(NATS), vi(NATS,LL), wi(NATS,LL), ui(NATS,LL)
-    REAL(LATTEPREC) :: su(NATS), wv(NATS), dq_dv(NATS), dq_v(NATS), v(NATS), ri(NATS,LL)
-    REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS), Coulomb_Pot_dq_v(NATS)
+    REAL(LATTEPREC) :: dq_dv(NATS), dq_v(NATS), v(NATS), ri(NATS,LL)
+    REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS)
     REAL(LATTEPREC) :: H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM), H_SAVE(HDIM,HDIM)
-    REAL(LATTEPREC) :: D_dq_dv(HDIM,HDIM), Nocc, beta, eps, FCOUL_SAVE(3,NATS), T12(HDIM,HDIM)
-    REAL(LATTEPREC) :: X(HDIM,HDIM), YY(HDIM,HDIM), ORTHOH_SAVE(HDIM,HDIM)
+    REAL(LATTEPREC) :: Nocc, beta, eps, FCOUL_SAVE(3,NATS)
+    REAL(LATTEPREC) :: ORTHOH_SAVE(HDIM,HDIM)
     REAL(LATTEPREC) :: FO(LL,LL), FM(LL,LL), ri_t(LL,NATS)
     REAL(LATTEPREC) :: WORK(LL+LL*LL)
     INTEGER         :: INFO, IPIV(LL)
@@ -235,11 +237,11 @@ CONTAINS
     INTEGER, INTENT(IN) :: MDITER,LL
     INTEGER :: I, J, N, II, JJ, K
     REAL(LATTEPREC) :: Res(NATS), dr(NATS), vi(NATS,LL), wi(NATS,LL), ui(NATS,LL)
-    REAL(LATTEPREC) :: su(NATS), wv(NATS), dq_dv(NATS), dq_v(NATS), v(NATS), ri(NATS,LL)
-    REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS), Coulomb_Pot_dq_v(NATS)
+    REAL(LATTEPREC) :: dq_dv(NATS), dq_v(NATS), v(NATS), ri(NATS,LL)
+    REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS)
     REAL(LATTEPREC) :: H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM), H_SAVE(HDIM,HDIM)
-    REAL(LATTEPREC) :: D_dq_dv(HDIM,HDIM), Nocc, beta, eps, FCOUL_SAVE(3,NATS), T12(HDIM,HDIM)
-    REAL(LATTEPREC) :: X(HDIM,HDIM), YY(HDIM,HDIM), ORTHOH_SAVE(HDIM,HDIM)
+    REAL(LATTEPREC) :: Nocc, beta, eps, FCOUL_SAVE(3,NATS)
+    REAL(LATTEPREC) :: ORTHOH_SAVE(HDIM,HDIM)
     REAL(LATTEPREC) :: ri_t(LL,NATS), IDENTRES(NATS)
     REAL(LATTEPREC) :: WORK(LL+LL*LL)
     REAL(LATTEPREC) :: RESNORM, FEL, CRIT, DTMP
@@ -342,11 +344,11 @@ CONTAINS
     INTEGER, INTENT(IN) :: MDITER,LL
     INTEGER :: I, J, N, ii, jj
     REAL(LATTEPREC) :: Res(NATS), dr(NATS), vi(NATS,LL), wi(NATS,LL), ui(NATS,LL)
-    REAL(LATTEPREC) :: su(NATS), wv(NATS), dq_dv(NATS), dq_v(NATS), v(NATS), ri(NATS,LL)
-    REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS), Coulomb_Pot_dq_v(NATS)
+    REAL(LATTEPREC) :: du(NATS), dq_dv(NATS), dq_v(NATS), v(NATS), ri(NATS,LL)
+    REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS)
     REAL(LATTEPREC) :: H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM), H_SAVE(HDIM,HDIM)
-    REAL(LATTEPREC) :: D_dq_dv(HDIM,HDIM), Nocc, beta, eps, FCOUL_SAVE(3,NATS), T12(HDIM,HDIM)
-    REAL(LATTEPREC) :: X(HDIM,HDIM), YY(HDIM,HDIM), ORTHOH_SAVE(HDIM,HDIM)
+    REAL(LATTEPREC) :: Nocc, beta, eps, FCOUL_SAVE(3,NATS)
+    REAL(LATTEPREC) :: ORTHOH_SAVE(HDIM,HDIM)
     !
     DELTAQ_SAVE = DELTAQ
     COULOMBV_SAVE = COULOMBV
@@ -388,13 +390,13 @@ CONTAINS
            dq_dv = DELTAQ
            dr = dq_dv
            ri(:,I) = dr + ((1.D0 - MDMIX)/MDMIX)*vi(:,I)
-           su(:) = -MDMIX*ri(:,I)
+           du(:) = -MDMIX*ri(:,I)
            wi(:,I) = -MDMIX*vi(:,I)
            do J = 1,I-1
-              su(:) = su(:) - dot_product(wi(:,J),ri(:,I))*ui(:,J)
+              du(:) = du(:) - dot_product(wi(:,J),ri(:,I))*ui(:,J)
               wi(:,I) = wi(:,I) - dot_product(ui(:,J),vi(:,I))*wi(:,J)
            enddo
-           ui(:,I) = su/(1.D0 + dot_product(vi(:,I),su))
+           ui(:,I) = du/(1.D0 + dot_product(vi(:,I),du))
         enddo
         ! update q corresponding to q = q - MATMUL(KK,Res)
         !DELTAQ = OLDDELTAQS + QMIX*Res
@@ -413,90 +415,90 @@ CONTAINS
     DELTAQ = DELTAQ_SAVE
   END SUBROUTINE KERNELPROPAGATION
 
-  SUBROUTINE KERNELMIXER(PITER,LL)
-    INTEGER, INTENT(IN) :: PITER,LL
-    INTEGER :: I, J, N, ii, jj
-    REAL(LATTEPREC) :: Res(NATS), dr(NATS), vi(NATS,LL), wi(NATS,LL), ui(NATS,LL)
-    REAL(LATTEPREC) :: su(NATS), wv(NATS), dq_dv(NATS), dq_v(NATS), v(NATS), ri(NATS,LL)
-    REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS), Coulomb_Pot_dq_v(NATS)
-    REAL(LATTEPREC) :: H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM), H_SAVE(HDIM,HDIM)
-    REAL(LATTEPREC) :: D_dq_dv(HDIM,HDIM), Nocc, beta, eps, FCOUL_SAVE(3,NATS), T12(HDIM,HDIM)
-!    REAL(LATTEPREC) :: ev(HDIM), mu0 , fe(HDIM), DDT(HDIM,HDIM), mu1, trX, trDDT
-    REAL(LATTEPREC) :: X(HDIM,HDIM), YY(HDIM,HDIM), ORTHOH_SAVE(HDIM,HDIM)
-    !
-    DELTAQ_SAVE = DELTAQ
-    COULOMBV_SAVE = COULOMBV
-    FCOUL_SAVE = FCOUL
-    BO_SAVE = BO
-    ORTHOH_SAVE = ORTHOH
-    H_SAVE = H
-    H_0 = H0
-    H0 = 0.D0
+  !SUBROUTINE KERNELMIXER(PITER,LL)
+  !  INTEGER, INTENT(IN) :: PITER,LL
+  !  INTEGER :: I, J, N, ii, jj
+  !  REAL(LATTEPREC) :: Res(NATS), dr(NATS), vi(NATS,LL), wi(NATS,LL), ui(NATS,LL)
+  !  REAL(LATTEPREC) :: du(NATS), dq_dv(NATS), dq_v(NATS), v(NATS), ri(NATS,LL)
+  !  REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS)
+  !  REAL(LATTEPREC) :: H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM), H_SAVE(HDIM,HDIM)
+  !  REAL(LATTEPREC) :: Nocc, beta, eps, FCOUL_SAVE(3,NATS)
+  !  !REAL(LATTEPREC) :: ev(HDIM), mu0 , fe(HDIM), DDT(HDIM,HDIM), mu1, trX, trDDT
+  !  REAL(LATTEPREC) :: ORTHOH_SAVE(HDIM,HDIM)
+  !  !
+  !  DELTAQ_SAVE = DELTAQ
+  !  COULOMBV_SAVE = COULOMBV
+  !  FCOUL_SAVE = FCOUL
+  !  BO_SAVE = BO
+  !  ORTHOH_SAVE = ORTHOH
+  !  H_SAVE = H
+  !  H_0 = H0
+  !  H0 = 0.D0
 
-    Res = DELTAQ - OLDDELTAQS
-    !if  (PITER <= 10) then  !! typical choice <= 1, for really really hard cases <= 20
-    if ((norm2(Res)/sqrt(1.D0*NATS) > 1e-1).OR.(PITER<=1)) then
-      DELTAQ = OLDDELTAQS + QMIX*Res
-    else
-        dr = Res
-        do I = 1,LL !! LL is the number of rank-1 updates  LL = 0 means linear mixing
-           vi(:,I) = dr/norm2(dr)
-           do J = 1,I-1
-              vi(:,I) = vi(:,I) - dot_product(vi(:,I),vi(:,J))*vi(:,J)
-              vi(:,I) = vi(:,I)/norm2(vi(:,I))
-           enddo
-           v(:) = vi(:,I)
-           !!!! Calculated dq_dv, which is the response in q(n) from change in input charge n = v
-           dq_dv = ZERO
-           dq_v = v/norm2(v)
-           DELTAQ = dq_v
-           call coulombrspace
-           call coulombewald
-           call addqdep
-           call orthomyh
-           Nocc = BNDFIL*float(HDIM)
-           beta = 1.D0/KBT
-           !call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
-           call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
-           BO = 2.D0*BO
-           call deorthomyrho
-           call getdeltaq_resp
-           dq_dv = DELTAQ
-           dr = dq_dv
-           ri(:,I) = dr + ((1.D0 - QMIX)/QMIX)*vi(:,I)
-           su(:) = -QMIX*ri(:,I)
-           wi(:,I) = -QMIX*vi(:,I)
-           do J = 1,I-1
-              su(:) = su(:) - dot_product(wi(:,J),ri(:,I))*ui(:,J)
-              wi(:,I) = wi(:,I) - dot_product(ui(:,J),vi(:,I))*wi(:,J)
-           enddo
-           ui(:,I) = su/(1.D0 + dot_product(vi(:,I),su))
-        enddo
-        ! update q corresponding to q = q - MATMUL(KK,Res)
-        DELTAQ = OLDDELTAQS + QMIX*Res
-        do I = 1,LL  !! Let the approximate kernel act on the residual by individual rank-1 updates
-           DELTAQ = DELTAQ + dot_product(wi(:,I),Res)*ui(:,I)
-        enddo
-    endif
-    COULOMBV = COULOMBV_SAVE
-    BO = BO_SAVE
-    H0 = H_0
-    H = H_SAVE
-    FCOUL = FCOUL_SAVE
-    ORTHOH = ORTHOH_SAVE
-  END SUBROUTINE KERNELMIXER        
+  !  Res = DELTAQ - OLDDELTAQS
+  !  !if  (PITER <= 10) then  !! typical choice <= 1, for really really hard cases <= 20
+  !  if ((norm2(Res)/sqrt(1.D0*NATS) > 1e-1).OR.(PITER<=1)) then
+  !    DELTAQ = OLDDELTAQS + QMIX*Res
+  !  else
+  !      dr = Res
+  !      do I = 1,LL !! LL is the number of rank-1 updates  LL = 0 means linear mixing
+  !         vi(:,I) = dr/norm2(dr)
+  !         do J = 1,I-1
+  !            vi(:,I) = vi(:,I) - dot_product(vi(:,I),vi(:,J))*vi(:,J)
+  !            vi(:,I) = vi(:,I)/norm2(vi(:,I))
+  !         enddo
+  !         v(:) = vi(:,I)
+  !         !!!! Calculated dq_dv, which is the response in q(n) from change in input charge n = v
+  !         dq_dv = ZERO
+  !         dq_v = v/norm2(v)
+  !         DELTAQ = dq_v
+  !         call coulombrspace
+  !         call coulombewald
+  !         call addqdep
+  !         call orthomyh
+  !         Nocc = BNDFIL*float(HDIM)
+  !         beta = 1.D0/KBT
+  !         !call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+  !         call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
+  !         BO = 2.D0*BO
+  !         call deorthomyrho
+  !         call getdeltaq_resp
+  !         dq_dv = DELTAQ
+  !         dr = dq_dv
+  !         ri(:,I) = dr + ((1.D0 - QMIX)/QMIX)*vi(:,I)
+  !         du(:) = -QMIX*ri(:,I)
+  !         wi(:,I) = -QMIX*vi(:,I)
+  !         do J = 1,I-1
+  !            du(:) = du(:) - dot_product(wi(:,J),ri(:,I))*ui(:,J)
+  !            wi(:,I) = wi(:,I) - dot_product(ui(:,J),vi(:,I))*wi(:,J)
+  !         enddo
+  !         ui(:,I) = du/(1.D0 + dot_product(vi(:,I),du))
+  !      enddo
+  !      ! update q corresponding to q = q - MATMUL(KK,Res)
+  !      DELTAQ = OLDDELTAQS + QMIX*Res
+  !      do I = 1,LL  !! Let the approximate kernel act on the residual by individual rank-1 updates
+  !         DELTAQ = DELTAQ + dot_product(wi(:,I),Res)*ui(:,I)
+  !      enddo
+  !  endif
+  !  COULOMBV = COULOMBV_SAVE
+  !  BO = BO_SAVE
+  !  H0 = H_0
+  !  H = H_SAVE
+  !  FCOUL = FCOUL_SAVE
+  !  ORTHOH = ORTHOH_SAVE
+  !END SUBROUTINE KERNELMIXER        
 
 !!! ANDERS CHANGE ADD NEW SUBROUTINE
   SUBROUTINE DMKERNELPROPAGATION(PITER)
     INTEGER, INTENT(IN) :: PITER
     INTEGER :: I, J, N, ii, jj
     REAL(LATTEPREC) :: Res(NATS), dr(NATS) !, vi(NATS,LL), wi(NATS,LL), ui(NATS,LL)
-    REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS)  !, Coulomb_Pot_dq_v(NATS)
+    REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS)
     REAL(LATTEPREC) :: H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM), H_SAVE(HDIM,HDIM)
-    REAL(LATTEPREC) :: D_dq_dv(HDIM,HDIM), Nocc, beta, eps, FCOUL_SAVE(3,NATS)
+    REAL(LATTEPREC) :: Nocc, beta, eps, FCOUL_SAVE(3,NATS)
     REAL(LATTEPREC) :: X(HDIM,HDIM), YY(HDIM,HDIM), ORTHOH_SAVE(HDIM,HDIM)
     REAL(LATTEPREC) :: Delta_DO(HDIM,HDIM), nDelta_DO(HDIM,HDIM),nDO, Delta_DS(HDIM,HDIM)
-    REAL(LATTEPREC) :: SU(HDIM,HDIM), H_1(HDIM,HDIM),H1(HDIM,HDIM), ndDO_dU, dU(HDIM,HDIM)
+    REAL(LATTEPREC) :: H_1(HDIM,HDIM),H1(HDIM,HDIM), ndDO_dU, dU(HDIM,HDIM)
 !    !
     DELTAQ_SAVE = DELTAQ
     COULOMBV_SAVE = COULOMBV
@@ -580,13 +582,13 @@ CONTAINS
     !
     INTEGER :: I, J, N, ii, jj
     INTEGER :: K
-    REAL(LATTEPREC) :: Res(NATS), dr(NATS) !, vi(NATS,LL), wi(NATS,LL), ui(NATS,LL)
-    REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS)  !, Coulomb_Pot_dq_v(NATS)
+    REAL(LATTEPREC) :: Res(NATS), dr(NATS)
+    REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS)
     REAL(LATTEPREC) :: H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM), H_SAVE(HDIM,HDIM)
-    REAL(LATTEPREC) :: D_dq_dv(HDIM,HDIM), Nocc, beta, eps, FCOUL_SAVE(3,NATS)
+    REAL(LATTEPREC) :: Nocc, beta, eps, FCOUL_SAVE(3,NATS)
     REAL(LATTEPREC) :: X(HDIM,HDIM), YY(HDIM,HDIM), ORTHOH_SAVE(HDIM,HDIM)
     REAL(LATTEPREC) :: Delta_DO(HDIM,HDIM), nDelta_DO(HDIM,HDIM),nDO, Delta_DS(HDIM,HDIM)
-    REAL(LATTEPREC) :: SU(HDIM,HDIM), H_1(HDIM,HDIM),H1(HDIM,HDIM), ndDO_dU, dU(HDIM,HDIM)
+    REAL(LATTEPREC) :: H_1(HDIM,HDIM),H1(HDIM,HDIM), ndDO_dU, dU(HDIM,HDIM)
 !    !
     DELTAQ_SAVE = DELTAQ
     COULOMBV_SAVE = COULOMBV
@@ -688,17 +690,18 @@ CONTAINS
 
     Delta_DO = DOrth-PO_0
 
-    !call DGEMM('N','N',HDIM,HDIM,HDIM,ONE,XMAT,HDIM,Delta_DO,HDIM,ZERO,YY,HDIM)
-    !call DGEMM('N','T',HDIM,HDIM,HDIM,ONE,YY,HDIM,XMAT,HDIM,ZERO,X,HDIM)
-    !call DGEMM('N','N',HDIM,HDIM,HDIM,ONE,X,HDIM,SMAT,HDIM,ZERO,Delta_DS,HDIM)
+    call DGEMM('N','N',HDIM,HDIM,HDIM,ONE,XMAT,HDIM,Delta_DO,HDIM,ZERO,YY,HDIM)
+    call DGEMM('N','T',HDIM,HDIM,HDIM,ONE,YY,HDIM,XMAT,HDIM,ZERO,X,HDIM)
+    call DGEMM('N','N',HDIM,HDIM,HDIM,ONE,X,HDIM,SMAT,HDIM,ZERO,Delta_DS,HDIM)
 
-    !do I = 1, NATS
-    !  Res(I) = 0.D0
-    !  do K = H_INDEX_START(I), H_INDEX_END(I)
-    !    Res(I) = Res(I) + Delta_DS(K,K)
-    !  enddo
-    !enddo
+    do I = 1, NATS
+      Res(I) = 0.D0
+      do K = H_INDEX_START(I), H_INDEX_END(I)
+        Res(I) = Res(I) + Delta_DS(K,K)
+      enddo
+    enddo
     !write(*,*) ' Res = ', Res(:)
+    write(6,*) 'MDITER', PITER,NORM2(RES) / SQRT(DBLE(NATS)) 
 
     !write(6,*) 'maxval(dDO/dP) called from dP2MD'
     IF (PITER <= 1) then
@@ -769,16 +772,16 @@ CONTAINS
     !
     INTEGER :: I, J, N, ii, jj
     INTEGER :: KI, MI, K, L
-    REAL(LATTEPREC) :: ErrDM, Tol, TMP
+    REAL(LATTEPREC) :: ErrDM, TMP
     REAL(LATTEPREC) :: IdentResDM(HDIM,HDIM), ErrDMn
     REAL(LATTEPREC) :: DM_V(HDIM,HDIM,NRANK), UU(HDIM,HDIM,NRANK)
-    REAL(LATTEPREC) :: Res(NATS), dr(NATS) 
-    REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS)  !, Coulomb_Pot_dq_v(NATS)
+    REAL(LATTEPREC) :: Res(NATS)
+    REAL(LATTEPREC) :: DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS)
     REAL(LATTEPREC) :: H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM), H_SAVE(HDIM,HDIM)
     REAL(LATTEPREC) :: Nocc, beta, eps, FCOUL_SAVE(3,NATS)
     REAL(LATTEPREC) :: X(HDIM,HDIM), YY(HDIM,HDIM), ORTHOH_SAVE(HDIM,HDIM)
-    REAL(LATTEPREC) :: nDelta_DO(HDIM,HDIM),nDO, Delta_DS(HDIM,HDIM)
-    REAL(LATTEPREC) :: SU(HDIM,HDIM), H_1(HDIM,HDIM),H1(HDIM,HDIM), ndDO_dU, dU(HDIM,HDIM)
+    REAL(LATTEPREC) :: nDelta_DO(HDIM,HDIM), Delta_DS(HDIM,HDIM)
+    REAL(LATTEPREC) :: H_1(HDIM,HDIM),H1(HDIM,HDIM), dU(HDIM,HDIM)
     REAL(LATTEPREC), allocatable     :: MMX(:,:), MMX_I(:,:)
 !    !
     DELTAQ_SAVE = DELTAQ
@@ -787,7 +790,6 @@ CONTAINS
     ORTHOH_SAVE = ORTHOH
     H_SAVE = H
     H_0 = H0
-    Tol = 0.01_LATTEPREC
     ErrDM = 100_LATTEPREC
     eps   = 1.d-7
 
@@ -800,12 +802,9 @@ CONTAINS
     enddo
     enddo
 
-    !WRITE(6,*) 'test-dP2: NRANK=', NRANK
-    !write(6,*) 'maxval(dDO)=', maxval(dabs(dU))
-
     K = 0
     ALLOCATE(MMX(1,1),MMX_I(1,1))
-    do while ( ErrDM > Tol .AND. K < NRANK) 
+    do while ( ErrDM > KERNELTOL .AND. K < NRANK) 
        DEALLOCATE(MMX,MMX_I)
        H0 = 0.D0  ! SUCH THAT ADDQDEP ONLY INCLUDES RESPONSE PART
        K = K + 1
@@ -824,14 +823,6 @@ CONTAINS
        TMP = NORM2(DM_V(:,:,K))
        IF (TMP<1.d-20) TMP = TMP + 1.d-20
 
-       !write(6,*) 'TMP=', K, TMP
-       !TMP = 0.D0
-       !do I = 1, HDIM
-       !do L = 1, HDIM
-       !   TMP = TMP + DM_V(L,I,K)**2
-       !enddo
-       !enddo
-       !write(6,*) 'TMP=', dsqrt(TMP)
       
        IF (TMP < 1.D-12) write(6,*) 'TMP is ZERO in dP2!'
        DM_V(:,:,K) = DM_V(:,:,K)/TMP

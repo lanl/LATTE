@@ -60,6 +60,7 @@ MODULE CONSTANTS_MOD
   INTEGER :: RESTARTLIB
   INTEGER :: FREEZE, FIRE_FREEZE
   INTEGER :: NEWSYSTEMLATTE 
+  INTEGER :: KERNELSCHEME
   REAL(LATTEPREC) :: BOX(3,3), BOX_OLD(3,3), BOXDIMS(3)
   REAL(LATTEPREC) :: BNDFIL, TOTNE
   REAL(LATTEPREC) :: COVE, TOTE, ENTE, KEE, ECOUL, EREP, TRRHOH
@@ -77,6 +78,7 @@ MODULE CONSTANTS_MOD
   REAL(LATTEPREC) :: MCBETA, MCSIGMA ! Temperature in simulated annealing
   REAL(LATTEPREC) :: PPBETA, PPSIGMA
   REAL(LATTEPREC) :: MINGAP ! Minimum gap for adaptive SCF
+  REAL(LATTEPREC) :: KERNELTOL ! tolerance for adaptive kernels
   REAL(LATTEPREC) :: S_DFTB_U ! S_DFTB_U is the chosen Hubbard U for the DM term
   REAL(LATTEPREC) :: P_DFTB_U ! P_DFTB_U is the chosen Hubbard U for the DM term
   REAL(LATTEPREC) :: D_DFTB_U ! D_DFTB_U is the chosen Hubbard U for the DM term

@@ -123,7 +123,7 @@ CONTAINS
     USE FERMICOMMON
 
     IMPLICIT NONE
-    INTEGER, PARAMETER :: NKEY_CHAR = 8, NKEY_INT = 53, NKEY_RE = 25, NKEY_LOG = 4
+    INTEGER, PARAMETER :: NKEY_CHAR = 8, NKEY_INT = 54, NKEY_RE = 26, NKEY_LOG = 4
     CHARACTER(LEN=*) :: FILENAME
 
     !Library of keywords with the respective defaults.
@@ -141,7 +141,8 @@ CONTAINS
          'MDON=','PBCON=','RESTART=','CHARGE=','XBO=','XBODISON=','XBODISORDER=','NGPU=',& !33
          'KON=','COMPFORCE=','DOSFIT=','INTS2FIT=','NFITSTEP=','QFIT=',& !39
          'PPFITON=','ALLFITON=','PPSTEP=','BISTEP=','PP2FIT=','BINT2FIT=','PPNMOL=',& !46
-         'PPNGEOM=','PARREP=','VERBOSE=','MIXER=','RESTARTLIB=','FREEZE=','xControl=']
+         'PPNGEOM=','PARREP=','VERBOSE=','MIXER=','RESTARTLIB=','FREEZE=','xControl=', & !53
+         'KERNELSCHEME=']
     INTEGER :: VALVECTOR_INT(NKEY_INT) = (/ &
          1,0,6,1,1,1, &
          1,0,0,1,0,250, &
@@ -150,18 +151,19 @@ CONTAINS
          1,1,0,0,1,1,5,2, &
          0,1,0,1,5000,0,&
          0,0,500,500,2,6,10,&
-         200,0,1,0,0,0,-1 /)
+         200,0,1,0,0,0,-1,  &
+         0 /)
 
     CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_RE(NKEY_RE) = [CHARACTER(LEN=50) :: &
          'CGTOL=','KBT=','SPINTOL=','ELEC_ETOL=','ELEC_QTOL=','COULACC=','COULCUT=', 'COULR1=',& !8
          'BREAKTOL=','QMIX=','SPINMIX=','MDMIX=','NUMTHRESH=','CHTOL=','SKIN=',& !15
-         'RLXFTOL=','BETA=','MCSIGMA=','PPBETA=','PPSIGMA=','ER=','S_DFTB_U=', & !22
-         'P_DFTB_U=', 'D_DFTB_U=', 'F_DFTB_U='] !25
+         'RLXFTOL=','BETA=','MCSIGMA=','PPBETA=','PPSIGMA=','ER=','KERNELTOL=', & !22
+         'S_DFTB_U=','P_DFTB_U=', 'D_DFTB_U=', 'F_DFTB_U='] !26
     REAL(DP) :: VALVECTOR_RE(NKEY_RE) = (/&
          1.0e-6,0.0,1.0e-4,0.001,1.0e-8,1.0e-6,-500.0, 500.0,&
          1.0e-6,0.25,0.25,0.25,1.0e-6,0.01,1.0,&
-         1.0e-7,1000.0,0.2,1000.0,0.01,1.0,0.0,& 
-         0.0, 0.0, 0.0/)
+         1.0e-7,1000.0,0.2,1000.0,0.01,1.0,0.1,& 
+         0.0, 0.0, 0.0, 0.0/)
 
     CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_LOG(NKEY_LOG) = [CHARACTER(LEN=100) :: &
          'LIBINIT=','STOPATMAXSCF=','DOKERNEL=','DFTBU=']
@@ -516,13 +518,21 @@ CONTAINS
 
     !Do Kernel
     DOKERNEL = VALVECTOR_LOG(3)
+    KERNELTOL = VALVECTOR_RE(22)
+    KERNELSCHEME = VALVECTOR_INT(54)
 
     ! DFTB+U
     DFTBU = VALVECTOR_LOG(4)
-    S_DFTB_U = VALVECTOR_RE(22)
-    P_DFTB_U = VALVECTOR_RE(23)
-    D_DFTB_U = VALVECTOR_RE(24)
-    F_DFTB_U = VALVECTOR_RE(25)
+    S_DFTB_U = VALVECTOR_RE(23)
+    P_DFTB_U = VALVECTOR_RE(24)
+    D_DFTB_U = VALVECTOR_RE(25)
+    F_DFTB_U = VALVECTOR_RE(26)
+
+    IF (DFTBU.AND.DOKERNEL) THEN
+       WRITE(6,*) 'DOKERNEL IS TURNED OF BECAUSE DFTB+U IS USING!'
+       WRITE(6,*) 'DM-based rank-m update is used instead!!'
+       DOKERNEL = .FALSE.
+    ENDIF
 
   END SUBROUTINE PARSE_CONTROL
 
