@@ -173,7 +173,6 @@ for name in fittingoutput.dat ; do
 
   time=`( /usr/bin/time -f "%U" $RUN > out ) 2>&1 > /dev/null`
   
-  tol=0.001 #zy
   tol=0.0001
   
   check=`
@@ -209,13 +208,13 @@ for name in fittingoutput.dat ; do
     echo ""
     diff $REF $name
     echo "NOT PASSED"
-    #exit -1
+    exit -1
   fi
   
   if [ "$LATTE_PERFORMANCE" = "yes" ]
   then
 	test=`echo "($relativeTime-${performanceExpectedTimes[$name]})/${performanceExpectedTimes[$name]} < 0.1" | bc -l`
-	#[ "$test" -eq 0 ] && exit -1
+	[ "$test" -eq 0 ] && exit -1
   fi
 
   rm $REF out

@@ -32,12 +32,15 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
   IMPLICIT NONE
 
-  INTEGER :: I, SWITCH, MDITER, ITER, II
-  INTEGER :: ALLOKQ, ALLOKM, ALLOK, MDSOFT
-  INTEGER :: START_CLOCK, STOP_CLOCK, CLOCK_RATE, CLOCK_MAX, ITERACC
+  INTEGER :: I, J, K, SWITCH, MDITER, ITER, II, DIIS_DIM, INFO
+  INTEGER :: ALLOKQ, ALLOKM, ALLOK, NEW_MIXER, MDSOFT
+  INTEGER :: START_CLOCK, STOP_CLOCK, CLOCK_RATE, CLOCK_MAX, ITERACC, DIIS_M
+  INTEGER, ALLOCATABLE :: IPIV(:)
   REAL(4) :: TIMEACC
-  REAL(LATTEPREC) :: MAXDQ, SCF_ERR, MLSI
+  REAL(LATTEPREC) :: MAXDQ, MAG_DIFF, DELTA_DIFF, SCF_ERR, MLSI
   REAL(LATTEPREC), ALLOCATABLE :: QDIFF(:), SPINDIFF(:)
+  REAL(LATTEPREC), ALLOCATABLE :: QDIFF_DIIS(:,:), BMAT_DIIS(:,:), DIIS_RHS(:)
+  REAL(LATTEPREC), ALLOCATABLE :: QHIST(:,:)
 
   MDSOFT = 10
   IF (DFTBU) THEN
@@ -46,6 +49,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   ENDIF
 
   IF (EXISTERROR) RETURN
+
+  ALLOCATE(QDIFF_DIIS(NATS, MAXSCF), QHIST(NATS, MAXSCF))
 
   !
   ! If FULLQCONV = 1, then we're going to iterate until all charges are within
@@ -62,6 +67,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
   TIMEACC = 0.0
   ITERACC = 0
+
+  NEW_MIXER = 0
 
   IF (FULLQCONV .EQ. 1 .OR. MDITER .LE. MDSOFT) THEN
 
@@ -138,6 +145,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
      ALLOK = 1
      ITER = 0
 
+     DIIS_M = 0
+
      ALLOCATE(QDIFF(NATS))
      IF (SPINON .EQ. 1) ALLOCATE(SPINDIFF(DELTADIM))
 
@@ -196,7 +205,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
 
         ! We've made changes to the H matrix so we have to re-orthogonalize
-        MLSI = TIME_MLS()
 
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
@@ -214,14 +222,12 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            ENDIF
         ENDIF
 
-        IF(VERBOSE >= 1) WRITE(*,*) "Time for ORTHOMYH ",  TIME_MLS() - MLSI
         !
         ! New Hamiltonian: get the bond order
         !
 
         ! Compute the density matrix
 
-        MLSI = TIME_MLS()
         TX = START_TIMER(DMBUILD_TIMER)
 
         IF (KON .EQ. 0) THEN
@@ -232,7 +238,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         IF (DFTBU) DOrth = BO 
 
-        IF(VERBOSE >=1) WRITE(*,*) "Time for BUILDRHO ",  TIME_MLS() - MLSI
         TX = STOP_TIMER(DMBUILD_TIMER)
 
         ! We have a density matrix computed in from the orthogonalized
@@ -280,9 +285,31 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         MAXDQ = MAXVAL(QDIFF)
         IF (MAXDQ .GT. ELEC_QTOL) ALLOKQ = 1
 
-        ! Mix new and old partial charges
+        IF (ITER .GT. 1) THEN
+           DELTA_DIFF = MAG_DIFF
+        ELSE
+           DELTA_DIFF = 1.0D6
+        ENDIF
 
-        IF (MDITER .LE. MDSOFT) THEN
+        MAG_DIFF = ZERO
+        DO I = 1, NATS
+           MAG_DIFF = MAG_DIFF + QDIFF(I)*QDIFF(I)
+        ENDDO
+
+        MAG_DIFF = SQRT(MAG_DIFF/REAL(NATS))
+        
+        DELTA_DIFF = DELTA_DIFF - MAG_DIFF
+
+        ALLOKQ = 0
+        DO I = 1, NATS
+           IF (ABS(QDIFF(I)) .GT. ELEC_QTOL) ALLOKQ = ALLOKQ + 1
+        ENDDO
+
+        IF ((DELTA_DIFF .GT. 1.0D-3) .AND. (NEW_MIXER .EQ. 0)) THEN
+
+           ! Run linear mixing for a bit until we start to converge
+
+        !IF (MDITER .LE. MDSOFT) THEN
           IF (.NOT.DFTBU) THEN
 #ifdef PROGRESSON
            IF(MX%MIXERON)THEN
@@ -294,34 +321,91 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
 #endif
           ELSE
-           !BO = DOrth_old + QMIX*(DOrth - DOrth_old)   ! Simple linear mixing
-           !CALL DMKERNELMIXER(ITER,MAXDQ)              ! Rank1-1 updated DM kernel mixer
-           CALL dP2MIXER(ITER,SCF_ERR,MAXDQ)            ! Rank1-1 updated DM kernel mixer
-           DOrth_old = BO                               !
+           !CALL DMKERNELMIXER(ITER,MAXDQ)    ! Rank-1 updated DM kernel mixer
+           CALL dP2MIXER(ITER,SCF_ERR,MAXDQ)  ! Rank-m updated DM kernel mixer
+           DOrth_old = BO                   
            CALL DEORTHOMYRHO
            OLDDELTAQS = DELTAQ
            CALL GETDELTAQ
-           SCF_ERR = norm2(DELTAQ - OLDDELTAQS)/sqrt(ONE*NATS) ! ANDERS CHANGE SCF_ERR TO COMPARE TO Dev Verison
+           SCF_ERR = norm2(DELTAQ - OLDDELTAQS)/sqrt(ONE*NATS)
           ENDIF
+
         ELSE
 
-          IF (.NOT.DFTBU) THEN
-#ifdef PROGRESSON
-           IF(MX%MIXERON)THEN
-              CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
-           ELSE
-              DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
-           ENDIF
-#elif defined(PROGRESSOFF)
-           DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
-#endif
-          ELSE
-           BO = DOrth_old + QMIX*(DOrth - DOrth_old)
-           DOrth_old = BO
-           CALL DEORTHOMYRHO
-           CALL GETDELTAQ      ! INCLUDED_GETDELTAQ Probably not to comment out ANDERS?
-          ENDIF
+           ! Flip this flag so we don't go back into linear mixing
 
+           NEW_MIXER = 1
+
+           IF (DFTBU) THEN
+             BO = DOrth_old + QMIX*(DOrth - DOrth_old)
+             DOrth_old = BO
+             CALL DEORTHOMYRHO
+             CALL GETDELTAQ      ! INCLUDED_GETDELTAQ Probably not to comment out
+           ELSE
+   
+           ! Then switch to DIIS
+
+           DIIS_M = DIIS_M + 1
+
+
+           ! Linear mixing for the first iteration in DIIS
+
+           IF (DIIS_M .EQ. 1) THEN
+
+              ! The history of the errors
+
+              QDIFF_DIIS(:,DIIS_M) = DELTAQ - OLDDELTAQS
+
+              ! The history of the deltaq's. We use DIIS to combine these into a better guess
+
+              QHIST(:,DIIS_M) = DELTAQ
+
+              DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
+           
+           ELSE
+
+              QDIFF_DIIS(:,DIIS_M) = DELTAQ - OLDDELTAQS
+              QHIST(:,DIIS_M) = DELTAQ
+
+              ALLOCATE(BMAT_DIIS(DIIS_M+1, DIIS_M+1), DIIS_RHS(DIIS_M+1), IPIV(DIIS_M+1))
+              
+              ! Setting up 'B'
+
+              BMAT_DIIS = MINUSONE
+              BMAT_DIIS(DIIS_M+1, DIIS_M+1) = ZERO
+              
+              DO I = 1, DIIS_M
+                 DO J = 1, DIIS_M
+                    
+                    DO K = 1, NATS
+                       
+                       BMAT_DIIS(J,I) = BMAT_DIIS(J,I) + QDIFF_DIIS(K,J)*QDIFF_DIIS(K,I)
+                       
+                    ENDDO
+                    
+                 ENDDO
+              ENDDO
+              
+              DIIS_DIM = DIIS_M + 1
+              
+              DIIS_RHS = ZERO
+              DIIS_RHS(DIIS_M+1) = MINUSONE
+
+              ! Solve A X = B using LAPACK call
+              
+              CALL DGESV(DIIS_DIM, 1, BMAT_DIIS, DIIS_DIM, IPIV, DIIS_RHS, DIIS_DIM, INFO)
+              
+!              PRINT*, INFO, DIIS_M, DIIS_RHS, DELTAQ(1)
+              
+              DELTAQ = ZERO
+              DO I = 1, DIIS_M
+                 DELTAQ(:) = DELTAQ(:) + QHIST(:,I)*DIIS_RHS(I)
+              ENDDO
+              
+              DEALLOCATE(BMAT_DIIS, DIIS_RHS, IPIV)
+              
+           ENDIF
+           ENDIF ! DFTBU
         ENDIF
 
         IF (DFTBU) DOrth = DOrth_old
@@ -357,7 +441,14 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
            IF (STOPATMAXSCF) CALL ERRORS("qconsistency","The SCF procedure has not converged")
 
+!           DO I = 1, NATS
+!              PRINT*, ATELE(I), CR(1,I), CR(2,I), CR(3,I)
+!           ENDDO
+!           PRINT*, CHARGE
+           
         ENDIF
+
+        IF (MDON .EQ. 1 .AND. ITER .LE. QITER) ALLOK = 1
 
 
      ENDDO
@@ -370,9 +461,46 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
      !     WRITE(6,99) "# HDIM, TIME PER RHO BUILD = ", HDIM, TIMEACC/REAL(ITERACC)
      !99   FORMAT(A29, I5, 1X, G18.6)
 
+     IF (MDON .EQ. 1 .AND. MDADAPT .EQ. 1) THEN
+
+        IF (EGAP .GT. MINGAP) THEN
+
+           MDADAPT_COUNT = MDADAPT_COUNT + 1
+!           PRINT*, MDADAPT_COUNT, EGAP
+           IF (MDADAPT_COUNT .EQ. 100) THEN
+
+              WRITE(6,'("# Returning to linear mixing")')
+              FULLQCONV = 0
+              QITER = 1
+
+           ENDIF
+
+
+        ENDIF
+
+     ENDIF
+
      FLUSH(6)
 
   ELSEIF (FULLQCONV .EQ. 0 .AND. MDON .EQ. 1 .AND. MDITER .GT. MDSOFT) THEN
+
+     IF (MDON .EQ. 1 .AND. MDADAPT .EQ. 1) THEN
+
+        ! When the gap closes start running to full convergence                     
+
+        IF (EGAP .LT. MINGAP) THEN
+        
+           WRITE(6,'("# Gap closed! Running to full SCF convergence")')
+           
+           FULLQCONV = 1
+           QITER = 4
+!           MDADAPT = 0
+           MDADAPT_COUNT = 0
+
+        ENDIF
+
+
+     ENDIF
 
      ! Now we're doing MD
 
@@ -401,7 +529,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         IF (SPINON .EQ. 1) CALL BLDSPINH
 
-        MLSI = TIME_MLS()
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
 
@@ -420,7 +547,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            ENDIF
         ENDIF
 
-        IF (VERBOSE >=1 )WRITE(*,*)"Time for ORTHOMYH", TIME_MLS() - MLSI
 
         !
         ! New Hamiltonian: get the bond order
@@ -429,22 +555,19 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ! Compute the density matrix
 
 
-        MLSI = TIME_MLS()
         IF (KON .EQ. 0) THEN
            CALL GETRHO(MDITER)
         ELSE
            CALL KGETRHO
         ENDIF
 
-        IF (VERBOSE>=1) WRITE(*,*)"Time for GETRHO", TIME_MLS() - MLSI
         OLDDELTAQS = DELTAQ
-        IF (DFTBU) DOrth = BO
+        IF (DFTBU) DOrth = BO  
 
         !
         ! Get a new set of charges for our system
         !
 
-        MLSI = TIME_MLS()
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
 #ifdef PROGRESSON
@@ -460,7 +583,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
               CALL KDEORTHOMYRHO
            ENDIF
         ENDIF
-        IF (VERBOSE >=1 ) WRITE(*,*)"Time for DEORTHOMYRHO", TIME_MLS() - MLSI
 
         CALL GETDELTAQ
 
@@ -566,6 +688,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
      ENDIF
 
   ENDIF
+
+  DEALLOCATE(QDIFF_DIIS, QHIST)
 
   RETURN
 
