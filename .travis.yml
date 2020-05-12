@@ -1,7 +1,6 @@
 language: c
 
 sudo: required
-dist: trusty
 
 sources:
   - ubuntu-toolchain-r-test
@@ -13,7 +12,7 @@ os:
 before_install:
   - export LATTEPATH=`pwd`
   - sudo apt-get install gfortran libblas-dev liblapack-dev
-  - sudo apt-get install cmake python gcc cmake-data g++ curl
+  - sudo apt-get install python gcc g++ curl
   - cd; git clone --depth=1 https://github.com/lanl/qmd-progress.git
   - cd; git clone --depth=1 https://github.com/lanl/bml.git
   - cd; git clone --depth=1 https://github.com/lammps/lammps.git
@@ -22,7 +21,7 @@ before_install:
   # Install BML, PROGRESS and LAMMPS
   - cd; cd bml; CC=gcc FC=gfortran CMAKE_BUILD_TYPE=Release BLAS_VENDOR=GNU BML_OPENMP=yes BML_TESTING=no ./build.sh configure
   - cd; cd bml/build; make; make install
-  - cd; cd qmd-progress; CC=gcc FC=gfortran PROGRESS_MPI=no PROGRESS_TESTING=yes BLAS_VENDOR=GNU PKG_CONFIG_PATH=~/bml/install/lib/pkgconfig PROGRESS_OPENMP=yes ./build.sh configure
+  - cd; cd qmd-progress; CC=gcc FC=gfortran PROGRESS_MPI=no PROGRESS_TESTING=yes BLAS_VENDOR=GNU CMAKE_PREFIX_PATH=~/bml/install PROGRESS_OPENMP=yes ./build.sh configure
   - cd; cd qmd-progress/build; make; make install
   # Lammps installation
   - cd; cd lammps/lib/latte; ln -s $LATTEPATH/src/latte_c_bind.o filelink.o ; ln -s $LATTEPATH/src includelink ; ln -s $LATTEPATH liblink
