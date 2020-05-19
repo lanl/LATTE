@@ -604,7 +604,7 @@ CONTAINS
 
     ELSEIF (MDON .EQ. 1 .AND. RELAXME .EQ. 0 .AND. MAXITER_IN < 0 ) THEN
 
-       IF(VERBOSE >= 1)WRITE(*,*)"Insie MDON= 1 and RELAXME= 0 ..."
+       IF(VERBOSE >= 1)WRITE(*,*)"Inside MDON= 1 and RELAXME= 0 ..."
 
        DT = DT_IN ! Get the integration step from the hosting code.
 

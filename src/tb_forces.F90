@@ -704,6 +704,9 @@ SUBROUTINE TBFORCES
 
 !$OMP END PARALLEL DO
 
+  ! ZY, the sign is different from prevous pulay_sp
+  VIRPUL = - VIRPUL
+
   !  DO I= 1, NATS
   !     WRITE(6,10) I, FPUL(1,I), FPUL(2,I), FPUL(3,I)
   !  ENDDO
