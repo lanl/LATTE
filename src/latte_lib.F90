@@ -126,6 +126,7 @@ CONTAINS
     REAL(LATTEPREC), INTENT(OUT) :: VIRIAL_INOUT(6)
     INTEGER, INTENT(IN) ::  NTYPES, TYPES(:), MAXITER_IN
     LOGICAL(1), INTENT(INOUT) :: EXISTERROR_INOUT
+    LOGICAL :: ANIMATEEXISTS
     INTEGER, INTENT(INOUT) :: NEWSYSTEM
     CHARACTER(LEN=*), OPTIONAL, INTENT(IN) :: FNAME
 
@@ -151,8 +152,8 @@ CONTAINS
        LIBCALLS = 0 ; MAXITER = -10
 
       ! Only LATTE main code will create the animate folder
-      ! INQUIRE( FILE="animate/.", exist=LATTEINEXISTS)
-      ! IF (.NOT. LATTEINEXISTS) CALL SYSTEM("mkdir animate")
+       INQUIRE( FILE="animate/.", exist=ANIMATEEXISTS)
+       IF (.NOT. ANIMATEEXISTS) CALL SYSTEM("mkdir animate")
 
        NUMSCF = 0
        CHEMPOT = ZERO
