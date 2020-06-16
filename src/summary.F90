@@ -32,6 +32,7 @@ SUBROUTINE SUMMARY
   USE DIAGARRAY
   USE VIRIALARRAY
   USE NONOARRAY
+  USE DMARRAY, ONLY : EHUB
 
   IMPLICIT NONE
 
@@ -194,28 +195,34 @@ SUBROUTINE SUMMARY
   WRITE(6,'("# Pressure (GPa) = ", F16.8)') PRESSURE
   WRITE(24,'("# Pressure (GPa) = ", F16.8)') PRESSURE
 
+  IF (.NOT.DFTBU) THEN
+    EHUB = 0.D0
+  ELSE
+    TRRHOH = TRRHOH0
+  ENDIF
+
   IF (SPINON .EQ. 0) THEN
-     WRITE(6,'("# Total energy (zero K) = ", F16.8)') TRRHOH + EREP - ECOUL + EPLUSD
+     WRITE(6,'("# Total energy (zero K) = ", F16.8)') TRRHOH + EREP - ECOUL + EPLUSD + EHUB
      WRITE(6,'("")')
-     WRITE(6,'("# FREE ENERGY = ", F16.8)') TRRHOH + EREP - ECOUL - ENTE + EPLUSD
+     WRITE(6,'("# FREE ENERGY = ", F16.8)') TRRHOH + EREP - ECOUL - ENTE + EPLUSD + EHUB
      WRITE(6,'("")')
-     WRITE(24,'("Total energy (zero K) = ", F16.8)') TRRHOH + EREP - ECOUL + EPLUSD
+     WRITE(24,'("Total energy (zero K) = ", F16.8)') TRRHOH + EREP - ECOUL + EPLUSD + EHUB
      WRITE(24,'("")')
-     WRITE(24,'("FREE ENERGY = ", F16.8)') TRRHOH + EREP - ECOUL - ENTE + EPLUSD
+     WRITE(24,'("FREE ENERGY = ", F16.8)') TRRHOH + EREP - ECOUL - ENTE + EPLUSD + EHUB
      WRITE(24,'("")')
      ESPIN = ZERO
   ELSEIF (SPINON .EQ. 1) THEN
      WRITE(6,'("# Total energy (zero K) = ", F16.8)') TRRHOH + EREP - ECOUL + &
-          ESPIN + EPLUSD
+          ESPIN + EPLUSD + EHUB
      WRITE(6,'("")')
      WRITE(6,'("# FREE ENERGY = ", F16.8)') TRRHOH + EREP - ECOUL - ENTE + &
-          ESPIN + EPLUSD
+          ESPIN + EPLUSD + EHUB
      WRITE(6,'("")')
      WRITE(24,'("Total energy (zero K) = ", F16.8)') TRRHOH + EREP - ECOUL + &
-          ESPIN + EPLUSD
+          ESPIN + EPLUSD + EHUB
      WRITE(24,'("")')
      WRITE(24,'("FREE ENERGY = ", F16.8)') TRRHOH + EREP - ECOUL - ENTE + &
-          ESPIN + EPLUSD
+          ESPIN + EPLUSD + EHUB
      WRITE(24,'("")')
   ENDIF
 

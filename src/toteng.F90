@@ -32,6 +32,7 @@ SUBROUTINE TOTENG
 
   INTEGER :: I, J, K
   COMPLEX(LATTEPREC) :: ZTRRHOH
+  COMPLEX(LATTEPREC) :: ZTRRHOH0
   IF (EXISTERROR) RETURN
 
   TRRHOH = ZERO
@@ -65,16 +66,19 @@ SUBROUTINE TOTENG
               DO J = 1, HDIM
 
                  ZTRRHOH = ZTRRHOH + KBO(J,I,K)*(HK(I,J,K))
+                 ZTRRHOH0= ZTRRHOH0+ KBO(J,I,K)*(HK0(I,J,K))
 
               ENDDO
 
               ZTRRHOH = ZTRRHOH - CMPLX(BOZERO(I))*HK(I,I,K)
+              ZTRRHOH0= ZTRRHOH0- CMPLX(BOZERO(I))*HK0(I,I,K)
 
            ENDDO
 
         ENDDO
 
         TRRHOH = REAL(ZTRRHOH)/REAL(NKTOT)
+        TRRHOH0= REAL(ZTRRHOH0)/REAL(NKTOT)
 
      ENDIF
 
@@ -113,15 +117,18 @@ SUBROUTINE TOTENG
               DO J = 1, HDIM
 
                  ZTRRHOH = ZTRRHOH + (KRHOUP(J,I,K) + KRHODOWN(J,I,K))*HK(I,J,K)
+                 ZTRRHOH0= ZTRRHOH0+ (KRHOUP(J,I,K) + KRHODOWN(J,I,K))*HK0(I,J,K)
 
               ENDDO
 
               ZTRRHOH = ZTRRHOH - (RHOUPZERO(I) + RHODOWNZERO(I))*HK(I,I,K)
+              ZTRRHOH0= ZTRRHOH0- (RHOUPZERO(I) + RHODOWNZERO(I))*HK0(I,I,K)
 
            ENDDO
         ENDDO
 
         TRRHOH = REAL(ZTRRHOH)/REAL(NKTOT)
+        TRRHOH0= REAL(ZTRRHOH0)/REAL(NKTOT)
            
      ENDIF
 

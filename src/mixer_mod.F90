@@ -244,7 +244,7 @@ CONTAINS
     REAL(LATTEPREC) :: ORTHOH_SAVE(HDIM,HDIM)
     REAL(LATTEPREC) :: ri_t(LL,NATS), IDENTRES(NATS)
     REAL(LATTEPREC) :: WORK(LL+LL*LL)
-    REAL(LATTEPREC) :: RESNORM, FEL, CRIT, DTMP
+    REAL(LATTEPREC) :: RESNORM, FEL, DTMP
     INTEGER         :: INFO, RANK
     REAL(LATTEPREC), ALLOCATABLE :: FO(:,:), FM(:,:)
     INTEGER,         ALLOCATABLE :: IPIV(:)
@@ -260,7 +260,6 @@ CONTAINS
 
     Res = DELTAQ - PNK(1,:)
 
-    CRIT = 0.1D0
     RESNORM = NORM2(RES) / SQRT(DBLE(NATS)) 
    
     write(6,*) 'MDITER', MDITER, RESNORM
@@ -272,7 +271,7 @@ CONTAINS
 
         I = 0
         FEL = 1.D0
-        DO WHILE (FEL > CRIT)  !! LL is the number of rank-1 updates  LL = 0 means preconditioning only!
+        DO WHILE (FEL > KERNELTOL)  !! LL is the number of rank-1 updates  LL = 0 means preconditioning only!
            I = I + 1
            vi(:,I) = dr/norm2(dr)
            do J = 1,I-1
