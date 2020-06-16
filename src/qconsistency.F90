@@ -96,7 +96,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            CALL KGETRHO
         ENDIF
 
-        IF (DFTBU) DOrth_old = BO
+        IF (DFTBU .AND. KON==0) DOrth_old = BO
 
         TX = STOP_TIMER(DMBUILD_TIMER)
 
@@ -230,7 +230,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            CALL KGETRHO
         ENDIF
 
-        IF (DFTBU) DOrth = BO 
+        IF (DFTBU .AND. KON==0) DOrth = BO 
 
         IF(VERBOSE >=1) WRITE(*,*) "Time for BUILDRHO ",  TIME_MLS() - MLSI
         TX = STOP_TIMER(DMBUILD_TIMER)
@@ -283,7 +283,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ! Mix new and old partial charges
 
         IF (MDITER .LE. MDSOFT) THEN
-          IF (.NOT.DFTBU) THEN
+          IF (.NOT.DFTBU .OR. KON==1) THEN
 #ifdef PROGRESSON
            IF(MX%MIXERON)THEN
               CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
@@ -305,7 +305,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
           ENDIF
         ELSE
 
-          IF (.NOT.DFTBU) THEN
+          IF (.NOT.DFTBU .OR. KON==1) THEN
 #ifdef PROGRESSON
            IF(MX%MIXERON)THEN
               CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
@@ -324,7 +324,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         ENDIF
 
-        IF (DFTBU) DOrth = DOrth_old
+        IF (DFTBU.AND.KON==0) DOrth = DOrth_old
 
         IF(VERBOSE >= 1)WRITE(*,*)"SCF error (MAXDQ) =",MAXDQ," SCF Tol =",ELEC_QTOL
 
@@ -441,7 +441,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         IF (VERBOSE>=1) WRITE(*,*)"Time for GETRHO", TIME_MLS() - MLSI
         OLDDELTAQS = DELTAQ
-        IF (DFTBU) DOrth = BO
+        IF (DFTBU .AND. KON==0) DOrth = BO
 
         !
         ! Get a new set of charges for our system
@@ -474,7 +474,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
 
         ! Here we do DM mixing instead of charge mixing
-        IF (DFTBU) THEN
+        IF (DFTBU .AND. KON==0) THEN
           BO = DOrth_old + QMIX*(DOrth - DOrth_old) 
           DOrth_old = BO                           
           CALL DEORTHOMYRHO
@@ -547,7 +547,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         CALL KGETRHO
      ENDIF
 
-     IF (DFTBU) THEN
+     IF (DFTBU .AND. KON==0) THEN
        DOrth_old = DOrth
        DOrth = BO
      ENDIF
