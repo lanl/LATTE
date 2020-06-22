@@ -76,7 +76,9 @@ CONTAINS
     H0 = 0.D0
 
     Res = DELTAQ - PNK(1,:)
-    write(6,*) 'MDITER', MDITER, norm2(Res)
+    write(6,*) 'MDITER', MDITER, norm2(Res) / SQRT(DBLE(NATS)) 
+
+!    if (norm2(Res) <= 0.000001D0) then
 !    if  (MDITER <= 0) then  !! typical choice <= 1, for really really hard cases <= 20
 !     dn2dt2 = MDMIX*Res
 !    else
@@ -172,6 +174,9 @@ CONTAINS
     H0 = 0.D0
 
     Res = DELTAQ - PNK(1,:)
+    write(6,*) 'MDITER', MDITER, norm2(Res) / SQRT(DBLE(NATS)) 
+
+!    if (norm2(Res) <= 0.00001D0) then
 !    if  (MDITER <= 0) then  !! typical choice <= 1, for really really hard cases <= 20
 !     dn2dt2 = MDMIX*Res
 !    else
@@ -748,7 +753,8 @@ CONTAINS
     !enddo
     !write(*,*) ' Res = ', Res(:)
 
-    IF(SCF_ERR > 0.01D0) THEN
+    !IF(SCF_ERR > 0.01D0) THEN
+    IF(SCF_ERR > 0.1D0) THEN
       !write(*,*) ' LINEAR MIX MIXER_MOD', QMIX, SCF_ERR
       dU = QMIX*Delta_DO
     ELSE

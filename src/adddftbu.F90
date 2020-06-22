@@ -85,13 +85,13 @@ SUBROUTINE ADDDFTBU(FIRSTCALL)
     ENDDO
 
     DO K = 1, NKTOT
-       IF (FIRSTCALL) THEN
+       !IF (FIRSTCALL) THEN
            CALL ZGEMM('C','N',HDIM,HDIM,HDIM,CONE,KBO(:,:,K),HDIM,SK(:,:,K),HDIM,CZERO,PSK,HDIM)  !! Should be PNO instead of BO for propagation in XL-BOMD
-       ELSE
-           WRITE(6,*) 'DFBTU FOR K SPACE IS NOT READY YET!'
-           STOP
-           !CALL DGEMM('T','N',HDIM,HDIM,HDIM,CONE,PNO,HDIM,SMAT,HDIM,CZERO,PSK,HDIM)    !! PNO = propagated density matrix dynamical variable
-       ENDIF
+       !ELSE
+       !    WRITE(6,*) 'DFBTU FOR K SPACE IS NOT READY YET!'
+       !    STOP
+       !    CALL ZGEMM('C','N',HDIM,HDIM,HDIM,CONE,KBO(:,:,K),HDIM,SK(:,:,K),HDIM,CZERO,PSK,HDIM)    !! PNO = propagated density matrix dynamical variable
+       !ENDIF
 
        CALL ZGEMM('C','N',HDIM,HDIM,HDIM,CONE,PSK,HDIM,SUK(1,1,K),HDIM,CZERO,XK,HDIM)
        CALL ZGEMM('N','N',HDIM,HDIM,HDIM,CONE,SUK(1,1,K),HDIM,PSK,HDIM,CZERO,YK,HDIM)

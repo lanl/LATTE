@@ -28,6 +28,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   USE TIMER_MOD
   USE MYPRECISION
   USE MIXER_MOD
+  USE KSPACEARRAY, ONLY : KBO
   USE DMARRAY
 
   IMPLICIT NONE
@@ -97,6 +98,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         IF (DFTBU .AND. KON==0) DOrth_old = BO
+        IF (DFTBU .AND. KON==1) DORK_OLD = KBO
 
         TX = STOP_TIMER(DMBUILD_TIMER)
 
@@ -231,6 +233,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         IF (DFTBU .AND. KON==0) DOrth = BO 
+        IF (DFTBU .AND. KON==1) DORK = KBO
 
         IF(VERBOSE >=1) WRITE(*,*) "Time for BUILDRHO ",  TIME_MLS() - MLSI
         TX = STOP_TIMER(DMBUILD_TIMER)
@@ -283,7 +286,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ! Mix new and old partial charges
 
         IF (MDITER .LE. MDSOFT) THEN
-          IF (.NOT.DFTBU .OR. KON==1) THEN
+          !IF (.NOT.DFTBU .OR. KON==1) THEN
+          IF (.NOT.DFTBU) THEN
 #ifdef PROGRESSON
            IF(MX%MIXERON)THEN
               CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
@@ -294,18 +298,27 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
 #endif
           ELSE
-           !BO = DOrth_old + QMIX*(DOrth - DOrth_old)   ! Simple linear mixing
-           !CALL DMKERNELMIXER(ITER,MAXDQ)              ! Rank1-1 updated DM kernel mixer
-           CALL dP2MIXER(ITER,SCF_ERR,MAXDQ)            ! Rank1-1 updated DM kernel mixer
-           DOrth_old = BO                               !
-           CALL DEORTHOMYRHO
-           OLDDELTAQS = DELTAQ
-           CALL GETDELTAQ
-           SCF_ERR = norm2(DELTAQ - OLDDELTAQS)/sqrt(ONE*NATS) ! ANDERS CHANGE SCF_ERR TO COMPARE TO Dev Verison
+           IF (KON==0) THEN
+             !BO = DOrth_old + QMIX*(DOrth - DOrth_old)   ! Simple linear mixing
+             !CALL DMKERNELMIXER(ITER,MAXDQ)              ! Rank1-1 updated DM kernel mixer
+             CALL dP2MIXER(ITER,SCF_ERR,MAXDQ)            ! Rank1-1 updated DM kernel mixer
+             DOrth_old = BO                               !
+             CALL DEORTHOMYRHO
+             OLDDELTAQS = DELTAQ
+             CALL GETDELTAQ
+             SCF_ERR = norm2(DELTAQ - OLDDELTAQS)/sqrt(ONE*NATS) ! ANDERS CHANGE SCF_ERR TO COMPARE TO Dev Verison
+           ELSE
+             KBO = DORK_old + QMIX*(DORK - DORK_old)   ! Simple linear mixing
+             DORK_old = KBO                            !
+             CALL KDEORTHOMYRHO
+             OLDDELTAQS = DELTAQ
+             CALL GETDELTAQ
+           ENDIF
           ENDIF
         ELSE
 
-          IF (.NOT.DFTBU .OR. KON==1) THEN
+          !IF (.NOT.DFTBU .OR. KON==1) THEN
+          IF (.NOT.DFTBU) THEN
 #ifdef PROGRESSON
            IF(MX%MIXERON)THEN
               CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
@@ -316,15 +329,23 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
 #endif
           ELSE
-           BO = DOrth_old + QMIX*(DOrth - DOrth_old)
-           DOrth_old = BO
-           CALL DEORTHOMYRHO
-           CALL GETDELTAQ      ! INCLUDED_GETDELTAQ Probably not to comment out ANDERS?
+           IF (KON==0) THEN
+             BO = DOrth_old + QMIX*(DOrth - DOrth_old)
+             DOrth_old = BO
+             CALL DEORTHOMYRHO
+             CALL GETDELTAQ      ! INCLUDED_GETDELTAQ Probably not to comment out ANDERS?
+           ELSE
+             KBO = DORK_old + QMIX*(DORK - DORK_old)   ! Simple linear mixing
+             DORK_old = KBO                            !
+             CALL KDEORTHOMYRHO
+             CALL GETDELTAQ
+           ENDIF
           ENDIF
 
         ENDIF
 
         IF (DFTBU.AND.KON==0) DOrth = DOrth_old
+        IF (DFTBU.AND.KON==1) DORK = DORK
 
         IF(VERBOSE >= 1)WRITE(*,*)"SCF error (MAXDQ) =",MAXDQ," SCF Tol =",ELEC_QTOL
 
@@ -442,6 +463,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         IF (VERBOSE>=1) WRITE(*,*)"Time for GETRHO", TIME_MLS() - MLSI
         OLDDELTAQS = DELTAQ
         IF (DFTBU .AND. KON==0) DOrth = BO
+        IF (DFTBU .AND. KON==1) DORK = KBO
 
         !
         ! Get a new set of charges for our system
@@ -477,6 +499,12 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         IF (DFTBU .AND. KON==0) THEN
           BO = DOrth_old + QMIX*(DOrth - DOrth_old) 
           DOrth_old = BO                           
+          CALL DEORTHOMYRHO
+          CALL GETDELTAQ         ! INCLUDED_GETDELTAQ
+        ENDIF
+        IF (DFTBU .AND. KON==1) THEN
+          KBO = DORK_old + QMIX*(DORK - DORK_old) 
+          DORK_old = KBO                           
           CALL DEORTHOMYRHO
           CALL GETDELTAQ         ! INCLUDED_GETDELTAQ
         ENDIF
@@ -550,6 +578,10 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
      IF (DFTBU .AND. KON==0) THEN
        DOrth_old = DOrth
        DOrth = BO
+     ENDIF
+     IF (DFTBU .AND. KON==1) THEN
+       DORK_old = DORK
+       DORK = KBO
      ENDIF
 
      IF (BASISTYPE .EQ. "NONORTHO") THEN
