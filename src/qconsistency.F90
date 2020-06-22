@@ -345,7 +345,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         IF (DFTBU.AND.KON==0) DOrth = DOrth_old
-        IF (DFTBU.AND.KON==1) DORK = DORK
+        IF (DFTBU.AND.KON==1) DORK = DORK_old
 
         IF(VERBOSE >= 1)WRITE(*,*)"SCF error (MAXDQ) =",MAXDQ," SCF Tol =",ELEC_QTOL
 
