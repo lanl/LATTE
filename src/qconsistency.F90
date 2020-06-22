@@ -98,7 +98,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         IF (DFTBU .AND. KON==0) DOrth_old = BO
-        IF (DFTBU .AND. KON==1) DORK_OLD = KBO
+        !IF (DFTBU .AND. KON==1) DORK_OLD = KBO
 
         TX = STOP_TIMER(DMBUILD_TIMER)
 
@@ -233,7 +233,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         IF (DFTBU .AND. KON==0) DOrth = BO 
-        IF (DFTBU .AND. KON==1) DORK = KBO
+        !IF (DFTBU .AND. KON==1) DORK = KBO
 
         IF(VERBOSE >=1) WRITE(*,*) "Time for BUILDRHO ",  TIME_MLS() - MLSI
         TX = STOP_TIMER(DMBUILD_TIMER)
@@ -286,8 +286,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ! Mix new and old partial charges
 
         IF (MDITER .LE. MDSOFT) THEN
-          !IF (.NOT.DFTBU .OR. KON==1) THEN
-          IF (.NOT.DFTBU) THEN
+          IF (.NOT.DFTBU .OR. KON==1) THEN
+          !IF (.NOT.DFTBU) THEN
 #ifdef PROGRESSON
            IF(MX%MIXERON)THEN
               CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
@@ -317,8 +317,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
           ENDIF
         ELSE
 
-          !IF (.NOT.DFTBU .OR. KON==1) THEN
-          IF (.NOT.DFTBU) THEN
+          IF (.NOT.DFTBU .OR. KON==1) THEN
+          !IF (.NOT.DFTBU) THEN
 #ifdef PROGRESSON
            IF(MX%MIXERON)THEN
               CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
@@ -345,7 +345,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         IF (DFTBU.AND.KON==0) DOrth = DOrth_old
-        IF (DFTBU.AND.KON==1) DORK = DORK_old
+        !IF (DFTBU.AND.KON==1) DORK = DORK_old
 
         IF(VERBOSE >= 1)WRITE(*,*)"SCF error (MAXDQ) =",MAXDQ," SCF Tol =",ELEC_QTOL
 
@@ -463,7 +463,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         IF (VERBOSE>=1) WRITE(*,*)"Time for GETRHO", TIME_MLS() - MLSI
         OLDDELTAQS = DELTAQ
         IF (DFTBU .AND. KON==0) DOrth = BO
-        IF (DFTBU .AND. KON==1) DORK = KBO
+        !IF (DFTBU .AND. KON==1) DORK = KBO
 
         !
         ! Get a new set of charges for our system
@@ -502,12 +502,12 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
           CALL DEORTHOMYRHO
           CALL GETDELTAQ         ! INCLUDED_GETDELTAQ
         ENDIF
-        IF (DFTBU .AND. KON==1) THEN
-          KBO = DORK_old + QMIX*(DORK - DORK_old) 
-          DORK_old = KBO                           
-          CALL DEORTHOMYRHO
-          CALL GETDELTAQ         ! INCLUDED_GETDELTAQ
-        ENDIF
+        !IF (DFTBU .AND. KON==1) THEN
+        !  KBO = DORK_old + QMIX*(DORK - DORK_old) 
+        !  DORK_old = KBO                           
+        !  CALL DEORTHOMYRHO
+        !  CALL GETDELTAQ         ! INCLUDED_GETDELTAQ
+        !ENDIF
 
         !        PRINT*, DELTAQ(1)
 
