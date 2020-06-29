@@ -232,7 +232,12 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            CALL KGETRHO
         ENDIF
 
-        IF (DFTBU .AND. KON==0) DOrth = BO 
+        !IF (DFTBU .AND. KON==0) DOrth = BO 
+        IF (DFTBU .AND. KON==0) then 
+           DOrth = BO 
+           PNO   = BO
+        ENDIF
+
         !IF (DFTBU .AND. KON==1) DORK = KBO
 
         IF(VERBOSE >=1) WRITE(*,*) "Time for BUILDRHO ",  TIME_MLS() - MLSI
@@ -262,6 +267,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            ELSEIF (KON .EQ. 1) THEN
               CALL KDEORTHOMYRHO
            ENDIF
+           IF (DFTBU .AND. KON==0) PNO = BO
         ENDIF
 
         OLDDELTAQS = DELTAQ

@@ -53,7 +53,6 @@ SUBROUTINE HUBBARDFORCE  ! AND ENERGY
     D = 0.5D0*BO   ! D*S*D = D, BO*S*BO = 2*BO
     P = 0.5D0*PNO  ! D*S*D = D, SHOULD BE P = D for SCF CONVERGENCE
   
-  
     do I = 1, HDIM
     do J = 1, HDIM
        UD(I,J) = DFTB_U(I)*D(I,J)
@@ -99,16 +98,16 @@ SUBROUTINE HUBBARDFORCE  ! AND ENERGY
       ENDDO
       ENDDO
 
-      CALL ZGEMM('N','N',HDIM,HDIM,HDIM,CONE,UDK,HDIM,SK(:,:,K),HDIM,CZERO,PSK,HDIM)
-      CALL ZGEMM('N','C',HDIM,HDIM,HDIM,CONE,UDK,HDIM,PSK,HDIM,CZERO,UPSDK,HDIM)
+      CALL ZGEMM('N','N',HDIM,HDIM,HDIM,CONE*0.5D0,KBO(:,:,K),HDIM,SK(:,:,K),HDIM,CZERO,PSK,HDIM)
 
+      CALL ZGEMM('N','C',HDIM,HDIM,HDIM,CONE,UDK,HDIM,PSK,HDIM,CZERO,UPSDK,HDIM)
       CALL ZGEMM('N','N',HDIM,HDIM,HDIM,CONE,PSK,HDIM,UDK,HDIM,CZERO,PSUDK,HDIM)
 
       XK = UDK - UPSDK
 
       CALL ZGEMM('N','N',HDIM,HDIM,HDIM,CONE,XK,HDIM,SK(:,:,K),HDIM,CZERO,YK,HDIM)
       DO I = 1,HDIM
-        CTMP = CTMP + YK(I,I)  ! Hubbar Ebergy contribution
+        CTMP = CTMP + 0.5D0*YK(I,I)  ! Hubbar Ebergy contribution
         !EHub = EHub + 0.5D0*YK(I,I)  ! Hubbar Ebergy contribution
       ENDDO
 
@@ -116,7 +115,7 @@ SUBROUTINE HUBBARDFORCE  ! AND ENERGY
 
       DO I = 1, HDIM
       DO J = 1, HDIM
-        AHUBK(I,J,K) = YK(I,J) + YK(J,I)
+        AHUBK(I,J,K) = YK(I,J) + dconjg(YK(J,I))
       ENDDO
       ENDDO
       !
