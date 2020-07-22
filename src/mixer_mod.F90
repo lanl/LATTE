@@ -48,7 +48,8 @@ MODULE MIXER_MOD
 
   !For mixing scheme
   LOGICAL, PUBLIC                      ::  MIXINIT = .FALSE.
-  REAL(LATTEPREC), ALLOCATABLE, PUBLIC  ::  DQIN(:,:), DQOUT(:,:)
+  REAL(LATTEPREC), ALLOCATABLE, PUBLIC ::  DQIN(:,:), DQOUT(:,:)
+  REAL(LATTEPREC), ALLOCATABLE, PUBLIC ::  QTMP1(:), QTMP2(:)
   REAL(LATTEPREC), PUBLIC              ::  SCFERROR
 #ifdef PROGRESSON
   TYPE(MX_TYPE), PUBLIC                ::  MX
@@ -959,6 +960,16 @@ CONTAINS
     IF(MYMIXERTYPE == "Linear")THEN
 
        CALL PRG_LINEARMIXER(DELTAQ,OLDDELTAQS,SCFERROR,MX%MIXCOEFF,MX%VERBOSE)
+
+    ELSEIF(MYMIXERTYPE == "PulayDM")THEN
+       allocate(QTMP1(HDIM*HDIM),QTMP2(HDIM*HDIM))
+       QTMP1 = reshape(DOrth,(/HDIM*HDIM/))
+       QTMP2 = reshape(DOrth_old,(/HDIM*HDIM/))
+
+       CALL PRG_QMIXER(QTMP1,QTMP2,DQIN,DQOUT,SCFERROR,PITER,MX%MIXCOEFF,MX%MPULAY,MX%VERBOSE)
+       DOrth = reshape(QTMP1,(/Hdim,Hdim/))
+       DOrth_old = reshape(QTMP2,(/Hdim,Hdim/))
+       deallocate(QTMP1,QTMP2)
 
     ELSEIF(MYMIXERTYPE == "Pulay")THEN
 

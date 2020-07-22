@@ -174,7 +174,7 @@ SUBROUTINE XBO(ITER)
 
            DO I = 1, NATS
 
-	     IF(DOKERNEL)THEN  
+	     IF(DOKERNEL .AND. (.NOT.DFTBU) )THEN  
 
               DELTAQ(I) =  TWO*PNK(1,I) - PNK(2,I) + &           !! ANDERS_CHANGE ANDERS CHANGE
                    KAPPA_XBO*dn2dt2(I)                           !! ANDERS_CHANGE RANK-N KERNEL

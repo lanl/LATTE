@@ -158,7 +158,11 @@ SUBROUTINE SUMMARY
      WRITE(24,'("Using 8th order approximation for entropy")') 
   ENDIF
 
-  WRITE(6,'("# Tr[ rho*H ] = ", F16.8)') TRRHOH
+  IF (DFTBU) THEN
+    WRITE(6,'("# Tr[ rho*H ] = ", F16.8)') TRRHOH
+  ELSE
+    WRITE(6,'("# Tr[ rho*H ] = ", 2F16.8)') TRRHOH,TRRHOH0
+  ENDIF
   WRITE(6,'("# Pairwise energy = ", F16.8)') EREP
   WRITE(24,'("Tr[ rho*H ] = ", F16.8)') TRRHOH
   WRITE(24,'("Pairwise energy = ", F16.8)') EREP

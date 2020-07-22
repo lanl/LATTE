@@ -531,11 +531,13 @@ CONTAINS
     D_DFTB_U = VALVECTOR_RE(25)
     F_DFTB_U = VALVECTOR_RE(26)
 
-    IF (DFTBU.AND.DOKERNEL) THEN
-       WRITE(6,*) 'DOKERNEL IS TURNED OF BECAUSE DFTB+U IS USING!'
-       WRITE(6,*) 'DM-based rank-m update is used instead!!'
-       DOKERNEL = .FALSE.
-    ENDIF
+    ! DFTBU AND DOKERNEL, XLBOMD-DM with DFTBU
+    ! DFTBU and not DOKERNEL, regular BOMD with DFTBU
+    !IF (DFTBU.AND.DOKERNEL) THEN
+    !   WRITE(6,*) 'DOKERNEL IS TURNED OF BECAUSE DFTB+U IS USING!'
+    !   WRITE(6,*) 'DM-based rank-m update is used instead!!'
+    !   DOKERNEL = .FALSE.
+    !ENDIF
 
   END SUBROUTINE PARSE_CONTROL
 

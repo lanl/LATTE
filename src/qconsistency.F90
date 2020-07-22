@@ -232,7 +232,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            CALL KGETRHO
         ENDIF
 
-        !IF (DFTBU .AND. KON==0) DOrth = BO 
         IF (DFTBU .AND. KON==0) then 
            DOrth = BO 
            PNO   = BO
@@ -276,7 +275,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ! Get a new set of charges for our system
         !
 
-        CALL GETDELTAQ
+        !CALL GETDELTAQ
+        IF (.NOT.DFTBU) CALL GETDELTAQ
 
         !
         ! Let's check for convergence
@@ -284,10 +284,13 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         ALLOKQ = 0
 
-        QDIFF = ABS(DELTAQ - OLDDELTAQS)
+        IF (.NOT.DFTBU) THEN
+          QDIFF = ABS(DELTAQ - OLDDELTAQS)
 
-        MAXDQ = MAXVAL(QDIFF)
-        IF (MAXDQ .GT. ELEC_QTOL) ALLOKQ = 1
+          MAXDQ = MAXVAL(QDIFF)
+        ENDIF
+
+        !IF (MAXDQ .GT. ELEC_QTOL) ALLOKQ = 1
 
         ! Mix new and old partial charges
 
@@ -304,22 +307,36 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
 #endif
           ELSE
-           IF (KON==0) THEN
-             !BO = DOrth_old + QMIX*(DOrth - DOrth_old)   ! Simple linear mixing
-             !CALL DMKERNELMIXER(ITER,MAXDQ)              ! Rank1-1 updated DM kernel mixer
-             CALL dP2MIXER(ITER,SCF_ERR,MAXDQ)            ! Rank1-1 updated DM kernel mixer
+           !IF (KON==0) THEN
+             IF (DOKERNEL) THEN
+               !CALL DMKERNELMIXER(ITER,MAXDQ)              ! Rank1-1 updated DM kernel mixer
+               CALL dP2MIXER(ITER,SCF_ERR,MAXDQ)            ! Rank1-1 updated DM kernel mixer
+             ELSE
+#ifdef PROGRESSON
+               IF(MX%MIXERON)THEN
+                 ! use pulayDM
+                 CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
+               ELSE
+                 DOrth = DOrth_old + QMIX*(DOrth - DOrth_old)   ! Simple linear mixing
+               ENDIF
+#elif defined(PROGRESSOFF)
+               DOrth = DOrth_old + QMIX*(DOrth - DOrth_old)   ! Simple linear mixing
+#endif
+               BO = DOrth
+             ENDIF
              DOrth_old = BO                               !
              CALL DEORTHOMYRHO
              OLDDELTAQS = DELTAQ
              CALL GETDELTAQ
              SCF_ERR = norm2(DELTAQ - OLDDELTAQS)/sqrt(ONE*NATS) ! ANDERS CHANGE SCF_ERR TO COMPARE TO Dev Verison
-           ELSE
-             KBO = DORK_old + QMIX*(DORK - DORK_old)   ! Simple linear mixing
-             DORK_old = KBO                            !
-             CALL KDEORTHOMYRHO
-             OLDDELTAQS = DELTAQ
-             CALL GETDELTAQ
-           ENDIF
+             MAXDQ = MAXVAL(abs(DELTAQ-OLDDELTAQS))
+           !ELSE
+           !  KBO = DORK_old + QMIX*(DORK - DORK_old)   ! Simple linear mixing
+           !  DORK_old = KBO                            !
+           !  CALL KDEORTHOMYRHO
+           !  OLDDELTAQS = DELTAQ
+           !  CALL GETDELTAQ
+           !ENDIF
           ENDIF
         ELSE
 
@@ -335,17 +352,30 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
 #endif
           ELSE
-           IF (KON==0) THEN
-             BO = DOrth_old + QMIX*(DOrth - DOrth_old)
+           !IF (KON==0) THEN
+           !  BO = DOrth_old + QMIX*(DOrth - DOrth_old)
+#ifdef PROGRESSON
+             IF(MX%MIXERON)THEN
+               ! use pulayDM
+               CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
+             ELSE
+               DOrth = DOrth_old + QMIX*(DOrth - DOrth_old)   ! Simple linear mixing
+             ENDIF
+#elif defined(PROGRESSOFF)
+             DOrth = DOrth_old + QMIX*(DOrth - DOrth_old)   ! Simple linear mixing
+#endif
+             BO = DOrth
              DOrth_old = BO
              CALL DEORTHOMYRHO
+             OLDDELTAQS = DELTAQ
              CALL GETDELTAQ      ! INCLUDED_GETDELTAQ Probably not to comment out ANDERS?
-           ELSE
-             KBO = DORK_old + QMIX*(DORK - DORK_old)   ! Simple linear mixing
-             DORK_old = KBO                            !
-             CALL KDEORTHOMYRHO
-             CALL GETDELTAQ
-           ENDIF
+             MAXDQ = MAXVAL(abs(DELTAQ-OLDDELTAQS))
+           !ELSE
+           !  KBO = DORK_old + QMIX*(DORK - DORK_old)   ! Simple linear mixing
+           !  DORK_old = KBO                            !
+           !  CALL KDEORTHOMYRHO
+           !  CALL GETDELTAQ
+           !ENDIF
           ENDIF
 
         ENDIF
@@ -354,6 +384,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         !IF (DFTBU.AND.KON==1) DORK = DORK_old
 
         IF(VERBOSE >= 1)WRITE(*,*)"SCF error (MAXDQ) =",MAXDQ," SCF Tol =",ELEC_QTOL
+
+        IF (MAXDQ .GT. ELEC_QTOL) ALLOKQ = 1
 
         ALLOKM = 0
 
@@ -391,6 +423,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
 
      ENDDO
+
+     IF (DFTBU .AND. KON==0) PNO = BO
 
      NUMSCF = ITER
 
