@@ -68,7 +68,7 @@ wrtrestartlib.F90 deorthomyrhoprogress.F90 orthomyHprogress.F90 readrestartlib.F
 readppotspline.F90 pairpotspline.F90 errors.F90 initcoulombklist.F90 \
   dosfittab.F90 \
 readppotD.F90 pairpot_plusD.F90  tbfit.F90 fire.F90 angfactor.F90 \
-build_integral_map.F90 tb_forces.F90 dfdx_HS.F90 genorbitallist.F90 \
+build_integral_map.F90 tb_forces.F90 dfdx_HS.F90 genorbitallist.F90 tb_forcesprogress.F90\
 ktb_forces.F90 genHonsite.F90 gencutofflist.F90 getcorrs.F90 \
 Canon_DM_PRT.F90 can_resp.F90 getdeltaq_resp.F90  bldnewHS_sp.F90
 
