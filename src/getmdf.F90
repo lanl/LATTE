@@ -34,7 +34,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   IMPLICIT NONE
 
   INTEGER :: SWITCH, CURRITER, I, MLSI0, MLSI
-  REAL(LATTEPREC) :: ZEROSCFMOD
+  REAL(LATTEPREC) :: ZEROSCFMOD, RESIDUE
   IF (EXISTERROR) RETURN
 
   MLSI0 = TIME_MLS()
@@ -187,10 +187,22 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
         IF (DFTBU) THEN
           IF(VERBOSE >= 1)WRITE(*,*)"Doing XBODM ..."
-          CALL XBODM(1)
+            CALL XBODM(1)
+            FULLQCONV = 0
         ELSE
           IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."
-          CALL XBO(1)
+          residue =  norm2(DELTAQ - PNK(1,:))/NATS
+          write(*,*)"RESIDUE=",RESIDUE
+          if(RESIDUE/RESIDUEOLD > 10.0d0)then 
+            IF(VERBOSE >= 1)WRITE(*,*)"WARNING: A reaction is happening &
+                &(Rebuilding rho with FULLQCONV= 1)..."
+            FULLQCONV = 1
+            CALL QCONSISTENCY(0,1)
+            FULLQCONV = 0
+          else
+            CALL XBO(1)
+          endif
+          RESIDUEOLD = RESIDUE
         ENDIF
 
         IF (CONTROL .EQ. 1 .OR. CONTROL .EQ. 3 &
