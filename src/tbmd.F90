@@ -391,7 +391,13 @@ SUBROUTINE TBMD
         ENDIF
 
         EHUB = 0.D0
-        IF (DFTBU) CALL HUBBARDFORCE  ! ANDERS CHANGE  (Calculates hubbard forces) and energy contributions
+        ! ANDERS CHANGE  (Calculates hubbard forces) and energy contributions
+#ifdef PROGRESSON
+        IF (DFTBU) CALL HUBBARDFORCEPRG
+        !IF (DFTBU) CALL HUBBARDFORCE
+#elif defined(PROGRESSOFF)
+        IF (DFTBU) CALL HUBBARDFORCE
+#endif
 
         TOTE = TRRHOH + EREP + KEE - ENTE - ECOUL + ESPIN + EPLUSD
         IF(DFTBU)TOTE = TRRHOH0 + EREP + KEE - ENTE + ECOUL + ESPIN + EPLUSD + 2.D0*EHUB  ! ANDERS CHANGE TO BE CONSISTENT WITH HUBBARD U works also without Hubbard U's
