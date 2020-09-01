@@ -40,7 +40,11 @@ SUBROUTINE GETFORCE
         
      ELSEIF (BASISTYPE .EQ. "NONORTHO") THEN
         
+#ifdef PROGRESSON
+        CALL TBFORCESPROGRESS
+#elif defined(PROGRESSOFF)
         CALL TBFORCES
+#endif
         
         FTOT = F + FPUL
 

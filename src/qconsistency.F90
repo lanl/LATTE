@@ -184,7 +184,12 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         CALL ADDQDEP
 
+#ifdef PROGRESSON
+        IF (DFTBU) CALL ADDDFTBUPRG(.true.) 
+        !IF (DFTBU) CALL ADDDFTBU(.true.) 
+#elif defined(PROGRESSOFF)
         IF (DFTBU) CALL ADDDFTBU(.true.) 
+#endif
 
         ! Got to add the electrostatic potential to
         ! the Slater-Koster H before adding H_2 to form
@@ -455,7 +460,12 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         CALL ADDQDEP
+#ifdef PROGRESSON
+        IF (DFTBU) CALL ADDDFTBUPRG(.false.) 
+        !IF (DFTBU) CALL ADDDFTBU(.false.) 
+#elif defined(PROGRESSOFF)
         IF (DFTBU) CALL ADDDFTBU(.false.) 
+#endif
 
         !
         ! Building the spin up and spin down H's after we've
@@ -577,7 +587,12 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
      ENDIF
 
      CALL ADDQDEP
+#ifdef PROGRESSON
+     IF (DFTBU) CALL ADDDFTBUPRG(.false.) 
+     !IF (DFTBU) CALL ADDDFTBU(.false.) 
+#elif defined(PROGRESSOFF)
      IF (DFTBU) CALL ADDDFTBU(.false.) 
+#endif
 
      ! This is the right order
 

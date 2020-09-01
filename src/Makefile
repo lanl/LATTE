@@ -29,7 +29,7 @@ DBCSRMODS = dbcsr_var_mod.F90 init_dbcsr.F90 shutdown_dbcsr.F90
 MYSUBS = allocatediag.F90 allocatenono.F90 allocatepure.F90 bodirect.F90 \
 deallocatediag.F90 deallocatepure.F90 deorthomyrho.F90 deallocatenono.F90 \
 allocatedm.F90 deallocatedm.F90 initiatedm.F90 adddftbu.F90 xbodm.F90 \
-hubbardforce.F90  Invert.F90 \
+hubbardforce.F90 hubbardforce_prg.F90 Invert.F90 \
 diagmyh.F90 diagmyhprogress.F90 entropy.F90 fermiexpans.F90 genX.F90  latte.F90 orthomyH.F90 \
  orthomyrho.F90  pulay.F90  solvematcg.F90 solvematlapack.F90 \
 sp2T.F90 pulay_spprogress.F90 \
@@ -51,6 +51,7 @@ pairpot.F90 panic.F90 plot_ppot.F90 plot_univ.F90 printsparse.F90 \
  propchempot_xbo.F90 propspins_xbo.F90 qconsistency.F90 readcontrols.F90 \
 readcr.F90 readmdcontroller.F90 readppot.F90  readtb.F90 resetprodhd.F90 \
 rhozero.F90 shockcomp.F90  spinrhodirect.F90 spinrhodirectprogress.F90 stdescent.F90 \
+adddftbu_progress.F90 \
 summary.F90 tbmd.F90 toteng.F90 univscaling.F90 univscaling_function.F90 univtailcoef.F90  \
 vdwtailcoef.F90 velverlet.F90  xbo.F90 am.F90 bm.F90  \
  wignerd.F90 dfdx.F90 \
