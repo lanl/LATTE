@@ -18,3 +18,7 @@ log.*
 *.gcda
 *.gcno
 ./tests/run_test_lmp.sh
+
+./Restarts/restartMD.last.dat
+./bl/inputblock.dat
+./tests/timer_cpu_time
