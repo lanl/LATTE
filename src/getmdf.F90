@@ -191,18 +191,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
             FULLQCONV = 0
         ELSE
           IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."
-          residue =  norm2(DELTAQ - PNK(1,:))/NATS
-          write(*,*)"RESIDUE=",RESIDUE
-          if(RESIDUE/RESIDUEOLD > 10.0d0)then 
-            IF(VERBOSE >= 1)WRITE(*,*)"WARNING: A reaction is happening &
-                &(Rebuilding rho with FULLQCONV= 1)..."
-            FULLQCONV = 1
-            CALL QCONSISTENCY(0,1)
-            FULLQCONV = 0
-          else
-            CALL XBO(1)
-          endif
-          RESIDUEOLD = RESIDUE
+          CALL XBO(1)
         ENDIF
 
         IF (CONTROL .EQ. 1 .OR. CONTROL .EQ. 3 &
