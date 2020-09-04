@@ -40,8 +40,9 @@ SUBROUTINE BOEVECS
   REAL(LATTEPREC), PARAMETER :: MAXSHIFT = ONE
   REAL(LATTEPREC) :: EBAND, QMIXORIG, NE
   REAL(LATTEPREC) :: S, OCCLOGOCC_ELECTRONS, OCCLOGOCC_HOLES
+  LOGICAL :: ERR
 
-  IF (EXISTERROR) RETURN
+  IF (EXISTERROR) RETURN; IF (VERBOSE >= 2) WRITE(*,*)"In bodirect.F90 ..."
 
   BO = ZERO
 
@@ -71,12 +72,6 @@ SUBROUTINE BOEVECS
   IF (KBT .GT. 0.000001) THEN  ! This bit is for a finite electronic temperature
 
      IF(VERBOSE >= 2)WRITE(*,*)"Total charge =",SUM(DELTAQ)
-
-#ifdef PROGRESSON
-
-     CALL PRG_GET_FLEVEL(EVALS,KBT,BNDFIL,BREAKTOL,CHEMPOT)
-
-#else
 
      DO WHILE (ABS(OCCERROR) .GT. BREAKTOL .AND. ITER .LT. 100)
 
@@ -118,11 +113,10 @@ SUBROUTINE BOEVECS
 
      IF (ITER .EQ. 100) THEN
         CALL ERRORS("bodirect","Newton-Raphson scheme to find the Chemical potential does not converge")
-        IF (EXISTERROR) RETURN
+        IF (EXISTERROR) RETURN; IF (VERBOSE >= 2) WRITE(*,*)"In bodirect.F90 ..."
      ENDIF
 
      ! Now we have the chemical potential we can build the density matrix
-#endif
 
      S = ZERO
 
