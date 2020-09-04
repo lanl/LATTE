@@ -37,7 +37,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   INTEGER :: ALLOKQ, ALLOKM, ALLOK, MDSOFT
   INTEGER :: START_CLOCK, STOP_CLOCK, CLOCK_RATE, CLOCK_MAX, ITERACC
   REAL(4) :: TIMEACC
-  REAL(LATTEPREC) :: MAXDQ, SCF_ERR, MLSI, MAXDSP
+  REAL(LATTEPREC) :: MAXDQ, SCF_ERR, MLSI, MAXDSP, MLSI0
   REAL(LATTEPREC), ALLOCATABLE :: QDIFF(:), SPINDIFF(:)
 
   MDSOFT = 10
@@ -72,11 +72,11 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            IF (KON .EQ. 0) THEN
 
 #ifdef PROGRESSON
-              IF (LATTEINEXISTS) THEN  !orthogonalize from progress lib if latte.in exists
-                 CALL ORTHOMYHPRG
-              ELSE
-                 CALL ORTHOMYH
-              ENDIF
+                IF (LATTEINEXISTS) THEN  !orthogonalize from progress lib if latte.in exists
+                   CALL ORTHOMYHPRG
+                ELSE
+                   CALL ORTHOMYH
+                ENDIF
 #elif defined(PROGRESSOFF)
 
               CALL ORTHOMYH
@@ -221,7 +221,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            ENDIF
         ENDIF
 
-        IF(VERBOSE >= 1) WRITE(*,*) "Time for ORTHOMYH ",  TIME_MLS() - MLSI
+        IF(VERBOSE >= 1) WRITE(*,*) "Time for GETMDF-QCONSISTENCY-ORTHOMYH ",  TIME_MLS() - MLSI
         !
         ! New Hamiltonian: get the bond order
         !
@@ -244,7 +244,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         !IF (DFTBU .AND. KON==1) DORK = KBO
 
-        IF(VERBOSE >=1) WRITE(*,*) "Time for BUILDRHO ",  TIME_MLS() - MLSI
+        IF(VERBOSE >=1) WRITE(*,*) "Time for GETMDF-QCONSISTENCY-BUILDRHO ",  TIME_MLS() - MLSI
         TX = STOP_TIMER(DMBUILD_TIMER)
 
         ! We have a density matrix computed in from the orthogonalized
@@ -449,9 +449,13 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         IF (ELECMETH .EQ. 0) THEN
 
+           MLSI = TIME_MLS()
            CALL COULOMBRSPACE
+           WRITE(*,*)"Time for COULOMBRSPACE",TIME_MLS()-MLSI
 
+           MLSI = TIME_MLS()
            CALL COULOMBEWALD
+           WRITE(*,*)"Time for COULOMBEWALD",TIME_MLS()-MLSI
 
         ELSE
 
@@ -494,7 +498,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            ENDIF
         ENDIF
 
-        IF (VERBOSE >=1 )WRITE(*,*)"Time for ORTHOMYH", TIME_MLS() - MLSI
+        IF (VERBOSE >=1 )WRITE(*,*)"Time for GETMDF-QCONSISTENCY-ORTHOMYH", TIME_MLS() - MLSI
 
         !
         ! New Hamiltonian: get the bond order
@@ -510,7 +514,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            CALL KGETRHO
         ENDIF
 
-        IF (VERBOSE>=1) WRITE(*,*)"Time for GETRHO", TIME_MLS() - MLSI
+        IF (VERBOSE>=1) WRITE(*,*)"Time for GETMDF-QCONSISTENCY-GETRHO", TIME_MLS() - MLSI
         OLDDELTAQS = DELTAQ
         IF (DFTBU .AND. KON==0) DOrth = BO
         !IF (DFTBU .AND. KON==1) DORK = KBO
@@ -535,7 +539,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
               CALL KDEORTHOMYRHO
            ENDIF
         ENDIF
-        IF (VERBOSE >=1 ) WRITE(*,*)"Time for DEORTHOMYRHO", TIME_MLS() - MLSI
+        IF (VERBOSE >=1 ) WRITE(*,*)"Time for GETMDF-QCONSISTENCY-DEORTHOMYRHO", TIME_MLS() - MLSI
 
         CALL GETDELTAQ
 
@@ -576,9 +580,14 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
      IF (ELECMETH .EQ. 0) THEN
 
+        MLSI0 = TIME_MLS()
         CALL COULOMBRSPACE
+        WRITE(*,*)"Time for COULOMBRSPACE",TIME_MLS()-MLSI
 
+        MLSI0 = TIME_MLS()
         CALL COULOMBEWALD
+        WRITE(*,*)"Time for COULOMBEWALD",TIME_MLS()-MLSI
+
 
      ELSE
 

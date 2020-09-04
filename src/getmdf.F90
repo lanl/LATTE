@@ -86,7 +86,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   ENDIF
   FLUSH(6)
 
-  !WRITE(*,*) "Time get H",  TIME_MLS() - MLSI
+  WRITE(*,*) "Time get H",  TIME_MLS() - MLSI
 
   MLSI = TIME_MLS()
 
@@ -131,7 +131,19 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
           DELTAQ = DELTAQDM    ! UPDATE DELTAQ FROM NEW DELTAQDM
         ELSE
           IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."
-          CALL XBO(CURRITER) ! Propagate q's
+          residue =  norm2(DELTAQ - PNK(1,:))/NATS
+          WRITE(*,*)"MDIter,RESIDUE,RES/RESOLD,EGAP",CURRITER,RESIDUE,RESIDUE/RESIDUEOLD,EGAP
+          if((CURRITER >= 10) .and. ((RESIDUE/RESIDUEOLD > 100.0d0) .or. (EGAP <= -0.1)))then
+            IF(VERBOSE >= 1)WRITE(*,*)"WARNING: A reaction is happening &
+                &(Rebuilding rho with FULLQCONV= 1)..."
+            FULLQCONV = 1
+            CALL QCONSISTENCY(0,1)
+          else
+            FULLQCONV = 0
+            CALL XBO(CURRITER) ! Propagate q's
+          endif
+          RESIDUEOLD = RESIDUE
+
         ENDIF
         !
         ! If we are also propagating the chemical potential
@@ -152,7 +164,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
      FLUSH(6)
   ENDIF
 
-  WRITE(*,*) "Time for PROPCHEMPOT XBO GETDELTASPIN",  TIME_MLS() - MLSI
+  WRITE(*,*) "Time for GETMDF-PROPCHEMPOT XBO GETDELTASPIN",  TIME_MLS() - MLSI
   MLSI = TIME_MLS()
   !
   ! If SWITCH = 0, then we don't have a set of partials charges
@@ -172,7 +184,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
      CALL QCONSISTENCY(SWITCH, CURRITER) ! Self consistent charge transfer
   ENDIF
 
-  WRITE(*,*) "Time for QNEUTRAL QCONSISTENCY ",  TIME_MLS() - MLSI
+  WRITE(*,*) "Time for GETMDF-QNEUTRAL QCONSISTENCY ",  TIME_MLS() - MLSI
   ! Run to self-consistency QITER = 0 -> only H(P) + D calculated 
 
   !
@@ -191,7 +203,10 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
             FULLQCONV = 0
         ELSE
           IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."
+          residue =  norm2(DELTAQ - PNK(1,:))/NATS
+          write(*,*)"RESIDUE=",RESIDUE
           CALL XBO(1)
+          RESIDUEOLD = RESIDUE
         ENDIF
 
         IF (CONTROL .EQ. 1 .OR. CONTROL .EQ. 3 &
@@ -219,17 +234,12 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   IF(VERBOSE >= 1)WRITE(*,*)"Getting forces ..."
 
   IF (DFTBU) THEN
-#ifdef PROGRESSON
-    call HUBBARDFORCEPRG
-    !call HUBBARDFORCE
-#elif defined(PROGRESSOFF)
     call HUBBARDFORCE
-#endif
   ENDIF
 
   CALL GETFORCE
 
-  WRITE(*,*) "Time for GETFORCE  ",  TIME_MLS() - MLSI
+  WRITE(*,*) "Time for GETMDF-GETFORCE  ",  TIME_MLS() - MLSI
 
   MLSI = TIME_MLS()
 

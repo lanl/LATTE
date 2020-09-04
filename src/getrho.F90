@@ -32,7 +32,7 @@ SUBROUTINE GETRHO(MDITER)
   IMPLICIT NONE
 
   INTEGER :: MDITER, MLSI
-  IF (EXISTERROR) RETURN
+  IF (EXISTERROR) RETURN; IF (VERBOSE >= 2) WRITE(*,*)"In getrho.F90 ..."
 
   ! This subroutine selects and calls the subroutines used to
   ! compute the density matrix based on the value of CONTROL
@@ -46,18 +46,23 @@ MLSI = TIME_MLS()
 
   IF (CONTROL .EQ. 1) THEN
 #ifdef PROGRESSON
-    IF (SPINON .EQ. 0) THEN
-      CALL BOEVECSPRG()
+    IF(LATTEINEXISTS)THEN
+    	IF (SPINON .EQ. 0) THEN
+      		CALL BOEVECSPRG()
+    	ELSE
+      		CALL DIAGMYHPRG()
+      		CALL SPINRHOEVECSPRG()
+    	ENDIF
     ELSE
-      !CALL DIAGMYH()
-      !CALL SPINRHOEVECS
-      !WRITE(*,*)"This is using the original LATTE routine. Spin-polarized non yet with PROGRESS/BML"
-      CALL DIAGMYHPRG()
-      CALL SPINRHOEVECSPRG()
+    	CALL DIAGMYH()
+     	IF (SPINON .EQ. 0) THEN
+        	CALL BOEVECS()
+     	ELSE
+        	CALL SPINRHOEVECS
+     	ENDIF
     ENDIF
 #elif defined(PROGRESSOFF)
      CALL DIAGMYH()
-
      IF (SPINON .EQ. 0) THEN
         CALL BOEVECS()
      ELSE
@@ -69,14 +74,17 @@ MLSI = TIME_MLS()
 
      IF  (SPARSEON .EQ. 0) THEN
 
-        CALL GERSHGORIN
-
 #ifdef PROGRESSON
-
-        CALL SP2PRG
+	IF(LATTEINEXISTS)THEN
+        	CALL SP2PRG
+	ELSE
+        	CALL GERSHGORIN
+        	CALL SP2PURE
+	ENDIF
 
 #elif defined(PROGRESSOFF)
 
+        CALL GERSHGORIN
         CALL SP2PURE
 
 #endif
@@ -93,7 +101,15 @@ MLSI = TIME_MLS()
 
 #ifdef PROGRESSON
 
-        CALL SP2PRG
+	IF(LATTEINEXISTS)THEN
+        	CALL SP2PRG
+	ELSE
+       		IF (MDITER .LE. 10) THEN
+           		CALL SP2PURE_SPARSE_PARALLEL(MDITER)
+        	ELSE
+           		CALL SP2PURE_SPARSE_PARALLEL_SIMPLE(MDITER)
+        	ENDIF
+	ENDIF
 
 #elif defined(PROGRESSOFF)
 

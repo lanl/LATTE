@@ -19,81 +19,15 @@
 ! Public License for more details.                                         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SUBROUTINE GETFORCE
+MODULE NONOARRAYPROGRESS
 
-  USE CONSTANTS_MOD
-  USE SETUPARRAY
   USE MYPRECISION
+  USE BML 
 
   IMPLICIT NONE
-  IF (EXISTERROR) RETURN
+  SAVE
 
-  FTOT = ZERO
+  TYPE(BML_MATRIX_T), PUBLIC :: HAM_BML, ORTHOH_BML, BO_BML, ORTHOBO_BML 
 
-  IF (KON .EQ. 0) THEN
 
-     IF (BASISTYPE .EQ. "ORTHO") THEN
-        
-        CALL GRADH
-        
-        FTOT = TWO * F
-        
-     ELSEIF (BASISTYPE .EQ. "NONORTHO") THEN
-        
-#ifdef PROGRESSON
-	IF(LATTEINEXISTS)THEN
-        	CALL TBFORCESPROGRESS
-	ELSE
-        	CALL TBFORCES
-	ENDIF	
-#elif defined(PROGRESSOFF)
-        CALL TBFORCES
-#endif
-        
-        FTOT = F + FPUL
-
-     ENDIF
-
-  ELSEIF (KON .EQ. 1) THEN
-
-     IF (BASISTYPE .EQ. "ORTHO") THEN
-
-        CALL KGRADH
-
-        FTOT = TWO*F
-
-     ELSEIF (BASISTYPE .EQ. "NONORTHO") THEN
-
-        CALL KTBFORCES
-        
-        FTOT = F + FPUL
-
-     ENDIF
-
-  ENDIF
-
-  IF (PPOTON .EQ. 1) THEN
-     CALL PAIRPOT
-     FTOT = FTOT + FPP
-  ENDIF
-
-  IF (PPOTON .EQ. 2) THEN
-     CALL PAIRPOTTAB
-     FTOT = FTOT + FPP
-  ENDIF
-
-  IF (PPOTON .EQ. 3) THEN
-     CALL PAIRPOTSPLINE
-     FTOT = FTOT + FPP
-  ENDIF
-
-  IF (PLUSDON .EQ. 1) THEN
-     CALL PAIRPOTPLUSD
-     FTOT = FTOT + FPLUSD
-  ENDIF
-
-  IF (ELECTRO .EQ. 1) FTOT = FTOT + FCOUL
-
-  RETURN
-
-END SUBROUTINE GETFORCE
+END MODULE NONOARRAYPROGRESS
