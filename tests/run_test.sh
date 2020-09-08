@@ -4,6 +4,12 @@
 
 MY_PATH=`pwd`                                   # Capturing the local path of the folder where we are running.
 
+
+if [ "$LATTE_PERFORMANCE" = "yes" ]
+then
+  export OMP_NUM_THREADS=1 #Performace is only tested for one omp thread
+fi
+
 declare -A performanceExpectedTimes
 performanceExpectedTimes["single.point"]=0.014
 performanceExpectedTimes["single.point.noelec"]=0.027
@@ -85,7 +91,11 @@ for name in single.point single.point.noelec single.point.rspace ; do
   if [ "$LATTE_PERFORMANCE" = "yes" ]
   then
 	test=`echo "($relativeTime-${performanceExpectedTimes[$name]})/${performanceExpectedTimes[$name]} < 0.1" | bc -l`
-	[ "$test" -eq 0 ] && exit -1
+	  if [ "$test" -eq 0 ]
+    then 
+      echo "FAILING for performance (time,expectedTime)",$relativeTime,${performanceExpectedTimes[$name]}
+      exit -1
+    fi  
   fi
 
   rm $REF out
