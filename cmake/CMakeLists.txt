@@ -76,7 +76,7 @@ endif()
 
 set(MYMODULES  myprecision.F90 constants_mod.F90 setuparray.F90 coulombarray.F90 
 diagarray.F90 fermicommon.F90 mdarray.F90 neblistarray.F90 
-nonoarray.F90 ppotarray.F90 purearray.F90 relaxcommon.F90 restartarray.F90 
+nonoarray.F90 nonoarrayprogress.F90 ppotarray.F90 purearray.F90 relaxcommon.F90 restartarray.F90 
 sparsearray.F90 spinarray.F90 univarray.F90 virialarray.F90 xboarray.F90 
 kspacearray.F90 timer_mod.F90 subgraph.F90 matrixio.F90 sparsemath.F90 
 sparsesp2.F90 subgraphsp2.F90 homolumo.F90 openfiles_mod.F90 kernelparser_mod.F90 
