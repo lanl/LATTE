@@ -35,7 +35,8 @@ SUBROUTINE ADDQDEP
   REAL(LATTEPREC) :: ES, EP, ED, EF
   REAL(LATTEPREC) :: HMOD
   COMPLEX(LATTEPREC) :: ZHMOD
-  IF (EXISTERROR) RETURN
+  INTEGER, PARAMETER :: dp = LATTEPREC
+  IF (EXISTERROR) RETURN; IF (VERBOSE >= 2) WRITE(*,*)"In addqdep.F90 ..."
 
   INDEX = 0
 
@@ -247,7 +248,10 @@ SUBROUTINE ADDQDEP
         ! When we have a non-orthogonal basis, the electrostatic
         ! potential enters as SH_1 
         !
-
+!!$OMP PARALLEL DO DEFAULT (NONE) &
+!!$OMP SHARED(NATS,HUBBARDU,ELEMPOINTER,DELTAQ,COULOMBV) &
+!!$OMP SHARED(BASIS,HJJ) &
+!!$OMP PRIVATE(NUMORB,HMOD,INDEX,I,J) 
         DO I = 1, NATS
 
            HMOD = HUBBARDU(ELEMPOINTER(I))*DELTAQ(I) + COULOMBV(I)
@@ -294,16 +298,21 @@ SUBROUTINE ADDQDEP
            ENDDO
 
         ENDDO
+!!$OMP END PARALLEL DO
 
         ! H = H_0 + S*H_1
 
+!$OMP PARALLEL DO DEFAULT (NONE) &
+!$OMP SHARED(HDIM,H0,SMAT,HJJ,H) &
+!$OMP PRIVATE(I,J) 
         DO I = 1, HDIM
            DO J = 1, HDIM
 
-              H(J,I) = H0(J,I) + SMAT(J,I)*(HJJ(I) + HJJ(J))/TWO
+              H(J,I) = H0(J,I) + SMAT(J,I)*(HJJ(I) + HJJ(J))/2.0_dp
 
            ENDDO
         ENDDO
+!$OMP END PARALLEL DO
 
      ENDIF
 
