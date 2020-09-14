@@ -7,7 +7,6 @@ cp latte.in latte.tmp
 set -e                                          # This will exit the script if there is any error
 MY_PATH=`pwd`                                   # Capturing the local path of the folder where we are running.
 
-#RUN=$HOME"/ecp/lammps-skim/src/lmp_serial"  #EXAALT version of Lammps program
 RUN=$HOME"/lammps/src/lmp_serial"  #EXAALT version of Lammps program
 
 for name in 0scf 2scf fullscf 0scf.wrtrestart 0scf.rdrestart ; do
@@ -29,7 +28,7 @@ for name in 0scf 2scf fullscf 0scf.wrtrestart 0scf.rdrestart ; do
   echo -e "\nTesting for "$name" \n"
 
   time $RUN < $INLAMMPSFILE >  out
-  grep -A1000 -e "Step Temp E_pair E_mol TotEng Press" out > out1
+  grep -A1000 -e "Step Temp E_pair E_mol TotEng Press" log.lammps > out1
   grep Energy out1 | sed -e s/"Total Energy ="/""/g >  energy.out
   echo ""
 
@@ -56,7 +55,7 @@ for name in opt ; do
   echo -e "\nTesting for "$name" \n"
 
   time $RUN < $INLAMMPSFILE >  out
-  grep -A 16 TotEng out | sed -e s/"TotEng"/"0.0"/g >  energy.out
+  grep -A 16 TotEng log.lammps | sed -e s/"TotEng"/"0.0"/g >  energy.out
   echo ""
   
   python ./tests/test-energy.py --reference $REF --current energy.out --reltol 0.0000001
