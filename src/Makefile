@@ -7,6 +7,11 @@ include ../makefile.CHOICES
 
 FCID = $(shell echo $(FC) | head -c 3)
 
+ifeq ($(PROGRESS),)
+	PROGRESS=OFF
+endif
+
+
 PPFLAGS = -DXSYEVD -DXHEEVD -D$(PRECISION)PREC -DGPU$(GPUOPT) -DDBCSR_$(DBCSR_OPT) -DMPI_$(MPIOPT)
 PPFLAGS += -DPROGRESS$(PROGRESS) -DFCID$(FCID)
 
