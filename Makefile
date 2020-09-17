@@ -6,6 +6,8 @@ include makefile.CHOICES
 
 PROGRAMS = LATTE_SINGLE LATTE_DOUBLE LATTEGPU_SINGLE LATTEGPU_DOUBLE LATTE_DBCSR_DOUBLE LATTE_DBCSR_SINGLE
 
+MY_PATH=$(shell pwd)
+
 all : 
 ifeq ($(GPUOPT),ON)
 	(cd MATRIX; make; cd ..)
@@ -14,7 +16,7 @@ endif
 
 lammps : 
 	(rm liblatte.a; cd src; make; cd ..)
-	(cd $(HOME)/lammps/src; touch fix_latte.cpp; make serial; cd -)
+	(cd $(MY_PATH)/../lammps/src; touch fix_latte.cpp; make serial; cd -)
 	
 src : 
 	(rm liblatte.a; cd src; make; cd ..)
