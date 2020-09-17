@@ -1,0 +1,76 @@
+#
+# Compilation and link flags for LATTE
+#
+
+MY_PATH=$(shell pwd)
+
+# Precision - double or single
+PRECISION = DOUBLE
+
+# Make the latte library
+# AR and RUNLIB executable default path to compile 
+# latte as a library (change accordingly)
+MAKELIB = ON
+AR = /usr/bin/ar cq
+RANLIB = /usr/bin/ranlib
+
+# Use PROGRESS and BML libraries
+PROGRESS = ON
+PROGRESS_PATH= $(MY_PATH)/../../qmd-progress/install/lib64
+BML_PATH= $(MY_PATH)/../../bml/install/lib64
+MAGMA_PATH = $(MY_PATH)/../../magma
+
+
+# Use METIS library for graph partitioning
+METIS = OFF
+
+# GPU available - OFF or ON
+GPUOPT = OFF
+
+# Using DBCSR library from cp2k? OFF or ON
+DBCSR_OPT = OFF
+
+# Parallelizing over k-points?
+MPIOPT = OFF
+
+#
+# CPU Fortran options
+#
+
+FC = gfortran
+FCL = $(FC)
+
+FFLAGS =  -ffree-line-length-none -fopenmp -lpthread -L${OLCF_ESSL_ROOT}/lib64 -lesslsmp
+
+LINKFLAG = -fopenmp
+
+#BLAS/LAPACK libraries:
+LIB = -fopenmp -lpthread -L${OLCF_ESSL_ROOT}/lib64 -lesslsmp
+LIB += -L${OLCF_CUDA_ROOT}/lib64/ -lcublas -lcudart
+LIB += -L${CUDA_TOOLKIT_ROOT_DIR}/lib64/ -lcublas -lcusolver 
+LIB += -L${MAGMA_PATH}/lib -lmagma
+
+# Uncomment for coverage
+#CVR = OFF
+ifeq ($(CVR), ON)
+	FFLAGS += -fprofile-arcs -ftest-coverage
+	LINKFLAG += -fprofile-arcs -ftest-coverage
+endif
+
+ifeq ($(PROGRESS), ON)
+	LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml_fortran -lbml
+	FFLAGS += -I$(BML_PATH)/../include -I$(PROGRESS_PATH)/../include
+endif
+
+ifeq ($(GRAPH), ON) 
+	LIB += -L$(METIS_PATH)/lib -lmetis
+	FFLAGS += -I$(METIS_PATH)/include
+endif
+
+#
+# GPU options
+#
+
+GPU_CUDA_LIB = -L${OLCF_CUDA_ROOT}/lib64/ -lcublas -lcudart
+
+GPU_ARCH = sm_70 
