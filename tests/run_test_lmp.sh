@@ -7,8 +7,7 @@ cp latte.in latte.tmp
 set -e                                          # This will exit the script if there is any error
 MY_PATH=`pwd`                                   # Capturing the local path of the folder where we are running.
 
-#RUN=$HOME"/ecp/lammps-skim/src/lmp_serial"  #EXAALT version of Lammps program
-RUN=$PROJWORK"/csc304/call-latte/lammps/src/lmp_serial"  #EXAALT version of Lammps program
+RUN=$HOME"/lammps/src/lmp_serial"  #EXAALT version of Lammps program
 
 for name in 0scf 2scf fullscf 0scf.wrtrestart 0scf.rdrestart ; do
 
