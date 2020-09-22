@@ -132,17 +132,17 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
         ELSE
           IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."
           residue =  norm2(DELTAQ - PNK(1,:))/NATS
-          WRITE(*,*)"MDIter,RESIDUE,RES/RESOLD,EGAP",CURRITER,RESIDUE,RESIDUE/RESIDUEOLD,EGAP
-          if((CURRITER >= 10) .and. ((RESIDUE/RESIDUEOLD > 100.0d0) .or. (EGAP <= -0.1)))then
-            IF(VERBOSE >= 1)WRITE(*,*)"WARNING: A reaction is happening &
-                &(Rebuilding rho with FULLQCONV= 1)..."
-            FULLQCONV = 1
-            CALL QCONSISTENCY(0,1)
-          else
-            FULLQCONV = 0
-            CALL XBO(CURRITER) ! Propagate q's
-          endif
-          RESIDUEOLD = RESIDUE
+!          WRITE(*,*)"MDIter,RESIDUE,RES/RESOLD,EGAP",CURRITER,RESIDUE,RESIDUE/RESIDUEOLD,EGAP
+!          if((CURRITER >= 10) .and. ((RESIDUE/RESIDUEOLD > 100.0d0) .or. (EGAP <= -0.1)))then
+!            IF(VERBOSE >= 1)WRITE(*,*)"WARNING: A reaction is happening &
+!                &(Rebuilding rho with FULLQCONV= 1)..."
+!            FULLQCONV = 1
+!            CALL QCONSISTENCY(0,1)
+!          else
+!            FULLQCONV = 0
+!            CALL XBO(CURRITER) ! Propagate q's
+!          endif
+!          RESIDUEOLD = RESIDUE
 
         ENDIF
         !
