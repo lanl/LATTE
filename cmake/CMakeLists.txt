@@ -52,7 +52,7 @@ if(PROGRESS)
   message(STATUS "Found PROGRESS: ${PROGRESS_LIBRARIES} ${BML_LIBRARIES}")
 endif()  
 
-option(DBCSR_OPT "Whether to use DBCSR" OFF)
+#option(DBCSR_OPT "Whether to use DBCSR" OFF)
 
 option(GPUOPT "Whether to use the GPU" OFF)
 if(GPUOPT)
@@ -119,6 +119,12 @@ readppotspline.F90 pairpotspline.F90 errors.F90 initcoulombklist.F90
 flcnnono.F90 flcnnono_sp.F90 kflcnnono.F90 dosfittab.F90 
 readppotD.F90 pairpot_plusD.F90)
 
+#if(NOT DBCSR_OPT)
+#  set(DBCSR)
+#else()
+#  set(DBCSR dbcsr_var_mod.f90 init_dbcsr.f90 shutdown_dbcsr.f90)
+#endif()
+
 foreach(_m MYMODULES MYSUBS DBCSR)
   set(${_m}_SOURCES)
   foreach(_file ${${_m}})
@@ -126,13 +132,14 @@ foreach(_m MYMODULES MYSUBS DBCSR)
   endforeach()
 endforeach()
 
+add_library(latte ${MYMODULES_SOURCES} ${MYSUBS_SOURCES} ${DBCSR_SOURCES}
+  ${CMAKE_CURRENT_SOURCE_DIR}/../src/latte_lib.f90
+  ${CMAKE_CURRENT_SOURCE_DIR}/../src/latte_c_bind.f90
+
 if(NOT DBCSR_OPT)
   set(DBCSR_SOURCES)
 endif()
 
-add_library(latte ${MYMODULES_SOURCES} ${MYSUBS_SOURCES}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../src/latte_lib.F90
-  ${CMAKE_CURRENT_SOURCE_DIR}/../src/latte_c_bind.F90
 )
 target_compile_options(latte PRIVATE -cpp)
 install(TARGETS latte EXPORT LATTE_Targets LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
