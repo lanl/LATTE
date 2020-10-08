@@ -200,7 +200,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
         IF (DFTBU) THEN
           IF(VERBOSE >= 1)WRITE(*,*)"Doing XBODM ..."
             CALL XBODM(1)
-            FULLQCONV = 0
+            !FULLQCONV = 0
         ELSE
           IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."
           residue =  norm2(DELTAQ - PNK(1,:))/NATS
@@ -234,7 +234,12 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   IF(VERBOSE >= 1)WRITE(*,*)"Getting forces ..."
 
   IF (DFTBU) THEN
+#ifdef PROGRESSON
+    call HUBBARDFORCEPRG
+    !call HUBBARDFORCE
+#elif defined(PROGRESSOFF)
     call HUBBARDFORCE
+#endif
   ENDIF
 
   CALL GETFORCE
