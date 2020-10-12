@@ -131,6 +131,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
           DELTAQ = DELTAQDM    ! UPDATE DELTAQ FROM NEW DELTAQDM
         ELSE
           IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."
+          CALL XBO(CURRITER) ! Propagate q's
           residue =  norm2(DELTAQ - PNK(1,:))/NATS
 !          WRITE(*,*)"MDIter,RESIDUE,RES/RESOLD,EGAP",CURRITER,RESIDUE,RESIDUE/RESIDUEOLD,EGAP
 !          if((CURRITER >= 10) .and. ((RESIDUE/RESIDUEOLD > 100.0d0) .or. (EGAP <= -0.1)))then
