@@ -9,20 +9,28 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 subroutine  Canon_DM_PRT(H1,beta,Q,e,mu0,m,HDIM)
 
-USE SETUPARRAY
+  USE MYPRECISION
+  USE SETUPARRAY
 
-implicit none
-integer, parameter      :: PREC = 8
-!real(PREC), parameter   :: ONE = 1.D0, TWO = 2.D0, ZERO = 0.D0
-integer, intent(in)     :: HDIM, m ! m = Number of recursion steps
-real(PREC), intent(in)  :: H1(HDIM,HDIM), Q(HDIM,HDIM), e(HDIM) ! Q and e are eigenvectors and eigenvalues of H0
-real(PREC), intent(in)  :: beta, mu0 ! Electronic temperature and chemical potential
-real(PREC)              :: P1(HDIM,HDIM) ! Density matrix response derivative with respect to perturbation H1 to H0
-real(PREC)              :: X(HDIM,HDIM), DX1(HDIM,HDIM), Y(HDIM,HDIM) ! Temporary matrices
-real(PREC)              :: h_0(HDIM), p_0(HDIM), dPdmu(HDIM), p_02(HDIM), iD0(HDIM)
-real(PREC)              :: cnst, mu1
-real(PREC)              :: traceBO
-integer                 :: i, j, k, N 
+  implicit none
+  integer, parameter      :: PREC = LATTEPREC
+
+  !real(PREC), parameter   :: ONE = 1.D0, TWO = 2.D0, ZERO = 0.D0
+  integer, intent(in)     :: HDIM, m ! m = Number of recursion steps
+  real(PREC), intent(in)  :: H1(HDIM,HDIM), Q(HDIM,HDIM), e(HDIM) ! Q and e are eigenvectors and eigenvalues of H0
+  real(PREC), intent(in)  :: beta, mu0 ! Electronic temperature and chemical potential
+!
+  real(PREC), ALLOCATABLE :: P1(:,:)                  ! Density matrix response derivative with respect to perturbation H1 to H0
+  real(PREC), ALLOCATABLE :: X(:,:), DX1(:,:), Y(:,:) ! Temporary matrices
+  real(PREC), ALLOCATABLE :: h_0(:), p_0(:), dPdmu(:), p_02(:), iD0(:)
+!
+  real(PREC)              :: cnst, mu1
+  real(PREC)              :: traceBO
+  integer                 :: i, j, k, N 
+
+  ALLOCATE(P1(HDIM,HDIM)) ! Density matrix response derivative with respect to perturbation H1 to H0
+  ALLOCATE(X(HDIM,HDIM), DX1(HDIM,HDIM), Y(HDIM,HDIM)) ! Temporary matrices
+  ALLOCATE(h_0(HDIM), p_0(HDIM), dPdmu(HDIM), p_02(HDIM), iD0(HDIM))
 
   h_0 = e                ! Diagonal Hamiltonian H0 respresented in the eigenbasis Q
   cnst = beta/(1.D0*2**(m+2)) ! Scaling constant
@@ -78,5 +86,7 @@ integer                 :: i, j, k, N
 
 !  call MMult(ONE,Q,P1,ZERO,X,'N','N',HDIM) ! and back transformation of P1, with a total of
 !  call MMult(ONE,X,Q,ZERO,P1,'N','T',HDIM) ! 4 matrix-matrix multiplication dominates the cost
+
+  DEALLOCATE(P1, X, DX1, Y, H_0, P_0, DPDMU, P_02, ID0)
 
 end subroutine Canon_DM_PRT

@@ -1,23 +1,29 @@
 subroutine  can_resp(H1,Nocc,beta,Q,ev,fe,mu0,eps,HDIM)
 
+USE MYPRECISION
 USE SETUPARRAY
 implicit none
 
-integer, parameter      :: PREC = 8
+integer, parameter      :: PREC = LATTEPREC
 integer, intent(in)     :: HDIM, Nocc
 !real(PREC), parameter   :: ONE = 1.D0, ZERO = 0.D0, TWO = 2.D0
 real(PREC), intent(in)  :: H1(HDIM,HDIM), Q(HDIM,HDIM), ev(HDIM), fe(HDIM)
-real(PREC)              :: X(HDIM,HDIM), YY(HDIM,HDIM), fermifun
-real(PREC)              :: P02(HDIM,HDIM), II(HDIM,HDIM), XI(HDIM,HDIM)
-real(PREC)              :: DX1(HDIM,HDIM)
-real(PREC)              :: ID0(HDIM,HDIM), T12(HDIM,HDIM), DDT(HDIM,HDIM)
+
+real(PREC), ALLOCATABLE :: X(:,:), YY(:,:), DX1(:,:)
+real(PREC), ALLOCATABLE :: P02(:,:), II(:,:), XI(:,:)
+real(PREC), ALLOCATABLE :: ID0(:,:), T12(:,:), DDT(:,:)
 !real(PREC), intent(out) :: P1(HDIM,HDIM)
 real(PREC), intent(in)  :: beta, eps
-real(PREC), intent(inout)  :: mu0
-real(PREC)              ::  OccErr, TrdPdmu, TrP0, TrP1
+real(PREC), intent(inout) :: mu0
+real(PREC)              :: fermifun
+real(PREC)              :: OccErr, TrdPdmu, TrP0, TrP1
 real(PREC)              :: trX, trDDT
 real(PREC)              :: mu1, y
 integer                 :: N, Cnt, i, j, k,l, ind, ind2, fact
+
+  ALLOCATE(X(HDIM,HDIM), YY(HDIM,HDIM), DX1(HDIM,HDIM))
+  ALLOCATE(P02(HDIM,HDIM), II(HDIM,HDIM), XI(HDIM,HDIM))
+  ALLOCATE(ID0(HDIM,HDIM), T12(HDIM,HDIM), DDT(HDIM,HDIM))
 
   N = HDIM
   CALL DGEMM('T', 'N', HDIM, HDIM, HDIM, ONE, &
@@ -72,4 +78,5 @@ integer                 :: N, Cnt, i, j, k,l, ind, ind2, fact
 !  call MMult(ONE,Q,X,ZERO,YY,'N','N',HDIM)
 !  call MMult(ONE,YY,Q,ZERO,P1,'N','T',HDIM)
 
+  DEALLOCATE(X, YY, DX1, P02, II, XI, ID0, T12, DDT)
 end subroutine can_resp
