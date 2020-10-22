@@ -30,9 +30,16 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   USE MIXER_MOD
   USE KSPACEARRAY, ONLY : KBO
   USE DMARRAY
+  USE LATTEPARSER 
+#ifdef  PROGRESSON
+  USE SPARSEARRAY, ONLY : NUMTHRESH
+  USE BML
+  USE NONOARRAYPROGRESS
+#endif
 
   IMPLICIT NONE
 
+  INTEGER, PARAMETER :: dp = LATTEPREC
   INTEGER :: I, SWITCH, MDITER, ITER, II
   INTEGER :: ALLOKQ, ALLOKM, ALLOK, MDSOFT
   INTEGER :: START_CLOCK, STOP_CLOCK, CLOCK_RATE, CLOCK_MAX, ITERACC
@@ -98,6 +105,11 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         IF (DFTBU .AND. KON==0) DOrth_old = BO
+#ifdef PROGRESSON
+        IF (DFTBU .AND. KON==0) CALL BML_COPY_NEW(ORTHOBO_BML,DO_BML_OLD)
+#elif defined(PROGRESSOFF)
+#endif
+
         !IF (DFTBU .AND. KON==1) DORK_OLD = KBO
 
         TX = STOP_TIMER(DMBUILD_TIMER)
@@ -240,6 +252,10 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         IF (DFTBU .AND. KON==0) then 
            DOrth = BO 
            PNO   = BO
+#ifdef  PROGRESSON
+           CALL BML_COPY_NEW(ORTHOBO_BML,PNO_BML)
+           CALL BML_COPY_NEW(ORTHOBO_BML,DO_BML)
+#endif
         ENDIF
 
         !IF (DFTBU .AND. KON==1) DORK = KBO
@@ -271,7 +287,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            ELSEIF (KON .EQ. 1) THEN
               CALL KDEORTHOMYRHO
            ENDIF
-           IF (DFTBU .AND. KON==0) PNO = BO
+!           IF (DFTBU .AND. KON==0) PNO = BO
         ENDIF
 
         OLDDELTAQS = DELTAQ
@@ -322,6 +338,10 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
                  ! use pulayDM
                  CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
                ELSE
+                 CALL BML_ADD(DO_BML,DO_BML_OLD,1.0_DP,-1.0_DP,NUMTHRESH)
+                 CALL BML_ADD(DO_BML,DO_BML_OLD,QMIX,1.0_DP,NUMTHRESH)
+                 CALL BML_COPY_NEW(DO_BML, DO_BML_OLD)
+                 CALL BML_COPY_NEW(DO_BML, ORTHOBO_BML)
                  DOrth = DOrth_old + QMIX*(DOrth - DOrth_old)   ! Simple linear mixing
                ENDIF
 #elif defined(PROGRESSOFF)
@@ -329,12 +349,19 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 #endif
                BO = DOrth
              ENDIF
+
              DOrth_old = BO                               !
+#ifdef PROGRESSON
+             CALL DEORTHOMYRHOPRG
+#elif defined(PROGRESSOFF)
              CALL DEORTHOMYRHO
+#endif
+
              OLDDELTAQS = DELTAQ
              CALL GETDELTAQ
              SCF_ERR = norm2(DELTAQ - OLDDELTAQS)/sqrt(ONE*NATS) ! ANDERS CHANGE SCF_ERR TO COMPARE TO Dev Verison
              MAXDQ = MAXVAL(abs(DELTAQ-OLDDELTAQS))
+
            !ELSE
            !  KBO = DORK_old + QMIX*(DORK - DORK_old)   ! Simple linear mixing
            !  DORK_old = KBO                            !
@@ -346,7 +373,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ELSE
 
           IF (.NOT.DFTBU .OR. KON==1) THEN
-          !IF (.NOT.DFTBU) THEN
 #ifdef PROGRESSON
            IF(MX%MIXERON)THEN
               CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
@@ -358,20 +384,29 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 #endif
           ELSE
            !IF (KON==0) THEN
-           !  BO = DOrth_old + QMIX*(DOrth - DOrth_old)
 #ifdef PROGRESSON
              IF(MX%MIXERON)THEN
                ! use pulayDM
                CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
              ELSE
                DOrth = DOrth_old + QMIX*(DOrth - DOrth_old)   ! Simple linear mixing
+               CALL BML_ADD(DO_BML,DO_BML_OLD,1.0_DP,-1.0_DP,NUMTHRESH)
+               CALL BML_ADD(DO_BML,DO_BML_OLD,QMIX,1.0_DP,NUMTHRESH)
+               CALL BML_COPY_NEW(DO_BML, DO_BML_OLD)
+               CALL BML_COPY_NEW(DO_BML, ORTHOBO_BML)
              ENDIF
 #elif defined(PROGRESSOFF)
              DOrth = DOrth_old + QMIX*(DOrth - DOrth_old)   ! Simple linear mixing
 #endif
+
              BO = DOrth
              DOrth_old = BO
+
+#ifdef PROGRESSON
+             CALL DEORTHOMYRHOPRG
+#elif defined(PROGRESSOFF)
              CALL DEORTHOMYRHO
+#endif
              OLDDELTAQS = DELTAQ
              CALL GETDELTAQ      ! INCLUDED_GETDELTAQ Probably not to comment out ANDERS?
              MAXDQ = MAXVAL(abs(DELTAQ-OLDDELTAQS))
@@ -430,6 +465,9 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
      ENDDO
 
      IF (DFTBU .AND. KON==0) PNO = BO
+#ifdef  PROGRESSON
+     IF (DFTBU .AND. KON==0) CALL BML_COPY_NEW(BO_BML,PNO_BML)
+#endif
 
      NUMSCF = ITER
 
