@@ -127,7 +127,11 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
           IF(VERBOSE >= 1)WRITE(*,*)"Doing XBODM ..."
           !CALL DMKERNELPROPAGATION(CURRITER)  !!! using rank-1 update
           IF (DOKERNEL) CALL dP2MD(CURRITER)  !!! rank-m
+#ifdef PROGRESSON
+          CALL XBODMPRG(CURRITER) ! Propagate DM's
+#elif defined(PROGRESSOFF)
           CALL XBODM(CURRITER) ! Propagate DM's
+#endif
           DELTAQ = DELTAQDM    ! UPDATE DELTAQ FROM NEW DELTAQDM
         ELSE
           IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."
@@ -200,7 +204,11 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
         IF (DFTBU) THEN
           IF(VERBOSE >= 1)WRITE(*,*)"Doing XBODM ..."
+#ifdef PROGRESSON
+            CALL XBODMPRG(1)
+#elif defined(PROGRESSOFF)
             CALL XBODM(1)
+#endif
             !FULLQCONV = 0
         ELSE
           IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."

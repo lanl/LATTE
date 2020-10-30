@@ -68,8 +68,10 @@ SUBROUTINE ALLOCATEXBO
   ELSE
 
      ALLOCATE( PNK(XBODISORDER + 1, ARRAYDIM) )
-     IF (.NOT.ALLOCATED(d2PO)) ALLOCATE( d2PO(HDIM,HDIM) ) ! CHANGE ANDERS
-
+     IF (.NOT.ALLOCATED(d2PO)) THEN
+        ALLOCATE( d2PO(HDIM,HDIM) ) ! CHANGE ANDERS
+        d2PO = 0.0D0
+     ENDIF
      !
      ! If we need to propagate the chemical potential
      !

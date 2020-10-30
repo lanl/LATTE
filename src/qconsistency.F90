@@ -104,10 +104,10 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            CALL KGETRHO
         ENDIF
 
-        IF (DFTBU .AND. KON==0) DOrth_old = BO
 #ifdef PROGRESSON
         IF (DFTBU .AND. KON==0) CALL BML_COPY_NEW(ORTHOBO_BML,DO_BML_OLD)
 #elif defined(PROGRESSOFF)
+        IF (DFTBU .AND. KON==0) DOrth_old = BO
 #endif
 
         !IF (DFTBU .AND. KON==1) DORK_OLD = KBO
@@ -250,11 +250,12 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         IF (DFTBU .AND. KON==0) then 
-           DOrth = BO 
-           PNO   = BO
 #ifdef  PROGRESSON
            CALL BML_COPY_NEW(ORTHOBO_BML,PNO_BML)
            CALL BML_COPY_NEW(ORTHOBO_BML,DO_BML)
+#elif defined(PROGRESSOFF)
+           DOrth = BO 
+           PNO   = BO
 #endif
         ENDIF
 
@@ -288,6 +289,9 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
               CALL KDEORTHOMYRHO
            ENDIF
 !           IF (DFTBU .AND. KON==0) PNO = BO
+!#ifdef  PROGRESSON
+!           IF (DFTBU .AND. KON==0) CALL BML_COPY_NEW(BO_BML,PNO_BML)
+!#endif
         ENDIF
 
         OLDDELTAQS = DELTAQ
@@ -340,20 +344,19 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
                ELSE
                  CALL BML_ADD(DO_BML,DO_BML_OLD,1.0_DP,-1.0_DP,NUMTHRESH)
                  CALL BML_ADD(DO_BML,DO_BML_OLD,QMIX,1.0_DP,NUMTHRESH)
-                 CALL BML_COPY_NEW(DO_BML, DO_BML_OLD)
                  CALL BML_COPY_NEW(DO_BML, ORTHOBO_BML)
-                 DOrth = DOrth_old + QMIX*(DOrth - DOrth_old)   ! Simple linear mixing
                ENDIF
 #elif defined(PROGRESSOFF)
                DOrth = DOrth_old + QMIX*(DOrth - DOrth_old)   ! Simple linear mixing
-#endif
                BO = DOrth
+#endif
              ENDIF
 
-             DOrth_old = BO                               !
 #ifdef PROGRESSON
+             CALL BML_COPY_NEW(ORTHOBO_BML, DO_BML_OLD)
              CALL DEORTHOMYRHOPRG
 #elif defined(PROGRESSOFF)
+             DOrth_old = BO
              CALL DEORTHOMYRHO
 #endif
 
@@ -389,22 +392,20 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
                ! use pulayDM
                CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
              ELSE
-               DOrth = DOrth_old + QMIX*(DOrth - DOrth_old)   ! Simple linear mixing
                CALL BML_ADD(DO_BML,DO_BML_OLD,1.0_DP,-1.0_DP,NUMTHRESH)
                CALL BML_ADD(DO_BML,DO_BML_OLD,QMIX,1.0_DP,NUMTHRESH)
-               CALL BML_COPY_NEW(DO_BML, DO_BML_OLD)
                CALL BML_COPY_NEW(DO_BML, ORTHOBO_BML)
              ENDIF
 #elif defined(PROGRESSOFF)
              DOrth = DOrth_old + QMIX*(DOrth - DOrth_old)   ! Simple linear mixing
+             BO = DOrth
 #endif
 
-             BO = DOrth
-             DOrth_old = BO
-
 #ifdef PROGRESSON
+             CALL BML_COPY_NEW(ORTHOBO_BML, DO_BML_OLD)
              CALL DEORTHOMYRHOPRG
 #elif defined(PROGRESSOFF)
+             DOrth_old = BO
              CALL DEORTHOMYRHO
 #endif
              OLDDELTAQS = DELTAQ
@@ -420,7 +421,11 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         ENDIF
 
+#ifdef PROGRESSON
+        IF (DFTBU.AND.KON==0) CALL BML_COPY_NEW(DO_BML_OLD, DO_BML)
+#elif defined(PROGRESSOFF)
         IF (DFTBU.AND.KON==0) DOrth = DOrth_old
+#endif
         !IF (DFTBU.AND.KON==1) DORK = DORK_old
 
         IF(VERBOSE >= 1)WRITE(*,*)"SCF error (MAXDQ) =",MAXDQ," SCF Tol =",ELEC_QTOL
@@ -554,7 +559,11 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         IF (VERBOSE>=1) WRITE(*,*)"Time for GETMDF-QCONSISTENCY-GETRHO", TIME_MLS() - MLSI
         OLDDELTAQS = DELTAQ
+#ifdef PROGRESSON
+        IF (DFTBU .AND. KON==0) CALL BML_COPY_NEW(ORTHOBO_BML,DO_BML)
+#elif defined(PROGRESSOFF)
         IF (DFTBU .AND. KON==0) DOrth = BO
+#endif
         !IF (DFTBU .AND. KON==1) DORK = KBO
 
         !
@@ -589,9 +598,17 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         ! Here we do DM mixing instead of charge mixing
         IF (DFTBU .AND. KON==0) THEN
+#ifdef PROGRESSON
+          CALL BML_COPY(DO_BML_OLD, ORTHOBO_BML)
+          CALL BML_ADD(ORTHOBO_BML,DO_BML_OLD,1.0_DP,-1.0_DP,NUMTHRESH)
+          CALL BML_ADD(ORTHOBO_BML,DO_BML_OLD,QMIX,1.0_DP,NUMTHRESH)
+          CALL BML_COPY_NEW(ORTHOBO_BML, DO_BML_OLD)
+          CALL DEORTHOMYRHOPRG
+#elif defined(PROGRESSOFF)
           BO = DOrth_old + QMIX*(DOrth - DOrth_old) 
           DOrth_old = BO                           
           CALL DEORTHOMYRHO
+#endif
           CALL GETDELTAQ         ! INCLUDED_GETDELTAQ
         ENDIF
         !IF (DFTBU .AND. KON==1) THEN
@@ -678,9 +695,15 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
      ENDIF
 
      IF (DFTBU .AND. KON==0) THEN
+#ifdef PROGRESSON
+       CALL BML_COPY_NEW(DO_BML, DO_BML_OLD)
+       CALL BML_COPY_NEW(ORTHOBO_BML, DO_BML)
+#elif defined(PROGRESSOFF)
        DOrth_old = DOrth
        DOrth = BO
+#endif
      ENDIF
+
      IF (DFTBU .AND. KON==1) THEN
        DORK_old = DORK
        DORK = KBO
