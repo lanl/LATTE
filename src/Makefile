@@ -26,7 +26,7 @@ nonoarray.F90 ppotarray.F90 purearray.F90 relaxcommon.F90 restartarray.F90 \
 sparsearray.F90 spinarray.F90 univarray.F90 virialarray.F90 xboarray.F90 \
 kspacearray.F90 timer_mod.F90 subgraph.F90 matrixio.F90 sparsemath.F90 \
 sparsesp2.F90 subgraphsp2.F90 homolumo.F90 openfiles_mod.F90 kernelparser_mod.F90 \
-latteparser_latte_mod.F90 mixer_mod.F90 sp2progress.F90 genXprogress.F90  \
+latteparser_latte_mod.F90 sp2progress.F90 genXprogress.F90 mixer_mod.F90 \
 bodirectprogress.F90 constraints_mod.F90 latte_lib.F90 wignerarray.F90
 
 DBCSRMODS = dbcsr_var_mod.F90 init_dbcsr.F90 shutdown_dbcsr.F90

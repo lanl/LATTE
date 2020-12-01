@@ -321,6 +321,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         IF (MDITER .LE. MDSOFT) THEN
           IF (.NOT.DFTBU .OR. KON==1) THEN
+           ! mixing charge
           !IF (.NOT.DFTBU) THEN
 #ifdef PROGRESSON
            IF(MX%MIXERON)THEN
@@ -332,6 +333,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
 #endif
           ELSE
+           !ZY: mixing DM
            !IF (KON==0) THEN
              IF (DOKERNEL) THEN
                !CALL DMKERNELMIXER(ITER,MAXDQ)              ! Rank1-1 updated DM kernel mixer
@@ -386,7 +388,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
 #endif
           ELSE
-           !IF (KON==0) THEN
+             ! mixing DM
 #ifdef PROGRESSON
              IF(MX%MIXERON)THEN
                ! use pulayDM
