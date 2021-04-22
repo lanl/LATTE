@@ -30,375 +30,385 @@ SUBROUTINE GETDELTASPIN
 
   IMPLICIT NONE
 
+  REAL(LATTEPREC), ALLOCATABLE :: SPINLIST2(:)
   INTEGER :: I, J, K, INDEX, DINDEX
   IF (EXISTERROR) RETURN
 
   INDEX = 0
   DINDEX = 0
 
+  ALLOCATE(SPINLIST2(HDIM))
+
   !  deltaspin = number of spin ups - number of spin downs
 
   IF (BASISTYPE .EQ. "ORTHO") THEN
 
-     DO I = 1, NATS
+     !DO I = 1, NATS
 
-        SELECT CASE(BASIS(ELEMPOINTER(I)))
+     !   SELECT CASE(BASIS(ELEMPOINTER(I)))
 
-        CASE("s")
+     !   CASE("s")
 
-           INDEX = INDEX + 1
-           DINDEX = DINDEX + 1
+     !      INDEX = INDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           ! s
+     !      ! s
 
-           DELTASPIN(DINDEX) = RHOUP(INDEX, INDEX) - RHODOWN(INDEX,INDEX)
+     !      DELTASPIN(DINDEX) = RHOUP(INDEX, INDEX) - RHODOWN(INDEX,INDEX)
 
-        CASE("p")
+     !   CASE("p")
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
 
 
-           INDEX = INDEX + 3
+     !      INDEX = INDEX + 3
 
-        CASE("d")
+     !   CASE("d")
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) = &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
-                RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
-                RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
+     !      DELTASPIN(DINDEX) = &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
+     !           RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
+     !           RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
 
-           INDEX = INDEX + 5
+     !      INDEX = INDEX + 5
 
-        CASE("f")
+     !   CASE("f")
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) = &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
-                RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
-                RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5) + &
-                RHOUP(INDEX + 6, INDEX + 6) - RHODOWN(INDEX + 6, INDEX + 6) + &
-                RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
+     !      DELTASPIN(DINDEX) = &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
+     !           RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
+     !           RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5) + &
+     !           RHOUP(INDEX + 6, INDEX + 6) - RHODOWN(INDEX + 6, INDEX + 6) + &
+     !           RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
 
-           INDEX = INDEX + 7
+     !      INDEX = INDEX + 7
 
-        CASE("sp")
+     !   CASE("sp")
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
 
-           INDEX = INDEX + 1
+     !      INDEX = INDEX + 1
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
 
-           INDEX = INDEX + 3 
+     !      INDEX = INDEX + 3 
 
-        CASE("sd")
+     !   CASE("sd")
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
 
-           INDEX = INDEX + 1
+     !      INDEX = INDEX + 1
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
-                RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
-                RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
+     !           RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
+     !           RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
 
-           INDEX = INDEX + 5 
+     !      INDEX = INDEX + 5 
 
-        CASE("sf")
+     !   CASE("sf")
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
 
-           INDEX = INDEX + 1
+     !      INDEX = INDEX + 1
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
-                RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
-                RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5) + &
-                RHOUP(INDEX + 6, INDEX + 6) - RHODOWN(INDEX + 6, INDEX + 6) + &
-                RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
+     !           RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
+     !           RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5) + &
+     !           RHOUP(INDEX + 6, INDEX + 6) - RHODOWN(INDEX + 6, INDEX + 6) + &
+     !           RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
 
 
-           INDEX = INDEX + 7
+     !      INDEX = INDEX + 7
 
-        CASE("pd")
+     !   CASE("pd")
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
 
-           INDEX = INDEX + 3
+     !      INDEX = INDEX + 3
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
-                RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
-                RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
+     !           RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
+     !           RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
 
-           INDEX = INDEX + 5
+     !      INDEX = INDEX + 5
 
-        CASE("pf")
+     !   CASE("pf")
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
 
-           INDEX = INDEX + 3
+     !      INDEX = INDEX + 3
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
-                RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
-                RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5) + &
-                RHOUP(INDEX + 6, INDEX + 6) - RHODOWN(INDEX + 6, INDEX + 6) + &
-                RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
+     !           RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
+     !           RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5) + &
+     !           RHOUP(INDEX + 6, INDEX + 6) - RHODOWN(INDEX + 6, INDEX + 6) + &
+     !           RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
 
-           INDEX = INDEX + 7
+     !      INDEX = INDEX + 7
 
-        CASE("df")
+     !   CASE("df")
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
-                RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
-                RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
+     !           RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
+     !           RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
 
-           INDEX = INDEX + 5
+     !      INDEX = INDEX + 5
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
-                RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
-                RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5) + &
-                RHOUP(INDEX + 6, INDEX + 6) - RHODOWN(INDEX + 6, INDEX + 6) + &
-                RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
+     !           RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
+     !           RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5) + &
+     !           RHOUP(INDEX + 6, INDEX + 6) - RHODOWN(INDEX + 6, INDEX + 6) + &
+     !           RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
 
-           INDEX = INDEX + 7
+     !      INDEX = INDEX + 7
 
-        CASE("spd")
+     !   CASE("spd")
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
 
-           INDEX = INDEX + 1
+     !      INDEX = INDEX + 1
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
 
-           INDEX = INDEX + 3
+     !      INDEX = INDEX + 3
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
-                RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
-                RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
+     !           RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
+     !           RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
 
-           INDEX = INDEX + 5
+     !      INDEX = INDEX + 5
 
-        CASE("spf")
+     !   CASE("spf")
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
 
-           INDEX = INDEX + 1
+     !      INDEX = INDEX + 1
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
 
-           INDEX = INDEX + 3
+     !      INDEX = INDEX + 3
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
-                RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
-                RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5) + &
-                RHOUP(INDEX + 6, INDEX + 6) - RHODOWN(INDEX + 6, INDEX + 6) + &
-                RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
+     !           RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
+     !           RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5) + &
+     !           RHOUP(INDEX + 6, INDEX + 6) - RHODOWN(INDEX + 6, INDEX + 6) + &
+     !           RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
 
-           INDEX = INDEX + 7
+     !      INDEX = INDEX + 7
 
-        CASE("sdf")
+     !   CASE("sdf")
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
 
-           INDEX = INDEX + 1
+     !      INDEX = INDEX + 1
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
-                RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
-                RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
+     !           RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
+     !           RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
 
-           INDEX = INDEX + 5
+     !      INDEX = INDEX + 5
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
-                RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
-                RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5) + &
-                RHOUP(INDEX + 6, INDEX + 6) - RHODOWN(INDEX + 6, INDEX + 6) + &
-                RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
+     !           RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
+     !           RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5) + &
+     !           RHOUP(INDEX + 6, INDEX + 6) - RHODOWN(INDEX + 6, INDEX + 6) + &
+     !           RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
 
-           INDEX = INDEX + 7
+     !      INDEX = INDEX + 7
 
 
-        CASE("pdf")
+     !   CASE("pdf")
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
 
-           INDEX = INDEX + 3
+     !      INDEX = INDEX + 3
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
-                RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
-                RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
+     !           RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
+     !           RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
 
-           INDEX = INDEX + 5
+     !      INDEX = INDEX + 5
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
-                RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
-                RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5) + &
-                RHOUP(INDEX + 6, INDEX + 6) - RHODOWN(INDEX + 6, INDEX + 6) + &
-                RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
+     !           RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
+     !           RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5) + &
+     !           RHOUP(INDEX + 6, INDEX + 6) - RHODOWN(INDEX + 6, INDEX + 6) + &
+     !           RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
 
-           INDEX = INDEX + 7
+     !      INDEX = INDEX + 7
 
-        CASE("spdf") 
+     !   CASE("spdf") 
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) 
 
-           INDEX = INDEX + 1
+     !      INDEX = INDEX + 1
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3)
 
-           INDEX = INDEX + 3
+     !      INDEX = INDEX + 3
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
-                RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
-                RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
+     !           RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
+     !           RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5)
 
-           INDEX = INDEX + 5
+     !      INDEX = INDEX + 5
 
-           DINDEX = DINDEX + 1
+     !      DINDEX = DINDEX + 1
 
-           DELTASPIN(DINDEX) =  &
-                RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
-                RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
-                RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
-                RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
-                RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5) + &
-                RHOUP(INDEX + 6, INDEX + 6) - RHODOWN(INDEX + 6, INDEX + 6) + &
-                RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
+     !      DELTASPIN(DINDEX) =  &
+     !           RHOUP(INDEX + 1, INDEX + 1) - RHODOWN(INDEX + 1, INDEX + 1) + &
+     !           RHOUP(INDEX + 2, INDEX + 2) - RHODOWN(INDEX + 2, INDEX + 2) + &
+     !           RHOUP(INDEX + 3, INDEX + 3) - RHODOWN(INDEX + 3, INDEX + 3) + &
+     !           RHOUP(INDEX + 4, INDEX + 4) - RHODOWN(INDEX + 4, INDEX + 4) + &
+     !           RHOUP(INDEX + 5, INDEX + 5) - RHODOWN(INDEX + 5, INDEX + 5) + &
+     !           RHOUP(INDEX + 6, INDEX + 6) - RHODOWN(INDEX + 6, INDEX + 6) + &
+     !           RHOUP(INDEX + 7, INDEX + 7) - RHODOWN(INDEX + 7, INDEX + 7)
 
-           INDEX = INDEX + 7
+     !      INDEX = INDEX + 7
 
-        END SELECT
+     !   END SELECT
 
+     !ENDDO
+
+     SPINLIST = ZERO
+     SPINLIST2= ZERO
+     DO I = 1, HDIM
+       SPINLIST(I) = RHOUP(I,I) - RHODOWN(I,I)
+       SPINLIST2(I) = RHOUP(I,I) + RHODOWN(I,I)
      ENDDO
 
   ELSEIF (BASISTYPE .EQ. "NONORTHO") THEN
@@ -412,11 +422,13 @@ SUBROUTINE GETDELTASPIN
      IF (KON .EQ. 0) THEN
 
         SPINLIST = ZERO
+        SPINLIST2= ZERO
 
         DO I = 1, HDIM
            DO J = 1, HDIM
 
               SPINLIST(I) = SPINLIST(I) + (RHOUP(J,I) - RHODOWN(J,I))*SMAT(J,I)
+              SPINLIST2(I)= SPINLIST2(I)+ (RHOUP(J,I) + RHODOWN(J,I))*SMAT(J,I)
 
            ENDDO
         ENDDO
@@ -441,6 +453,8 @@ SUBROUTINE GETDELTASPIN
         SPINLIST = REAL(ZSPINLIST)
 
      ENDIF
+  ENDIF
+
      DO I = 1, NATS
 
         SELECT CASE(BASIS(ELEMPOINTER(I)))
@@ -451,6 +465,8 @@ SUBROUTINE GETDELTASPIN
 
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1)
 
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1)
+
            INDEX = INDEX + 1
 
         CASE("p")
@@ -459,6 +475,9 @@ SUBROUTINE GETDELTASPIN
 
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3)
+
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3)
 
            INDEX = INDEX + 3
 
@@ -469,6 +488,10 @@ SUBROUTINE GETDELTASPIN
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)
+
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3) + &
+                SPINLIST2(INDEX + 4) + SPINLIST2(INDEX + 5)
 
            INDEX = INDEX + 5
 
@@ -481,6 +504,11 @@ SUBROUTINE GETDELTASPIN
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)  + &
                 SPINLIST(INDEX + 6) + SPINLIST(INDEX + 7)
 
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3) + &
+                SPINLIST2(INDEX + 4) + SPINLIST2(INDEX + 5)  + &
+                SPINLIST2(INDEX + 6) + SPINLIST2(INDEX + 7)
+
            INDEX = INDEX + 7
 
         CASE("sp")
@@ -488,6 +516,7 @@ SUBROUTINE GETDELTASPIN
            DINDEX = DINDEX + 1
 
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1)
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1)
 
            INDEX = INDEX + 1
 
@@ -496,6 +525,9 @@ SUBROUTINE GETDELTASPIN
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3)
 
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3)
+
            INDEX = INDEX + 3
 
         CASE("sd")
@@ -503,6 +535,7 @@ SUBROUTINE GETDELTASPIN
            DINDEX = DINDEX + 1
 
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1)
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1)
 
            INDEX = INDEX + 1
 
@@ -512,6 +545,10 @@ SUBROUTINE GETDELTASPIN
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)
 
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3) + &
+                SPINLIST2(INDEX + 4) + SPINLIST2(INDEX + 5)
+
            INDEX = INDEX + 5
 
         CASE("sf")
@@ -519,6 +556,7 @@ SUBROUTINE GETDELTASPIN
            DINDEX = DINDEX + 1
 
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1)
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1)
 
            INDEX = INDEX + 1
 
@@ -528,6 +566,11 @@ SUBROUTINE GETDELTASPIN
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)  + &
                 SPINLIST(INDEX + 6) + SPINLIST(INDEX + 7)
+
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3) + &
+                SPINLIST2(INDEX + 4) + SPINLIST2(INDEX + 5)  + &
+                SPINLIST2(INDEX + 6) + SPINLIST2(INDEX + 7)
 
            INDEX = INDEX + 7           
 
@@ -539,6 +582,9 @@ SUBROUTINE GETDELTASPIN
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3)
 
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3)
+
            INDEX = INDEX + 3           
 
            DINDEX = DINDEX + 1
@@ -546,6 +592,10 @@ SUBROUTINE GETDELTASPIN
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)
+
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3) + &
+                SPINLIST2(INDEX + 4) + SPINLIST2(INDEX + 5)
 
            INDEX = INDEX + 5
 
@@ -556,6 +606,9 @@ SUBROUTINE GETDELTASPIN
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3)
 
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3)
+
            INDEX = INDEX + 3 
 
            DINDEX = DINDEX + 1
@@ -564,6 +617,11 @@ SUBROUTINE GETDELTASPIN
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)  + &
                 SPINLIST(INDEX + 6) + SPINLIST(INDEX + 7)
+
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3) + &
+                SPINLIST2(INDEX + 4) + SPINLIST2(INDEX + 5)  + &
+                SPINLIST2(INDEX + 6) + SPINLIST2(INDEX + 7)
 
            INDEX = INDEX + 7                  
 
@@ -575,6 +633,10 @@ SUBROUTINE GETDELTASPIN
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)
 
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3) + &
+                SPINLIST2(INDEX + 4) + SPINLIST2(INDEX + 5)
+
            INDEX = INDEX + 5
 
            DINDEX = DINDEX + 1
@@ -583,6 +645,11 @@ SUBROUTINE GETDELTASPIN
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)  + &
                 SPINLIST(INDEX + 6) + SPINLIST(INDEX + 7)
+
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3) + &
+                SPINLIST2(INDEX + 4) + SPINLIST2(INDEX + 5)  + &
+                SPINLIST2(INDEX + 6) + SPINLIST2(INDEX + 7)
 
            INDEX = INDEX + 7     
 
@@ -593,12 +660,17 @@ SUBROUTINE GETDELTASPIN
 
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1)
 
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1)
+
            INDEX = INDEX + 1
 
            DINDEX = DINDEX + 1
 
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3)
+
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3)
 
            INDEX = INDEX + 3
 
@@ -607,6 +679,10 @@ SUBROUTINE GETDELTASPIN
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)
+
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3) + &
+                SPINLIST2(INDEX + 4) + SPINLIST2(INDEX + 5)
 
            INDEX = INDEX + 5
 
@@ -616,12 +692,17 @@ SUBROUTINE GETDELTASPIN
 
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1)
 
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1)
+
            INDEX = INDEX + 1
 
            DINDEX = DINDEX + 1
 
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3)
+
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3)
 
            INDEX = INDEX + 3
 
@@ -632,6 +713,11 @@ SUBROUTINE GETDELTASPIN
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)  + &
                 SPINLIST(INDEX + 6) + SPINLIST(INDEX + 7)
 
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3) + &
+                SPINLIST2(INDEX + 4) + SPINLIST2(INDEX + 5)  + &
+                SPINLIST2(INDEX + 6) + SPINLIST2(INDEX + 7)
+
            INDEX = INDEX + 7                
 
         CASE("sdf")
@@ -639,6 +725,7 @@ SUBROUTINE GETDELTASPIN
            DINDEX = DINDEX + 1
 
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1)
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1)
 
            INDEX = INDEX + 1
 
@@ -648,6 +735,10 @@ SUBROUTINE GETDELTASPIN
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)
 
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3) + &
+                SPINLIST2(INDEX + 4) + SPINLIST2(INDEX + 5)
+
            INDEX = INDEX + 5
 
            DINDEX = DINDEX + 1
@@ -656,6 +747,11 @@ SUBROUTINE GETDELTASPIN
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)  + &
                 SPINLIST(INDEX + 6) + SPINLIST(INDEX + 7)
+
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3) + &
+                SPINLIST2(INDEX + 4) + SPINLIST2(INDEX + 5)  + &
+                SPINLIST2(INDEX + 6) + SPINLIST2(INDEX + 7)
 
            INDEX = INDEX + 7       
 
@@ -666,6 +762,9 @@ SUBROUTINE GETDELTASPIN
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3)
 
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3)
+
            INDEX = INDEX + 3 
 
            DINDEX = DINDEX + 1
@@ -673,6 +772,10 @@ SUBROUTINE GETDELTASPIN
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)
+
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3) + &
+                SPINLIST2(INDEX + 4) + SPINLIST2(INDEX + 5)
 
            INDEX = INDEX + 5
 
@@ -682,6 +785,11 @@ SUBROUTINE GETDELTASPIN
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)  + &
                 SPINLIST(INDEX + 6) + SPINLIST(INDEX + 7)
+
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3) + &
+                SPINLIST2(INDEX + 4) + SPINLIST2(INDEX + 5)  + &
+                SPINLIST2(INDEX + 6) + SPINLIST2(INDEX + 7)
 
            INDEX = INDEX + 7    
 
@@ -690,6 +798,7 @@ SUBROUTINE GETDELTASPIN
            DINDEX = DINDEX + 1
 
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1)
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1)
 
            INDEX = INDEX + 1
 
@@ -698,6 +807,9 @@ SUBROUTINE GETDELTASPIN
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3)
 
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3)
+
            INDEX = INDEX + 3 
 
            DINDEX = DINDEX + 1
@@ -705,6 +817,10 @@ SUBROUTINE GETDELTASPIN
            DELTASPIN(DINDEX) = SPINLIST(INDEX + 1) + &
                 SPINLIST(INDEX + 2) + SPINLIST(INDEX + 3) + &
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)
+
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3) + &
+                SPINLIST2(INDEX + 4) + SPINLIST2(INDEX + 5)
 
            INDEX = INDEX + 5
 
@@ -715,13 +831,19 @@ SUBROUTINE GETDELTASPIN
                 SPINLIST(INDEX + 4) + SPINLIST(INDEX + 5)  + &
                 SPINLIST(INDEX + 6) + SPINLIST(INDEX + 7)
 
+           SUMSPIN(DINDEX) = SPINLIST2(INDEX + 1) + &
+                SPINLIST2(INDEX + 2) + SPINLIST2(INDEX + 3) + &
+                SPINLIST2(INDEX + 4) + SPINLIST2(INDEX + 5)  + &
+                SPINLIST2(INDEX + 6) + SPINLIST2(INDEX + 7)
+
            INDEX = INDEX + 7   
 
         END SELECT
 
      ENDDO
 
-  ENDIF
+
+  DEALLOCATE(SPINLIST2)
 
   RETURN
 

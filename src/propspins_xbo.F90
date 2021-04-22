@@ -26,6 +26,7 @@ SUBROUTINE PROPSPINS(ITER)
   USE SETUPARRAY
   USE SPINARRAY
   USE MYPRECISION
+  USE COULOMBARRAY, ONLY: DN2DT2
 
   IMPLICIT NONE
 
@@ -52,9 +53,11 @@ SUBROUTINE PROPSPINS(ITER)
         DO I = 1, DELTADIM
 
            SPIN_PNK(1,I) = DELTASPIN(I)
+           IF (DOKERNEL) SPIN_PNK(1,I+DELTADIM) = SUMSPIN(I)
 
            DO J = 2, XBODISORDER + 1
               SPIN_PNK(J,I) = SPIN_PNK(J-1,I)
+              IF (DOKERNEL) SPIN_PNK(J,I+DELTADIM) = SPIN_PNK(J-1,I+DELTADIM)
            ENDDO
 
         ENDDO
@@ -79,13 +82,21 @@ SUBROUTINE PROPSPINS(ITER)
 
         DO I = 1, DELTADIM
 
-           DELTASPIN(I) = TWO*SPIN_PNK(1,I) - SPIN_PNK(2,I) + &
+           IF (DOKERNEL) THEN
+             DELTASPIN(I) = TWO*SPIN_PNK(1,I) - SPIN_PNK(2,I) + &
+                KAPPA_XBO*dn2dt2(I,2)
+             SUMSPIN(I) = TWO*SPIN_PNK(1,I+DELTADIM) - SPIN_PNK(2,I+DELTADIM) + &
+                KAPPA_XBO*DN2DT2(I,1)
+           ELSE
+             DELTASPIN(I) = TWO*SPIN_PNK(1,I) - SPIN_PNK(2,I) + &
                 KAPPA_SCALE*KAPPA_XBO*(DELTASPIN(I) - SPIN_PNK(1,I))
+           ENDIF
 
            DO J = 1, XBODISORDER + 1
 
               DELTASPIN(I) = DELTASPIN(I) + &
                    ALPHA_XBO*CNK(J)*SPIN_PNK(J,I)
+              IF (DOKERNEL) SUMSPIN(I) = SUMSPIN(I) + ALPHA_XBO*CNK(J)*SPIN_PNK(J,I+DELTADIM)
 
            ENDDO
 
@@ -93,13 +104,19 @@ SUBROUTINE PROPSPINS(ITER)
 
               SPIN_PNK(XBODISORDER + 2 - J, I) = &
                    SPIN_PNK(XBODISORDER + 1 - J, I)
+              IF (DOKERNEL) SPIN_PNK(XBODISORDER + 2 - J, I+DELTADIM) = &
+                   SPIN_PNK(XBODISORDER + 1 - J, I+DELTADIM)
 
            ENDDO
 
            SPIN_PNK(1,I) = DELTASPIN(I)
+           IF (DOKERNEL) SPIN_PNK(1,I+DELTADIM) = SUMSPIN(I)
 
         ENDDO
 
+        IF (DOKERNEL) THEN
+           CALL REDUCE_DELTASPIN(NATS,DELTADIM,SUMSPIN, DELTAQ,2)
+        ENDIF
      ENDIF
 
   ENDIF

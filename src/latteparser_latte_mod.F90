@@ -264,6 +264,8 @@ CONTAINS
     ! SPINON = 0 = no
 
     SPINON = VALVECTOR_INT(9); SPINTOL = VALVECTOR_RE(3)
+    NSPIN = 1
+    IF (SPINON == 1) NSPIN = 2
 
     !
     ! Controls for electrostatics:

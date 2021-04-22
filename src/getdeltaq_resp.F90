@@ -43,6 +43,11 @@ SUBROUTINE GETDELTAQ_RESP
   QLIST = ZERO
   MYCHARGE = ZERO
 
+  IF (SPINON==1) THEN
+     ALLOCATE(QSLIST(HDIM,NSPIN))
+     QSLIST   = ZERO
+  ENDIF
+
   IF (KON .EQ. 0 ) THEN
 
      IF (BASISTYPE .EQ. "ORTHO") THEN
@@ -57,6 +62,8 @@ SUBROUTINE GETDELTAQ_RESP
 
            DO I = 1, HDIM
               QLIST(I) = RHOUP(I,I) + RHODOWN(I,I)
+              QSLIST(I,1) = RHOUP(I,I)
+              QSLIST(I,2) = RHODOWN(I,I)
            ENDDO
 
         ENDIF
@@ -78,6 +85,8 @@ SUBROUTINE GETDELTAQ_RESP
 
                  QLIST(I) = QLIST(I) + (RHOUP(J,I)+RHODOWN(J,I))*SMAT(J,I)
 
+                 QSLIST(I,1) = QSLIST(I,1) + RHOUP(J,I) * SMAT(J,I)
+                 QSLIST(I,2) = QSLIST(I,2) + RHODOWN(J,I) * SMAT(J,I)
               ENDDO
            ENDDO
 
@@ -209,6 +218,8 @@ SUBROUTINE GETDELTAQ_RESP
 
   ENDDO
   !  deallocate(tmpq)
+
+  IF (SPINON==1) DEALLOCATE(QSLIST)
 
   RETURN
 
