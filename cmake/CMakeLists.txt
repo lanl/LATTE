@@ -102,7 +102,7 @@ coultailcoef.F90 deallocateall.F90 deallocatecoulomb.F90
 deallocatenebarrays.F90  deallocatexbo.F90 
 fermiallocate.F90 fermideallocate.F90 
    gershgorin.F90 getbndfil.F90 
-getcoule.F90 getdensity.F90 getdeltaq.F90 getdeltaspin.F90 gethdim.F90 
+getcoule.F90 getdensity.F90 getdeltaq.F90 getdeltaspin.F90 getdeltaspin_resp.F90 gethdim.F90 
 getke.F90 getmaxf.F90 getmdf.F90 getpressure.F90 getrho.F90 getspinE.F90  
  ifrestart.F90 initcoulomb.F90 initialv.F90 initshockcomp.F90 msrelax.F90 
 neblists.F90 noelec.F90 norms.F90 nptrescale.F90  nvtrescale.F90 
