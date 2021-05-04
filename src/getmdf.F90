@@ -34,8 +34,9 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
   IMPLICIT NONE
 
-  INTEGER :: SWITCH, CURRITER, I, MLSI0, MLSI
+  INTEGER :: SWITCH, CURRITER, I, MLSI0, MLSI, SAVEFULLQCONV
   REAL(LATTEPREC) :: ZEROSCFMOD, RESIDUE
+  REAL(LATTEPREC), ALLOCATABLE :: RES(:)
   IF (EXISTERROR) RETURN
 
   MLSI0 = TIME_MLS()
@@ -138,18 +139,6 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
           IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."
 
           IF (SPINON==0) CALL XBO(CURRITER) ! Propagate q's
-          residue =  norm2(DELTAQ - PNK(1,:))/NATS
-!          WRITE(*,*)"MDIter,RESIDUE,RES/RESOLD,EGAP",CURRITER,RESIDUE,RESIDUE/RESIDUEOLD,EGAP
-!          if((CURRITER >= 10) .and. ((RESIDUE/RESIDUEOLD > 100.0d0) .or. (EGAP <= -0.1)))then
-!            IF(VERBOSE >= 1)WRITE(*,*)"WARNING: A reaction is happening &
-!                &(Rebuilding rho with FULLQCONV= 1)..."
-!            FULLQCONV = 1
-!            CALL QCONSISTENCY(0,1)
-!          else
-!            FULLQCONV = 0
-!            CALL XBO(CURRITER) ! Propagate q's
-!          endif
-!          RESIDUEOLD = RESIDUE
 
         ENDIF
         !
@@ -191,6 +180,22 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
      CALL QCONSISTENCY(SWITCH, CURRITER) ! Self consistent charge transfer
   ENDIF
 
+  IF(FAILSAFE)THEN
+    CALL GETDELTAQ ! Get updated set of partial charges
+    WRITE(*,*)"MDITER,RESIDUE,RESIDUEOLD,EGAP",CURRITER,RESNORM,RESIDUEOLD,EGAP
+    RESNORM =  norm2(DELTAQ - PNK(1,:))/SQRT(DBLE(NATS))
+    SAVEFULLQCONV = FULLQCONV
+    if((CURRITER >= 10) .and. (RESNORM > 0.1d0))then
+    IF(VERBOSE >= 1)WRITE(*,*)"WARNING: A reaction is happening &
+                &(Rebuilding rho with FULLQCONV= 1)..."
+      FULLQCONV = 1
+      CALL QCONSISTENCY(0,1)
+      RESNORM = 0.0d0
+    ENDIF
+    FULLQCONV = SAVEFULLQCONV
+    RESIDUEOLD = RESNORM
+  ENDIF  
+
   WRITE(*,*) "Time for GETMDF-QNEUTRAL QCONSISTENCY ",  TIME_MLS() - MLSI
   ! Run to self-consistency QITER = 0 -> only H(P) + D calculated 
 
@@ -214,12 +219,11 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
             !FULLQCONV = 0
         ELSE
           IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."
-          residue =  norm2(DELTAQ - PNK(1,:))/NATS
+          RESNORM =  norm2(DELTAQ - PNK(1,:))/SQRT(DBLE(NATS))
           write(*,*)"RESIDUE=",RESIDUE
           IF (SPINON .EQ. 0) CALL XBO(1)
           RESIDUEOLD = RESIDUE
         ENDIF
-
         IF (CONTROL .EQ. 1 .OR. CONTROL .EQ. 3 &
              .OR. CONTROL .EQ. 5) CALL PROPCHEMPOT(1)
 
