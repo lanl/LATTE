@@ -600,7 +600,15 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ! Mix to get new charges
         !
 
+#ifdef PROGRESSON
+        IF(MX%MIXERON)THEN
+          CALL QMIXPRG(II)
+        ELSE
+          DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
+        ENDIF
+#else
         DELTAQ = MDMIX*DELTAQ + (ONE - MDMIX)*OLDDELTAQS
+#endif
 
         ! Here we do DM mixing instead of charge mixing
         IF (DFTBU .AND. KON==0) THEN
