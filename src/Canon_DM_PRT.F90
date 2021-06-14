@@ -43,6 +43,8 @@ subroutine  Canon_DM_PRT(H1,beta,Q,e,mu0,m,HDIM)
   CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
           X, HDIM, Q, HDIM, ZERO, Y, HDIM)
 
+write(*,*)"ZQHQZ",Y(1,1:5)
+
 !  call MMult(ONE,Q,H1,ZERO,X,'T','N',HDIM)      ! Main cost are the transformation 
 !  call MMult(ONE,X,Q,ZERO,Y,'N','N',HDIM)       ! to the eigenbasis of H1
 !  P1 = -cnst*H1    !(set mu1 = 0 for simplicity) ! Initialization of DM response in Q representation (not diagonal in Q)
