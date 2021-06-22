@@ -267,6 +267,14 @@ CONTAINS
   
        CALL BUILD_INTEGRAL_MAP 
 
+       IF(VERBOSE >= 1)THEN
+         WRITE(*,*)""
+         WRITE(*,*)"Number of orbitals", float(HDIM)
+         WRITE(*,*)"Number of occupied orbitals", BNDFIL*float(HDIM)
+         WRITE(*,*)"Number of electrons", 2.0*BNDFIL*float(HDIM)
+         WRITE(*,*)""
+       ENDIF
+
        FLUSH(6)
 
 #ifdef GPUON
@@ -717,6 +725,7 @@ CONTAINS
        ENDIF
 
        IF(VERBOSE >= 1) WRITE(*,*)"Energy Components (TRRHOH, EREP, ENTE, ECOUL)",TRRHOH, EREP, ENTE, ECOUL
+
 
        IF (FREEZE .EQ. 1) CALL FREEZE_ATOMS(FTOT,V)
 
