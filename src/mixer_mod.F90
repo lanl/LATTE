@@ -256,6 +256,7 @@ CONTAINS
   END SUBROUTINE FULLKERNELPROPAGATION
 
 
+#ifdef PROGRESSON
   SUBROUTINE PARALLELFULLKERNELPROPAGATION(MDITER)
     INTEGER, INTENT(IN) :: MDITER
     INTEGER :: I, J, N, ii, jj
@@ -287,10 +288,7 @@ CONTAINS
     NUMEL = 0.0d0
     
     !
-#ifdef PROGRESSON
      CALL BML_EXPORT_TO_DENSE(BO_BML,BO)
-#elif defined(PROGRESSOFF)
-#endif
     DELTAQ_SAVE = DELTAQ
     COULOMBV_SAVE = COULOMBV
     FCOUL_SAVE = FCOUL
@@ -338,19 +336,9 @@ CONTAINS
 
     DO IS = 1, NSPIN
         dr = 0.D0
-       ! !$OMP PARALLEL DO DEFAULT(SHARED) & 
-       ! !$PRIVATE(I) &
-       ! !PRIVATE() &
-       ! !PRIVATE(Coulomb_Force_k,Coulomb_Force_Real_I)
         do I = 1,NDIM !! NATS is the number of rank-1 updates  LL = 0 means linear mixing
            IF(VERBOSE >= 2)WRITE(*,*)"Constructing response to atom", I,"in PARALLELFULLKERNELPROPAGATION"
            dr(I) = 1.D0
-           !vi(:,I) = dr/norm2(dr)
-           !do J = 1,I-1
-           !   vi(:,I) = vi(:,I) - dot_product(vi(:,I),vi(:,J))*vi(:,J)
-           !   vi(:,I) = vi(:,I)/norm2(vi(:,I))
-           !enddo
-           !v(:) = vi(:,I)
            !!!!! Calculated dq_dv, which is the response in q(n) from change in input charge n = v
            dq_dv = ZERO
            !dq_v = v/norm2(v)
@@ -372,8 +360,6 @@ CONTAINS
            IF (SPINON==1) CALL BLDSPINH
            write(*,*)"Time for coulombrspace coulombewald ADDQDEP",time_mls() - mlsi
            mlsi = time_mls()
-          !call orthomyh  ! Z'HZ -> QZ'HZQ
-          !call orthomyhprg  ! Z'HZ -> QZ'HZQ
 
           call bml_multiply(zqt_bml,ham_bml,ptaux_bml,1.0_dp,0.0_dp,NUMTHRESH)
           call bml_multiply(ptaux_bml,zq_bml,ptham_bml,1.0_dp,0.0_dp,NUMTHRESH)  
@@ -393,9 +379,6 @@ CONTAINS
            write(*,*)"Time for canon",time_mls() - mlsi
            mlsi = time_mls()
 
-           !call deorthomyrho
-           !call getdeltaq_resp
-        !write(*,*)"DELTAQ",DELTAQ(1:5)
         call bml_multiply(zq_bml,ptrho_bml,ptaux_bml,1.0_dp,0.0_dp,0.0_dp)
         call bml_multiply(ptaux_bml,zqt_bml,ptrho_bml,2.0_dp,0.0_dp,0.0_dp)  
            write(*,*)"Time for deortho eig",time_mls() - mlsi
@@ -433,20 +416,6 @@ CONTAINS
       CALL Invert(FULL_K0, FULL_K, NATS)
       dn2dt2(:,1) = MATMUL(FULL_K,Res)
 
-        !call DGEMM('N','T',NATS,NATS,NATS,1.D0,ui,NATS,wi,NATS,1.D0,FULL_K,NATS)
-        ! update q corresponding to q = q - MATMUL(KK,Res)
-        !DELTAQ = OLDDELTAQS + QMIX*Res
-
-!        dn2dt2(:,1) = MATMUL(FULL_K,Res)
-!!        write(*,*) ' dn2dt2 FULL_K = ', dn2dt2(1:3)
-!!        dn2dt2 = MDMIX*Res
-!!        do I = 1,NATS  !! Let the approximate kernel act on the residual by individual rank-1 updates
-!!           !DELTAQ = DELTAQ + dot_product(wi(:,I),Res)*ui(:,I)
-!!           dn2dt2 = dn2dt2 + dot_product(wi(:,I),Res)*ui(:,I)
-!!        enddo
-!!        write(*,*) ' dn2dt2 Rank-Nats = ', dn2dt2(1:3)
-!!        write(*,*) ' ------------------ '
-!    endif
     ELSE
       FULL_K0 = - FULL_K
       do I = 1,2*NDIM 
@@ -482,7 +451,7 @@ CONTAINS
     DEALLOCATE(FCOUL_SAVE,ORTHOH_SAVE,DELTASPIN_SAVE)
 
   END SUBROUTINE PARALLELFULLKERNELPROPAGATION
-
+#endif
   
   
   SUBROUTINE PRECONDKERNELPROPAGATION(MDITER,LL)
@@ -669,12 +638,11 @@ CONTAINS
     ENDIF
 
     IF (MDITER == 1) THEN
-    !   CALL FULLKERNELPROPAGATION(MDITER)
-    !   write(*,*)"First",FULL_K(1,1:5)
+#ifdef PROGRESSON
        CALL PARALLELFULLKERNELPROPAGATION(MDITER)
-       write(*,*)"Second",FULL_K(1,1:5)
-      !stop 
-       
+#else
+       CALL FULLKERNELPROPAGATION(MDITER)
+#endif
     ELSE
       Res = MATMUL(FULL_K,Res) !! FULL_KK is the preconditioner
       dr = Res
