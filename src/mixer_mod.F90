@@ -33,6 +33,7 @@ MODULE MIXER_MOD
   USE DIAGARRAY    ! CHANGE ANDERS_CHANGE
   USE XBOARRAY     ! CHANGE ANDERS_CHANGE
   USE DMARRAY     ! CHANGE ANDERS
+  USE TIMER_MOD
 #ifdef PROGRESSON
   USE LATTEPARSER
   USE GENXPROGRESS, ONLY : ZMAT_BML, OVER_BML
@@ -40,6 +41,8 @@ MODULE MIXER_MOD
   USE PRG_PULAYMIXER_MOD
   USE BML
   USE NONOARRAYPROGRESS
+  USE PRG_RESPONSE_MOD
+  USE PRG_CHARGES_MOD
 #endif
   PRIVATE
 
@@ -130,6 +133,7 @@ CONTAINS
     DO IS = 1, NSPIN
         dr = 0.D0
         do I = 1,NDIM !! NATS is the number of rank-1 updates  LL = 0 means linear mixing
+           IF(VERBOSE >= 2)WRITE(*,*)"Constructing response to atom", I,"in FULLKERNELPROPAGATION"
            dr(I) = 1.D0
            vi(:,I) = dr/norm2(dr)
            do J = 1,I-1
@@ -251,6 +255,236 @@ CONTAINS
 
   END SUBROUTINE FULLKERNELPROPAGATION
 
+
+  SUBROUTINE PARALLELFULLKERNELPROPAGATION(MDITER)
+    INTEGER, INTENT(IN) :: MDITER
+    INTEGER :: I, J, N, ii, jj
+    INTEGER :: NDIM, IS
+    REAL(LATTEPREC) :: Nocc, beta, eps
+
+    REAL(LATTEPREC), ALLOCATABLE :: Res(:), dr(:), vi(:,:), wi(:,:), ui(:,:)
+    REAL(LATTEPREC), ALLOCATABLE :: du(:), dq_dv(:,:), dq_v(:), v(:), ri(:,:)
+    REAL(LATTEPREC), ALLOCATABLE :: DELTASPIN_SAVE(:)
+    REAL(LATTEPREC), ALLOCATABLE :: DELTAQ_SAVE(:), COULOMBV_SAVE(:)
+    REAL(LATTEPREC), ALLOCATABLE :: H_0(:,:), BO_SAVE(:,:,:), H_SAVE(:,:,:)
+    REAL(LATTEPREC), ALLOCATABLE :: FCOUL_SAVE(:,:), ORTHOH_SAVE(:,:,:)
+    INTEGER, ALLOCATABLE  :: dummy_array(:), mlsi
+    REAL(LATTEPREC), ALLOCATABLE :: NUMEL(:)
+
+    TYPE(BML_MATRIX_T) :: zq_bml, zqt_bml, ptham_bml, ptrho_bml, ptaux_bml
+    !
+    NDIM = NATS
+    IF (SPINON==1) NDIM = DELTADIM
+    ALLOCATE(Res(NDIM*NSPIN),dr(NDIM),vi(NDIM,NDIM),wi(NDIM,NDIM),ui(NDIM,NDIM))
+    ALLOCATE(du(NDIM), dq_dv(NDIM,NSPIN), dq_v(NDIM), v(NDIM), ri(NDIM,NDIM))
+    ALLOCATE(DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS))
+    ALLOCATE(H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM,NSPIN), H_SAVE(HDIM,HDIM,NSPIN))
+    ALLOCATE(FCOUL_SAVE(3,NATS),ORTHOH_SAVE(HDIM,HDIM,NSPIN))
+    ALLOCATE(DELTASPIN_SAVE(DELTADIM))
+    ALLOCATE(DUMMY_ARRAY(NATS))
+    ALLOCATE(NUMEL(NATS))
+    DUMMY_ARRAY = 1
+    NUMEL = 0.0d0
+    
+    !
+#ifdef PROGRESSON
+     CALL BML_EXPORT_TO_DENSE(BO_BML,BO)
+#elif defined(PROGRESSOFF)
+#endif
+    DELTAQ_SAVE = DELTAQ
+    COULOMBV_SAVE = COULOMBV
+    FCOUL_SAVE = FCOUL
+    IF (SPINON==1) THEN
+      BO_SAVE(:,:,1) = RHOUP
+      BO_SAVE(:,:,2) = RHODOWN
+      H_SAVE(:,:,1)  = HUP
+      H_SAVE(:,:,2)  = HDOWN
+      ORTHOH_SAVE(:,:,1) = ORTHOHUP
+      ORTHOH_SAVE(:,:,2) = ORTHOHDOWN
+      DELTASPIN_SAVE = DELTASPIN
+    ELSE
+      BO_SAVE(:,:,1)     = BO
+      ORTHOH_SAVE(:,:,1) = ORTHOH
+      H_SAVE(:,:,1)      = H
+    ENDIF
+    H_0 = H0
+    H0 = 0.D0
+
+    IF (SPINON==0) THEN
+      Res = DELTAQ - PNK(1,:)
+      write(6,*) 'MDITER', MDITER, norm2(Res) / SQRT(DBLE(NATS)) 
+    ELSE
+      !sumspin = up + down
+      !deltaspin = up - down ==>
+      ! up = (sum+delta)/2.0
+      du(1:NDIM) = DELTASPIN(1:NDIM) - SPIN_PNK(1,1:NDIM)
+      dr(1:NDIM) = SUMSPIN(1:NDIM)   - SPIN_PNK(1,1+NDIM:2*NDIM)
+
+      Res(1:NDIM)        = (dr(1:NDIM) + du(1:NDIM)) / 2.D0 ! up
+      Res(1+NDIM:2*NDIM) = (dr(1:NDIM) - du(1:NDIM)) / 2.D0 ! down
+      write(6,*) 'MDITER', MDITER, norm2(Res(1:NDIM)) / SQRT(DBLE(NDIM)), &
+                            norm2(Res(1+NDIM:2*NDIM)) / SQRT(DBLE(NDIM)) 
+    ENDIF
+
+    FULL_K = 0.D0
+
+       call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptham_bml)
+       call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptrho_bml)
+       call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,zq_bml)
+       call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,zqt_bml)
+       call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptaux_bml)    
+       call bml_multiply(zmat_bml,evecs_bml,zq_bml, 1.0d0,0.0d0,NUMTHRESH) 
+       call bml_transpose(zq_bml,zqt_bml)
+
+    DO IS = 1, NSPIN
+        dr = 0.D0
+       ! !$OMP PARALLEL DO DEFAULT(SHARED) & 
+       ! !$PRIVATE(I) &
+       ! !PRIVATE() &
+       ! !PRIVATE(Coulomb_Force_k,Coulomb_Force_Real_I)
+        do I = 1,NDIM !! NATS is the number of rank-1 updates  LL = 0 means linear mixing
+           IF(VERBOSE >= 2)WRITE(*,*)"Constructing response to atom", I,"in PARALLELFULLKERNELPROPAGATION"
+           dr(I) = 1.D0
+           !vi(:,I) = dr/norm2(dr)
+           !do J = 1,I-1
+           !   vi(:,I) = vi(:,I) - dot_product(vi(:,I),vi(:,J))*vi(:,J)
+           !   vi(:,I) = vi(:,I)/norm2(vi(:,I))
+           !enddo
+           !v(:) = vi(:,I)
+           !!!!! Calculated dq_dv, which is the response in q(n) from change in input charge n = v
+           dq_dv = ZERO
+           !dq_v = v/norm2(v)
+           dq_v = dr
+
+           IF (SPINON==0) THEN
+             DELTAQ = dq_v
+           ELSE
+             ! deltapsin is positive/negative for spin up/down
+             DELTASPIN = dq_v *(1-2*(IS-1))
+             !! get deltaq from deltaspin
+             CALL REDUCE_DELTASPIN(NATS,DELTADIM,dq_v,DELTAQ,1)
+           ENDIF
+           mlsi = time_mls()
+           call coulombrspace
+           call coulombewald
+           CALL ADDQDEP
+           call bml_import_from_dense(LT%bml_type, H, ham_bml, NUMTHRESH, HDIM)
+           IF (SPINON==1) CALL BLDSPINH
+           write(*,*)"Time for coulombrspace coulombewald ADDQDEP",time_mls() - mlsi
+           mlsi = time_mls()
+          !call orthomyh  ! Z'HZ -> QZ'HZQ
+          !call orthomyhprg  ! Z'HZ -> QZ'HZQ
+
+          call bml_multiply(zqt_bml,ham_bml,ptaux_bml,1.0_dp,0.0_dp,NUMTHRESH)
+          call bml_multiply(ptaux_bml,zq_bml,ptham_bml,1.0_dp,0.0_dp,NUMTHRESH)  
+           write(*,*)"Time for ortho eig",time_mls() - mlsi
+           mlsi = time_mls()
+           Nocc = BNDFIL*float(HDIM)
+           beta = 1.D0/KBT
+           !call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+           IF (NSPIN==1) THEN
+           !  call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
+           !  BO = 2.D0*BO
+            call prg_canon_response_orig(ptrho_bml,ptham_bml,nocc,beta,&
+             &evals,CHEMPOT,16,numthresh,HDIM)
+           ELSE
+             call Canon_DM_PRT_SPIN(ORTHOHUP,ORTHOHDOWN,beta,UPEVECS, DOWNEVECS, UPEVALS, DOWNEVALS,CHEMPOT,16,HDIM)
+           ENDIF
+           write(*,*)"Time for canon",time_mls() - mlsi
+           mlsi = time_mls()
+
+           !call deorthomyrho
+           !call getdeltaq_resp
+        !write(*,*)"DELTAQ",DELTAQ(1:5)
+        call bml_multiply(zq_bml,ptrho_bml,ptaux_bml,1.0_dp,0.0_dp,0.0_dp)
+        call bml_multiply(ptaux_bml,zqt_bml,ptrho_bml,2.0_dp,0.0_dp,0.0_dp)  
+           write(*,*)"Time for deortho eig",time_mls() - mlsi
+           mlsi = time_mls()
+        !call bml_export_to_dense(ptrho_bml,BO)
+        DELTAQ = 0.0d0
+        call prg_get_charges(ptrho_bml, over_bml, NORBINDEX, DELTAQ, numel,& 
+            &dummy_array, mdim, numthresh)
+           write(*,*)"Time for getcharges",time_mls() - mlsi
+
+        write(*,*)"DELTAQ",DELTAQ(1:5)
+           IF (SPINON==1) call getdeltaspin_resp
+
+           IF (SPINON==0) THEN
+             dq_dv(:,IS) = DELTAQ
+             FULL_K(1:NDIM,I) = dq_dv(1:NDIM,1)
+           ELSE
+             dq_dv = DELTA_QS 
+             FULL_K(1     :  NDIM,I+NDIM*(IS-1)) = dq_dv(1:NDIM,1)
+             FULL_K(NDIM+1:2*NDIM,I+NDIM*(IS-1)) = dq_dv(1:NDIM,2)
+           ENDIF
+           dr(I) = 0.D0
+        enddo
+    ENDDO
+    call bml_deallocate(ptrho_bml)
+    call bml_deallocate(zq_bml)
+    call bml_deallocate(zqt_bml)
+    call bml_deallocate(ptaux_bml)
+    call bml_deallocate(ptham_bml)
+    IF (SPINON==0) THEN
+      FULL_K0 = - FULL_K
+      do I = 1,NATS
+        FULL_K0(I,I) = FULL_K0(I,I) + 1.0D0
+      enddo
+      CALL Invert(FULL_K0, FULL_K, NATS)
+      dn2dt2(:,1) = MATMUL(FULL_K,Res)
+
+        !call DGEMM('N','T',NATS,NATS,NATS,1.D0,ui,NATS,wi,NATS,1.D0,FULL_K,NATS)
+        ! update q corresponding to q = q - MATMUL(KK,Res)
+        !DELTAQ = OLDDELTAQS + QMIX*Res
+
+!        dn2dt2(:,1) = MATMUL(FULL_K,Res)
+!!        write(*,*) ' dn2dt2 FULL_K = ', dn2dt2(1:3)
+!!        dn2dt2 = MDMIX*Res
+!!        do I = 1,NATS  !! Let the approximate kernel act on the residual by individual rank-1 updates
+!!           !DELTAQ = DELTAQ + dot_product(wi(:,I),Res)*ui(:,I)
+!!           dn2dt2 = dn2dt2 + dot_product(wi(:,I),Res)*ui(:,I)
+!!        enddo
+!!        write(*,*) ' dn2dt2 Rank-Nats = ', dn2dt2(1:3)
+!!        write(*,*) ' ------------------ '
+!    endif
+    ELSE
+      FULL_K0 = - FULL_K
+      do I = 1,2*NDIM 
+         FULL_K0(I,I) = FULL_K0(I,I) + 1.0D0
+      enddo
+      
+      CALL Invert(FULL_K0, FULL_K, 2*NDIM)
+      RES = MATMUL(FULL_K,Res)
+      dn2dt2(1:NDIM,1) = (Res(1:NDIM) + RES(1+NDIM:2*NDIM)) / 2.D0 !sum
+      dn2dt2(1:NDIM,2) = (Res(1:NDIM) - RES(1+NDIM:2*NDIM)) / 2.D0 !delta
+    ENDIF
+
+    IF (SPINON==1) THEN
+      RHOUP   = BO_SAVE(:,:,1)
+      RHODOWN = BO_SAVE(:,:,2)
+      HUP     = H_SAVE(:,:,1)
+      HDOWN   = H_SAVE(:,:,2)
+      ORTHOHUP   = ORTHOH_SAVE(:,:,1)
+      ORTHOHDOWN = ORTHOH_SAVE(:,:,2)
+      DELTASPIN = DELTASPIN_SAVE
+    ELSE
+      BO = BO_SAVE(:,:,1)
+      H  = H_SAVE(:,:,1)
+      ORTHOH = ORTHOH_SAVE(:,:,1)
+    ENDIF
+    H0 = H_0
+    FCOUL = FCOUL_SAVE
+    DELTAQ = DELTAQ_SAVE
+    COULOMBV = COULOMBV_SAVE
+
+    DEALLOCATE(RES, DR, VI, WI, UI, DU, DQ_DV, DQ_V, V, RI)
+    DEALLOCATE(DELTAQ_SAVE, COULOMBV_SAVE,H_0, BO_SAVE, H_SAVE)
+    DEALLOCATE(FCOUL_SAVE,ORTHOH_SAVE,DELTASPIN_SAVE)
+
+  END SUBROUTINE PARALLELFULLKERNELPROPAGATION
+
+  
+  
   SUBROUTINE PRECONDKERNELPROPAGATION(MDITER,LL)
     INTEGER, INTENT(IN) :: MDITER,LL
     INTEGER :: I, J, N, ii, jj
@@ -435,7 +669,12 @@ CONTAINS
     ENDIF
 
     IF (MDITER == 1) THEN
-       CALL FULLKERNELPROPAGATION(MDITER)
+    !   CALL FULLKERNELPROPAGATION(MDITER)
+    !   write(*,*)"First",FULL_K(1,1:5)
+       CALL PARALLELFULLKERNELPROPAGATION(MDITER)
+       write(*,*)"Second",FULL_K(1,1:5)
+      !stop 
+       
     ELSE
       Res = MATMUL(FULL_K,Res) !! FULL_KK is the preconditioner
       dr = Res
