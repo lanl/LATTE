@@ -1,6 +1,8 @@
 Runnng latte as an MDI engine 
 =============================
 
+All the MDI imlementations are done in the `/src/latte_mdi.F90` file.
+
 # Compile LATTE
 
 Source the variables in `vars`
