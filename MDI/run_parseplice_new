@@ -1,2 +1,1 @@
-mpirun -np 2 parsplice_new -mdi "-method LINK -name PS -role DRIVER -plugin_path /home/cnegre/Exaalt/MDI/LATTE" -plugs NULL latte_mdi NULL -p 1 1 0 0 1 1 0 0 -w 0 0 1 1 0 0 -e 9 -f "mylatte.in"
-#mpirun -np 2 parsplice_new -mdi "-method LINK -name PS -role DRIVER -plugin_path $HOME/Exaalt/MDI/" -plugs NULL latte_mdi NULL -p 1 1 0 0 1 1 0 0 -w 0 0 3 1 0 0 -e 1000
+mpirun -np 2 parsplice_new -mdi "-method LINK -name PS -role DRIVER -plugin_path $HOME/LATTE" -plugs NULL latte_mdi NULL -p 1 1 0 0 1 1 0 0 -w 0 0 1 1 0 0 -e 9 -f "mylatte.in"
