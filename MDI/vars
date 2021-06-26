@@ -2,3 +2,4 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/MDI_Library/build/MDI_Library/
 export PYTHONPATH=$PYTHONPATH:$HOME/MDI_Library/build/MDI_Library/
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/qmd-progress/install/lib/
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/bml/install/lib/
+export OMP_NUM_THREADS=1 
