@@ -19,7 +19,7 @@ MDI = ON
 MDI_PATH= $(HOME)/MDI_Library/build/MDI_Library
 
 # Use PROGRESS and BML libraries
-PROGRESS = ON
+PROGRESS = OFF
 PROGRESS_PATH= $(HOME)/qmd-progress/install/lib
 BML_PATH= $(HOME)/bml/install/lib
 MAGMA_PATH = $(HOME)/magma
