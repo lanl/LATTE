@@ -107,7 +107,7 @@ CONTAINS
   !! \brief Note: All units are LATTE units by default. See https://github.com/losalamos/LATTE/blob/master/Manual/LATTE_manual.pdf
   !!
   SUBROUTINE LATTE(NTYPES, TYPES, CR_IN, MASSES_IN, XLO, XHI, XY, XZ, YZ, FTOT_OUT, &
-       MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIAL_INOUT, NEWSYSTEM, EXISTERROR_INOUT, FNAME)
+       MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIAL_INOUT, NEWSYSTEM, EXISTERROR_INOUT, SYMBOLS, FNAME)
 
     USE CONSTANTS_MOD, ONLY: EXISTERROR
 
@@ -128,6 +128,7 @@ CONTAINS
     LOGICAL(1), INTENT(INOUT) :: EXISTERROR_INOUT
     LOGICAL :: ANIMATEEXISTS
     INTEGER, INTENT(INOUT) :: NEWSYSTEM
+    CHARACTER(LEN=*), OPTIONAL, INTENT(IN) :: SYMBOLS(:)
     CHARACTER(LEN=*), OPTIONAL, INTENT(IN) :: FNAME
 
 #ifdef PROGRESSON
@@ -224,13 +225,20 @@ CONTAINS
           IF (.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
           CR = CR_IN
 
-          IF(VERBOSE >= 1)WRITE(*,*)"Converting masses to symbols ..."
           IF(.NOT. ALLOCATED(ATELE)) ALLOCATE(ATELE(NATS))
-          CALL MASSES2SYMBOLS(TYPES,NTYPES,MASSES_IN,NATS,ATELE)
+          IF(.NOT. PRESENT(SYMBOLS))THEN
+            IF(VERBOSE >= 1)WRITE(*,*)"Converting masses to symbols ..."
+
+            CALL MASSES2SYMBOLS(TYPES,NTYPES,MASSES_IN,NATS,ATELE)
+
+          ELSE
+            DO I = 1, NATS
+              ATELE(I) = TRIM(ADJUSTL(SYMBOLS(TYPES(I))))
+            ENDDO  
+          ENDIF  
 
           !Forces, charges and element pointers are allocated in readcr
           CALL READCR
-
           FLUSH(6)
 
        ELSE
@@ -327,6 +335,7 @@ CONTAINS
        FLUSH(6)
 
     ENDIF
+
     !End of initialization
 
 
