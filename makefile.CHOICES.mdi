@@ -1,0 +1,85 @@
+#
+# Compilation and link flags for LATTE
+#
+
+# Precision - double or single
+PRECISION = DOUBLE
+#PRECISION = SINGLE
+
+# Make the latte library
+# AR and RUNLIB executable default path to compile 
+# latte as a library (change accordingly)
+MAKELIB = OFF
+SHARED = ON
+AR = /usr/bin/ar cq
+RANLIB = /usr/bin/ranlib
+
+# MDI engine compilation mode
+MDI = ON
+MDI_PATH= $(HOME)/MDI_Library/build/MDI_Library
+
+# Use PROGRESS and BML libraries
+PROGRESS = ON
+PROGRESS_PATH= $(HOME)/qmd-progress/install/lib
+BML_PATH= $(HOME)/bml/install/lib
+MAGMA_PATH = $(HOME)/magma
+
+# Use METIS library for graph partitioning
+METIS = OFF
+METIS_PATH= $(HOME)/metis/metis-5.1.0/install
+
+# GPU available - OFF or ON
+GPUOPT = OFF
+
+# Using DBCSR library from cp2k? OFF or ON
+DBCSR_OPT = OFF
+
+# Parallelizing over k-points?
+MPIOPT = OFF
+
+#
+# CPU Fortran options
+#
+
+#For GNU compiler:
+FC = mpif90
+#FC = gfortran
+FCL = $(FC)
+FFLAGS = -O3 -fopenmp -cpp -I$(MAGMA_PATH)/include  -I${CUDA_INCLUDE_DIRS}
+LINKFLAG = -fopenmp
+
+#BLAS/LAPACK libraries:
+LIB = -fopenmp -lpthread
+LIB += -L${CUDA_CUDART_LIBRARY} -lcublas -lcudart -lcusolver
+LIB += -llapack -lblas
+LIB += -L${MAGMA_PATH}/lib -lmagma
+
+# Uncomment for coverage
+#CVR = OFF
+ifeq ($(CVR), ON)
+	FFLAGS += -fprofile-arcs -ftest-coverage
+	LINKFLAG += -fprofile-arcs -ftest-coverage
+endif
+
+ifeq ($(PROGRESS), ON)
+	LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml_fortran -lbml
+	FFLAGS += -I$(BML_PATH)/../include -I$(PROGRESS_PATH)/../include
+endif
+
+ifeq ($(GRAPH), ON) 
+	LIB += -L$(METIS_PATH)/lib -lmetis
+	FFLAGS += -I$(METIS_PATH)/include
+endif
+
+
+#
+# GPU options
+#
+LIB += -fopenmp -lpthread
+LIB += -L${CUDA_CUDART_LIBRARY} -lcublas -lcudart -lcusolver
+LIB += -llapack -lblas
+LIB += -L${MAGMA_PATH}/lib -lmagma
+
+
+GPU_CUDA_LIB = -L/opt/cudatoolkit-5.5/lib64 -lcublas -lcudart
+GPU_ARCH = sm_20 

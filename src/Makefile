@@ -11,14 +11,30 @@ ifeq ($(PROGRESS),)
 	PROGRESS=OFF
 endif
 
+ifeq ($(MDI),)
+	MDI=OFF
+endif
+
+ifeq ($(SHARED), ON)
+  FFLAGS += -fpic
+endif
+
 
 PPFLAGS = -DXSYEVD -DXHEEVD -D$(PRECISION)PREC -DGPU$(GPUOPT) -DDBCSR_$(DBCSR_OPT) -DMPI_$(MPIOPT)
-PPFLAGS += -DPROGRESS$(PROGRESS) -DFCID$(FCID)
+PPFLAGS += -DPROGRESS$(PROGRESS) -DFCID$(FCID) -DMDI$(MDI)
+
 
 # Flags for linking GPU libraries
 #GPU_LINKFLAG = -I../MATRIX -lstdc++ $(GPU_LINK_LIB)
 GPU_LIB = -L../MATRIX -lmatrix_cuda.$(PRECISION) $(GPU_CUDA_LIB)
 
+ifeq ($(MDI), ON)
+  LIB += -L$(MDI_PATH)/ -lmdi
+  FFLAGS += -I$(MDI_PATH)/
+	mainSource = latte_mdi.F90
+else
+	mainSource = latte.F90
+endif
 
 MYMODULES = myprecision.F90 constants_mod.F90 setuparray.F90 coulombarray.F90 nonoarrayprogress.F90\
 diagarray.F90 fermicommon.F90 mdarray.F90 neblistarray.F90 dmarray.F90 \
@@ -27,7 +43,7 @@ sparsearray.F90 spinarray.F90 univarray.F90 virialarray.F90 xboarray.F90 \
 kspacearray.F90 timer_mod.F90 subgraph.F90 matrixio.F90 sparsemath.F90 \
 sparsesp2.F90 subgraphsp2.F90 homolumo.F90 openfiles_mod.F90 kernelparser_mod.F90 \
 latteparser_latte_mod.F90 sp2progress.F90 genXprogress.F90 mixer_mod.F90 \
-bodirectprogress.F90 constraints_mod.F90 latte_lib.F90 wignerarray.F90
+bodirectprogress.F90 constraints_mod.F90 latte_lib.F90 wignerarray.F90 
 
 DBCSRMODS = dbcsr_var_mod.F90 init_dbcsr.F90 shutdown_dbcsr.F90
 
@@ -35,7 +51,7 @@ MYSUBS = allocatediag.F90 allocatenono.F90 allocatepure.F90 bodirect.F90 \
 deallocatediag.F90 deallocatepure.F90 deorthomyrho.F90 deallocatenono.F90 \
 allocatedm.F90 deallocatedm.F90 initiatedm.F90 adddftbu.F90 xbodm.F90 \
 hubbardforce.F90 hubbardforce_prg.F90 Invert.F90 \
-diagmyh.F90 diagmyhprogress.F90 entropy.F90 fermiexpans.F90 genX.F90  latte.F90 orthomyH.F90 \
+diagmyh.F90 diagmyhprogress.F90 entropy.F90 fermiexpans.F90 genX.F90  $(mainSource) orthomyH.F90 \
  orthomyrho.F90  pulay.F90  solvematcg.F90 solvematlapack.F90 \
 sp2T.F90 pulay_spprogress.F90 \
 sp2fermi.F90 sp2fermi_init.F90 sp2pure.F90 sp2pure_sparse.F90 kdiagmyh.F90 \
@@ -125,6 +141,13 @@ else
 endif
 endif
 
+ifeq ($(MDI), ON)
+ifeq ($(SHARED), ON)
+	  (echo "Building a shared lbrary")
+		#$(FC) $(FFLAGS) -shared -fpic -o ../liblatte.so  $(XMYMODULES) $(XMYSUBS)
+		$(FC) $(FFLAGS) -shared -fpic  -o ../liblatte_mdi.so  $(XMYMODULES) $(XMYSUBS) $(LIB)
+endif
+endif
 
 
 ifeq ($(DBCSR_OPT), ON)
