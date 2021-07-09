@@ -590,7 +590,7 @@ CONTAINS
     !REAL(LATTEPREC) :: ORTHOH_SAVE(HDIM,HDIM)
     !REAL(LATTEPREC) :: ri_t(LL,NATS), IDENTRES(NATS)
 
-    REAL(LATTEPREC) :: RESNORM, FEL, DTMP
+    REAL(LATTEPREC) :: RESNORM, FEL, DTMP, DIFF, TMP
     INTEGER         :: INFO, RANK
     REAL(LATTEPREC), ALLOCATABLE :: FO(:,:), FM(:,:),WORK(:)
     INTEGER,         ALLOCATABLE :: IPIV(:)
@@ -603,6 +603,8 @@ CONTAINS
     REAL(LATTEPREC), ALLOCATABLE :: FCOUL_SAVE(:,:), ORTHOH_SAVE(:,:,:)
     REAL(LATTEPREC), ALLOCATABLE :: IDENTRES(:)
     REAL(LATTEPREC) :: mlsi, mls0
+    LOGICAL :: COMPUTEKERNEL
+
     !
     NDIM = NATS
     IF (SPINON==1) NDIM = DELTADIM
@@ -662,33 +664,56 @@ CONTAINS
       IF(READKERNEL)THEN
         WRITE(*,*)"Reading the kernel from file ..."
         CALL OPEN_FILE_TO_READ(MYIO,"kernel.tmp")
-        DO I=1,NATS
-          DO J=1,NATS
-            READ(MYIO,*)FULL_K(I,J)
+        DIFF = 0.0d0
+        READ(MYIO,*)TMP
+        IF(TMP .NE. HDIM)THEN
+          WRITE(*,*)"WARNING: The kernel.tmp file is inconsistent with this system &
+            & I will recompute the Kernel instead ..."
+          COMPUTEKERNEL = .TRUE.
+        ELSE 
+          DO I=1,HDIM
+            READ(MYIO,*)TMP
+            DIFF = DIFF + ABS(TMP - H(I,1))
           ENDDO
-        ENDDO
-        CLOSE(MYIO)
-
+          IF(DIFF > 1.0E-15)then
+            WRITE(*,*)"WARNING: The kernel.tmp file is inconsistent with this system &
+              & I will recompute the Kernel instead ..."
+            COMPUTEKERNEL = .TRUE.
+          ELSE  
+            DO I=1,NATS
+              DO J=1,NATS
+                READ(MYIO,*)FULL_K(I,J)
+              ENDDO
+            ENDDO
+            CLOSE(MYIO)
+            COMPUTEKERNEL = .FALSE.
+          ENDIF
+        ENDIF
       ELSE
+        COMPUTEKERNEL = .TRUE.
+      ENDIF 
 
+      IF(COMPUTEKERNEL)THEN
 #ifdef PROGRESSON
         CALL PARALLELFULLKERNELPROPAGATION(MDITER)
 #else
         CALL FULLKERNELPROPAGATION(MDITER)
 #endif
-
         IF(SAVEKERNEL)THEN
           WRITE(*,*)"Saving kernel into file ..."
-          CALL OPEN_FILE(MYIO,"kernel.tmp",.FALSE.)
+          CALL OPEN_FILE(MYIO,"kernel.tmp",.TRUE.)
+          !Creating a "tag" with the Hamiltonian - for checking purposes
+          WRITE(MYIO,*)HDIM
+          DO I=1,HDIM
+            WRITE(MYIO,*)H(I,1)
+          ENDDO
           DO I=1,NATS
             DO J=1,NATS
               WRITE(MYIO,*)FULL_K(I,J)
             ENDDO
           ENDDO
           CLOSE(MYIO)
-
         ENDIF
-
       ENDIF
 
     ELSE
