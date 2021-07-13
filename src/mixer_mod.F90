@@ -721,9 +721,11 @@ CONTAINS
       Res = MATMUL(FULL_K,Res) !! FULL_KK is the preconditioner
       dr = Res
 
+
       I = 0
       FEL = 1.D0
-      DO WHILE (FEL > KERNELTOL)  !! LL is the number of rank-1 updates  LL = 0 means preconditioning only!
+      RANK = 0
+      DO WHILE ((FEL > KERNELTOL) .AND. (RANK <= LL))  !! LL is the number of rank-1 updates  LL = 0 means preconditioning only!
         WRITE(*,*)"Adapting the Kernel, FEL > KERNELTOL ...",I
         I = I + 1
         mlsi = time_mls()
@@ -824,9 +826,6 @@ CONTAINS
 
       ENDDO
 
-      IF (RANK == LL ) THEN
-        CALL FULLKERNELPROPAGATION(MDITER)
-      ENDIF
       write(*,*)"Time for rankN update", time_mls() - mls0,"With iter",I
     endif
 
@@ -851,6 +850,11 @@ CONTAINS
     DEALLOCATE(RES, DR, VI, DQ_DV, DQ_V, V, RI)
     DEALLOCATE(DELTAQ_SAVE, COULOMBV_SAVE,H_0, BO_SAVE, H_SAVE)
     DEALLOCATE(FCOUL_SAVE,ORTHOH_SAVE,WORK,IDENTRES)
+
+    IF (RANK == LL ) THEN
+      CALL FULLKERNELPROPAGATION(MDITER)
+    ENDIF
+
   END SUBROUTINE ADAPTPRECONDKERNEL
 
 
