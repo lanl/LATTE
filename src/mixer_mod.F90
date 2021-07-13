@@ -289,9 +289,9 @@ CONTAINS
     ALLOCATE(DUMMY_ARRAY(NATS))
     NUMEL = 0.0d0
     DUMMY_ARRAY = 1
-
-
+   
     CALL BML_EXPORT_TO_DENSE(BO_BML,BO)
+
     DELTAQ_SAVE = DELTAQ
     COULOMBV_SAVE = COULOMBV
     FCOUL_SAVE = FCOUL
@@ -380,12 +380,13 @@ CONTAINS
           call Canon_DM_PRT_SPIN(ORTHOHUP,ORTHOHDOWN,beta,UPEVECS, DOWNEVECS, UPEVALS, DOWNEVALS,CHEMPOT,16,HDIM)
         ENDIF
         write(*,*)"Time for canon",time_mls() - mlsi
-        mlsi = time_mls()
 
+        mlsi = time_mls()
         call bml_multiply(zq_bml,ptrho_bml,ptaux_bml,1.0_dp,0.0_dp,0.0_dp)
         call bml_multiply(ptaux_bml,zqt_bml,ptrho_bml,2.0_dp,0.0_dp,0.0_dp)
         write(*,*)"Time for deortho eig",time_mls() - mlsi
         mlsi = time_mls()
+
         !call bml_export_to_dense(ptrho_bml,BO)
         DELTAQ = 0.0d0
         call prg_get_charges(ptrho_bml, over_bml, NORBINDEX, DELTAQ, numel,&
@@ -604,6 +605,12 @@ CONTAINS
     REAL(LATTEPREC), ALLOCATABLE :: IDENTRES(:)
     REAL(LATTEPREC) :: mlsi, mls0
     LOGICAL :: COMPUTEKERNEL
+    INTEGER, ALLOCATABLE  :: dummy_array(:)
+    REAL(LATTEPREC), ALLOCATABLE :: NUMEL(:)
+
+#ifdef PROGRESSON
+    TYPE(BML_MATRIX_T) :: zq_bml, zqt_bml, ptham_bml, ptrho_bml, ptaux_bml
+#endif
 
     !
     NDIM = NATS
@@ -685,10 +692,10 @@ CONTAINS
                 READ(MYIO,*)FULL_K(I,J)
               ENDDO
             ENDDO
-            CLOSE(MYIO)
             COMPUTEKERNEL = .FALSE.
           ENDIF
         ENDIF
+        CLOSE(MYIO)
       ELSE
         COMPUTEKERNEL = .TRUE.
       ENDIF 
@@ -721,9 +728,23 @@ CONTAINS
       Res = MATMUL(FULL_K,Res) !! FULL_KK is the preconditioner
       dr = Res
 
-
       I = 0
       FEL = 1.D0
+
+#ifdef PROGRESSON
+      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptham_bml)
+      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptrho_bml)
+      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,zq_bml)
+      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,zqt_bml)
+      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptaux_bml)
+      call bml_multiply(zmat_bml,evecs_bml,zq_bml, 1.0d0,0.0d0,NUMTHRESH)
+      call bml_transpose(zq_bml,zqt_bml)
+      ALLOCATE(NUMEL(NATS))
+      ALLOCATE(DUMMY_ARRAY(NATS))
+      NUMEL = 0.0d0
+      DUMMY_ARRAY = 1
+#endif
+
       RANK = 0
       DO WHILE ((FEL > KERNELTOL) .AND. (RANK <= LL))  !! LL is the number of rank-1 updates  LL = 0 means preconditioning only!
         WRITE(*,*)"Adapting the Kernel, FEL > KERNELTOL ...",I
@@ -756,25 +777,56 @@ CONTAINS
         call coulombewald
         call addqdep
         write(*,*)"Time for coulombrspace coulombewald addqdep at rankN",time_mls() - mlsi
+
         IF (SPINON==1) CALL BLDSPINH
+
         mlsi = time_mls()
+#ifdef PROGRESSON
+        call bml_import_from_dense(LT%bml_type, H, ham_bml, NUMTHRESH, HDIM)
+        call bml_multiply(zqt_bml,ham_bml,ptaux_bml,1.0_dp,0.0_dp,NUMTHRESH)
+        call bml_multiply(ptaux_bml,zq_bml,ptham_bml,1.0_dp,0.0_dp,NUMTHRESH)
+#else
         call orthomyh
+#endif        
         write(*,*)"Time for orthomyh at rankN",time_mls() - mlsi
+
         Nocc = BNDFIL*float(HDIM)
         beta = 1.D0/KBT
 
         IF (SPINON==0) THEN
-          !call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+
           mlsi = time_mls()
-          call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
+#ifdef PROGRESSON
+          call prg_canon_response_orig(ptrho_bml,ptham_bml,nocc,beta,&
+               &evals,CHEMPOT,16,numthresh,HDIM)
+#else
+          call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+ !         call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
+  !        BO = 2.D0*BO
+#endif             
           write(*,*)"Time for Canon_DM_PRT at rankN",time_mls() - mlsi
-          BO = 2.D0*BO
         ELSE
           call Canon_DM_PRT_SPIN(ORTHOHUP,ORTHOHDOWN,beta,UPEVECS, DOWNEVECS, UPEVALS, DOWNEVALS,CHEMPOT,16,HDIM)
         ENDIF
 
+        mlsi = time_mls()
+#ifdef PROGRESSON
+        call bml_multiply(zq_bml,ptrho_bml,ptaux_bml,1.0_dp,0.0_dp,0.0_dp)
+        call bml_multiply(ptaux_bml,zqt_bml,ptrho_bml,2.0_dp,0.0_dp,0.0_dp)
+#else
         call deorthomyrho
+#endif             
+        write(*,*)"Time for deorthomyrho at rankN",time_mls() - mlsi
+
+        mlsi = time_mls()
+#ifdef PROGRESSON
+        call prg_get_charges(ptrho_bml, over_bml, NORBINDEX, DELTAQ, numel,&
+             &dummy_array, hdim, numthresh)
+#else
         call getdeltaq_resp
+#endif             
+        write(*,*)"Time for getdeltaq_resp at rankN",time_mls() - mlsi
+        
         IF (SPINON==1) call getdeltaspin_resp
 
         IF (SPINON==0) THEN
@@ -826,8 +878,13 @@ CONTAINS
 
       ENDDO
 
-      write(*,*)"Time for rankN update", time_mls() - mls0,"With iter",I
-    endif
+#ifdef PROGRESSON
+      call bml_deallocate(ptrho_bml)
+      call bml_deallocate(zq_bml)
+      call bml_deallocate(zqt_bml)
+      call bml_deallocate(ptaux_bml)
+      call bml_deallocate(ptham_bml)
+#endif
 
     COULOMBV = COULOMBV_SAVE
     IF (SPINON==1) THEN
@@ -847,13 +904,27 @@ CONTAINS
     FCOUL = FCOUL_SAVE
     DELTAQ = DELTAQ_SAVE
 
+
     DEALLOCATE(RES, DR, VI, DQ_DV, DQ_V, V, RI)
     DEALLOCATE(DELTAQ_SAVE, COULOMBV_SAVE,H_0, BO_SAVE, H_SAVE)
     DEALLOCATE(FCOUL_SAVE,ORTHOH_SAVE,WORK,IDENTRES)
 
+#ifdef PROGRESSON      
+    DEALLOCATE(NUMEL,DUMMY_ARRAY)
+#endif      
+
     IF (RANK == LL ) THEN
-      CALL FULLKERNELPROPAGATION(MDITER)
+#ifdef PROGRESSON
+       CALL PARALLELFULLKERNELPROPAGATION(MDITER)
+#else
+       CALL FULLKERNELPROPAGATION(MDITER)
+#endif
     ENDIF
+
+
+      write(*,*)"Time for rankN update", time_mls() - mls0,"With iter",I
+    endif
+
 
   END SUBROUTINE ADAPTPRECONDKERNEL
 
