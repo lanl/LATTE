@@ -355,19 +355,19 @@ CONTAINS
           !! get deltaq from deltaspin
           CALL REDUCE_DELTASPIN(NATS,DELTADIM,dq_v,DELTAQ,1)
         ENDIF
-        mlsi = time_mls()
+!        mlsi = time_mls()
         call coulombrspace
         call coulombewald
         CALL ADDQDEP
         call bml_import_from_dense(LT%bml_type, H, ham_bml, NUMTHRESH, HDIM)
         IF (SPINON==1) CALL BLDSPINH
-        write(*,*)"Time for coulombrspace coulombewald ADDQDEP",time_mls() - mlsi
-        mlsi = time_mls()
+!        write(*,*)"Time for coulombrspace coulombewald ADDQDEP",time_mls() - mlsi
+!        mlsi = time_mls()
 
         call bml_multiply(zqt_bml,ham_bml,ptaux_bml,1.0_dp,0.0_dp,NUMTHRESH)
         call bml_multiply(ptaux_bml,zq_bml,ptham_bml,1.0_dp,0.0_dp,NUMTHRESH)
-        write(*,*)"Time for ortho eig",time_mls() - mlsi
-        mlsi = time_mls()
+!        write(*,*)"Time for ortho eig",time_mls() - mlsi
+!        mlsi = time_mls()
         Nocc = BNDFIL*float(HDIM)
         beta = 1.D0/KBT
         !call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
@@ -379,21 +379,20 @@ CONTAINS
         ELSE
           call Canon_DM_PRT_SPIN(ORTHOHUP,ORTHOHDOWN,beta,UPEVECS, DOWNEVECS, UPEVALS, DOWNEVALS,CHEMPOT,16,HDIM)
         ENDIF
-        write(*,*)"Time for canon",time_mls() - mlsi
+!        write(*,*)"Time for canon",time_mls() - mlsi
 
-        mlsi = time_mls()
+!        mlsi = time_mls()
         call bml_multiply(zq_bml,ptrho_bml,ptaux_bml,1.0_dp,0.0_dp,0.0_dp)
         call bml_multiply(ptaux_bml,zqt_bml,ptrho_bml,2.0_dp,0.0_dp,0.0_dp)
-        write(*,*)"Time for deortho eig",time_mls() - mlsi
-        mlsi = time_mls()
+!        write(*,*)"Time for deortho eig",time_mls() - mlsi
+!        mlsi = time_mls()
 
         !call bml_export_to_dense(ptrho_bml,BO)
         DELTAQ = 0.0d0
         call prg_get_charges(ptrho_bml, over_bml, NORBINDEX, DELTAQ, numel,&
              &dummy_array, mdim, numthresh)
-        write(*,*)"Time for getcharges",time_mls() - mlsi
+!        write(*,*)"Time for getcharges",time_mls() - mlsi
 
-        write(*,*)"DELTAQ",DELTAQ(1:5)
         IF (SPINON==1) call getdeltaspin_resp
 
         IF (SPINON==0) THEN
@@ -419,9 +418,9 @@ CONTAINS
       enddo
       CALL Invert(FULL_K0, FULL_K, NATS)
 
-      mlsii = time_mls()
+!      mlsii = time_mls()
       dn2dt2(:,1) = MATMUL(FULL_K,Res)
-      write(*,*)"Time for MATMUL",time_mls() - mlsii
+!      write(*,*)"Time for MATMUL",time_mls() - mlsii
 
     ELSE
       FULL_K0 = - FULL_K
@@ -509,11 +508,9 @@ CONTAINS
     do I = 1,LL !! LL is the number of rank-1 updates  LL = 0 means preconditioning only!
       vi(:,I) = dr/norm2(dr)
 
-      mlsi = time_mls()
       do J = 1,I-1
         vi(:,I) = vi(:,I) - dot_product(vi(:,I),vi(:,J))*vi(:,J)
       enddo
-      write(*,*)"Time for dot_prod at rankN",time_mls() - mlsi
 
       vi(:,I) = vi(:,I)/norm2(vi(:,I))
       v(:) = vi(:,I)
@@ -521,25 +518,18 @@ CONTAINS
       dq_dv = ZERO
       dq_v = v/norm2(v)
       DELTAQ = dq_v
-      mlsi = time_mls()
       call coulombrspace
       call coulombewald
       call addqdep
-      write(*,*)"Time for coulombrspace coulombewald addqdep  at rankN",time_mls() - mlsi
-      mlsi = time_mls()
       call orthomyh
-      write(*,*)"Time for orthomyh at rankN",time_mls() - mlsi
       Nocc = BNDFIL*float(HDIM)
       beta = 1.D0/KBT
       !call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
-      mlsi = time_mls()
       call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
-      write(*,*)"Time for Canon_DM_PRT addqdep  at rankN",time_mls() - mlsi
       BO = 2.D0*BO
       call deorthomyrho
       mlsi = time_mls()
       call getdeltaq_resp
-      write(*,*)"Time for getdeltaq_resp  at rankN",time_mls() - mlsi
       dq_dv = DELTAQ ! v_{i+1} = paritla f(n+\lambda v_i} \partial lambda, eq 42
       dr = dq_dv - v
       dr = MATMUL(FULL_K,dr)
@@ -682,7 +672,7 @@ CONTAINS
             READ(MYIO,*)TMP
             DIFF = DIFF + ABS(TMP - H(I,1))
           ENDDO
-          IF(DIFF > 1.0E-15)then
+          IF(DIFF > 1.0E-10)then
             WRITE(*,*)"WARNING: The kernel.tmp file is inconsistent with this system &
               & I will recompute the Kernel instead ..."
             COMPUTEKERNEL = .TRUE.
@@ -749,7 +739,7 @@ CONTAINS
       DO WHILE ((FEL > KERNELTOL) .AND. (RANK <= LL))  !! LL is the number of rank-1 updates  LL = 0 means preconditioning only!
         WRITE(*,*)"Adapting the Kernel, FEL > KERNELTOL ...",I
         I = I + 1
-        mlsi = time_mls()
+!        mlsi = time_mls()
         vi(:,I) = dr/norm2(dr)
         do J = 1,I-1
           vi(:,I) = vi(:,I) - dot_product(vi(:,I),vi(:,J))*vi(:,J)
@@ -759,7 +749,7 @@ CONTAINS
 !!!! Calculated dq_dv, which is the response in q(n) from change in input charge n = v
 
         v = v / norm2(v)
-        write(*,*)"Time for getting vs at rankN",time_mls() - mlsi
+!        write(*,*)"Time for getting vs at rankN",time_mls() - mlsi
 
         dq_dv = ZERO
         IF (SPINON==1) THEN
@@ -772,15 +762,15 @@ CONTAINS
           DELTAQ = dq_v
         ENDIF
 
-        mlsi = time_mls()
+!        mlsi = time_mls()
         call coulombrspace
         call coulombewald
         call addqdep
-        write(*,*)"Time for coulombrspace coulombewald addqdep at rankN",time_mls() - mlsi
+!        write(*,*)"Time for coulombrspace coulombewald addqdep at rankN",time_mls() - mlsi
 
         IF (SPINON==1) CALL BLDSPINH
 
-        mlsi = time_mls()
+!        mlsi = time_mls()
 #ifdef PROGRESSON
         call bml_import_from_dense(LT%bml_type, H, ham_bml, NUMTHRESH, HDIM)
         call bml_multiply(zqt_bml,ham_bml,ptaux_bml,1.0_dp,0.0_dp,NUMTHRESH)
@@ -788,14 +778,14 @@ CONTAINS
 #else
         call orthomyh
 #endif        
-        write(*,*)"Time for orthomyh at rankN",time_mls() - mlsi
+!        write(*,*)"Time for orthomyh at rankN",time_mls() - mlsi
 
         Nocc = BNDFIL*float(HDIM)
         beta = 1.D0/KBT
 
         IF (SPINON==0) THEN
 
-          mlsi = time_mls()
+!          mlsi = time_mls()
 #ifdef PROGRESSON
           call prg_canon_response_orig(ptrho_bml,ptham_bml,nocc,beta,&
                &evals,CHEMPOT,16,numthresh,HDIM)
@@ -804,28 +794,28 @@ CONTAINS
  !         call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
   !        BO = 2.D0*BO
 #endif             
-          write(*,*)"Time for Canon_DM_PRT at rankN",time_mls() - mlsi
+!          write(*,*)"Time for Canon_DM_PRT at rankN",time_mls() - mlsi
         ELSE
           call Canon_DM_PRT_SPIN(ORTHOHUP,ORTHOHDOWN,beta,UPEVECS, DOWNEVECS, UPEVALS, DOWNEVALS,CHEMPOT,16,HDIM)
         ENDIF
 
-        mlsi = time_mls()
+!        mlsi = time_mls()
 #ifdef PROGRESSON
         call bml_multiply(zq_bml,ptrho_bml,ptaux_bml,1.0_dp,0.0_dp,0.0_dp)
         call bml_multiply(ptaux_bml,zqt_bml,ptrho_bml,2.0_dp,0.0_dp,0.0_dp)
 #else
         call deorthomyrho
 #endif             
-        write(*,*)"Time for deorthomyrho at rankN",time_mls() - mlsi
+!        write(*,*)"Time for deorthomyrho at rankN",time_mls() - mlsi
 
-        mlsi = time_mls()
+!        mlsi = time_mls()
 #ifdef PROGRESSON
         call prg_get_charges(ptrho_bml, over_bml, NORBINDEX, DELTAQ, numel,&
              &dummy_array, hdim, numthresh)
 #else
         call getdeltaq_resp
 #endif             
-        write(*,*)"Time for getdeltaq_resp at rankN",time_mls() - mlsi
+!        write(*,*)"Time for getdeltaq_resp at rankN",time_mls() - mlsi
         
         IF (SPINON==1) call getdeltaspin_resp
 
