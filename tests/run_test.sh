@@ -67,7 +67,6 @@ mv latte.in latte.in.tmp
 set -e                                          # This will exit the script if there is any error
 
 # Testing for single point calculations:
-
 for name in single.point single.point.noelec single.point.rspace ; do
 
   INLATTEFILE="latte."$name".in"
@@ -103,7 +102,6 @@ for name in single.point single.point.noelec single.point.rspace ; do
 done
 
 # Testing geometry optimizations:
-
 for name in opt opt.cg opt_cons dorbitals; do
 
   INLATTEFILE="latte."$name".in"
@@ -131,13 +129,12 @@ for name in opt opt.cg opt_cons dorbitals; do
 	[ "$test" -eq 0 ] && exit -1
   fi
 
-  #rm $REF monitorrelax.xyz out
+  rm $REF monitorrelax.xyz out
 done
 
 # Testing for MD simulations:
-
 for name in tableread 0scf 2scf fullscf fullscf.etemp sp2 sp2.sparse fullscf.nvt \
-       	fullscf.npt fullscf.vdw fullscf.spin fullscf.kon fullscf.rspace ; do
+       	fullscf.npt fullscf.vdw fullscf.spin fullscf.kon fullscf.rspace dokernel1 dokernel2; do
 
   INLATTEFILE="latte."$name".in"
   REF="energy."$name".out"
@@ -168,7 +165,6 @@ for name in tableread 0scf 2scf fullscf fullscf.etemp sp2 sp2.sparse fullscf.nvt
 done
 
 # Testing exact output files
-
 for name in fittingoutput.dat ; do
 
   INLATTEFILE="latte."$name".in"
@@ -232,7 +228,6 @@ for name in fittingoutput.dat ; do
 done
 
 # Testing with the usual latte input method:
-
 rm latte.in
 
 echo ""
