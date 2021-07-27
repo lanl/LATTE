@@ -198,7 +198,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
 #ifdef PROGRESSON
         IF (DFTBU) CALL ADDDFTBUPRG(.true.) 
-        !IF (DFTBU) CALL ADDDFTBU(.true.) 
 #elif defined(PROGRESSOFF)
         IF (DFTBU) CALL ADDDFTBU(.true.) 
 #endif
@@ -322,7 +321,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         IF (MDITER .LE. MDSOFT) THEN
           IF (.NOT.DFTBU .OR. KON==1) THEN
            ! mixing charge
-          !IF (.NOT.DFTBU) THEN
+           !IF (.NOT.DFTBU) THEN
 #ifdef PROGRESSON
            IF(MX%MIXERON)THEN
               CALL QMIXPRG(ITER)     !Alternative mixing scheme from PROGRESS
@@ -413,12 +412,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
              OLDDELTAQS = DELTAQ
              CALL GETDELTAQ      ! INCLUDED_GETDELTAQ Probably not to comment out ANDERS?
              MAXDQ = MAXVAL(abs(DELTAQ-OLDDELTAQS))
-           !ELSE
-           !  KBO = DORK_old + QMIX*(DORK - DORK_old)   ! Simple linear mixing
-           !  DORK_old = KBO                            !
-           !  CALL KDEORTHOMYRHO
-           !  CALL GETDELTAQ
-           !ENDIF
           ENDIF
 
         ENDIF
@@ -428,7 +421,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 #elif defined(PROGRESSOFF)
         IF (DFTBU.AND.KON==0) DOrth = DOrth_old
 #endif
-        !IF (DFTBU.AND.KON==1) DORK = DORK_old
 
         IF(VERBOSE >= 1)WRITE(*,*)"SCF error (MAXDQ) =",MAXDQ," SCF Tol =",ELEC_QTOL
 
@@ -452,7 +444,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
            DELTASPIN = SPINMIX*DELTASPIN + (ONE - SPINMIX)*OLDDELTASPIN
            SUMSPIN   = SPINMIX*SUMSPIN   + (ONE - SPINMIX)*OLDSUMSPIN
-           CALL REDUCE_DELTASPIN(NATS,DELTADIM,SUMSPIN, DELTAQ,2)
+           IF (DOKERNEL)  CALL REDUCE_DELTASPIN(NATS, DELTADIM, SUMSPIN, DELTAQ, 2)
 
            IF(VERBOSE >= 1)WRITE(*,*)"SPIN error =",MAXDSP," SPIN Tol =",SPINTOL
 
@@ -643,7 +635,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            DELTASPIN = SPINMIX*DELTASPIN + (ONE - SPINMIX)*OLDDELTASPIN
            SUMSPIN   = SPINMIX*SUMSPIN   + (ONE - SPINMIX)*OLDSUMSPIN
 
-           CALL REDUCE_DELTASPIN(NATS,DELTADIM,SUMSPIN, DELTAQ,2)
+           IF (DOKERNEL)  CALL REDUCE_DELTASPIN(NATS,DELTADIM,SUMSPIN, DELTAQ,2)
         ENDIF
 
      ENDDO
@@ -722,10 +714,10 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 #endif
      ENDIF
 
-     IF (DFTBU .AND. KON==1) THEN
-       DORK_old = DORK
-       DORK = KBO
-     ENDIF
+     !IF (DFTBU .AND. KON==1) THEN
+     !  DORK_old = DORK
+     !  DORK = KBO
+     !ENDIF
 
      IF (BASISTYPE .EQ. "NONORTHO") THEN
         IF (KON .EQ. 0) THEN
