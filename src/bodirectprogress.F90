@@ -99,6 +99,8 @@ SUBROUTINE BOEVECSPRG
      call bml_multiply_x2(ORTHOH_bml,g_bml,numthresh,trace)
      call bml_threshold(g_bml, numthresh)
      nparts = 8
+     E0 = CHEMPOT
+
      call prg_build_densityGP_T0(ORTHOH_BML, g_bml, ORTHOBO_bml, numthresh, bndfil, E0, nparts, verbose)
      !call bml_print_matrix("rhoGP",ORTHOBO_bml,0,10,0,10)
      CALL BML_DEALLOCATE(G_BML)
