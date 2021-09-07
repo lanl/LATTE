@@ -35,7 +35,7 @@ SUBROUTINE PROPSPINS(ITER)
 
   ! If iter = 1, then we just set up our arrays of previous guesses
 
-  IF (ITER .LE. MDSOFT) THEN
+  IF (ITER .EQ. 1) THEN
 
      ! Dissipation off
 

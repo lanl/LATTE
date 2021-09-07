@@ -443,7 +443,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
            ! Mix new and old spin densities
 
-           IF (MAXDSP .GT. 1.0D-3 .OR. ITER < 3 .OR. (.NOT. DOKERNEL)) THEN
+           IF (MAXDSP .GT. 1.0D-1 .OR. ITER < 3 .OR. (.NOT. DOKERNEL)) THEN
              DELTASPIN = SPINMIX*DELTASPIN + (ONE - SPINMIX)*OLDDELTASPIN
              SUMSPIN   = SPINMIX*SUMSPIN   + (ONE - SPINMIX)*OLDSUMSPIN
              FIRSTCALL = .TRUE.
