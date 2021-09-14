@@ -86,6 +86,7 @@ MODULE CONSTANTS_MOD
   REAL(LATTEPREC) :: P_DFTB_U ! P_DFTB_U is the chosen Hubbard U for the DM term
   REAL(LATTEPREC) :: D_DFTB_U ! D_DFTB_U is the chosen Hubbard U for the DM term
   REAL(LATTEPREC) :: F_DFTB_U ! F_DFTB_U is the chosen Hubbard U for the DM term
+  REAL(LATTEPREC) :: MAGNETIC = 0.0 ! 
   CHARACTER(LEN = 3) :: SP2CONV
   CHARACTER(LEN = 20) :: BASISTYPE, SCLTYPE !scltype controls whether we do exp or tabular integrals
 
