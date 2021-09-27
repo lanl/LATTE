@@ -704,7 +704,8 @@ CONTAINS
 
       IF(COMPUTEKERNEL)THEN
 #ifdef PROGRESSON
-        CALL PARALLELFULLKERNELPROPAGATION(MDITER)
+        !CALL PARALLELFULLKERNELPROPAGATION(MDITER)
+        CALL FULLKERNELPROPAGATION(MDITER)
 #else
         CALL FULLKERNELPROPAGATION(MDITER)
 #endif
@@ -733,19 +734,20 @@ CONTAINS
       I = 0
       FEL = 1.D0
 
-#ifdef PROGRESSON
-      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptham_bml)
-      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptrho_bml)
-      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,zq_bml)
-      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,zqt_bml)
-      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptaux_bml)
-      call bml_multiply(zmat_bml,evecs_bml,zq_bml, 1.0d0,0.0d0,NUMTHRESH)
-      call bml_transpose(zq_bml,zqt_bml)
-      ALLOCATE(NUMEL(NATS))
-      ALLOCATE(DUMMY_ARRAY(NATS))
-      NUMEL = 0.0d0
-      DUMMY_ARRAY = 1
-#endif
+! the progress for spinon=1 is not working 
+!#ifdef PROGRESSON
+!      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptham_bml)
+!      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptrho_bml)
+!      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,zq_bml)
+!      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,zqt_bml)
+!      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptaux_bml)
+!      call bml_multiply(zmat_bml,evecs_bml,zq_bml, 1.0d0,0.0d0,NUMTHRESH)
+!      call bml_transpose(zq_bml,zqt_bml)
+!      ALLOCATE(NUMEL(NATS))
+!      ALLOCATE(DUMMY_ARRAY(NATS))
+!      NUMEL = 0.0d0
+!      DUMMY_ARRAY = 1
+!#endif
 
       RANK = 0
       DO WHILE ((FEL > KERNELTOL) .AND. (RANK <= LL))  !! LL is the number of rank-1 updates  LL = 0 means preconditioning only!
@@ -783,13 +785,14 @@ CONTAINS
         IF (SPINON==1) CALL BLDSPINH
 
 !        mlsi = time_mls()
-#ifdef PROGRESSON
-        call bml_import_from_dense(LT%bml_type, H, ham_bml, NUMTHRESH, HDIM)
-        call bml_multiply(zqt_bml,ham_bml,ptaux_bml,1.0_dp,0.0_dp,NUMTHRESH)
-        call bml_multiply(ptaux_bml,zq_bml,ptham_bml,1.0_dp,0.0_dp,NUMTHRESH)
-#else
+!#ifdef PROGRESSON
+!        ! does not work for spinon=1
+!        call bml_import_from_dense(LT%bml_type, H, ham_bml, NUMTHRESH, HDIM)
+!        call bml_multiply(zqt_bml,ham_bml,ptaux_bml,1.0_dp,0.0_dp,NUMTHRESH)
+!        call bml_multiply(ptaux_bml,zq_bml,ptham_bml,1.0_dp,0.0_dp,NUMTHRESH)
+!#else
         call orthomyh
-#endif        
+!#endif        
 !        write(*,*)"Time for orthomyh at rankN",time_mls() - mlsi
 
         Nocc = BNDFIL*float(HDIM)
@@ -798,35 +801,35 @@ CONTAINS
         IF (SPINON==0) THEN
 
 !          mlsi = time_mls()
-#ifdef PROGRESSON
-          call prg_canon_response_orig(ptrho_bml,ptham_bml,nocc,beta,&
-               &evals,CHEMPOT,16,numthresh,HDIM)
-#else
+!#ifdef PROGRESSON
+!          call prg_canon_response_orig(ptrho_bml,ptham_bml,nocc,beta,&
+!               &evals,CHEMPOT,16,numthresh,HDIM)
+!#else
           call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
  !         call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
   !        BO = 2.D0*BO
-#endif             
+!#endif             
 !          write(*,*)"Time for Canon_DM_PRT at rankN",time_mls() - mlsi
         ELSE
           call Canon_DM_PRT_SPIN(ORTHOHUP,ORTHOHDOWN,beta,UPEVECS, DOWNEVECS, UPEVALS, DOWNEVALS,CHEMPOT,16,HDIM)
         ENDIF
 
 !        mlsi = time_mls()
-#ifdef PROGRESSON
-        call bml_multiply(zq_bml,ptrho_bml,ptaux_bml,1.0_dp,0.0_dp,0.0_dp)
-        call bml_multiply(ptaux_bml,zqt_bml,ptrho_bml,2.0_dp,0.0_dp,0.0_dp)
-#else
+!#ifdef PROGRESSON
+!        call bml_multiply(zq_bml,ptrho_bml,ptaux_bml,1.0_dp,0.0_dp,0.0_dp)
+!        call bml_multiply(ptaux_bml,zqt_bml,ptrho_bml,2.0_dp,0.0_dp,0.0_dp)
+!#else
         call deorthomyrho
-#endif             
+!#endif             
 !        write(*,*)"Time for deorthomyrho at rankN",time_mls() - mlsi
 
 !        mlsi = time_mls()
-#ifdef PROGRESSON
-        call prg_get_charges(ptrho_bml, over_bml, NORBINDEX, DELTAQ, numel,&
-             &dummy_array, hdim, numthresh)
-#else
+!#ifdef PROGRESSON
+!        call prg_get_charges(ptrho_bml, over_bml, NORBINDEX, DELTAQ, numel,&
+!             &dummy_array, hdim, numthresh)
+!#else
         call getdeltaq_resp
-#endif             
+!#endif             
 !        write(*,*)"Time for getdeltaq_resp at rankN",time_mls() - mlsi
         
         IF (SPINON==1) call getdeltaspin_resp
@@ -880,13 +883,13 @@ CONTAINS
 
       ENDDO
 
-#ifdef PROGRESSON
-      call bml_deallocate(ptrho_bml)
-      call bml_deallocate(zq_bml)
-      call bml_deallocate(zqt_bml)
-      call bml_deallocate(ptaux_bml)
-      call bml_deallocate(ptham_bml)
-#endif
+!#ifdef PROGRESSON
+!      call bml_deallocate(ptrho_bml)
+!      call bml_deallocate(zq_bml)
+!      call bml_deallocate(zqt_bml)
+!      call bml_deallocate(ptaux_bml)
+!      call bml_deallocate(ptham_bml)
+!#endif
 
     COULOMBV = COULOMBV_SAVE
     IF (SPINON==1) THEN
@@ -913,13 +916,14 @@ CONTAINS
     DEALLOCATE(DELTAQ_SAVE, COULOMBV_SAVE,H_0, BO_SAVE, H_SAVE)
     DEALLOCATE(FCOUL_SAVE,ORTHOH_SAVE,WORK,IDENTRES,DELTASPIN_SAVE, SUMSPIN_SAVE)
 
-#ifdef PROGRESSON      
-    IF (ALLOCATED(NUMEL)) DEALLOCATE(NUMEL,DUMMY_ARRAY)
-#endif      
+!#ifdef PROGRESSON      
+!    IF (ALLOCATED(NUMEL)) DEALLOCATE(NUMEL,DUMMY_ARRAY)
+!#endif      
 
     IF (RANK >= LL ) THEN
 #ifdef PROGRESSON
-       CALL PARALLELFULLKERNELPROPAGATION(MDITER)
+       !CALL PARALLELFULLKERNELPROPAGATION(MDITER) ! not fully tested yet!
+       CALL FULLKERNELPROPAGATION(MDITER)
 #else
        CALL FULLKERNELPROPAGATION(MDITER)
 #endif
