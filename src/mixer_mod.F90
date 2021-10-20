@@ -805,9 +805,9 @@ CONTAINS
 !          call prg_canon_response_orig(ptrho_bml,ptham_bml,nocc,beta,&
 !               &evals,CHEMPOT,16,numthresh,HDIM)
 !#else
-          call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
- !         call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
-  !        BO = 2.D0*BO
+          !call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+          call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
+          BO = 2.D0*BO
 !#endif             
 !          write(*,*)"Time for Canon_DM_PRT at rankN",time_mls() - mlsi
         ELSE
