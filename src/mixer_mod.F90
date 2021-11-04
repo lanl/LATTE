@@ -785,7 +785,7 @@ CONTAINS
 
         IF (SPINON==0) THEN
 
-!          mlsi = time_mls()
+          mlsi = time_mls()
 #ifdef PROGRESSON
           call prg_canon_response_orig(ptrho_bml,ptham_bml,nocc,beta,&
                &evals,CHEMPOT,16,numthresh,HDIM)
@@ -794,19 +794,19 @@ CONTAINS
  !         call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
   !        BO = 2.D0*BO
 #endif             
-!          write(*,*)"Time for Canon_DM_PRT at rankN",time_mls() - mlsi
+          write(*,*)"Time for Canon_DM_PRT at rankN",time_mls() - mlsi
         ELSE
           call Canon_DM_PRT_SPIN(ORTHOHUP,ORTHOHDOWN,beta,UPEVECS, DOWNEVECS, UPEVALS, DOWNEVALS,CHEMPOT,16,HDIM)
         ENDIF
 
-!        mlsi = time_mls()
+        mlsi = time_mls()
 #ifdef PROGRESSON
         call bml_multiply(zq_bml,ptrho_bml,ptaux_bml,1.0_dp,0.0_dp,0.0_dp)
         call bml_multiply(ptaux_bml,zqt_bml,ptrho_bml,2.0_dp,0.0_dp,0.0_dp)
 #else
         call deorthomyrho
 #endif             
-!        write(*,*)"Time for deorthomyrho at rankN",time_mls() - mlsi
+        write(*,*)"Time for deorthomyrho at rankN",time_mls() - mlsi
 
 !        mlsi = time_mls()
 #ifdef PROGRESSON
