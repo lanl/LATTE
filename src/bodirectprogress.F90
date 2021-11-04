@@ -123,8 +123,8 @@ SUBROUTINE BOEVECSPRG
 
      S = ZERO
 
-     IF (MDON .EQ. 0 .OR. &
-          (MDON .EQ. 1 .AND. MOD(ENTROPYITER, WRTFREQ) .EQ. 0 )) THEN
+     IF ( KBT > 0 .AND. (MDON .EQ. 0 .OR. &
+          (MDON .EQ. 1 .AND. MOD(ENTROPYITER, WRTFREQ) .EQ. 0 ))) THEN
 
         DO I = 1, HDIM
 

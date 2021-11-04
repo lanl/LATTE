@@ -123,7 +123,7 @@ CONTAINS
     USE FERMICOMMON
 
     IMPLICIT NONE
-    INTEGER, PARAMETER :: NKEY_CHAR = 8, NKEY_INT = 55, NKEY_RE = 26, NKEY_LOG = 7
+    INTEGER, PARAMETER :: NKEY_CHAR = 8, NKEY_INT = 55, NKEY_RE = 27, NKEY_LOG = 7
     CHARACTER(LEN=*) :: FILENAME
 
     !Library of keywords with the respective defaults.
@@ -158,12 +158,12 @@ CONTAINS
          'CGTOL=','KBT=','SPINTOL=','ELEC_ETOL=','ELEC_QTOL=','COULACC=','COULCUT=', 'COULR1=',& !8
          'BREAKTOL=','QMIX=','SPINMIX=','MDMIX=','NUMTHRESH=','CHTOL=','SKIN=',& !15
          'RLXFTOL=','BETA=','MCSIGMA=','PPBETA=','PPSIGMA=','ER=','KERNELTOL=', & !22
-         'S_DFTB_U=','P_DFTB_U=', 'D_DFTB_U=', 'F_DFTB_U='] !26
+         'S_DFTB_U=','P_DFTB_U=', 'D_DFTB_U=', 'F_DFTB_U=', 'MAGNETIC='] !27
     REAL(DP) :: VALVECTOR_RE(NKEY_RE) = (/&
          1.0e-6,0.0,1.0e-4,0.001,1.0e-8,1.0e-6,-500.0, 500.0,&
          1.0e-6,0.25,0.25,0.25,1.0e-6,0.01,1.0,&
          1.0e-7,1000.0,0.2,1000.0,0.01,1.0,0.1,& 
-         0.0, 0.0, 0.0, 0.0/)
+         0.0, 0.0, 0.0, 0.0, 0.0/)
 
     CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_LOG(NKEY_LOG) = [CHARACTER(LEN=100) :: &
          'LIBINIT=','STOPATMAXSCF=','DOKERNEL=','DFTBU=','FAILSAFE=','READKERNEL=','SAVEKERNEL=']
@@ -534,6 +534,7 @@ CONTAINS
     P_DFTB_U = VALVECTOR_RE(24)
     D_DFTB_U = VALVECTOR_RE(25)
     F_DFTB_U = VALVECTOR_RE(26)
+    MAGNETIC = VALVECTOR_RE(27)
 
     !Failsafe mode 
     FAILSAFE = VALVECTOR_LOG(5)

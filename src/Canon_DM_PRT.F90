@@ -43,8 +43,7 @@ subroutine  Canon_DM_PRT(H1,beta,Q,e,mu0,m,HDIM)
   CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, &
           X, HDIM, Q, HDIM, ZERO, Y, HDIM)
 
-write(*,*)"ZQHQZ",Y(1,1:5)
-
+!write(*,*)"ZQHQZ",Y(1,1:5)
 !  call MMult(ONE,Q,H1,ZERO,X,'T','N',HDIM)      ! Main cost are the transformation 
 !  call MMult(ONE,X,Q,ZERO,Y,'N','N',HDIM)       ! to the eigenbasis of H1
 !  P1 = -cnst*H1    !(set mu1 = 0 for simplicity) ! Initialization of DM response in Q representation (not diagonal in Q)
@@ -200,10 +199,10 @@ subroutine  Canon_DM_PRT_SPIN(H1UP,H1DOWN,beta,QUP,QDOWN,EUP,EDOWN,mu0,m,HDIM)
   enddo
 
   CALL DGEMM('N', 'N', HDIM, HDIM, HDIM, ONE, QUP, HDIM, P1UP, HDIM, ZERO, X,     HDIM)
-  CALL DGEMM('N', 'T', HDIM, HDIM, HDIM, ONE, X,   HDIM, QUP,   HDIM, ZERO, RHOUP, HDIM)
+  CALL DGEMM('N', 'T', HDIM, HDIM, HDIM, ONE, X,   HDIM, QUP,  HDIM, ZERO, RHOUP, HDIM)
 
   CALL DGEMM('N', 'N', HDIM,HDIM,HDIM,ONE,QDOWN,HDIM,P1DOWN, HDIM, ZERO, X,       HDIM)
-  CALL DGEMM('N', 'T', HDIM,HDIM,HDIM,ONE,X,    HDIM,QDOWN,   HDIM, ZERO, RHODOWN, HDIM)
+  CALL DGEMM('N', 'T', HDIM,HDIM,HDIM,ONE,X,    HDIM,QDOWN,  HDIM, ZERO, RHODOWN, HDIM)
 
   DEALLOCATE(P1UP, P1DOWN, X, DX1, Y, H_0, P_0, DPDMU, DPDMU_DOWN, P_02, ID0)
 

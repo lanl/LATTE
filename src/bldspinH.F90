@@ -353,6 +353,9 @@ SUBROUTINE BLDSPINH
 
         HDOWN = H - SH2
 
+        HUP = HUP + SMAT * MAGNETIC
+        HDOWN = HDOWN - SMAT * MAGNETIC
+
      ELSE ! Now we're doing kspace
 
         KHUP = HK

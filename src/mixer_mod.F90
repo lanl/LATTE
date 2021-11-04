@@ -53,6 +53,7 @@ MODULE MIXER_MOD
 
   INTEGER, PARAMETER :: DP = LATTEPREC
   !PUBLIC :: KERNELMIXER  ! this mixer is not used
+  PUBLIC :: ADAPTKERNELMIXER
   PUBLIC :: KERNELPROPAGATION, FULLKERNELPROPAGATION
   PUBLIC :: PRECONDKERNELPROPAGATION, ADAPTPRECONDKERNEL
   PUBLIC :: DMKERNELMIXER, DMKERNELPROPAGATION, dP2MD, dP2MIXER
@@ -76,7 +77,7 @@ CONTAINS
 
     REAL(LATTEPREC), ALLOCATABLE :: Res(:), dr(:), vi(:,:), wi(:,:), ui(:,:)
     REAL(LATTEPREC), ALLOCATABLE :: du(:), dq_dv(:,:), dq_v(:), v(:), ri(:,:)
-    REAL(LATTEPREC), ALLOCATABLE :: DELTASPIN_SAVE(:)
+    REAL(LATTEPREC), ALLOCATABLE :: DELTASPIN_SAVE(:), SUMSPIN_SAVE(:)
     REAL(LATTEPREC), ALLOCATABLE :: DELTAQ_SAVE(:), COULOMBV_SAVE(:)
     REAL(LATTEPREC), ALLOCATABLE :: H_0(:,:), BO_SAVE(:,:,:), H_SAVE(:,:,:)
     REAL(LATTEPREC), ALLOCATABLE :: FCOUL_SAVE(:,:), ORTHOH_SAVE(:,:,:)
@@ -86,9 +87,9 @@ CONTAINS
     ALLOCATE(Res(NDIM*NSPIN),dr(NDIM),vi(NDIM,NDIM),wi(NDIM,NDIM),ui(NDIM,NDIM))
     ALLOCATE(du(NDIM), dq_dv(NDIM,NSPIN), dq_v(NDIM), v(NDIM), ri(NDIM,NDIM))
     ALLOCATE(DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS))
-    ALLOCATE(H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM,NSPIN), H_SAVE(HDIM,HDIM,NSPIN))
+    ALLOCATE(H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM,NSPIN), H_SAVE(HDIM,HDIM,2*(NSPIN-1)+1))
     ALLOCATE(FCOUL_SAVE(3,NATS),ORTHOH_SAVE(HDIM,HDIM,NSPIN))
-    ALLOCATE(DELTASPIN_SAVE(DELTADIM))
+    ALLOCATE(DELTASPIN_SAVE(DELTADIM), SUMSPIN_SAVE(DELTADIM))
     !
 #ifdef PROGRESSON
     CALL BML_EXPORT_TO_DENSE(BO_BML,BO)
@@ -102,9 +103,11 @@ CONTAINS
       BO_SAVE(:,:,2) = RHODOWN
       H_SAVE(:,:,1)  = HUP
       H_SAVE(:,:,2)  = HDOWN
+      H_SAVE(:,:,3)  = H
       ORTHOH_SAVE(:,:,1) = ORTHOHUP
       ORTHOH_SAVE(:,:,2) = ORTHOHDOWN
       DELTASPIN_SAVE = DELTASPIN
+      SUMSPIN_SAVE = SUMSPIN
     ELSE
       BO_SAVE(:,:,1)     = BO
       ORTHOH_SAVE(:,:,1) = ORTHOH
@@ -228,8 +231,8 @@ CONTAINS
 
       CALL Invert(FULL_K0, FULL_K, 2*NDIM)
       RES = MATMUL(FULL_K,Res)
-      dn2dt2(1:NDIM,1) = (Res(1:NDIM) + RES(1+NDIM:2*NDIM)) / 2.D0 !sum
-      dn2dt2(1:NDIM,2) = (Res(1:NDIM) - RES(1+NDIM:2*NDIM)) / 2.D0 !delta
+      dn2dt2(1:NDIM,1) = (Res(1:NDIM) + RES(1+NDIM:2*NDIM))  !sum
+      dn2dt2(1:NDIM,2) = (Res(1:NDIM) - RES(1+NDIM:2*NDIM))  !delta
     ENDIF
 
     IF (SPINON==1) THEN
@@ -237,9 +240,11 @@ CONTAINS
       RHODOWN = BO_SAVE(:,:,2)
       HUP     = H_SAVE(:,:,1)
       HDOWN   = H_SAVE(:,:,2)
+      H = H_SAVE(:,:,3)
       ORTHOHUP   = ORTHOH_SAVE(:,:,1)
       ORTHOHDOWN = ORTHOH_SAVE(:,:,2)
       DELTASPIN = DELTASPIN_SAVE
+      SUMSPIN = SUMSPIN_SAVE
     ELSE
       BO = BO_SAVE(:,:,1)
       H  = H_SAVE(:,:,1)
@@ -252,7 +257,7 @@ CONTAINS
 
     DEALLOCATE(RES, DR, VI, WI, UI, DU, DQ_DV, DQ_V, V, RI)
     DEALLOCATE(DELTAQ_SAVE, COULOMBV_SAVE,H_0, BO_SAVE, H_SAVE)
-    DEALLOCATE(FCOUL_SAVE,ORTHOH_SAVE,DELTASPIN_SAVE)
+    DEALLOCATE(FCOUL_SAVE,ORTHOH_SAVE,SUMSPIN_SAVE,DELTASPIN_SAVE)
 
   END SUBROUTINE FULLKERNELPROPAGATION
 
@@ -282,7 +287,7 @@ CONTAINS
     ALLOCATE(Res(NDIM*NSPIN),dr(NDIM),vi(NDIM,NDIM),wi(NDIM,NDIM),ui(NDIM,NDIM))
     ALLOCATE(du(NDIM), dq_dv(NDIM,NSPIN), dq_v(NDIM), v(NDIM), ri(NDIM,NDIM))
     ALLOCATE(DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS))
-    ALLOCATE(H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM,NSPIN), H_SAVE(HDIM,HDIM,NSPIN))
+    ALLOCATE(H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM,NSPIN),H_SAVE(HDIM,HDIM,2*(NSPIN-1)+1))
     ALLOCATE(FCOUL_SAVE(3,NATS),ORTHOH_SAVE(HDIM,HDIM,NSPIN))
     ALLOCATE(DELTASPIN_SAVE(DELTADIM))
     ALLOCATE(NUMEL(NATS))
@@ -300,6 +305,7 @@ CONTAINS
       BO_SAVE(:,:,2) = RHODOWN
       H_SAVE(:,:,1)  = HUP
       H_SAVE(:,:,2)  = HDOWN
+      H_SAVE(:,:,3)  = H
       ORTHOH_SAVE(:,:,1) = ORTHOHUP
       ORTHOH_SAVE(:,:,2) = ORTHOHDOWN
       DELTASPIN_SAVE = DELTASPIN
@@ -430,8 +436,8 @@ CONTAINS
 
       CALL Invert(FULL_K0, FULL_K, 2*NDIM)
       RES = MATMUL(FULL_K,Res)
-      dn2dt2(1:NDIM,1) = (Res(1:NDIM) + RES(1+NDIM:2*NDIM)) / 2.D0 !sum
-      dn2dt2(1:NDIM,2) = (Res(1:NDIM) - RES(1+NDIM:2*NDIM)) / 2.D0 !delta
+      dn2dt2(1:NDIM,1) = (Res(1:NDIM) + RES(1+NDIM:2*NDIM))  !sum
+      dn2dt2(1:NDIM,2) = (Res(1:NDIM) - RES(1+NDIM:2*NDIM))  !delta
     ENDIF
 
     IF (SPINON==1) THEN
@@ -439,6 +445,7 @@ CONTAINS
       RHODOWN = BO_SAVE(:,:,2)
       HUP     = H_SAVE(:,:,1)
       HDOWN   = H_SAVE(:,:,2)
+      H = H_SAVE(:,:,3)
       ORTHOHUP   = ORTHOH_SAVE(:,:,1)
       ORTHOHDOWN = ORTHOH_SAVE(:,:,2)
       DELTASPIN = DELTASPIN_SAVE
@@ -476,7 +483,7 @@ CONTAINS
     INTEGER,         ALLOCATABLE :: IPIV(:)
     !
     ALLOCATE(Res(NATS), dr(NATS), vi(NATS,NATS), wi(NATS,NATS), ui(NATS,NATS))
-    ALLOCATE(du(NATS), dq_dv(NATS), dq_v(NATS), v(NATS), ri(NATS,NATS))
+    ALLOCATE(du(NATS), dq_dv(NATS), dq_v(NATS), v(NATS), ri(NATS,LL))
     ALLOCATE(DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS))
     ALLOCATE(H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM), H_SAVE(HDIM,HDIM))
     ALLOCATE(FCOUL_SAVE(3,NATS),ORTHOH_SAVE(HDIM,HDIM))
@@ -588,7 +595,7 @@ CONTAINS
 
     REAL(LATTEPREC), ALLOCATABLE :: Res(:), dr(:), vi(:,:)
     REAL(LATTEPREC), ALLOCATABLE :: dq_dv(:), dq_v(:), v(:), ri(:,:)
-    REAL(LATTEPREC), ALLOCATABLE :: DELTASPIN_SAVE(:)
+    REAL(LATTEPREC), ALLOCATABLE :: DELTASPIN_SAVE(:), SUMSPIN_SAVE(:)
     REAL(LATTEPREC), ALLOCATABLE :: DELTAQ_SAVE(:), COULOMBV_SAVE(:)
     REAL(LATTEPREC), ALLOCATABLE :: H_0(:,:), BO_SAVE(:,:,:), H_SAVE(:,:,:)
     REAL(LATTEPREC), ALLOCATABLE :: FCOUL_SAVE(:,:), ORTHOH_SAVE(:,:,:)
@@ -610,10 +617,10 @@ CONTAINS
     ALLOCATE(Res(NDIM2),dr(NDIM2),vi(NDIM2,NDIM2))
     ALLOCATE(dq_dv(NDIM2), dq_v(NDIM), v(NDIM2), ri(NDIM2,NDIM2))
     ALLOCATE(DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS))
-    ALLOCATE(H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM,NSPIN), H_SAVE(HDIM,HDIM,NSPIN))
+    ALLOCATE(H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM,NSPIN), H_SAVE(HDIM,HDIM,2*(NSPIN-1)+1))
     ALLOCATE(FCOUL_SAVE(3,NATS),ORTHOH_SAVE(HDIM,HDIM,NSPIN))
     ALLOCATE(WORK(LL+LL*LL),IDENTRES(NDIM2))
-    ALLOCATE(DELTASPIN_SAVE(DELTADIM))
+    ALLOCATE(DELTASPIN_SAVE(DELTADIM),SUMSPIN_SAVE(DELTADIM))
     !
 #ifdef PROGRESSON
     CALL BML_EXPORT_TO_DENSE(BO_BML,BO)
@@ -631,9 +638,11 @@ CONTAINS
       ORTHOH_SAVE(:,:,2) = ORTHOHDOWN
       H_SAVE(:,:,1) = HUP
       H_SAVE(:,:,2) = HDOWN
+      H_SAVE(:,:,3) = H
       BO_SAVE(:,:,1) = RHOUP
       BO_SAVE(:,:,2) = RHODOWN
       DELTASPIN_SAVE = DELTASPIN
+      SUMSPIN_SAVE = SUMSPIN
     ELSE
       BO_SAVE(:,:,1)     = BO
       ORTHOH_SAVE(:,:,1) = ORTHOH
@@ -655,6 +664,9 @@ CONTAINS
       write(6,*) 'MDITER', MDITER, norm2(Res(1:NDIM)) / SQRT(DBLE(NDIM)), &
            norm2(Res(1+NDIM:2*NDIM)) / SQRT(DBLE(NDIM))
     ENDIF
+
+    RANK = 0
+    I = 0
 
     IF (MDITER == 1) THEN
 
@@ -692,7 +704,8 @@ CONTAINS
 
       IF(COMPUTEKERNEL)THEN
 #ifdef PROGRESSON
-        CALL PARALLELFULLKERNELPROPAGATION(MDITER)
+        !CALL PARALLELFULLKERNELPROPAGATION(MDITER)
+        CALL FULLKERNELPROPAGATION(MDITER)
 #else
         CALL FULLKERNELPROPAGATION(MDITER)
 #endif
@@ -721,19 +734,20 @@ CONTAINS
       I = 0
       FEL = 1.D0
 
-#ifdef PROGRESSON
-      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptham_bml)
-      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptrho_bml)
-      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,zq_bml)
-      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,zqt_bml)
-      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptaux_bml)
-      call bml_multiply(zmat_bml,evecs_bml,zq_bml, 1.0d0,0.0d0,NUMTHRESH)
-      call bml_transpose(zq_bml,zqt_bml)
-      ALLOCATE(NUMEL(NATS))
-      ALLOCATE(DUMMY_ARRAY(NATS))
-      NUMEL = 0.0d0
-      DUMMY_ARRAY = 1
-#endif
+! the progress for spinon=1 is not working 
+!#ifdef PROGRESSON
+!      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptham_bml)
+!      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptrho_bml)
+!      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,zq_bml)
+!      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,zqt_bml)
+!      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptaux_bml)
+!      call bml_multiply(zmat_bml,evecs_bml,zq_bml, 1.0d0,0.0d0,NUMTHRESH)
+!      call bml_transpose(zq_bml,zqt_bml)
+!      ALLOCATE(NUMEL(NATS))
+!      ALLOCATE(DUMMY_ARRAY(NATS))
+!      NUMEL = 0.0d0
+!      DUMMY_ARRAY = 1
+!#endif
 
       RANK = 0
       DO WHILE ((FEL > KERNELTOL) .AND. (RANK <= LL))  !! LL is the number of rank-1 updates  LL = 0 means preconditioning only!
@@ -771,13 +785,14 @@ CONTAINS
         IF (SPINON==1) CALL BLDSPINH
 
 !        mlsi = time_mls()
-#ifdef PROGRESSON
-        call bml_import_from_dense(LT%bml_type, H, ham_bml, NUMTHRESH, HDIM)
-        call bml_multiply(zqt_bml,ham_bml,ptaux_bml,1.0_dp,0.0_dp,NUMTHRESH)
-        call bml_multiply(ptaux_bml,zq_bml,ptham_bml,1.0_dp,0.0_dp,NUMTHRESH)
-#else
+!#ifdef PROGRESSON
+!        ! does not work for spinon=1
+!        call bml_import_from_dense(LT%bml_type, H, ham_bml, NUMTHRESH, HDIM)
+!        call bml_multiply(zqt_bml,ham_bml,ptaux_bml,1.0_dp,0.0_dp,NUMTHRESH)
+!        call bml_multiply(ptaux_bml,zq_bml,ptham_bml,1.0_dp,0.0_dp,NUMTHRESH)
+!#else
         call orthomyh
-#endif        
+!#endif        
 !        write(*,*)"Time for orthomyh at rankN",time_mls() - mlsi
 
         Nocc = BNDFIL*float(HDIM)
@@ -809,12 +824,12 @@ CONTAINS
         write(*,*)"Time for deorthomyrho at rankN",time_mls() - mlsi
 
 !        mlsi = time_mls()
-#ifdef PROGRESSON
-        call prg_get_charges(ptrho_bml, over_bml, NORBINDEX, DELTAQ, numel,&
-             &dummy_array, hdim, numthresh)
-#else
+!#ifdef PROGRESSON
+!        call prg_get_charges(ptrho_bml, over_bml, NORBINDEX, DELTAQ, numel,&
+!             &dummy_array, hdim, numthresh)
+!#else
         call getdeltaq_resp
-#endif             
+!#endif             
 !        write(*,*)"Time for getdeltaq_resp at rankN",time_mls() - mlsi
         
         IF (SPINON==1) call getdeltaspin_resp
@@ -857,8 +872,8 @@ CONTAINS
         IF (SPINON==0) THEN
           dn2dt2(:,1) = v(:)
         ELSE
-          dn2dt2(1:NDIM,1) = (v(1:NDIM) + v(1+NDIM:2*NDIM)) / 2.D0
-          dn2dt2(1:NDIM,2) = (v(1:NDIM) - v(1+NDIM:2*NDIM)) / 2.D0
+          dn2dt2(1:NDIM,1) = (v(1:NDIM) + v(1+NDIM:2*NDIM)) !/ 2.D0
+          dn2dt2(1:NDIM,2) = (v(1:NDIM) - v(1+NDIM:2*NDIM)) !/ 2.D0
         ENDIF
 
         FEL = NORM2(IDENTRES - RES) / NORM2(RES)
@@ -868,13 +883,13 @@ CONTAINS
 
       ENDDO
 
-#ifdef PROGRESSON
-      call bml_deallocate(ptrho_bml)
-      call bml_deallocate(zq_bml)
-      call bml_deallocate(zqt_bml)
-      call bml_deallocate(ptaux_bml)
-      call bml_deallocate(ptham_bml)
-#endif
+!#ifdef PROGRESSON
+!      call bml_deallocate(ptrho_bml)
+!      call bml_deallocate(zq_bml)
+!      call bml_deallocate(zqt_bml)
+!      call bml_deallocate(ptaux_bml)
+!      call bml_deallocate(ptham_bml)
+!#endif
 
     COULOMBV = COULOMBV_SAVE
     IF (SPINON==1) THEN
@@ -882,9 +897,11 @@ CONTAINS
       RHODOWN = BO_SAVE(:,:,2)
       HUP     = H_SAVE(:,:,1)
       HDOWN   = H_SAVE(:,:,2)
+      H = H_SAVE(:,:,3)
       ORTHOHUP   = ORTHOH_SAVE(:,:,1)
       ORTHOHDOWN = ORTHOH_SAVE(:,:,2)
       DELTASPIN = DELTASPIN_SAVE
+      SUMSPIN = SUMSPIN_SAVE
     ELSE
       H      = H_SAVE(:,:,1)
       BO     = BO_SAVE(:,:,1)
@@ -897,15 +914,16 @@ CONTAINS
 
     DEALLOCATE(RES, DR, VI, DQ_DV, DQ_V, V, RI)
     DEALLOCATE(DELTAQ_SAVE, COULOMBV_SAVE,H_0, BO_SAVE, H_SAVE)
-    DEALLOCATE(FCOUL_SAVE,ORTHOH_SAVE,WORK,IDENTRES)
+    DEALLOCATE(FCOUL_SAVE,ORTHOH_SAVE,WORK,IDENTRES,DELTASPIN_SAVE, SUMSPIN_SAVE)
 
-#ifdef PROGRESSON      
-    DEALLOCATE(NUMEL,DUMMY_ARRAY)
-#endif      
+!#ifdef PROGRESSON      
+!    IF (ALLOCATED(NUMEL)) DEALLOCATE(NUMEL,DUMMY_ARRAY)
+!#endif      
 
-    IF (RANK == LL ) THEN
+    IF (RANK >= LL ) THEN
 #ifdef PROGRESSON
-       CALL PARALLELFULLKERNELPROPAGATION(MDITER)
+       !CALL PARALLELFULLKERNELPROPAGATION(MDITER) ! not fully tested yet!
+       CALL FULLKERNELPROPAGATION(MDITER)
 #else
        CALL FULLKERNELPROPAGATION(MDITER)
 #endif
@@ -918,6 +936,201 @@ CONTAINS
 
   END SUBROUTINE ADAPTPRECONDKERNEL
 
+  SUBROUTINE FULLKERNELMIXER(NDIM, dspin)
+    INTEGER, INTENT(IN) :: NDIM
+    REAL(LATTEPREC), INTENT(OUT) :: dspin(NDIM, NSPIN)
+
+    INTEGER :: I, J, N, ii, jj
+    INTEGER :: IS
+    REAL(LATTEPREC) :: Nocc, beta, eps
+
+    REAL(LATTEPREC), ALLOCATABLE :: Res(:), dr(:), vi(:,:), wi(:,:), ui(:,:)
+    REAL(LATTEPREC), ALLOCATABLE :: du(:), dq_dv(:,:), dq_v(:), v(:), ri(:,:)
+    REAL(LATTEPREC), ALLOCATABLE :: DELTASPIN_SAVE(:), SUMSPIN_SAVE(:)
+    REAL(LATTEPREC), ALLOCATABLE :: DELTAQ_SAVE(:), COULOMBV_SAVE(:)
+    REAL(LATTEPREC), ALLOCATABLE :: H_0(:,:), BO_SAVE(:,:,:), H_SAVE(:,:,:)
+    REAL(LATTEPREC), ALLOCATABLE :: FCOUL_SAVE(:,:), ORTHOH_SAVE(:,:,:)
+    !
+    ALLOCATE(Res(NDIM*NSPIN),dr(NDIM),vi(NDIM,NDIM),wi(NDIM,NDIM),ui(NDIM,NDIM))
+    ALLOCATE(du(NDIM), dq_dv(NDIM,NSPIN), dq_v(NDIM), v(NDIM), ri(NDIM,NDIM))
+    ALLOCATE(DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS))
+    ALLOCATE(H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM,NSPIN), H_SAVE(HDIM,HDIM,2*(NSPIN-1)+1))
+    ALLOCATE(FCOUL_SAVE(3,NATS),ORTHOH_SAVE(HDIM,HDIM,NSPIN))
+    ALLOCATE(DELTASPIN_SAVE(DELTADIM), SUMSPIN_SAVE(DELTADIM))
+    !
+#ifdef PROGRESSON
+     CALL BML_EXPORT_TO_DENSE(BO_BML,BO)
+#elif defined(PROGRESSOFF)
+#endif
+    DELTAQ_SAVE = DELTAQ
+    COULOMBV_SAVE = COULOMBV
+    FCOUL_SAVE = FCOUL
+    IF (SPINON==1) THEN
+      BO_SAVE(:,:,1) = RHOUP
+      BO_SAVE(:,:,2) = RHODOWN
+      H_SAVE(:,:,1)  = HUP
+      H_SAVE(:,:,2)  = HDOWN
+      H_SAVE(:,:,3)  = H
+      ORTHOH_SAVE(:,:,1) = ORTHOHUP
+      ORTHOH_SAVE(:,:,2) = ORTHOHDOWN
+      DELTASPIN_SAVE = DELTASPIN
+      SUMSPIN_SAVE = SUMSPIN
+    ELSE
+      BO_SAVE(:,:,1)     = BO
+      ORTHOH_SAVE(:,:,1) = ORTHOH
+      H_SAVE(:,:,1)      = H
+    ENDIF
+    H_0 = H0
+    H0 = 0.D0
+
+    IF (SPINON==0) THEN
+      Res = DELTAQ - OLDDELTAQS
+      write(6,*) 'Residue=', norm2(Res) / SQRT(DBLE(NATS)) 
+    ELSE
+      !sumspin = up + down
+      !deltaspin = up - down ==>
+      ! up = (sum+delta)/2.0
+      du(1:NDIM) = DELTASPIN(1:NDIM) - OLDDELTASPIN(1:NDIM)
+      dr(1:NDIM) = SUMSPIN(1:NDIM) - OLDSUMSPIN(1:NDIM)
+
+      Res(1:NDIM)        = (dr(1:NDIM) + du(1:NDIM)) / 2.D0 ! up
+      Res(1+NDIM:2*NDIM) = (dr(1:NDIM) - du(1:NDIM)) / 2.D0 ! down
+      write(6,*) 'Residue=', norm2(Res(1:2*NDIM)) / SQRT(DBLE(2*NDIM))
+
+      write(6,*) 'Residue=', norm2(Res(1:NDIM)) / SQRT(DBLE(NDIM)), &
+                            norm2(Res(1+NDIM:2*NDIM)) / SQRT(DBLE(NDIM)) 
+    ENDIF
+
+    FULL_S = 0.D0
+
+    DO I = 1,NDIM !! NATS is the number of rank-1 updates  LL = 0 means linear mixing
+    !DO IS = 1, NSPIN
+        dr = 0.D0
+!! OMP not done yet!
+!!$OMP PARALLEL DO DEFAULT (NONE) &
+!!$OMP PRIVATE(I,dq_dv, DELTAQ, NOCC,BETA) 
+        !do I = 1,NDIM !! NATS is the number of rank-1 updates  LL = 0 means linear mixing
+        DO IS = 1, NSPIN
+           dr(I) = 1.D0
+           vi(:,I) = dr/norm2(dr)
+           do J = 1,I-1
+              vi(:,I) = vi(:,I) - dot_product(vi(:,I),vi(:,J))*vi(:,J)
+              vi(:,I) = vi(:,I)/norm2(vi(:,I))
+           enddo
+           v(:) = vi(:,I)
+           !!!! Calculated dq_dv, which is the response in q(n) from change in input charge n = v
+           dq_dv = ZERO
+           dq_v = v/norm2(v)
+
+           IF (SPINON==0) THEN
+             DELTAQ = dq_v
+           ELSE
+             ! deltapsin is positive/negative for spin up/down
+             DELTASPIN = dq_v *(1-2*(IS-1))
+             !! get deltaq from deltaspin
+             CALL REDUCE_DELTASPIN(NATS,DELTADIM,dq_v,DELTAQ,1)
+           ENDIF
+
+           !IF (IS==1) call coulombrspace
+           !IF (IS==1) call coulombewald
+           call coulombrspace
+           call coulombewald
+
+           CALL ADDQDEP
+           IF (SPINON==1) CALL BLDSPINH
+
+           call orthomyh
+           Nocc = BNDFIL*float(HDIM)
+           beta = 1.D0/KBT
+           !call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+           IF (NSPIN==1) THEN
+             call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
+             BO = 2.D0*BO
+           ELSE
+             call Canon_DM_PRT_SPIN(ORTHOHUP,ORTHOHDOWN,beta,UPEVECS, DOWNEVECS, UPEVALS, DOWNEVALS,CHEMPOT,16,HDIM)
+           ENDIF
+
+           call deorthomyrho
+           call getdeltaq_resp
+           IF (SPINON==1) call getdeltaspin_resp
+
+           IF (SPINON==0) THEN
+             dq_dv(:,IS) = DELTAQ
+             dr = dq_dv(:,IS)
+
+             ! ri(:,I) = dr + ((1.D0 - MDMIX)/MDMIX)*vi(:,I)
+             ri(:,I) = dr 
+             !du(:) = -MDMIX*ri(:,I)
+             !wi(:,I) = -MDMIX*vi(:,I)
+
+             du(:) = -ri(:,I)
+             wi(:,I) = -vi(:,I)
+             do J = 1,I-1
+                du(:) = du(:) - dot_product(wi(:,J),ri(:,I))*ui(:,J)
+                wi(:,I) = wi(:,I) - dot_product(ui(:,J),vi(:,I))*wi(:,J)
+             enddo
+             ui(:,I) = du/(1.D0 + dot_product(vi(:,I),du))
+           ELSE
+             dq_dv = DELTA_QS 
+             FULL_S(1     :  NDIM,I+NDIM*(IS-1)) = dq_dv(1:NDIM,1)
+             FULL_S(NDIM+1:2*NDIM,I+NDIM*(IS-1)) = dq_dv(1:NDIM,2)
+
+             !FULL_S(1+NDIM*(IS-1):NDIM*IS, I+NDIM*(IS-1)) = dq_dv(1:NDIM,IS)
+           ENDIF
+           !dr(I) = 0.D0
+           dr = 0.D0
+        enddo
+    ENDDO
+!!$OMP END PARALLEL DO
+
+    IF (SPINON==0) THEN
+        FULL_S = 0.D0
+        do I = 1,NATS 
+           FULL_S(I,I) = 1.0D0
+        enddo
+
+        call DGEMM('N','T',NATS,NATS,NATS,1.D0,ui,NATS,wi,NATS,1.D0,FULL_S,NATS)
+        ! update q corresponding to q = q - MATMUL(KK,Res)
+        !DELTAQ = OLDDELTAQS + QMIX*Res
+
+        dspin(:,1) = MATMUL(FULL_S,Res)
+    ELSE
+      FULL_K0 = - FULL_S
+      do I = 1,2*NDIM 
+         FULL_K0(I,I) = FULL_K0(I,I) + 1.0D0
+      enddo
+      
+      CALL Invert(FULL_K0, FULL_S, 2*NDIM)
+      RES = MATMUL(FULL_S, Res)
+      dspin(1:NDIM,1) = (Res(1:NDIM) + RES(1+NDIM:2*NDIM)) !/ 2.D0 !sum
+      dspin(1:NDIM,2) = (Res(1:NDIM) - RES(1+NDIM:2*NDIM)) !/ 2.D0 !delta
+    ENDIF
+
+    IF (SPINON==1) THEN
+      RHOUP   = BO_SAVE(:,:,1)
+      RHODOWN = BO_SAVE(:,:,2)
+      HUP     = H_SAVE(:,:,1)
+      HDOWN   = H_SAVE(:,:,2)
+      H = H_SAVE(:,:,3)
+      ORTHOHUP   = ORTHOH_SAVE(:,:,1)
+      ORTHOHDOWN = ORTHOH_SAVE(:,:,2)
+      DELTASPIN = DELTASPIN_SAVE
+      SUMSPIN = SUMSPIN_SAVE
+    ELSE
+      BO = BO_SAVE(:,:,1)
+      H  = H_SAVE(:,:,1)
+      ORTHOH = ORTHOH_SAVE(:,:,1)
+    ENDIF
+    H0 = H_0
+    FCOUL = FCOUL_SAVE
+    DELTAQ = DELTAQ_SAVE
+    COULOMBV = COULOMBV_SAVE
+
+    DEALLOCATE(RES, DR, VI, WI, UI, DU, DQ_DV, DQ_V, V, RI)
+    DEALLOCATE(DELTAQ_SAVE, COULOMBV_SAVE,H_0, BO_SAVE, H_SAVE)
+    DEALLOCATE(FCOUL_SAVE,ORTHOH_SAVE,SUMSPIN_SAVE,DELTASPIN_SAVE)
+
+  END SUBROUTINE FULLKERNELMIXER
 
   SUBROUTINE KERNELPROPAGATION(MDITER,LL)
     INTEGER, INTENT(IN) :: MDITER,LL
@@ -1079,6 +1292,246 @@ CONTAINS
   !  ORTHOH = ORTHOH_SAVE
   !END SUBROUTINE KERNELMIXER
 
+  SUBROUTINE ADAPTKERNELMIXER(FIRSTCALL,LL)
+    implicit none
+    LOGICAL, INTENT(IN) :: FIRSTCALL
+    INTEGER, INTENT(IN) :: LL
+    INTEGER :: I, J, N, II, JJ, K
+    INTEGER :: NDIM,NDIM2,IS
+
+    REAL(LATTEPREC) :: Nocc, beta, eps
+
+    REAL(LATTEPREC) :: RESNORM, FEL, DTMP
+    INTEGER         :: INFO, RANK
+    REAL(LATTEPREC), ALLOCATABLE :: FO(:,:), FM(:,:),WORK(:)
+    INTEGER,         ALLOCATABLE :: IPIV(:)
+
+    REAL(LATTEPREC), ALLOCATABLE :: Res(:), dr(:), vi(:,:)
+    REAL(LATTEPREC), ALLOCATABLE :: dq_dv(:), dq_v(:), v(:), ri(:,:)
+    REAL(LATTEPREC), ALLOCATABLE :: DELTASPIN_SAVE(:), SUMSPIN_SAVE(:)
+    REAL(LATTEPREC), ALLOCATABLE :: DELTAQ_SAVE(:), COULOMBV_SAVE(:)
+    REAL(LATTEPREC), ALLOCATABLE :: H_0(:,:), BO_SAVE(:,:,:), H_SAVE(:,:,:)
+    REAL(LATTEPREC), ALLOCATABLE :: FCOUL_SAVE(:,:), ORTHOH_SAVE(:,:,:)
+    REAL(LATTEPREC), ALLOCATABLE :: dspin(:,:)
+    REAL(LATTEPREC), ALLOCATABLE :: IDENTRES(:)
+    !
+    NDIM = NATS
+    IF (SPINON==1) NDIM = DELTADIM
+    NDIM2 = NDIM * NSPIN
+    !
+    ALLOCATE(Res(NDIM2),dr(NDIM2),vi(NDIM2,NDIM2))
+    ALLOCATE(dq_dv(NDIM2), dq_v(NDIM), v(NDIM2), ri(NDIM2,NDIM2))
+    ALLOCATE(DELTAQ_SAVE(NATS), COULOMBV_SAVE(NATS))
+    ALLOCATE(H_0(HDIM,HDIM), BO_SAVE(HDIM,HDIM,NSPIN), H_SAVE(HDIM,HDIM,2*(NSPIN-1)+1))
+    ALLOCATE(FCOUL_SAVE(3,NATS),ORTHOH_SAVE(HDIM,HDIM,NSPIN))
+    ALLOCATE(WORK(LL+LL*LL),IDENTRES(NDIM2))
+    ALLOCATE(DELTASPIN_SAVE(DELTADIM),SUMSPIN_SAVE(DELTADIM))
+    ALLOCATE(dspin(NDIM,NSPIN))
+
+    !
+#ifdef PROGRESSON
+     CALL BML_EXPORT_TO_DENSE(BO_BML,BO)
+#elif defined(PROGRESSOFF)
+#endif
+
+    DELTAQ_SAVE = DELTAQ
+    COULOMBV_SAVE = COULOMBV
+    FCOUL_SAVE = FCOUL
+
+    IF (SPINON==1) THEN
+      !SAVE RHOUP/DOWN, H_UP/DOWN
+      !ORTHOHUP/DOWN
+      ORTHOH_SAVE(:,:,1) = ORTHOHUP
+      ORTHOH_SAVE(:,:,2) = ORTHOHDOWN
+      H_SAVE(:,:,1) = HUP
+      H_SAVE(:,:,2) = HDOWN
+      H_SAVE(:,:,3) = H
+      BO_SAVE(:,:,1) = RHOUP
+      BO_SAVE(:,:,2) = RHODOWN
+      DELTASPIN_SAVE = DELTASPIN
+      SUMSPIN_SAVE = SUMSPIN
+    ELSE
+      BO_SAVE(:,:,1)     = BO
+      ORTHOH_SAVE(:,:,1) = ORTHOH
+      H_SAVE(:,:,1)      = H
+    ENDIF
+    H_0 = H0
+    H0 = 0.D0
+
+    !!!
+    !!! Feb 26, 2021
+    !!! important problem, deltaspin's dim is different deltaq's
+    !!! but deltaq can be calculated q_up and q_down
+    !!! so, we have to use q_up/down as variables for spin polarized
+    !!! calculations
+    !!!
+    IF (SPINON==0) THEN
+      Res = DELTAQ - OLDDELTAQS
+      RESNORM = NORM2(RES) / SQRT(DBLE(NATS)) 
+      write(6,*) 'ITER', RESNORM
+    ELSE
+      dr(1:NDIM)        = SUMSPIN(1:NDIM)   - OLDSUMSPIN(1:NDIM)
+      dr(1+NDIM:2*NDIM) = DELTASPIN(1:NDIM) - OLDDELTASPIN(1:NDIM)
+      
+      Res(1:NDIM)        = (dr(1:NDIM) + dr(1+NDIM:2*NDIM)) / 2.D0 ! up
+      Res(1+NDIM:2*NDIM) = (dr(1:NDIM) - dr(1+NDIM:2*NDIM)) / 2.D0 ! down
+      write(6,*) 'ITER', norm2(Res(1:NDIM)) / SQRT(DBLE(NDIM)), &
+                         norm2(Res(1+NDIM:2*NDIM)) / SQRT(DBLE(NDIM)), &
+                         SUM(DELTASPIN(1:NDIM)) 
+    ENDIF
+
+
+    IF (FIRSTCALL) THEN
+       write(6,*) 'Test: pre-condition for SCF mixer!'
+       CALL FULLKERNELMIXER(NDIM, dspin)
+    ELSE
+       write(6,*) 'Test: adaptkernel mixer!'
+      Res = MATMUL(FULL_S, Res) !! FULL_S is the preconditioner
+      dr = Res
+
+      I = 0
+      RANK = 0
+      FEL = 1.D0
+      DO WHILE (FEL > KERNELTOL .AND. RANK <= LL)  !! LL is the number of rank-1 updates  LL = 0 means preconditioning only!
+         I = I + 1
+
+         ! use first half of dr for spin up and the second half for down???
+         vi(:,I) = dr/norm2(dr)
+         do J = 1,I-1
+            vi(:,I) = vi(:,I) - dot_product(vi(:,I),vi(:,J))*vi(:,J)
+         enddo
+         vi(:,I) = vi(:,I)/norm2(vi(:,I))
+         v(:) = vi(:,I)
+         !!!! Calculated dq_dv, which is the response in q(n) from change in input charge n = v
+
+         v = v / norm2(v)
+
+         dq_dv = ZERO
+         IF (SPINON==1) THEN
+           DELTASPIN    = v(1:NDIM)  - v(1+NDIM:2*NDIM)
+           dq_v(1:NDIM) = v(1:NDIM)  + v(1+NDIM:2*NDIM)
+           !!!! get deltaq from deltaspin
+           CALL REDUCE_DELTASPIN(NATS,DELTADIM,dq_v,DELTAQ,1)
+         ELSE
+           dq_v   = v
+           DELTAQ = dq_v
+         ENDIF
+
+         call coulombrspace
+         call coulombewald
+         call addqdep
+         IF (SPINON==1) CALL BLDSPINH
+         call orthomyh
+         Nocc = BNDFIL*float(HDIM)
+         beta = 1.D0/KBT
+
+         IF (SPINON==0) THEN
+           !call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+           call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,18,HDIM)
+           BO = 2.D0*BO
+         ELSE
+           call Canon_DM_PRT_SPIN(ORTHOHUP,ORTHOHDOWN,beta,UPEVECS, DOWNEVECS, UPEVALS, DOWNEVALS,CHEMPOT,18,HDIM)
+         ENDIF
+
+         call deorthomyrho
+         call getdeltaq_resp
+         IF (SPINON==1) call getdeltaspin_resp
+
+         IF (SPINON==0) THEN
+           dq_dv = DELTAQ
+         ELSE
+           dq_dv(1     :  NDIM) = DELTA_QS(1:NDIM,1)
+           dq_dv(1+NDIM:2*NDIM) = DELTA_QS(1:NDIM,2)
+         ENDIF
+
+         dr = dq_dv - v
+         dr = MATMUL(FULL_S, dr)
+         ri(:,I) = dr
+
+         RANK = I
+
+         ALLOCATE(FO(RANK, RANK), FM(RANK, RANK), IPIV(RANK))
+         DO J = 1, RANK
+            DO K = 1, RANK
+              FO(K,J) = DOT_PRODUCT(RI(:,K), RI(:,J))
+            ENDDO
+         ENDDO
+
+         CALL DGETRF(RANK, RANK, FO, RANK, IPIV, INFO)
+         CALL DGETRI(RANK, FO, RANK, IPIV, WORK, LL+LL*LL, INFO)
+
+         FM       = FO
+         DN2DT2   = 0.D0
+         IDENTRES = 0.D0
+         v        = 0.D0
+         DO K = 1,RANK
+         DO J = 1,RANK
+           DTMP = FM(K,J)*dot_product(RI(:,J),RES)
+           IdentRes = IdentRes + DTMP*RI(:,K)
+           v(:) = v(:) - DTMP*VI(:,K)
+         ENDDO
+         ENDDO
+
+         IF (SPINON==0) THEN
+            dspin(:,1) = v(:)
+         ELSE
+            dspin(1:NDIM,1) = (v(1:NDIM) + v(1+NDIM:2*NDIM)) !/ 2.D0
+            dspin(1:NDIM,2) = (v(1:NDIM) - v(1+NDIM:2*NDIM)) !/ 2.D0
+         ENDIF
+
+         FEL = NORM2(IDENTRES - RES) / NORM2(RES)
+         WRITE(6,*) 'ERROR:', I, FEL
+
+         DEALLOCATE(FO, FM, IPIV)
+
+      ENDDO 
+
+    endif
+
+    COULOMBV = COULOMBV_SAVE
+    IF (SPINON==1) THEN
+      RHOUP   = BO_SAVE(:,:,1)
+      RHODOWN = BO_SAVE(:,:,2)
+      HUP     = H_SAVE(:,:,1)
+      HDOWN   = H_SAVE(:,:,2)
+      H = H_SAVE(:,:,3)
+      ORTHOHUP   = ORTHOH_SAVE(:,:,1)
+      ORTHOHDOWN = ORTHOH_SAVE(:,:,2)
+      DELTASPIN = DELTASPIN_SAVE
+      SUMSPIN = SUMSPIN_SAVE
+    ELSE
+      H      = H_SAVE(:,:,1)
+      BO     = BO_SAVE(:,:,1)
+      ORTHOH = ORTHOH_SAVE(:,:,1)
+    ENDIF
+    H0 = H_0
+    FCOUL = FCOUL_SAVE
+    DELTAQ = DELTAQ_SAVE
+
+    IF (RANK >= LL ) THEN
+       WRITE(6,*) 'Update kernel for mixer!'
+       CALL FULLKERNELMIXER(NDIM, dspin)
+    ENDIF
+    
+    IF (SPINON==1) THEN
+      !DELTASPIN = OLDDELTASPIN + QMIX * (Res(1:NDIM) - Res(1+NDIM:2*NDIM))/2.d0
+      !SUMSPIN = OLDSUMSPIN + QMIX * (Res(1:NDIM) + Res(1+NDIM:2*NDIM))/2.d0
+      !DELTASPIN = DELTASPIN + dspin(1:NDIM,2)
+      !SUMSPIN = SUMSPIN + dspin(1:NDIM,1)
+
+      DELTASPIN = OLDDELTASPIN + dspin(1:NDIM,2)
+      SUMSPIN = OLDSUMSPIN + dspin(1:NDIM,1)
+
+    ELSE
+      DELTAQ = OLDDELTAQS !+ QMIX * Res(1:NDIM)
+      DELTAQ = DELTAQ + dspin(1:NDIM,1)
+    ENDIF
+
+    DEALLOCATE(RES, DR, VI, DQ_DV, DQ_V, V, RI)
+    DEALLOCATE(DELTAQ_SAVE, COULOMBV_SAVE,H_0, BO_SAVE, H_SAVE, dspin)
+    DEALLOCATE(FCOUL_SAVE,ORTHOH_SAVE,WORK,IDENTRES,SUMSPIN_SAVE, DELTASPIN_SAVE)
+  END SUBROUTINE ADAPTKERNELMIXER
+
 !!! ANDERS CHANGE ADD NEW SUBROUTINE
   SUBROUTINE DMKERNELPROPAGATION(PITER)
     INTEGER, INTENT(IN) :: PITER
@@ -1200,7 +1653,7 @@ CONTAINS
     ALLOCATE(X(HDIM,HDIM), YY(HDIM,HDIM), ORTHOH_SAVE(HDIM,HDIM))
     ALLOCATE(Delta_DO(HDIM,HDIM), nDelta_DO(HDIM,HDIM),Delta_DS(HDIM,HDIM))
     ALLOCATE(H_1(HDIM,HDIM),H1(HDIM,HDIM), dU(HDIM,HDIM))
-    !    !
+    !
     DELTAQ_SAVE = DELTAQ
     COULOMBV_SAVE = COULOMBV
     FCOUL_SAVE = FCOUL
