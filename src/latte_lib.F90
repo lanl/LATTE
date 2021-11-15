@@ -107,7 +107,7 @@ CONTAINS
   !! \brief Note: All units are LATTE units by default. See https://github.com/losalamos/LATTE/blob/master/Manual/LATTE_manual.pdf
   !!
   SUBROUTINE LATTE(NTYPES, TYPES, CR_IN, MASSES_IN, XLO, XHI, XY, XZ, YZ, FTOT_OUT, &
-       MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIAL_INOUT, NEWSYSTEM, EXISTERROR_INOUT, FNAME)
+       MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIAL_INOUT, Q_OUT, NEWSYSTEM, EXISTERROR_INOUT, FNAME)
 
     USE CONSTANTS_MOD, ONLY: EXISTERROR
 
@@ -123,7 +123,7 @@ CONTAINS
     REAL(LATTEPREC), INTENT(IN)  :: CR_IN(:,:),VEL_IN(:,:), MASSES_IN(:),XLO(3),XHI(3)
     REAL(LATTEPREC), INTENT(IN)  :: DT_IN, XY, XZ, YZ
     REAL(LATTEPREC), INTENT(OUT) :: FTOT_OUT(:,:), VENERG
-    REAL(LATTEPREC), INTENT(OUT) :: VIRIAL_INOUT(6)
+    REAL(LATTEPREC), INTENT(OUT) :: VIRIAL_INOUT(6), Q_OUT(:)
     INTEGER, INTENT(IN) ::  NTYPES, TYPES(:), MAXITER_IN
     LOGICAL(1), INTENT(INOUT) :: EXISTERROR_INOUT
     LOGICAL :: ANIMATEEXISTS
@@ -179,11 +179,11 @@ CONTAINS
           CALL READCONTROLS
        ENDIF
 
-       IF(VERBOSE <= 0)THEN
-          OPEN(UNIT=6, FILE="/dev/null", FORM="formatted")
-       ELSE
-          OPEN(UNIT=6, FILE=OUTFILE, FORM="formatted")
-       ENDIF
+!       IF(VERBOSE <= 0)THEN
+!          OPEN(UNIT=6, FILE="/dev/null", FORM="formatted")
+!       ELSE
+!          OPEN(UNIT=6, FILE=OUTFILE, FORM="formatted")
+!       ENDIF
 
        IF(VERBOSE >= 1)THEN
           WRITE(*,*)"# The log file for latte_lib"
@@ -747,6 +747,7 @@ CONTAINS
 
        LIBINIT = .TRUE.
        NEWSYSTEM = 0 !Setting newsystem back to 0.
+       Q_OUT= DELTAQ
 
 #ifdef PROGRESSON
        IF(MOD(LIBCALLS,WRTFREQ) == 0)THEN
