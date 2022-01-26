@@ -704,8 +704,8 @@ CONTAINS
 
       IF(COMPUTEKERNEL)THEN
 #ifdef PROGRESSON
-        !CALL PARALLELFULLKERNELPROPAGATION(MDITER)
-        CALL FULLKERNELPROPAGATION(MDITER)
+        CALL PARALLELFULLKERNELPROPAGATION(MDITER)
+        !CALL FULLKERNELPROPAGATION(MDITER)
 #else
         CALL FULLKERNELPROPAGATION(MDITER)
 #endif
@@ -735,19 +735,19 @@ CONTAINS
       FEL = 1.D0
 
 ! the progress for spinon=1 is not working 
-!#ifdef PROGRESSON
-!      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptham_bml)
-!      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptrho_bml)
-!      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,zq_bml)
-!      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,zqt_bml)
-!      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptaux_bml)
-!      call bml_multiply(zmat_bml,evecs_bml,zq_bml, 1.0d0,0.0d0,NUMTHRESH)
-!      call bml_transpose(zq_bml,zqt_bml)
-!      ALLOCATE(NUMEL(NATS))
-!      ALLOCATE(DUMMY_ARRAY(NATS))
-!      NUMEL = 0.0d0
-!      DUMMY_ARRAY = 1
-!#endif
+#ifdef PROGRESSON
+      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptham_bml)
+      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptrho_bml)
+      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,zq_bml)
+      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,zqt_bml)
+      call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptaux_bml)
+      call bml_multiply(zmat_bml,evecs_bml,zq_bml, 1.0d0,0.0d0,NUMTHRESH)
+      call bml_transpose(zq_bml,zqt_bml)
+      ALLOCATE(NUMEL(NATS))
+      ALLOCATE(DUMMY_ARRAY(NATS))
+      NUMEL = 0.0d0
+      DUMMY_ARRAY = 1
+#endif
 
       RANK = 0
       DO WHILE ((FEL > KERNELTOL) .AND. (RANK <= LL))  !! LL is the number of rank-1 updates  LL = 0 means preconditioning only!
@@ -785,15 +785,15 @@ CONTAINS
         IF (SPINON==1) CALL BLDSPINH
 
 !        mlsi = time_mls()
-!#ifdef PROGRESSON
-!        ! does not work for spinon=1
-!        call bml_import_from_dense(LT%bml_type, H, ham_bml, NUMTHRESH, HDIM)
-!        call bml_multiply(zqt_bml,ham_bml,ptaux_bml,1.0_dp,0.0_dp,NUMTHRESH)
-!        call bml_multiply(ptaux_bml,zq_bml,ptham_bml,1.0_dp,0.0_dp,NUMTHRESH)
-!#else
-        call orthomyh
-!#endif        
-!        write(*,*)"Time for orthomyh at rankN",time_mls() - mlsi
+#ifdef PROGRESSON
+        ! does not work for spinon=1
+        call bml_import_from_dense(LT%bml_type, H, ham_bml, NUMTHRESH, HDIM)
+        call bml_multiply(zqt_bml,ham_bml,ptaux_bml,1.0_dp,0.0_dp,NUMTHRESH)
+        call bml_multiply(ptaux_bml,zq_bml,ptham_bml,1.0_dp,0.0_dp,NUMTHRESH)
+#else
+       call orthomyh
+#endif        
+        write(*,*)"Time for orthomyh at rankN",time_mls() - mlsi
 
         Nocc = BNDFIL*float(HDIM)
         beta = 1.D0/KBT
@@ -823,14 +823,14 @@ CONTAINS
 #endif             
         write(*,*)"Time for deorthomyrho at rankN",time_mls() - mlsi
 
-!        mlsi = time_mls()
-!#ifdef PROGRESSON
-!        call prg_get_charges(ptrho_bml, over_bml, NORBINDEX, DELTAQ, numel,&
-!             &dummy_array, hdim, numthresh)
-!#else
-        call getdeltaq_resp
-!#endif             
-!        write(*,*)"Time for getdeltaq_resp at rankN",time_mls() - mlsi
+        mlsi = time_mls()
+#ifdef PROGRESSON
+        call prg_get_charges(ptrho_bml, over_bml, NORBINDEX, DELTAQ, numel,&
+             &dummy_array, hdim, numthresh)
+#else
+       call getdeltaq_resp
+#endif             
+        write(*,*)"Time for getdeltaq_resp at rankN",time_mls() - mlsi
         
         IF (SPINON==1) call getdeltaspin_resp
 
@@ -883,13 +883,13 @@ CONTAINS
 
       ENDDO
 
-!#ifdef PROGRESSON
-!      call bml_deallocate(ptrho_bml)
-!      call bml_deallocate(zq_bml)
-!      call bml_deallocate(zqt_bml)
-!      call bml_deallocate(ptaux_bml)
-!      call bml_deallocate(ptham_bml)
-!#endif
+#ifdef PROGRESSON
+      call bml_deallocate(ptrho_bml)
+      call bml_deallocate(zq_bml)
+      call bml_deallocate(zqt_bml)
+      call bml_deallocate(ptaux_bml)
+      call bml_deallocate(ptham_bml)
+#endif
 
     COULOMBV = COULOMBV_SAVE
     IF (SPINON==1) THEN
