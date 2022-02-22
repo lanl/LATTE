@@ -2,9 +2,10 @@
 # Compilation and link flags for LATTE
 #
 
+MY_PATH=$(shell pwd)
+
 # Precision - double or single
 PRECISION = DOUBLE
-#PRECISION = SINGLE
 
 # Make the latte library
 # AR and RUNLIB executable default path to compile 
@@ -14,13 +15,15 @@ AR = /usr/bin/ar cq
 RANLIB = /usr/bin/ranlib
 
 # Use PROGRESS and BML libraries
-PROGRESS = OFF
-PROGRESS_PATH= $(HOME)/qmd-progress/install/lib
-BML_PATH= $(HOME)/bml/install/lib
+PROGRESS = ON
+PROGRESS_PATH= $(MY_PATH)/../../qmd-progress/install/lib64
+BML_PATH= $(MY_PATH)/../../bml/install/lib64
+MAGMA_PATH = $(MY_PATH)/../../magma
+METIS_PATH = $(MY_PATH)/../../metis-5.1.0/
+
 
 # Use METIS library for graph partitioning
 METIS = OFF
-METIS_PATH= $(HOME)/metis/metis-5.1.0/install
 
 # GPU available - OFF or ON
 GPUOPT = OFF
@@ -35,35 +38,19 @@ MPIOPT = OFF
 # CPU Fortran options
 #
 
-#For GNU compiler:
-#FC = mpif90
 FC = gfortran
 FCL = $(FC)
-FFLAGS = -O3 -fopenmp -cpp
-#FFLAGS =  -fast -Mpreprocess -mp
+
+FFLAGS =  -ffree-line-length-none -fopenmp -lpthread 
+
 LINKFLAG = -fopenmp
 
-#For intel compiler:
-#FC = ifort
-#FCL = $(FC)
-#FFLAGS =  -O3 -fpp -qopenmp
-#LINKFLAG = -qopenmp
-#LIB = -mkl=parallel
-
-#GNU BLAS/LAPACK libraries:
-LIB = -llapack -lblas
-
-#Intel MKL BLAS/LAPACK libraries:
-#LIB = -Wl,--no-as-needed -L${MKLROOT}/lib/intel64 \
-# -lmkl_lapack95_lp64 -lmkl_gf_lp64 -lmkl_gnu_thread -lmkl_core \
-# -lmkl_gnu_thread -lmkl_core -ldl -lpthread -lm
-
-#Alternative flags for MKL:
-#LIB += -mkl=parallel
-
-#Other BLAS/LAPACK vendors:
-#LIB = -framework Accelerate
-#LIB = -L/usr/projects/hpcsoft/toss2/common/acml/5.3.1/gfortran64/lib -lacml
+#BLAS/LAPACK libraries:
+LIB = -fopenmp -lpthread 
+LIB += -L${CUDA_LIB} -L/usr/local/cuda-10.2/lib64 -I${CUDA_INCLUDE} -lcublas -lcudart
+LIB += -L${CUDA_TOOLKIT_ROOT_DIR}/lib64/ -lcublas -lcusolver 
+LIB += -L${MAGMA_PATH}/lib -lmagma 
+LIB += -fopenmp -lpthread  -llapack -lblas
 
 # Uncomment for coverage
 #CVR = OFF
@@ -72,22 +59,20 @@ ifeq ($(CVR), ON)
 	LINKFLAG += -fprofile-arcs -ftest-coverage
 endif
 
-ifeq ($(PROGRESS), ON)
+#ifeq ($(PROGRESS), ON)
 	LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml_fortran -lbml
 	FFLAGS += -I$(BML_PATH)/../include -I$(PROGRESS_PATH)/../include
-endif
+#endif
 
-ifeq ($(GRAPH), ON) 
+#ifeq ($(GRAPH), ON) 
 	LIB += -L$(METIS_PATH)/lib -lmetis
 	FFLAGS += -I$(METIS_PATH)/include
-endif
-
-#DBCSR_LIB = -L/home/cawkwell/cp2k/lib/cawkwell/popt -lcp2k_dbcsr_lib
-#DBCSR_MOD = -I/home/cawkwell/cp2k/obj/cawkwell/popt
+#endif
 
 #
 # GPU options
 #
 
-GPU_CUDA_LIB = -L/opt/cudatoolkit-5.5/lib64 -lcublas -lcudart
-GPU_ARCH = sm_20 
+GPU_CUDA_LIB = -L${OLCF_CUDA_ROOT}/lib64/ -lcublas -lcudart
+
+GPU_ARCH = sm_70 
