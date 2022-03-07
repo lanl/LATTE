@@ -89,9 +89,11 @@ SUBROUTINE BOEVECSPRG
 
   ELSE ! This bit is for zero electronic temperature
 
-     IF (GRAPHON == 1) THEN
+     IF (GRAPHON /= 1) THEN
        CALL PRG_BUILD_DENSITY_T0(ORTHOH_BML,ORTHOBO_BML,NUMTHRESH,BNDFIL,EVALS)
      ELSE
+       write(6,*) '==DEBUG-ZY: graph solver is used!'
+
        ! Construct the graph out ot H^2 and apply threshold
        CALL BML_ZERO_MATRIX(BML_MATRIX_ELLPACK, BML_ELEMENT_REAL, &
          LATTEPREC, HDIM, HDIM, G_BML)
