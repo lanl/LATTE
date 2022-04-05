@@ -33,18 +33,21 @@ SUBROUTINE BOEVECSPRG
 
   USE BML
   USE PRG_DENSITYMATRIX_MOD
+  USE PRG_GRAPHSOLVER_MOD
   USE NONOARRAYPROGRESS
 
   IMPLICIT NONE
 
   INTEGER :: I, J, K
   INTEGER :: ITER, BREAKLOOP, LOOPTARGET
+  INTEGER :: nparts
   REAL(LATTEPREC) :: OCCTARGET, OCC, FDIRAC, DFDIRAC
   REAL(LATTEPREC) :: OCCERROR, SHIFTCP, FDIRACARG, EXPARG
   REAL(LATTEPREC), PARAMETER :: MAXSHIFT = ONE
   REAL(LATTEPREC) :: EBAND, QMIXORIG
   REAL(LATTEPREC) :: S, OCCLOGOCC_ELECTRONS, OCCLOGOCC_HOLES
-  !TYPE(BML_MATRIX_T) :: EVECS_BML
+  REAL(LATTEPREC), ALLOCATABLE :: TRACE(:)
+  TYPE(BML_MATRIX_T) :: G_BML
 
   IF (VERBOSE .GE. 1) WRITE(*,*) "In BOEVECSPRG ..."
 
@@ -86,8 +89,26 @@ SUBROUTINE BOEVECSPRG
 
   ELSE ! This bit is for zero electronic temperature
 
-     CALL PRG_BUILD_DENSITY_T0(ORTHOH_BML,ORTHOBO_BML,NUMTHRESH,BNDFIL,EVALS)
-     CALL BML_DEALLOCATE(ORTHOH_BML)
+     IF (GRAPHON /= 1) THEN
+       CALL PRG_BUILD_DENSITY_T0(ORTHOH_BML,ORTHOBO_BML,NUMTHRESH,BNDFIL,EVALS)
+     ELSE
+       write(6,*) '==DEBUG-ZY: graph solver is used!'
+
+       ! Construct the graph out ot H^2 and apply threshold
+       CALL BML_ZERO_MATRIX(BML_MATRIX_ELLPACK, BML_ELEMENT_REAL, &
+         LATTEPREC, HDIM, HDIM, G_BML)
+       !call bml_multiply_x2(ORTHOH_bml,g_bml,1.0d-2,trace)
+       !call bml_threshold(g_bml, 10.0d0)
+       call bml_multiply_x2(ORTHOH_bml,g_bml,numthresh,trace)
+       call bml_threshold(g_bml, numthresh)
+
+       E0 = CHEMPOT
+       
+       call prg_build_densityGP_T0(ORTHOH_BML, g_bml, ORTHOBO_bml, numthresh, bndfil, E0, graph_nparts, verbose)
+       !call bml_print_matrix("rhoGP",ORTHOBO_bml,0,10,0,10)
+       CALL BML_DEALLOCATE(G_BML)
+       CALL BML_DEALLOCATE(ORTHOH_BML)
+     ENDIF 
 
   ENDIF
 

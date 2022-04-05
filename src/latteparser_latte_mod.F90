@@ -123,7 +123,7 @@ CONTAINS
     USE FERMICOMMON
 
     IMPLICIT NONE
-    INTEGER, PARAMETER :: NKEY_CHAR = 8, NKEY_INT = 55, NKEY_RE = 27, NKEY_LOG = 7
+    INTEGER, PARAMETER :: NKEY_CHAR = 8, NKEY_INT = 57, NKEY_RE = 27, NKEY_LOG = 7
     CHARACTER(LEN=*) :: FILENAME
 
     !Library of keywords with the respective defaults.
@@ -142,7 +142,7 @@ CONTAINS
          'KON=','COMPFORCE=','DOSFIT=','INTS2FIT=','NFITSTEP=','QFIT=',& !39
          'PPFITON=','ALLFITON=','PPSTEP=','BISTEP=','PP2FIT=','BINT2FIT=','PPNMOL=',& !46
          'PPNGEOM=','PARREP=','VERBOSE=','MIXER=','RESTARTLIB=','FREEZE=','xControl=', & !53
-         'KERNELSCHEME=','PLUSDON=']
+         'KERNELSCHEME=','PLUSDON=', 'GRAPHON=', 'GRAPH_NPARTS=']
     INTEGER :: VALVECTOR_INT(NKEY_INT) = (/ &
          1,0,6,1,1,1, &
          1,0,0,1,0,250, &
@@ -152,7 +152,7 @@ CONTAINS
          0,1,0,1,5000,0,&
          0,0,500,500,2,6,10,&
          200,0,1,0,0,0,-1,  &
-         0,0 /)
+         0,0,0,4 /)
 
     CHARACTER(LEN=50), PARAMETER :: KEYVECTOR_RE(NKEY_RE) = [CHARACTER(LEN=50) :: &
          'CGTOL=','KBT=','SPINTOL=','ELEC_ETOL=','ELEC_QTOL=','COULACC=','COULCUT=', 'COULR1=',& !8
@@ -527,6 +527,10 @@ CONTAINS
 
     !Plus D
     PLUSDON= VALVECTOR_INT(55)
+
+    !GRAPHON    
+    GRAPHON = VALVECTOR_INT(56)
+    GRAPH_NPARTS = VALVECTOR_INT(57)
 
     ! DFTB+U
     DFTBU = VALVECTOR_LOG(4)
