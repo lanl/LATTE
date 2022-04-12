@@ -89,5 +89,5 @@ endif
 # GPU options
 #
 
-GPU_CUDA_LIB = -L/opt/cudatoolkit-5.5/lib64 -lcublas -lcudart
-GPU_ARCH = sm_20 
+GPU_CUDA_LIB = -L/opt/cuda/lib64 -lcublas -lcudart -lgomp
+GPU_ARCH = sm_35 

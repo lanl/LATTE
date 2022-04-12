@@ -21,7 +21,7 @@
 
 #include "Matrix.h"
 
-extern "C" void mmtest_(int *hdim, void *bo_pointer, void *h_pointer) {
-  runmatmult(*hdim, (double *)bo_pointer, (double *)h_pointer)
+extern "C" void mmlatte_(int *hdim, void *bo_pointer, void *h_pointer) {
+  runmatmult(*hdim, (double *)bo_pointer, (double *)h_pointer);
     }
 
