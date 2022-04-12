@@ -23,7 +23,7 @@ METIS = OFF
 METIS_PATH= $(HOME)/metis/metis-5.1.0/install
 
 # GPU available - OFF or ON
-GPUOPT = ON
+GPUOPT = OFF
 
 # Using DBCSR library from cp2k? OFF or ON
 DBCSR_OPT = OFF
