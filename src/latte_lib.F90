@@ -44,6 +44,7 @@ MODULE LATTE_LIB
   USE PRG_PULAYMIXER_MOD
   USE PRG_EXTRAS_MOD
   USE MIXER_MOD
+  USE PRG_DOS_MOD
   USE BML
 #endif
 
@@ -106,8 +107,14 @@ CONTAINS
   !!
   !! \brief Note: All units are LATTE units by default. See https://github.com/losalamos/LATTE/blob/master/Manual/LATTE_manual.pdf
   !!
+
+#ifdef MDION
+  SUBROUTINE LATTE(NTYPES, TYPES, CR_IN, BOX_IN, FTOT_OUT, &
+       MAXITER_IN, VENERG, STRESS_INOUT, NEWSYSTEM, EXISTERROR_INOUT, SYMBOLS, FNAME)
+#else
   SUBROUTINE LATTE(NTYPES, TYPES, CR_IN, MASSES_IN, XLO, XHI, XY, XZ, YZ, FTOT_OUT, &
        MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIAL_INOUT, NEWSYSTEM, EXISTERROR_INOUT, FNAME)
+#endif
 
     USE CONSTANTS_MOD, ONLY: EXISTERROR
 
@@ -119,11 +126,19 @@ CONTAINS
     REAL :: TARRAY(2), RESULT, SYSTDIAG, SYSTPURE
     REAL(LATTEPREC) :: DBOX
     REAL(LATTEPREC) :: MLSI, LUMO, HOMO
-
-    REAL(LATTEPREC), INTENT(IN)  :: CR_IN(:,:),VEL_IN(:,:), MASSES_IN(:),XLO(3),XHI(3)
-    REAL(LATTEPREC), INTENT(IN)  :: DT_IN, XY, XZ, YZ
-    REAL(LATTEPREC), INTENT(OUT) :: FTOT_OUT(:,:), VENERG
+    REAL(LATTEPREC), INTENT(IN)  :: CR_IN(:,:)
+#ifdef MDION
+    REAL(LATTEPREC), INTENT(IN)  :: BOX_IN(:,:)
+    CHARACTER(LEN=*), INTENT(IN) :: SYMBOLS(:)
+    REAL(LATTEPREC), INTENT(OUT) :: STRESS_INOUT(3,3)
+#else
+    REAL(LATTEPREC), INTENT(IN)  :: DT_IN
+    REAL(LATTEPREC), INTENT(IN) :: VEL_IN(:,:), MASSES_IN(:)
+    REAL(LATTEPREC), INTENT(IN)  :: XY, XZ, YZ, XLO(3),XHI(3)
     REAL(LATTEPREC), INTENT(OUT) :: VIRIAL_INOUT(6)
+#endif
+    REAL(LATTEPREC), INTENT(OUT) :: FTOT_OUT(:,:), VENERG
+    REAL(LATTEPREC) ::  DIPOLEMAG
     INTEGER, INTENT(IN) ::  NTYPES, TYPES(:), MAXITER_IN
     LOGICAL(1), INTENT(INOUT) :: EXISTERROR_INOUT
     LOGICAL :: ANIMATEEXISTS
@@ -134,6 +149,7 @@ CONTAINS
     TYPE(SYSTEM_TYPE) :: SY
 #endif
 
+  
 #ifdef MPI_ON
     INTEGER :: IERR, STATUS(MPI_STATUS_SIZE), NUMPROCS
     CALL MPI_INIT( IERR )
@@ -201,6 +217,9 @@ CONTAINS
 
        IF (RESTART .EQ. 0) THEN
 
+#ifdef MDION
+          BOX = BOX_IN
+#else
           BOX = 0.0d0
           BOX(1,1) = xhi(1) - xlo(1)
           BOX(2,1) = XY
@@ -208,7 +227,7 @@ CONTAINS
           BOX(3,1) = XZ
           BOX(3,2) = YZ
           BOX(3,3) = xhi(3) - xlo(3)
-
+#endif
           IF(VERBOSE >= 1)THEN
              WRITE(*,*)"Lattice vectors:"
              WRITE(*,*)"a=",BOX(1,1),BOX(1,2),BOX(1,3)
@@ -224,9 +243,15 @@ CONTAINS
           IF (.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
           CR = CR_IN
 
-          IF(VERBOSE >= 1)WRITE(*,*)"Converting masses to symbols ..."
           IF(.NOT. ALLOCATED(ATELE)) ALLOCATE(ATELE(NATS))
-          CALL MASSES2SYMBOLS(TYPES,NTYPES,MASSES_IN,NATS,ATELE)
+#ifdef MDION  
+            DO I = 1, NATS
+              ATELE(I) = TRIM(ADJUSTL(SYMBOLS(TYPES(I))))
+            ENDDO
+#else            
+            IF(VERBOSE >= 1)WRITE(*,*)"Converting masses to symbols ..."
+            CALL MASSES2SYMBOLS(TYPES,NTYPES,MASSES_IN,NATS,ATELE)
+#endif          
 
           !Forces, charges and element pointers are allocated in readcr
           CALL READCR
@@ -301,6 +326,9 @@ CONTAINS
 
     ELSE
 
+#ifdef MDION
+       BOX = BOX_IN
+#else
        BOX = 0.0d0
        BOX(1,1) = xhi(1) - xlo(1)
        BOX(2,1) = XY
@@ -308,6 +336,7 @@ CONTAINS
        BOX(3,1) = XZ
        BOX(3,2) = YZ
        BOX(3,3) = xhi(3) - xlo(3)
+#endif
 
        IF(VERBOSE >= 1)THEN
           WRITE(*,*)"Lattice vectors:"
@@ -539,6 +568,10 @@ CONTAINS
        ENDIF
 
        CALL WRTRESTART(0)
+      
+#ifdef PROGRESSON 
+       call PRG_WRITE_TDOS(EVALS, 0.01d0, 1000, -10.0d0, 10.0d0, "DOS.dat")
+#endif
 
        IF (CONTROL .EQ. 1) THEN
           !  CALL DEALLOCATEDIAG
@@ -597,6 +630,7 @@ CONTAINS
 
 #endif
 
+
        !     CALL ASSESSOCC
 
        IF (ELECTRO .EQ. 1) CALL DEALLOCATECOULOMB
@@ -615,13 +649,17 @@ CONTAINS
 
        IF(VERBOSE >= 1)WRITE(*,*)"Inside MDON= 1 and RELAXME= 0 ..."
 
+#ifdef MDIOFF
        DT = DT_IN ! Get the integration step from the hosting code.
+#endif
 
+#ifdef MDIOFF
        V = VEL_IN/1000.0d0  !Convert from Ang/ps to Ang/fs
+#endif
 
        !Control for implicit geometry optimization.
        !This will need to be replaced by a proper flag.
-       IF (DT_IN == 0) THEN
+       IF (DT == 0) THEN
           IF (VERBOSE >= 1) WRITE(*,*)"NOTE: DT = 0 => FULLQCONV = 1"
           IF (VERBOSE >= 1) WRITE(*,*)"NOTE: DT = 0 => MDMIX = QMIX"
           FULLQCONV = 1
@@ -750,9 +788,39 @@ CONTAINS
           VIRIAL = VIRIAL - VIRPUL + VIRSCOUL
        ENDIF
 
-       !       CALL GETPRESSURE
+!       CALL GETPRESSURE
+#ifdef MDION
+       SYSVOL = ABS(BOX(1,1)*(BOX(2,2)*BOX(3,3) - BOX(3,2)*BOX(2,3)) + &
+       BOX(1,2)*(BOX(2,1)*BOX(3,3) - BOX(3,1)*BOX(2,3)) + &
+       BOX(1,3)*(BOX(2,1)*BOX(3,2) - BOX(3,1)*BOX(2,2)))
 
+       STRTEN(1) = ( -VIRIAL(1) + KETEN(1)/F2V ) / SYSVOL
+       STRTEN(2) = ( -VIRIAL(2) + KETEN(2)/F2V ) / SYSVOL
+       STRTEN(3) = ( -VIRIAL(3) + KETEN(3)/F2V ) / SYSVOL
+       STRTEN(4) = ( -VIRIAL(4) + KETEN(4)/F2V ) / SYSVOL
+       STRTEN(5) = ( -VIRIAL(5) + KETEN(5)/F2V ) / SYSVOL
+       STRTEN(6) = ( -VIRIAL(6) + KETEN(6)/F2V ) / SYSVOL
+
+       STRTEN = STRTEN * TOGPA
+
+       PRESSURE = (STRTEN(1) + STRTEN(2) + STRTEN(3))/THREE
+       STRESS_INOUT(1,1) = STRTEN(1)
+       STRESS_INOUT(2,2) = STRTEN(2)
+       STRESS_INOUT(3,3) = STRTEN(3)
+       
+       STRESS_INOUT(1,2) = STRTEN(4)
+       STRESS_INOUT(2,1) = STRTEN(4)
+
+       STRESS_INOUT(1,3) = STRTEN(5)
+       STRESS_INOUT(3,1) = STRTEN(5)
+
+       STRESS_INOUT(2,3) = STRTEN(6)
+       STRESS_INOUT(3,2) = STRTEN(6)
+
+       WRITE(*,*)"PRESSURE",PRESSURE
+#else
        VIRIAL_INOUT = -VIRIAL
+#endif
 
        LIBINIT = .TRUE.
        NEWSYSTEM = 0 !Setting newsystem back to 0.
@@ -766,15 +834,17 @@ CONTAINS
              SY%COORDINATE = CR
              SY%SYMBOL = ATELE
              SY%LATTICE_VECTOR = BOX
-             SY%NET_CHARGE = DELTAQ
+             !SY%NET_CHARGE = DELTAQ
+             if(LIBCALLS == 0) MAXDN2DT = abs(maxval(DN2DT2(:,1)))
+             SY%NET_CHARGE = abs(DN2DT2(:,1))
              CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT_IN,"trajectory","pdb")
              CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT_IN,"trajectory","xyz")
 
              WRITE(*,*)"Writing trajectory into trajectory.xyz ..."
              IF(LIBCALLS .EQ. 0)THEN
-                OPEN(UNIT=20,FILE="trajectory.xyz",STATUS='unknown')
+                OPEN(UNIT=20,FILE="trajectory_ext.xyz",STATUS='unknown')
              ELSE
-                OPEN(UNIT=20,FILE="trajectory.xyz",POSITION='append',STATUS='old')
+                OPEN(UNIT=20,FILE="trajectory_ext.xyz",POSITION='append',STATUS='old')
              ENDIF
              !Extended xyz file.
              WRITE(20,*)NATS
@@ -801,7 +871,7 @@ CONTAINS
              WRITE(20,*)NATS
              WRITE(20,*) 'Lattice="',BOX(1,1),BOX(1,2),BOX(1,3),&
                   &BOX(2,1),BOX(2,2),BOX(2,3),BOX(3,1),BOX(3,2),BOX(3,3),'"',&
-                  &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT_IN
+                  &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT
              DO I=1,NATS
                 WRITE(20,*)ATELE(I),CR(1,I),CR(2,I),CR(3,I),V(1,I),V(2,I),V(3,I),&
                      &FTOT(1,I),FTOT(2,I),FTOT(3,I),-DELTAQ(I)
@@ -834,12 +904,10 @@ CONTAINS
        ENDIF
 
 #ifdef PROGRESSON
-       !  IF(VERBOSE >= 1)THEN
-       !    CALL GETDIPOLE(DIPOLEMAG,DIPOLEVECOUT=DIPOLEVECOUT)
-       !    WRITE(*,*)"Dipole Magnitude = DIPOLEMAG"
-       !    WRITE(*,*)"Dipole Vector:"
-       !    WRITE(*,*)DIPOLEVECOUT(1),DIPOLEVECOUT(2),DIPOLEVECOUT(3)
-       !  ENDIF
+         IF(VERBOSE >= 3)THEN
+           CALL GETDIPOLE(DIPOLEMAG)
+           WRITE(*,*)"Dipole Magnitude=",DIPOLEMAG
+         ENDIF
 #endif
 
        FLUSH(6) !To force writing to file at every call
