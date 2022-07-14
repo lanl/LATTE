@@ -1,4 +1,4 @@
-// dummy proxy for DMI-LATTE driver
+// dummy proxy for MDI-LATTE driver
 
 // Syntax: mpirun -np P driver switch args ...
 // Switches:
@@ -123,16 +123,6 @@ engine_wrapper (void *mpicomm_ptr, MDI_Comm mdicomm, void *class_object)
   MDI_Send_Command (">NATOMS", mdicomm);
   MDI_Send (&natoms, 1, MDI_INT, mdicomm);
 
-  // Send number of types
-  ntypes = 2;
-  MDI_Send_Command (">NTYPES", mdicomm);
-  MDI_Send (&ntypes, 1, MDI_INT, mdicomm);
-
-  // Send atoms symbols for every species
-  symbols = "C O O";
-  MDI_Send_Command (">SYMBOLS", mdicomm);
-  MDI_Send (symbols, 100, MDI_CHAR, mdicomm);
-
   // Send atomic numbers for every atom
   elements = new int[natoms];
   elements[0] = 6;
@@ -141,13 +131,6 @@ engine_wrapper (void *mpicomm_ptr, MDI_Comm mdicomm, void *class_object)
   MDI_Send_Command (">ELEMENTS", mdicomm);
   MDI_Send (elements, natoms, MDI_INT, mdicomm);
     
-  // Send a vector of lenght natms with the types
-  types = new int[natoms];
-  types[0] = 1;
-  types[1] = 2;
-  //MDI_Send_Command (">TYPES", mdicomm);
-  //MDI_Send (types, natoms, MDI_INT, mdicomm);
-
   // Send the coordinates 
   coords = new double[3 * natoms];
   coords[0] = 0.0;
@@ -165,15 +148,15 @@ engine_wrapper (void *mpicomm_ptr, MDI_Comm mdicomm, void *class_object)
 
   // Send cell parameters
   cell = new double[9];
-  cell[0] = 1.0;		//xlo(1) 
-  cell[1] = 0.2;		//xhi(1) 
-  cell[2] = 0.3;		//xlo(2) 
-  cell[3] = 0.0;		//xhi(2)
-  cell[4] = 2.0;		//xlo(3)
-  cell[5] = 1.0;		//xhi(3) 
-  cell[6] = 0.0;		//xy
-  cell[7] = 0.0;		//xz 
-  cell[8] = 3.0;		//yz 
+  cell[0] = 10.0;		 
+  cell[1] = 0.2;		 
+  cell[2] = 0.3;		 
+  cell[3] = 0.0;		
+  cell[4] = 20.0;		
+  cell[5] = 1.0;		 
+  cell[6] = 0.0;		
+  cell[7] = 0.0;		
+  cell[8] = 30.0;		
   MDI_Send_Command (">CELL", mdicomm);
   MDI_Send (cell, 9, MDI_DOUBLE, mdicomm);
 
