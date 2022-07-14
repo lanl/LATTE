@@ -128,15 +128,15 @@ endif
 ifeq ($(MAKELIB), ON) 
 ifeq ($(GPUOPT), ON)
 		$(AR) ../liblatte.a latte_lib.o $(XMYMODULES) $(XMYSUBS) 
-		$(AR) ../liblattetools.a latte_lib_tools.o $(XMYMODULES) $(XMYSUBS) 
+		#$(AR) ../liblattetools.a latte_lib_tools.o $(XMYMODULES) $(XMYSUBS) 
 		$(RANLIB) ../liblatte.a  
-		$(RANLIB) ../liblattetools.a  
+		#$(RANLIB) ../liblattetools.a  
 		$(FC) $(FFLAGS) -c latte_c_bind.F90  $(GPU_LINKFLAG) $(GPU_LIB)
 else
 		$(AR) ../liblatte.a latte_lib.o $(XMYMODULES) $(XMYSUBS)
-		$(AR) ../liblattetools.a latte_lib_tools.o $(XMYMODULES) $(XMYSUBS) 
+		#$(AR) ../liblattetools.a latte_lib_tools.o $(XMYMODULES) $(XMYSUBS) 
 		$(RANLIB) ../liblatte.a
-		$(RANLIB) ../liblattetools.a  
+		#$(RANLIB) ../liblattetools.a  
 		$(FC) $(FFLAGS) -c latte_c_bind.F90
 endif
 endif
