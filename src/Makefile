@@ -144,7 +144,7 @@ endif
 ifeq ($(MDI), ON)
 ifeq ($(SHARED), ON)
 		(echo "Building shared lib")
-		$(FC) $(FFLAGS) -shared -fpic  -o ../liblatte_mdi.so  $(XMYMODULES) $(XMYSUBS) $(LIB)
+		$(FC) $(FFLAGS) $(PPFLAGS) -shared -fpic  -o ../liblatte_mdi.so  $(XMYMODULES) $(XMYSUBS) $(LIB)
 endif
 endif
 
