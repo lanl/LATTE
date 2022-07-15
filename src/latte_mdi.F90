@@ -57,7 +57,7 @@ MODULE LATTE_MDI
   INTEGER :: NEWSYSTEM = 0
   REAL(DP) :: BOX(3,3)
 
-  !> Element symbol
+  !> Element symbols
   !!
   character(2), parameter :: MDI_element_symbol(103) = [character(2) :: &
        "H" ,          "He" ,         "Li" ,         "Be" ,         &
@@ -145,8 +145,8 @@ CONTAINS
     CHARACTER(LEN=1024) :: OPTION
     CHARACTER(LEN=1024) :: MDI_OPTION, OTHER_OPTIONS
     LOGICAL :: MDI_OPTION_FOUND
+    
     ! how to declare other_options as vector of strings?
-
     MDI_OPTION_FOUND = .FALSE.
     CALL MDI_PLUGIN_GET_ARGC(ARGC,IERR)
 
@@ -173,10 +173,10 @@ CONTAINS
     END IF
 
     ! start LATTE running as an MDI engine
-
     CALL MDI_ENGINE_INVOKE(MDI_OPTION,OTHER_OPTIONS)
 
     MDI_PLUGIN_INIT_LATTE_MDI = 0
+
   END FUNCTION MDI_PLUGIN_INIT_LATTE_MDI
 
   ! -----------------------------------------------------------------
@@ -296,7 +296,7 @@ CONTAINS
     CASE("EXIT")
       EXITFLAG = .TRUE.
 
-      ! Receving the name of the latte file
+    ! Receving the name of the latte file
     CASE(">FNAME")
       FNAME = ""
       CALL MDI_RECV(FNAME, LNAME, MDI_CHAR, MDICOMM, IERR)
@@ -308,19 +308,13 @@ CONTAINS
       CALL MPI_BCAST(FNAME, LNAME, MPI_CHAR, 0, WORLD, IERR)
       WRITE(*,*)"Name of latte file ",FNAME
 
-      ! Receiving the number of atoms
+    ! Receiving the number of atoms
     CASE( ">NATOMS" )
       CALL MDI_RECV(NATOMS, 1, MDI_INT, MDICOMM, IERR)
       CALL MPI_BCAST(NATOMS, 1, MPI_INT, 0, WORLD, IERR)
       WRITE(*,*)"Number of atoms ",NATOMS
 
-      ! Receiving the number of types (number of different elements)
-    CASE( ">NTYPES" )
-      CALL MDI_RECV(NTYPES, 1, MDI_INT, MDICOMM, IERR)
-      CALL MPI_BCAST(NTYPES, 1, MPI_INT, 0, WORLD, IERR)
-      WRITE(*,*)"Number of species/atom types",NTYPES
-
-      ! Receiving element atomic numbers
+    ! Receiving element atomic numbers
     CASE( ">ELEMENTS" )
       ALLOCATE(ELEMENTS(NATOMS))
       CALL MDI_RECV(ELEMENTS, NATOMS, MDI_INT, MDICOMM, IERR)
@@ -330,29 +324,8 @@ CONTAINS
       write(*,*)TYPES
       write(*,*)SYMB
 
-      ! Receiving the types. (types(1) = 1 <=> Atom 1 is of type 1
-    CASE( ">TYPES")
-      ALLOCATE(TYPES(NATOMS))
-      CALL MDI_RECV(TYPES, NATOMS, MDI_INT, MDICOMM, IERR)
-      CALL MPI_BCAST(TYPES, NATOMS, MPI_INT, 0, WORLD, IERR)
-      WRITE(*,*)"Type for each atom",TYPES
-      ALLOCATE(MASSES(NTYPES))
-      MASSES = 0.0 !Latte will know the masses if the symbols are passed
-      !MASSES(1) = 12.01_dp; MASSES(2) = 15.999400_dp
-
-      ! Receivng the symbols for each type. In case symbols are not
-      ! known, latte can identify them based on their masses
-      ! Symbols are passed as a large character which is then
-      ! vectorzed.
-    CASE( ">SYMBOLS" )
-      ALLOCATE(SYMB(NATOMS))
-      CALL MDI_RECV(SYMBLIST, 100, MDI_CHAR, MDICOMM, IERR)
-      CALL MPI_BCAST(SYMBLIST, 100, MPI_CHAR, 0, WORLD, IERR)
-      READ(SYMBLIST,*,IOSTAT=IOS)(SYMB(I),I=1,NTYPES)
-      WRITE(*,*)"List of elements in the system ",SYMB
-
-      ! Receiving the coordinate. A 3*nats auxiliary array is used
-      ! to pass the coordinated.
+    ! Receiving the coordinate. A 3*nats auxiliary array is used
+    ! to pass the coordinated.
     CASE( ">COORDS" )
       ALLOCATE(AUX(3*NATOMS))
       IF(.NOT. ALLOCATED(COORDS)) ALLOCATE(COORDS(3,NATOMS))
@@ -365,8 +338,8 @@ CONTAINS
       ENDDO
       DEALLOCATE(AUX)
 
-      ! Receiving the cell. The format that is passed is the same
-      ! as the one used by lammps.
+    ! Receiving the cell. The format that is passed is the same
+    ! as the one used by lammps.
     CASE( ">CELL" )
       ALLOCATE(CELL(9))
       CALL MDI_RECV(CELL, 9, MDI_DOUBLE, MDICOMM, IERR)
@@ -384,7 +357,7 @@ CONTAINS
       WRITE(*,*)CELL_DISPL(:)
       DEALLOCATE(CELL_DISPL)
 
-      ! This command will run latte, with the info received
+    ! This command will run latte, with the info received
     CASE( "RUN" )
       MAXITER = -1
       IF(.NOT. ALLOCATED(FORCES)) ALLOCATE(FORCES(3,NATOMS))
