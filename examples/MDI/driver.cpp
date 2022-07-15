@@ -183,7 +183,7 @@ engine_wrapper (void *mpicomm_ptr, MDI_Comm mdicomm, void *class_object)
       coords[3] = coords[3] + 0.1;	// Stretch the CO molecule
       MDI_Send_Command (">COORDS", mdicomm);
       MDI_Send (coords, 3 * natoms, MDI_DOUBLE, mdicomm);
-      MDI_Send_Command ("RUN", mdicomm);
+      //MDI_Send_Command ("RUN", mdicomm);
 
       // Receive forces
       MDI_Send_Command ("<FORCES", mdicomm);
@@ -204,6 +204,40 @@ engine_wrapper (void *mpicomm_ptr, MDI_Comm mdicomm, void *class_object)
       printf ("Stress Tensor %f\n", stress[0]);
 
     }
+  
+  // Send the number of atoms and trigger new run 
+  natoms = 3;
+  MDI_Send_Command (">NATOMS", mdicomm);
+  MDI_Send (&natoms, 1, MDI_INT, mdicomm);
+
+  // Run LATTE 
+  for (int i = 0; i < 5; i++)
+    {
+      coords[3] = coords[3] + 0.1;  // Stretch the CO molecule
+      MDI_Send_Command (">COORDS", mdicomm);
+      MDI_Send (coords, 3 * natoms, MDI_DOUBLE, mdicomm);
+      //MDI_Send_Command ("RUN", mdicomm);
+
+      // Receive forces
+      MDI_Send_Command ("<FORCES", mdicomm);
+      MDI_Recv (forces, 3 * natoms, MDI_DOUBLE, mdicomm);
+      MPI_Bcast (forces, 3 * natoms, MPI_DOUBLE, 0, world_engine);
+      printf ("Forces %f %f\n", forces[0], forces[3]);
+
+      // Receive potential energy
+      MDI_Send_Command ("<PE", mdicomm);
+      MDI_Recv (venerg, 1, MDI_DOUBLE, mdicomm);
+      MPI_Bcast (venerg, 1, MPI_DOUBLE, 0, world_engine);
+      printf ("Potential Energy %f\n", venerg[0]);
+
+      // Receive stress tensor energy
+      MDI_Send_Command ("<STRESS", mdicomm);
+      MDI_Recv (stress, 9, MDI_DOUBLE, mdicomm);
+      MPI_Bcast (stress, 9, MPI_DOUBLE, 0, world_engine);
+      printf ("Stress Tensor %f\n", stress[0]);
+
+    }
+
 
   MDI_Send_Command ("EXIT", mdicomm);
 

@@ -54,8 +54,10 @@ MODULE LATTE_MDI
   CHARACTER(2), ALLOCATABLE :: SYMB(:)
   INTEGER, ALLOCATABLE :: ELEMENTS(:)
   DOUBLE PRECISION, ALLOCATABLE :: COORDS(:,:), MASSES(:), FORCES(:,:)
+  DOUBLE PRECISION, ALLOCATABLE :: STRESS(:), BOX(:,:)
   INTEGER :: NEWSYSTEM = 0
-  REAL(DP) :: BOX(3,3)
+  CHARACTER(1) :: STATE
+  LOGICAL :: FIRSTSYSTEM = .true.
 
   !> Element symbols
   !!
@@ -284,12 +286,15 @@ CONTAINS
 
     !Latte_lib specifics
     INTEGER, PARAMETER :: DP = KIND(1.0D0)
-    REAL(DP) :: STRESS(3,3)
     INTEGER ::  MAXITER, NEWSYSTEM, I, J, IOS
     LOGICAL(1) :: EXISTERROR
     REAL(DP), ALLOCATABLE ::  VEL(:,:), CHARGES(:)
     CHARACTER(2), ALLOCATABLE :: SYMBOLS(:)
     INTEGER, PARAMETER :: LNAME = 100
+
+    WRITE(*,*)"MDISTATE = ",STATE
+    WRITE(*,*)"FIRSTSYSYTEM = ",FIRSTSYSTEM
+    WRITE(*,*)"NEWSYSTEM = ",NEWSYSTEM
 
     SELECT CASE(TRIM(COMMAND))
 
@@ -298,6 +303,7 @@ CONTAINS
 
     ! Receving the name of the latte file
     CASE(">FNAME")
+      WRITE(*,*)"Receiving FNAME"
       FNAME = ""
       CALL MDI_RECV(FNAME, LNAME, MDI_CHAR, MDICOMM, IERR)
       IF(IERR > 0)THEN
@@ -310,23 +316,38 @@ CONTAINS
 
     ! Receiving the number of atoms
     CASE( ">NATOMS" )
+      WRITE(*,*)"Receiving NATOMS"
       CALL MDI_RECV(NATOMS, 1, MDI_INT, MDICOMM, IERR)
       CALL MPI_BCAST(NATOMS, 1, MPI_INT, 0, WORLD, IERR)
       WRITE(*,*)"Number of atoms ",NATOMS
+      IF(FIRSTSYSTEM)THEN 
+        NEWSYSTEM = 0
+        FIRSTSYSTEM = .false.
+      ELSE
+        NEWSYSTEM = 1
+      ENDIF
+      STATE = ">"
 
     ! Receiving element atomic numbers
     CASE( ">ELEMENTS" )
+      WRITE(*,*)"Receiving ELEMENTS"
+      IF(NEWSYSTEM == 1) DEALLOCATE(ELEMENTS)
       ALLOCATE(ELEMENTS(NATOMS))
       CALL MDI_RECV(ELEMENTS, NATOMS, MDI_INT, MDICOMM, IERR)
       CALL MPI_BCAST(ELEMENTS, NATOMS, MPI_INT, 0, WORLD, IERR)
-      WRITE(*,*)" Atomic numbers each atom",ELEMENTS
       CALL GET_TYPES_AND_SYMBOLS(ELEMENTS,TYPES,SYMB)
-      write(*,*)TYPES
-      write(*,*)SYMB
+      IF(FIRSTSYSTEM)THEN
+        NEWSYSTEM = 0
+        FIRSTSYSTEM = .false.
+      ELSE
+        NEWSYSTEM = 1
+      ENDIF
+      STATE = ">"
 
     ! Receiving the coordinate. A 3*nats auxiliary array is used
     ! to pass the coordinated.
     CASE( ">COORDS" )
+      WRITE(*,*)"Receiving COORDS"
       ALLOCATE(AUX(3*NATOMS))
       IF(.NOT. ALLOCATED(COORDS)) ALLOCATE(COORDS(3,NATOMS))
       CALL MDI_RECV(AUX, 3*NATOMS, MDI_DOUBLE, MDICOMM, IERR)
@@ -337,60 +358,121 @@ CONTAINS
         COORDS(3,I) = AUX(3*(I-1)+3)
       ENDDO
       DEALLOCATE(AUX)
+      STATE = ">"
 
     ! Receiving the cell. The format that is passed is the same
     ! as the one used by lammps.
     CASE( ">CELL" )
+      WRITE(*,*)"Receiving CELL"
       ALLOCATE(CELL(9))
+      IF(.not.ALLOCATED(BOX)) ALLOCATE(BOX(3,3))
       CALL MDI_RECV(CELL, 9, MDI_DOUBLE, MDICOMM, IERR)
       CALL MPI_BCAST(CELL, 9, MPI_DOUBLE, 0, WORLD, IERR)
       BOX(1,1) = CELL(1); BOX(1,2) = CELL(2); BOX(1,3) = CELL(3)
       BOX(2,1) = CELL(4); BOX(2,2) = CELL(5); BOX(2,3) = CELL(6)
       BOX(3,1) = CELL(7); BOX(3,2) = CELL(8); BOX(3,3) = CELL(9)
       DEALLOCATE(CELL)
+      STATE = ">"
 
+    ! Receiving the cell displacement.
     CASE( ">CELL_DISPL" )
+      WRITE(*,*)"Receiving CELL_DISP"
       ALLOCATE(CELL_DISPL(3))
       CALL MDI_RECV(CELL_DISPL, 3, MDI_DOUBLE, MDICOMM, IERR)
       CALL MPI_BCAST(CELL_DISPL, 3, MPI_DOUBLE, 0, WORLD, IERR)
       WRITE(*,*)"WARNING: CELL_DISL is not used within LATTE"
-      WRITE(*,*)CELL_DISPL(:)
       DEALLOCATE(CELL_DISPL)
+      STATE = ">"
 
     ! This command will run latte, with the info received
     CASE( "RUN" )
       MAXITER = -1
       IF(.NOT. ALLOCATED(FORCES)) ALLOCATE(FORCES(3,NATOMS))
       FORCES = 0.0_DP
-      ALLOCATE(VEL(3,NATOMS))
-
+      iF(.NOT. ALLOCATED(STRESS)) ALLOCATE(STRESS(9))
       CALL LATTE(NTYPES, TYPES, COORDS, BOX, FORCES, &
            MAXITER, VENERG, STRESS, NEWSYSTEM, EXISTERROR, SYMB, FNAME)
-
       NEWSYSTEM = 0
 
-      ! This command will clear the latte memory and recompute all the
-      ! matrices
+    ! This command will clear the latte memory and recompute all the
+    ! matrices
     CASE ( "NEWSYSTEM" )
       NEWSYSTEM = 1
 
-      ! Passing back the forces using a 3*nats auxiliary array.
+    ! Passing back the forces using a 3*nats auxiliary array.
     CASE ( "<FORCES" )
-      ALLOCATE(AUX(3*NATOMS))
-      DO I = 1,NATOMS
-        AUX(3*(I-1) + 1) = FORCES(1,I)
-        AUX(3*(I-1) + 2) = FORCES(2,I)
-        AUX(3*(I-1) + 3) = FORCES(3,I)
-      ENDDO
-      CALL MDI_SEND(AUX, 3*NATOMS, MDI_DOUBLE, MDICOMM, IERR)
-      DEALLOCATE(AUX)
+      MAXITER = -1
+      IF(.NOT. ALLOCATED(ELEMENTS)) STOP "EROOR: ELEMENTS were not received yet ..."
+      IF(.NOT. ALLOCATED(COORDS)) STOP "EROOR: COORDS were not received yet ..."
+      IF(.NOT. ALLOCATED(BOX)) STOP "EROOR: CELL was not received yet ..."
+      WRITE(*,*)"Sending FORCES"
+      IF(.NOT. ALLOCATED(FORCES)) ALLOCATE(FORCES(3,NATOMS))
+      FORCES = 0.0_DP
+      iF(.NOT. ALLOCATED(STRESS)) ALLOCATE(STRESS(9))
+      IF ( STATE == ">" ) THEN
+        CALL LATTE(NTYPES, TYPES, COORDS, BOX, FORCES, &
+        MAXITER, VENERG, STRESS, NEWSYSTEM, EXISTERROR, SYMB, FNAME)
+        NEWSYSTEM = 0
+        ALLOCATE(AUX(3*NATOMS))
+        DO I = 1,NATOMS
+          AUX(3*(I-1) + 1) = FORCES(1,I)
+          AUX(3*(I-1) + 2) = FORCES(2,I)
+          AUX(3*(I-1) + 3) = FORCES(3,I)
+        ENDDO
+        CALL MDI_SEND(AUX, 3*NATOMS, MDI_DOUBLE, MDICOMM, IERR)
+        DEALLOCATE(AUX)
+        STATE = "<" 
+      ELSE
+        ALLOCATE(AUX(3*NATOMS))
+        DO I = 1,NATOMS
+          AUX(3*(I-1) + 1) = FORCES(1,I)
+          AUX(3*(I-1) + 2) = FORCES(2,I)
+          AUX(3*(I-1) + 3) = FORCES(3,I)
+        ENDDO
+        CALL MDI_SEND(AUX, 3*NATOMS, MDI_DOUBLE, MDICOMM, IERR)
+        DEALLOCATE(AUX)
+      ENDIF
 
-      ! Passing the potential energy
+    ! Passing the potential energy
     CASE ( "<PE" )
-      WRITE(*,*)"VENERG on engine", VENERG
-      CALL MDI_SEND(VENERG, 1, MDI_DOUBLE, MDICOMM, IERR)
+      MAXITER = -1
+      IF(.NOT. ALLOCATED(ELEMENTS)) STOP "EROOR: ELEMENTS were not received yet ..."
+      IF(.NOT. ALLOCATED(COORDS)) STOP "EROOR: COORDS were not received yet ..."
+      IF(.NOT. ALLOCATED(BOX)) STOP "EROOR: CELL was not received yet ..."
+      IF(.NOT. ALLOCATED(FORCES)) ALLOCATE(FORCES(3,NATOMS))
+      FORCES = 0.0_DP
+      iF(.NOT. ALLOCATED(STRESS)) ALLOCATE(STRESS(9))
+      IF ( STATE == ">" ) THEN
+        CALL LATTE(NTYPES, TYPES, COORDS, BOX, FORCES, &
+        MAXITER, VENERG, STRESS, NEWSYSTEM, EXISTERROR, SYMB, FNAME)
+        NEWSYSTEM = 0
+        CALL MDI_SEND(VENERG, 1, MDI_DOUBLE, MDICOMM, IERR)
+        STATE = "<"
+      ELSE
+        CALL MDI_SEND(VENERG, 1, MDI_DOUBLE, MDICOMM, IERR)
+      ENDIF
 
-      ! Print out the variables that were received
+    ! Passing stress tensor 
+    CASE ( "<STRESS" )
+      MAXITER = -1
+      IF(.NOT. ALLOCATED(ELEMENTS)) STOP "EROOR: ELEMENTS were not received yet ..."
+      IF(.NOT. ALLOCATED(COORDS)) STOP "EROOR: COORDS were not received yet ..."
+      IF(.NOT. ALLOCATED(BOX)) STOP "EROOR: CELL was not received yet ..."
+      IF(.NOT. ALLOCATED(FORCES)) ALLOCATE(FORCES(3,NATOMS))
+      FORCES = 0.0_DP
+      iF(.NOT. ALLOCATED(STRESS)) ALLOCATE(STRESS(9))
+      IF ( STATE == ">" ) THEN
+        CALL LATTE(NTYPES, TYPES, COORDS, BOX, FORCES, &
+        MAXITER, VENERG, STRESS, NEWSYSTEM, EXISTERROR, SYMB, FNAME)
+        NEWSYSTEM = 0
+        CALL MDI_SEND(STRESS, 9, MDI_DOUBLE, MDICOMM, IERR)
+        STATE = "<"
+      ELSE
+        CALL MDI_SEND(STRESS, 9, MDI_DOUBLE, MDICOMM, IERR)
+      ENDIF
+      write(*,*)"STRESS tensor", STRESS
+      
+    ! Print out the variables that were received
     CASE( "ECHO" )
       write(*,*)"Name of latte file ", FNAME
       write(*,*)"Number of atoms ", NATOMS

@@ -1,1 +1,3 @@
-mpirun -np 2 driver -mdi "-method LINK -name PS -role DRIVER -plugin_path $HOME/LATTE" -plugs NULL latte_mdi NULL -p 1 1 0 0 1 1 0 0 -w 0 0 1 1 0 0 -e 9 -f "mylatte.in"                                                                
+mpirun -np 2 driver -mdi "-method LINK -name PS -role DRIVER -plugin_path $HOME/LATTE" -plugs NULL latte_mdi NULL -p 1 1 0 0 1 1 0 0 -w 0 0 1 1 0 0 -e 9 -f "mylatte.in" 
+
+#mpirun -np 1 lmp_mpi -mdi "-name LMP1 -role DRIVER -method MPI" -log log.aimd.driver.mpi.1 -in in.aimd.driver : -np 1 latte_double -mdi "-name LATTE -role ENGINE -method MPI" -log log.latte -in in.latte                                                               
