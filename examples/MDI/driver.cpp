@@ -199,8 +199,8 @@ engine_wrapper (void *mpicomm_ptr, MDI_Comm mdicomm, void *class_object)
 
       // Receive stress tensor energy
       MDI_Send_Command ("<STRESS", mdicomm);
-      MDI_Recv (stress, 1, MDI_DOUBLE, mdicomm);
-      MPI_Bcast (stress, 1, MPI_DOUBLE, 0, world_engine);
+      MDI_Recv (stress, 9, MDI_DOUBLE, mdicomm);
+      MPI_Bcast (stress, 9, MPI_DOUBLE, 0, world_engine);
       printf ("Stress Tensor %f\n", stress[0]);
 
     }
