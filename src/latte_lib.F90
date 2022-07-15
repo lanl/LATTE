@@ -92,6 +92,13 @@ CONTAINS
   !! \param VIRIAL_INOUT Components of the second virial coefficient.
   !! \param NEWSYSTEM Tells LATTE if a new system is passed.
   !! \param EXISTERROR_INOUT Returns an error flag (.true.) to the hosting code.
+  !! \param SYMBOLS (Valid for MDI) Element symbols passed by the application code. SYMBOLS(1) gives 
+  !!        the symbol of the type 1. SYMBOLS(TYPES(3)) tells what is the element symbol
+  !!        of atom 3. Note: MDI passes the element atomic numbers which is translated to SYMBOLS 
+  !!        and TYPES within latte_mdi.F90.
+  !! \param BOX_IN (Valid for MDI) System PBC slab edge vectors. The first vector's coordinates 
+  !!        are BOX(1,1:3)
+  !! \param STRESS_INOUT (Valid for MDI) Symetric stress tensor passed by latte to the host code.
   !!
   !! \brief This routine will be used load call latte_lib from a C/C++ program:
   !!
@@ -104,6 +111,7 @@ CONTAINS
   !! \verbatim
   !!      BOX(1,1) = XHI(1) - XLO(1); ...
   !! \endverbatim
+  !! 
   !!
   !! \brief Note: All units are LATTE units by default. See https://github.com/losalamos/LATTE/blob/master/Manual/LATTE_manual.pdf
   !!
@@ -804,6 +812,10 @@ CONTAINS
        STRTEN = STRTEN * TOGPA
 
        PRESSURE = (STRTEN(1) + STRTEN(2) + STRTEN(3))/THREE
+! 1
+!   2 
+!     3
+
        STRESS_INOUT(1,1) = STRTEN(1)
        STRESS_INOUT(2,2) = STRTEN(2)
        STRESS_INOUT(3,3) = STRTEN(3)
@@ -837,8 +849,8 @@ CONTAINS
              !SY%NET_CHARGE = DELTAQ
              if(LIBCALLS == 0) MAXDN2DT = abs(maxval(DN2DT2(:,1)))
              SY%NET_CHARGE = abs(DN2DT2(:,1))
-             CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT_IN,"trajectory","pdb")
-             CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT_IN,"trajectory","xyz")
+             CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT,"trajectory","pdb")
+             CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT,"trajectory","xyz")
 
              WRITE(*,*)"Writing trajectory into trajectory.xyz ..."
              IF(LIBCALLS .EQ. 0)THEN
@@ -850,7 +862,7 @@ CONTAINS
              WRITE(20,*)NATS
              WRITE(20,*) 'Lattice="',BOX(1,1),BOX(1,2),BOX(1,3),&
                   &BOX(2,1),BOX(2,2),BOX(2,3),BOX(3,1),BOX(3,2),BOX(3,3),'"',&
-                  &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT_IN
+                  &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT
              DO I=1,NATS
                 WRITE(20,*)ATELE(I),CR(1,I),CR(2,I),CR(3,I),V(1,I),V(2,I),V(3,I),&
                      &FTOT(1,I),FTOT(2,I),FTOT(3,I),-DELTAQ(I)
