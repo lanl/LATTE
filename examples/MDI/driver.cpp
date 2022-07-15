@@ -136,11 +136,11 @@ engine_wrapper (void *mpicomm_ptr, MDI_Comm mdicomm, void *class_object)
   coords[0] = 0.0;
   coords[1] = 0.0;
   coords[2] = 0.0;
-  coords[3] = 0.8;
+  coords[3] = 1.6;
   coords[4] = 0.0;
   coords[5] = 0.0;
-  coords[6] = 0.8;
-  coords[7] = 2.0;
+  coords[6] = 1.6;
+  coords[7] = 4.0;
   coords[8] = 0.0;
 
   MDI_Send_Command (">COORDS", mdicomm);
