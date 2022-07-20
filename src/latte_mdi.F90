@@ -458,16 +458,6 @@ CONTAINS
       FORCES = 0.0_DP
       iF(.NOT. ALLOCATED(STRESS)) ALLOCATE(STRESS(9))
       IF ( STATE == ">" ) THEN
-        WRITE(*,*)"DEBUG!!!!!!!!!!!!!!!!!!"
-        WRITE(*,*)"NTYPES",NTYPES
-        WRITE(*,*)"TYPES",TYPES
-        WRITE(*,*)"SYMB",SYMB
-        WRITE(*,*)"COORDS",COORDS
-        WRITE(*,*)"BOX",BOX
-        WRITE(*,*)"NEWSYSTEM",NEWSYSTEM
-        WRITE(*,*)"DEBUG!!!!!!!!!!!!!!!!!!"
-        
-
         CALL LATTE(NTYPES, TYPES, COORDS, BOX, FORCES, &
         MAXITER, VENERG, STRESS, NEWSYSTEM, EXISTERROR, SYMB, FNAME)
         NEWSYSTEM = 0
