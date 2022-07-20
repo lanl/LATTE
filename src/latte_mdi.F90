@@ -303,9 +303,9 @@ CONTAINS
     REAL(dp), PARAMETER :: Ang2Bohr = 1.0_dp/0.529177_dp
 
 
-    WRITE(*,*)"MDISTATE = ",STATE
-    WRITE(*,*)"FIRSTSYSYTEM = ",FIRSTSYSTEM
-    WRITE(*,*)"NEWSYSTEM = ",NEWSYSTEM
+    !WRITE(*,*)"MDISTATE = ",STATE
+    !WRITE(*,*)"FIRSTSYSYTEM = ",FIRSTSYSTEM
+    !WRITE(*,*)"NEWSYSTEM = ",NEWSYSTEM
 
     SELECT CASE(TRIM(COMMAND))
 
@@ -314,7 +314,7 @@ CONTAINS
 
     ! Receving the name of the latte file
     CASE(">FNAME")
-      WRITE(*,*)"Receiving FNAME"
+      !WRITE(*,*)"Receiving FNAME"
       FNAME = ""
       CALL MDI_RECV(FNAME, LNAME, MDI_CHAR, MDICOMM, IERR)
       IF(IERR > 0)THEN
@@ -323,14 +323,14 @@ CONTAINS
         STOP
       ENDIF
       CALL MPI_BCAST(FNAME, LNAME, MPI_CHAR, 0, WORLD, IERR)
-      WRITE(*,*)"Name of latte file ",FNAME
+      !WRITE(*,*)"Name of latte file ",FNAME
 
     ! Receiving the number of atoms
     CASE( ">NATOMS" )
-      WRITE(*,*)"Receiving NATOMS"
+      !WRITE(*,*)"Receiving NATOMS"
       CALL MDI_RECV(NATOMS, 1, MDI_INT, MDICOMM, IERR)
       CALL MPI_BCAST(NATOMS, 1, MPI_INT, 0, WORLD, IERR)
-      WRITE(*,*)"Number of atoms ",NATOMS
+      !WRITE(*,*)"Number of atoms ",NATOMS
       IF(FIRSTSYSTEM)THEN 
         NEWSYSTEM = 0
         FIRSTSYSTEM = .false.
@@ -341,7 +341,7 @@ CONTAINS
 
     ! Receiving element atomic numbers
     CASE( ">ELEMENTS" )
-      WRITE(*,*)"Receiving ELEMENTS"
+      !WRITE(*,*)"Receiving ELEMENTS"
       IF(NEWSYSTEM == 1) DEALLOCATE(ELEMENTS)
       IF(.NOT. ALLOCATED(ELEMENTS)) ALLOCATE(ELEMENTS(NATOMS))
       CALL MDI_RECV(ELEMENTS, NATOMS, MDI_INT, MDICOMM, IERR)
@@ -358,7 +358,7 @@ CONTAINS
     ! Receiving the coordinate. A 3*nats auxiliary array is used
     ! to pass the coordinated.
     CASE( ">COORDS" )
-      WRITE(*,*)"Receiving COORDS"
+      !WRITE(*,*)"Receiving COORDS"
       ALLOCATE(AUX(3*NATOMS))
       IF(.NOT. ALLOCATED(COORDS)) ALLOCATE(COORDS(3,NATOMS))
       CALL MDI_RECV(AUX, 3*NATOMS, MDI_DOUBLE, MDICOMM, IERR)
@@ -375,7 +375,7 @@ CONTAINS
     ! Receiving the cell. The format that is passed is the same
     ! as the one used by lammps.
     CASE( ">CELL" )
-      WRITE(*,*)"Receiving CELL"
+      !WRITE(*,*)"Receiving CELL"
       ALLOCATE(CELL(9))
       IF(.not.ALLOCATED(BOX)) ALLOCATE(BOX(3,3))
       CALL MDI_RECV(CELL, 9, MDI_DOUBLE, MDICOMM, IERR)
@@ -389,12 +389,12 @@ CONTAINS
 
     ! Receiving the cell displacement.
     CASE( ">CELL_DISPL" )
-      WRITE(*,*)"Receiving CELL_DISP"
+      !WRITE(*,*)"Receiving CELL_DISP"
       ALLOCATE(CELL_DISPL(3))
       CELL_DISPL = CELL_DISPL/Ang2Bohr
       CALL MDI_RECV(CELL_DISPL, 3, MDI_DOUBLE, MDICOMM, IERR)
       CALL MPI_BCAST(CELL_DISPL, 3, MPI_DOUBLE, 0, WORLD, IERR)
-      WRITE(*,*)"WARNING: CELL_DISL is not used within LATTE"
+      !WRITE(*,*)"WARNING: CELL_DISL is not used within LATTE"
       DEALLOCATE(CELL_DISPL)
       STATE = ">"
 
@@ -419,7 +419,7 @@ CONTAINS
       IF(.NOT. ALLOCATED(ELEMENTS)) STOP "ERROR: ELEMENTS were not received yet ..."
       IF(.NOT. ALLOCATED(COORDS)) STOP "ERROR: COORDS were not received yet ..."
       IF(.NOT. ALLOCATED(BOX)) STOP "ERROR: CELL was not received yet ..."
-      WRITE(*,*)"Sending FORCES"
+      !WRITE(*,*)"Sending FORCES"
       IF(.NOT. ALLOCATED(FORCES)) ALLOCATE(FORCES(3,NATOMS))
       FORCES = 0.0_DP
       IF(.NOT. ALLOCATED(STRESS)) ALLOCATE(STRESS(9))
