@@ -262,6 +262,7 @@ CONTAINS
 #endif          
 
           !Forces, charges and element pointers are allocated in readcr
+
           CALL READCR
 
           FLUSH(6)
