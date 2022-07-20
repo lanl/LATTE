@@ -121,6 +121,14 @@ SUBROUTINE READCR
 
   SUMMASS = ZERO
 
+       !Forces, charges and element pointers are allocated in readcr
+        WRITE(*,*)"DEBUG IN LATTE!!!!!!!!!!!!!!!!!!"
+        WRITE(*,*)"NATS",NATS
+        WRITE(*,*)"ELEMPOINTER",ELEMPOINTER
+        WRITE(*,*)"MASS",MASS
+        WRITE(*,*)"DEBUG!!!!!!!!!!!!!!!!!!"
+
+
   DO I = 1, NATS
      SUMMASS = SUMMASS + MASS(ELEMPOINTER(I))
      WRITE(*,*)MASS(ELEMPOINTER(I))
