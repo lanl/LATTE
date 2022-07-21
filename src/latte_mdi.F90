@@ -303,9 +303,9 @@ CONTAINS
     REAL(dp), PARAMETER :: Ang2Bohr = 1.0_dp/0.529177_dp
 
 
-    WRITE(*,*)"MDISTATE = ",STATE
-    WRITE(*,*)"FIRSTSYSYTEM = ",FIRSTSYSTEM
-    WRITE(*,*)"NEWSYSTEM = ",NEWSYSTEM
+    !WRITE(*,*)"MDISTATE = ",STATE
+    !WRITE(*,*)"FIRSTSYSYTEM = ",FIRSTSYSTEM
+    !WRITE(*,*)"NEWSYSTEM = ",NEWSYSTEM
 
     SELECT CASE(TRIM(COMMAND))
 
@@ -375,7 +375,6 @@ CONTAINS
       ENDDO
       DEALLOCATE(AUX)
       STATE = ">"
-      WRITE(*,*)"COORDSMDI",COORDS
 
     ! Receiving the cell. The format that is passed is the same
     ! as the one used by lammps.
@@ -424,7 +423,7 @@ CONTAINS
       IF(.NOT. ALLOCATED(ELEMENTS)) STOP "ERROR: ELEMENTS were not received yet ..."
       IF(.NOT. ALLOCATED(COORDS)) STOP "ERROR: COORDS were not received yet ..."
       IF(.NOT. ALLOCATED(BOX)) STOP "ERROR: CELL was not received yet ..."
-      WRITE(*,*)"Sending FORCES"
+     ! WRITE(*,*)"Sending FORCES"
       IF(.NOT. ALLOCATED(FORCES)) ALLOCATE(FORCES(3,NATOMS))
       IF(.NOT. ALLOCATED(STRESS)) ALLOCATE(STRESS(9))
       IF ( STATE == ">" ) THEN
@@ -449,7 +448,6 @@ CONTAINS
         ENDDO
         CALL MDI_SEND(AUX, 3*NATOMS, MDI_DOUBLE, MDICOMM, IERR)
       ENDIF
-      WRITE(*,*)"FORCESINTERFACE",AUX(1:6)
       DEALLOCATE(AUX)
 
     ! Passing the potential energy
@@ -492,7 +490,7 @@ CONTAINS
         STRESS = STRESS*eV2H/(Ang2Bohr**3)
         CALL MDI_SEND(STRESS, 9, MDI_DOUBLE, MDICOMM, IERR)
       ENDIF
-      write(*,*)"STRESS tensor", STRESS
+      !write(*,*)"STRESS tensor", STRESS
       
     ! Print out the variables that were received
     CASE( "ECHO" )
