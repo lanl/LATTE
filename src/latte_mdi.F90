@@ -424,9 +424,8 @@ CONTAINS
       IF(.NOT. ALLOCATED(ELEMENTS)) STOP "ERROR: ELEMENTS were not received yet ..."
       IF(.NOT. ALLOCATED(COORDS)) STOP "ERROR: COORDS were not received yet ..."
       IF(.NOT. ALLOCATED(BOX)) STOP "ERROR: CELL was not received yet ..."
-      !WRITE(*,*)"Sending FORCES"
+      WRITE(*,*)"Sending FORCES"
       IF(.NOT. ALLOCATED(FORCES)) ALLOCATE(FORCES(3,NATOMS))
-      FORCES = 0.0_DP
       IF(.NOT. ALLOCATED(STRESS)) ALLOCATE(STRESS(9))
       IF ( STATE == ">" ) THEN
         CALL LATTE(NTYPES, TYPES, COORDS, BOX, FORCES, &
@@ -440,7 +439,6 @@ CONTAINS
         ENDDO
         AUX = AUX*eV2H/Ang2Bohr   !eV/Ang to H/Bohr
         CALL MDI_SEND(AUX, 3*NATOMS, MDI_DOUBLE, MDICOMM, IERR)
-        DEALLOCATE(AUX)
         STATE = "<" 
       ELSE
         ALLOCATE(AUX(3*NATOMS))
@@ -449,10 +447,10 @@ CONTAINS
           AUX(3*(I-1) + 2) = FORCES(2,I)
           AUX(3*(I-1) + 3) = FORCES(3,I)
         ENDDO
-        WRITE(*,*)"FORCESINTERFACE",AUX(1:6)
         CALL MDI_SEND(AUX, 3*NATOMS, MDI_DOUBLE, MDICOMM, IERR)
-        DEALLOCATE(AUX)
       ENDIF
+      WRITE(*,*)"FORCESINTERFACE",AUX(1:6)
+      DEALLOCATE(AUX)
 
     ! Passing the potential energy
     CASE ( "<PE" )
@@ -461,7 +459,6 @@ CONTAINS
       IF(.NOT. ALLOCATED(COORDS)) STOP "EROOR: COORDS were not received yet ..."
       IF(.NOT. ALLOCATED(BOX)) STOP "EROOR: CELL was not received yet ..."
       IF(.NOT. ALLOCATED(FORCES)) ALLOCATE(FORCES(3,NATOMS))
-      FORCES = 0.0_DP
       iF(.NOT. ALLOCATED(STRESS)) ALLOCATE(STRESS(9))
       IF ( STATE == ">" ) THEN
         CALL LATTE(NTYPES, TYPES, COORDS, BOX, FORCES, &
@@ -475,6 +472,7 @@ CONTAINS
         CALL MDI_SEND(VENERG, 1, MDI_DOUBLE, MDICOMM, IERR)
       ENDIF
 
+
     ! Passing stress tensor 
     CASE ( "<STRESS" )
       MAXITER = -1
@@ -482,7 +480,6 @@ CONTAINS
       IF(.NOT. ALLOCATED(COORDS)) STOP "EROOR: COORDS were not received yet ..."
       IF(.NOT. ALLOCATED(BOX)) STOP "EROOR: CELL was not received yet ..."
       IF(.NOT. ALLOCATED(FORCES)) ALLOCATE(FORCES(3,NATOMS))
-      FORCES = 0.0_DP
       iF(.NOT. ALLOCATED(STRESS)) ALLOCATE(STRESS(9))
       IF ( STATE == ">" ) THEN
         CALL LATTE(NTYPES, TYPES, COORDS, BOX, FORCES, &
