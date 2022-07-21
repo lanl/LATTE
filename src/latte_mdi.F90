@@ -449,6 +449,7 @@ CONTAINS
           AUX(3*(I-1) + 2) = FORCES(2,I)
           AUX(3*(I-1) + 3) = FORCES(3,I)
         ENDDO
+        WRITE(*,*)"FORCESINTERFACE",AUX(1:6)
         CALL MDI_SEND(AUX, 3*NATOMS, MDI_DOUBLE, MDICOMM, IERR)
         DEALLOCATE(AUX)
       ENDIF
