@@ -786,6 +786,7 @@ CONTAINS
           FTOT_OUT = FTOT
        ENDIF
 
+       WRITE(*,*)"FORCESMDI", FTOT_OUT(1:3,1), FTOT_OUT(1:3,2)
 
        ! Get the seccond virial coefficient to pass it to the application program
        IF (ELECTRO .EQ. 0) VIRCOUL = ZERO
