@@ -448,7 +448,7 @@ CONTAINS
         CALL MDI_SEND(AUX, 3*NATOMS, MDI_DOUBLE, MDICOMM, IERR)
         STATE = "<" 
       ELSE
-        WRITE(*,*)"FORCESBACK",FORCES(1:3,1),FORCES(1:3,2)
+        WRITE(*,*)"FORCESBACK",FORCES(1:3,4)
         ALLOCATE(AUX(3*NATOMS))
         DO I = 1,NATOMS
           AUX(3*(I-1) + 1) = FORCES(1,I)
@@ -456,7 +456,7 @@ CONTAINS
           AUX(3*(I-1) + 3) = FORCES(3,I)
         ENDDO
         AUX = AUX*eV2H/Ang2Bohr   !eV/Ang to H/Bohr
-        WRITE(*,*)"AUX",AUX(1:6)
+        WRITE(*,*)"FORCESAUX",AUX(10:12)
         CALL MDI_SEND(AUX, 3*NATOMS, MDI_DOUBLE, MDICOMM, IERR)
       ENDIF
       DEALLOCATE(AUX)
