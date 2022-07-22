@@ -434,7 +434,7 @@ CONTAINS
         WRITE(*,*)"BOX",BOX
         CALL LATTE(NTYPES, TYPES, COORDS, BOX, FORCES, &
         MAXITER, VENERG, STRESS, NEWSYSTEM, EXISTERROR, SYMB, FNAME)
-        WRITE(*,*)"FORCESBACK",FORCES(1:3,1),FORCES(1:3,2)
+        WRITE(*,*)"FORCESBACK",FORCES(1:3,4)
         NEWSYSTEM = 0
         ALLOCATE(AUX(3*NATOMS))
         DO I = 1,NATOMS
@@ -443,6 +443,8 @@ CONTAINS
           AUX(3*(I-1) + 3) = FORCES(3,I)
         ENDDO
         AUX = AUX*eV2H/Ang2Bohr   !eV/Ang to H/Bohr
+        
+        WRITE(*,*)"FORCESAUX",AUX(10:12)
         CALL MDI_SEND(AUX, 3*NATOMS, MDI_DOUBLE, MDICOMM, IERR)
         STATE = "<" 
       ELSE
