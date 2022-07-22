@@ -167,11 +167,11 @@ CONTAINS
 
     EXISTERROR = .FALSE. !We assume we start the lib call without errors
 
-!    IF(VERBOSE <= 0)THEN
-!      OPEN(UNIT=6, FILE="/dev/null", FORM="formatted")
-!    ELSE
-!      OPEN(UNIT=6, FILE=OUTFILE, FORM="formatted")
-!    ENDIF
+    IF(VERBOSE <= 0)THEN
+      OPEN(UNIT=6, FILE="/dev/null", FORM="formatted")
+    ELSE
+      OPEN(UNIT=6, FILE=OUTFILE, FORM="formatted")
+    ENDIF
 
     IF(.NOT. LIBINIT .OR. NEWSYSTEM == 1)THEN
 
@@ -800,7 +800,6 @@ CONTAINS
        ENDIF
 
        WRITE(*,*)"FORCES LATTE JUST AFTER ATOM 4",FTOT_OUT(1:3,4)
-       STOP
 
 !       CALL GETPRESSURE
 #ifdef MDION
