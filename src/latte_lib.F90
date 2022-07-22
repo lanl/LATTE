@@ -274,6 +274,8 @@ CONTAINS
 
        ENDIF
 
+       WRITE(*,*)"COORDINATE LATTE JUST BEFORE ATOM 4",CR(1:3,4)
+
        CALL GENORBITALLIST
 
        CALL GENCUTOFFLIST
@@ -786,8 +788,6 @@ CONTAINS
           FTOT_OUT = FTOT
        ENDIF
 
-       WRITE(*,*)"FORCESMDI", FTOT_OUT(1:3,1), FTOT_OUT(1:3,2)
-
        ! Get the seccond virial coefficient to pass it to the application program
        IF (ELECTRO .EQ. 0) VIRCOUL = ZERO
        VIRIAL = VIRBOND + VIRPAIR + VIRCOUL
@@ -797,6 +797,9 @@ CONTAINS
        IF (BASISTYPE .EQ. "NONORTHO") THEN
           VIRIAL = VIRIAL - VIRPUL + VIRSCOUL
        ENDIF
+
+       WRITE(*,*)"FORCES LATTE JUST AFTER ATOM 4",FTOT_OUT(1:3,4)
+       STOP
 
 !       CALL GETPRESSURE
 #ifdef MDION
