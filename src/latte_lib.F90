@@ -778,8 +778,9 @@ CONTAINS
 
        IF (FREEZE .EQ. 1) CALL FREEZE_ATOMS(FTOT,V)
 
+       FTOT_OUT = 0.0D0
        IF(MAXVAL(FTOT_OUT) .NE. 0.0d0)THEN
-          IF(VERBOSE >= 1) WRITE(*,*)"Adding force components and energies from applicacion code ..."
+          IF(VERBOSE >= 1) WRITE(*,*)"Adding force components and energies from application code ..."
           IF(VERBOSE >= 1) WRITE(*,*)"APPCODE,LATTE",VENERG,TRRHOH + EREP - ENTE - ECOUL + ESPIN
           VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
           FTOT_OUT = FTOT_OUT +  FTOT
