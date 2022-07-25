@@ -778,7 +778,7 @@ CONTAINS
 
        IF (FREEZE .EQ. 1) CALL FREEZE_ATOMS(FTOT,V)
 
-       !FTOT_OUT = 0.0D0 Carefull here - the host code could have some forces already.
+       FTOT_OUT = 0.0D0 !Carefull here - the host code could have some forces already.
        IF(MAXVAL(FTOT_OUT) .NE. 0.0d0)THEN
           IF(VERBOSE >= 1) WRITE(*,*)"Adding force components and energies from application code ..."
           IF(VERBOSE >= 1) WRITE(*,*)"APPCODE,LATTE",VENERG,TRRHOH + EREP - ENTE - ECOUL + ESPIN
@@ -807,12 +807,20 @@ CONTAINS
        BOX(1,2)*(BOX(2,1)*BOX(3,3) - BOX(3,1)*BOX(2,3)) + &
        BOX(1,3)*(BOX(2,1)*BOX(3,2) - BOX(3,1)*BOX(2,2)))
 
-       STRTEN(1) = ( -VIRIAL(1) + KETEN(1)/F2V ) / SYSVOL
-       STRTEN(2) = ( -VIRIAL(2) + KETEN(2)/F2V ) / SYSVOL
-       STRTEN(3) = ( -VIRIAL(3) + KETEN(3)/F2V ) / SYSVOL
-       STRTEN(4) = ( -VIRIAL(4) + KETEN(4)/F2V ) / SYSVOL
-       STRTEN(5) = ( -VIRIAL(5) + KETEN(5)/F2V ) / SYSVOL
-       STRTEN(6) = ( -VIRIAL(6) + KETEN(6)/F2V ) / SYSVOL
+!       STRTEN(1) = ( -VIRIAL(1) + KETEN(1)/F2V ) / SYSVOL
+!       STRTEN(2) = ( -VIRIAL(2) + KETEN(2)/F2V ) / SYSVOL
+!       STRTEN(3) = ( -VIRIAL(3) + KETEN(3)/F2V ) / SYSVOL
+!       STRTEN(4) = ( -VIRIAL(4) + KETEN(4)/F2V ) / SYSVOL
+!       STRTEN(5) = ( -VIRIAL(5) + KETEN(5)/F2V ) / SYSVOL
+!       STRTEN(6) = ( -VIRIAL(6) + KETEN(6)/F2V ) / SYSVOL
+
+       STRTEN(1) = ( -VIRIAL(1) )! / SYSVOL
+       STRTEN(2) = ( -VIRIAL(2) )! / SYSVOL
+       STRTEN(3) = ( -VIRIAL(3) )! / SYSVOL
+       STRTEN(4) = ( -VIRIAL(4) )! / SYSVOL
+       STRTEN(5) = ( -VIRIAL(5) )! / SYSVOL
+       STRTEN(6) = ( -VIRIAL(6) )! / SYSVOL
+
 
        !STRTEN = STRTEN * TOGPA 
 
@@ -832,8 +840,7 @@ CONTAINS
        STRESS_INOUT(3) = STRTEN(6) !xz
        STRESS_INOUT(7) = STRTEN(6) !zx
 
-       WRITE(*,*)"STRESS_INOUT",STRESS_INOUT
-
+       WRITE(*,*)"STRESS_INOUT",-STRTEN(1),-STRTEN(2),-STRTEN(3) 
 
 #else
        VIRIAL_INOUT = -VIRIAL
