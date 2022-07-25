@@ -422,14 +422,17 @@ CONTAINS
 
     ! Passing back the forces using a 3*nats auxiliary array.
     CASE ( "<FORCES" )
+     ! WRITE(*,*)"Sending FORCES"
       MAXITER = -1
       IF(.NOT. ALLOCATED(ELEMENTS)) STOP "ERROR: ELEMENTS were not received yet ..."
       IF(.NOT. ALLOCATED(COORDS)) STOP "ERROR: COORDS were not received yet ..."
       IF(.NOT. ALLOCATED(BOX)) STOP "ERROR: CELL was not received yet ..."
-     ! WRITE(*,*)"Sending FORCES"
       IF(.NOT. ALLOCATED(FORCES)) ALLOCATE(FORCES(3,NATOMS))
       IF(.NOT. ALLOCATED(STRESS)) ALLOCATE(STRESS(9))
       IF ( STATE == ">" ) THEN
+        FORCES = 0.0d0 
+        STRESS = 0.0d0 
+        VENERG = 0.0d0 
         WRITE(*,*)"COORDSMDI",COORDS(1:3,1), COORDS(1:3,2)
         WRITE(*,*)"BOX",BOX
         CALL LATTE(NTYPES, TYPES, COORDS, BOX, FORCES, &
@@ -470,6 +473,9 @@ CONTAINS
       IF(.NOT. ALLOCATED(FORCES)) ALLOCATE(FORCES(3,NATOMS))
       iF(.NOT. ALLOCATED(STRESS)) ALLOCATE(STRESS(9))
       IF ( STATE == ">" ) THEN
+        FORCES = 0.0d0
+        STRESS = 0.0d0
+        VENERG = 0.0d0
         WRITE(*,*)"COORDSMDI",COORDS(1:3,1), COORDS(1:3,2)
         WRITE(*,*)"BOX",BOX
         CALL LATTE(NTYPES, TYPES, COORDS, BOX, FORCES, &
@@ -494,6 +500,9 @@ CONTAINS
       IF(.NOT. ALLOCATED(FORCES)) ALLOCATE(FORCES(3,NATOMS))
       iF(.NOT. ALLOCATED(STRESS)) ALLOCATE(STRESS(9))
       IF ( STATE == ">" ) THEN
+        FORCES = 0.0d0
+        STRESS = 0.0d0 
+        VENERG = 0.0d0
         CALL LATTE(NTYPES, TYPES, COORDS, BOX, FORCES, &
         MAXITER, VENERG, STRESS, NEWSYSTEM, EXISTERROR, SYMB, FNAME)
         NEWSYSTEM = 0
