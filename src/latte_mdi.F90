@@ -56,6 +56,7 @@ MODULE LATTE_MDI
   DOUBLE PRECISION, ALLOCATABLE :: COORDS(:,:), MASSES(:), FORCES(:,:)
   DOUBLE PRECISION, ALLOCATABLE :: STRESS(:), BOX(:,:)
   INTEGER :: NEWSYSTEM = 0
+  INTEGER :: MDIVERB = 0
   CHARACTER(1) :: STATE
   LOGICAL :: FIRSTSYSTEM = .true.
 
@@ -234,6 +235,7 @@ CONTAINS
     CALL MDI_REGISTER_NODE("@DEFAULT", IERR)
     CALL MDI_REGISTER_COMMAND("@DEFAULT", "EXIT", IERR)
     CALL MDI_REGISTER_COMMAND("@DEFAULT", ">FNAME", IERR)
+    CALL MDI_REGISTER_COMMAND("@DEFAULT", ">VERBOSE", IERR)
     CALL MDI_REGISTER_COMMAND("@DEFAULT", ">NATOMS", IERR)
     CALL MDI_REGISTER_COMMAND("@DEFAULT", ">ELEMENTS", IERR)
     CALL MDI_REGISTER_COMMAND("@DEFAULT", ">COORDS", IERR)
@@ -306,9 +308,11 @@ CONTAINS
     REAL(dp), PARAMETER :: Ang2Bohr = 1.0_dp/0.529177_dp
 
 
-    !WRITE(*,*)"MDISTATE = ",STATE
-    !WRITE(*,*)"FIRSTSYSYTEM = ",FIRSTSYSTEM
-    !WRITE(*,*)"NEWSYSTEM = ",NEWSYSTEM
+    IF(MDIVERB >= 1)THEN 
+      WRITE(*,*)"MDISTATE = ",STATE
+      WRITE(*,*)"FIRSTSYSYTEM = ",FIRSTSYSTEM
+      WRITE(*,*)"NEWSYSTEM = ",NEWSYSTEM
+    ENDIF 
 
     SELECT CASE(TRIM(COMMAND))
 
@@ -317,7 +321,7 @@ CONTAINS
 
     ! Receving the name of the latte file
     CASE(">FNAME")
-      !WRITE(*,*)"Receiving FNAME"
+      IF(MDIVERB >= 1) WRITE(*,*)"Receiving FNAME ..."
       FNAME = ""
       CALL MDI_RECV(FNAME, LNAME, MDI_CHAR, MDICOMM, IERR)
       IF(IERR > 0)THEN
@@ -328,14 +332,29 @@ CONTAINS
       CALL MPI_BCAST(FNAME, LNAME, MPI_CHAR, 0, WORLD, IERR)
       !WRITE(*,*)"Name of latte file ",FNAME
 
+    ! Receving verbosity level 
+    CASE(">VERBOSE")
+      WRITE(*,*)"Receiving VERBOSE ..."
+      WRITE(*,*)"VERBOSE is ON ..."
+      CALL MDI_RECV(MDIVERB, 1, MDI_INT, MDICOMM, IERR)
+      CALL MPI_BCAST(MDIVERB, 1, MPI_INT, 0, WORLD, IERR)
+      IF(IERR > 0)THEN
+        WRITE(*,*)"ERROR passing FNAME. Check the leght name integer&
+             & passed from the driver. The length integer should be set to: ",LNAME
+        STOP
+      ENDIF
+      CALL MPI_BCAST(FNAME, LNAME, MPI_CHAR, 0, WORLD, IERR)
+      !WRITE(*,*)"Name of latte file ",FNAME
+  
+
     ! Receiving the number of atoms
     CASE( ">NATOMS" )
-      !WRITE(*,*)"Receiving NATOMS"
+      IF(MDIVERB >= 1) WRITE(*,*)"Receiving NATOMS ..."
       CALL MDI_RECV(NATOMS, 1, MDI_INT, MDICOMM, IERR)
       CALL MPI_BCAST(NATOMS, 1, MPI_INT, 0, WORLD, IERR)
       IF(ALLOCATED(ELEMENTS)) DEALLOCATE(ELEMENTS)
       IF(ALLOCATED(COORDS)) DEALLOCATE(COORDS)
-      !WRITE(*,*)"Number of atoms ",NATOMS
+      IF(MDIVERB >= 1) WRITE(*,*)"Received ",NATOMS," atoms ..."
       IF(FIRSTSYSTEM)THEN 
         NEWSYSTEM = 0
         FIRSTSYSTEM = .false.
@@ -346,7 +365,7 @@ CONTAINS
 
     ! Receiving element atomic numbers
     CASE( ">ELEMENTS" )
-      !WRITE(*,*)"Receiving ELEMENTS"
+      IF(MDIVERB >= 1) WRITE(*,*)"Receiving ELEMENTS ..."
       IF(NEWSYSTEM == 1)THEN 
         IF(ALLOCATED(ELEMENTS))DEALLOCATE(ELEMENTS)
       ENDIF
@@ -365,7 +384,7 @@ CONTAINS
     ! Receiving the coordinate. A 3*nats auxiliary array is used
     ! to pass the coordinated.
     CASE( ">COORDS" )
-      !WRITE(*,*)"Receiving COORDS"
+      IF(MDIVERB >= 1) WRITE(*,*)"Receiving COORDS"
       ALLOCATE(AUX(3*NATOMS))
       IF(.NOT. ALLOCATED(COORDS)) ALLOCATE(COORDS(3,NATOMS))
       CALL MDI_RECV(AUX, 3*NATOMS, MDI_DOUBLE, MDICOMM, IERR)
@@ -382,7 +401,7 @@ CONTAINS
     ! Receiving the cell. The format that is passed is the same
     ! as the one used by lammps.
     CASE( ">CELL" )
-      !WRITE(*,*)"Receiving CELL"
+      IF(MDIVERB >= 1) WRITE(*,*)"Receiving CELL ..."
       ALLOCATE(CELL(9))
       IF(.not.ALLOCATED(BOX)) ALLOCATE(BOX(3,3))
       CALL MDI_RECV(CELL, 9, MDI_DOUBLE, MDICOMM, IERR)
@@ -396,17 +415,18 @@ CONTAINS
 
     ! Receiving the cell displacement.
     CASE( ">CELL_DISPL" )
-      !WRITE(*,*)"Receiving CELL_DISP"
+      IF(MDIVERB >= 1) WRITE(*,*)"Receiving CELL_DISP ..."
       ALLOCATE(CELL_DISPL(3))
       CELL_DISPL = CELL_DISPL/Ang2Bohr
       CALL MDI_RECV(CELL_DISPL, 3, MDI_DOUBLE, MDICOMM, IERR)
       CALL MPI_BCAST(CELL_DISPL, 3, MPI_DOUBLE, 0, WORLD, IERR)
-      !WRITE(*,*)"WARNING: CELL_DISL is not used within LATTE"
+      IF(MDIVERB >= 1) WRITE(*,*)"WARNING: CELL_DISL is not used within LATTE"
       DEALLOCATE(CELL_DISPL)
       STATE = ">"
 
     ! This command will run latte, with the info received
     CASE( "RUN" )
+      IF(MDIVERB >= 1) WRITE(*,*)"Executing RUN command ..."
       MAXITER = -1
       IF(.NOT. ALLOCATED(FORCES)) ALLOCATE(FORCES(3,NATOMS))
       FORCES = 0.0_DP
@@ -419,10 +439,11 @@ CONTAINS
     ! matrices
     CASE ( "NEWSYSTEM" )
       NEWSYSTEM = 1
+      IF(MDIVERB >= 1) WRITE(*,*)"Setting up a newsystem ..."
 
     ! Passing back the forces using a 3*nats auxiliary array.
     CASE ( "<FORCES" )
-     ! WRITE(*,*)"Sending FORCES"
+      IF(MDIVERB >= 1) WRITE(*,*)"Sending FORCES"
       MAXITER = -1
       IF(.NOT. ALLOCATED(ELEMENTS)) STOP "ERROR: ELEMENTS were not received yet ..."
       IF(.NOT. ALLOCATED(COORDS)) STOP "ERROR: COORDS were not received yet ..."
@@ -433,11 +454,10 @@ CONTAINS
         FORCES = 0.0d0 
         STRESS = 0.0d0 
         VENERG = 0.0d0 
-        WRITE(*,*)"COORDSMDI",COORDS(1:3,1), COORDS(1:3,2)
-        WRITE(*,*)"BOX",BOX
+        IF(MDIVERB >= 2) WRITE(*,*)"BOX",BOX
         CALL LATTE(NTYPES, TYPES, COORDS, BOX, FORCES, &
         MAXITER, VENERG, STRESS, NEWSYSTEM, EXISTERROR, SYMB, FNAME)
-        WRITE(*,*)"FORCESBACK",FORCES(1:3,4)
+        IF(MDIVERB >= 2) WRITE(*,*)"FORCESBACK",FORCES(1:3,1),"...",FORCES(1:3,NATOMS)
         NEWSYSTEM = 0
         ALLOCATE(AUX(3*NATOMS))
         DO I = 1,NATOMS
@@ -446,12 +466,11 @@ CONTAINS
           AUX(3*(I-1) + 3) = FORCES(3,I)
         ENDDO
         AUX = AUX*eV2H/Ang2Bohr   !eV/Ang to H/Bohr
-        
-        WRITE(*,*)"FORCESAUX",AUX(10:12)
+        IF(MDIVERB >= 2) WRITE(*,*)"FORCESAUX",AUX(1:3),"...",AUX(3*(NATOMS-1)+1:3*NATOMS)
         CALL MDI_SEND(AUX, 3*NATOMS, MDI_DOUBLE, MDICOMM, IERR)
         STATE = "<" 
       ELSE
-        WRITE(*,*)"FORCESBACK",FORCES(1:3,4)
+        IF(MDIVERB >= 2) WRITE(*,*)"FORCESBACK",FORCES(1:3,1),"...",FORCES(1:3,NATOMS)
         ALLOCATE(AUX(3*NATOMS))
         DO I = 1,NATOMS
           AUX(3*(I-1) + 1) = FORCES(1,I)
@@ -459,13 +478,14 @@ CONTAINS
           AUX(3*(I-1) + 3) = FORCES(3,I)
         ENDDO
         AUX = AUX*eV2H/Ang2Bohr   !eV/Ang to H/Bohr
-        WRITE(*,*)"FORCESAUX",AUX(10:12)
+        IF(MDIVERB >= 2) WRITE(*,*)"FORCESAUX",AUX(1:3),"...",AUX(3*(NATOMS-1)+1:3*NATOMS) 
         CALL MDI_SEND(AUX, 3*NATOMS, MDI_DOUBLE, MDICOMM, IERR)
       ENDIF
       DEALLOCATE(AUX)
 
     ! Passing the potential energy
     CASE ( "<PE" )
+      IF(MDIVERB >= 1) WRITE(*,*)"Sending PE ..."
       MAXITER = -1
       IF(.NOT. ALLOCATED(ELEMENTS)) STOP "EROOR: ELEMENTS were not received yet ..."
       IF(.NOT. ALLOCATED(COORDS)) STOP "EROOR: COORDS were not received yet ..."
@@ -476,11 +496,9 @@ CONTAINS
         FORCES = 0.0d0
         STRESS = 0.0d0
         VENERG = 0.0d0
-        WRITE(*,*)"COORDSMDI",COORDS(1:3,1), COORDS(1:3,2)
-        WRITE(*,*)"BOX",BOX
         CALL LATTE(NTYPES, TYPES, COORDS, BOX, FORCES, &
         MAXITER, VENERG, STRESS, NEWSYSTEM, EXISTERROR, SYMB, FNAME)
-        WRITE(*,*)"FORCESBACK",FORCES(1:3,1),FORCES(1:3,2)
+        IF(MDIVERB >= 2) WRITE(*,*)"FORCESBACK",FORCES(1:3,1),"...",FORCES(1:3,NATOMS)
         NEWSYSTEM = 0
         VENERGTMP = VENERG*eV2H
         CALL MDI_SEND(VENERGTMP, 1, MDI_DOUBLE, MDICOMM, IERR)
@@ -514,6 +532,7 @@ CONTAINS
       ELSE
         ALLOCATE(STRESSTMP(9))
         STRESSTMP = STRESS*eV2H/(Ang2Bohr**3)
+        IF(MDIVERB >= 2) WRITE(*,*)"STRESS",STRESSTMP
         CALL MDI_SEND(STRESSTMP, 9, MDI_DOUBLE, MDICOMM, IERR)
         DEALLOCATE(STRESSTMP)  
       ENDIF
