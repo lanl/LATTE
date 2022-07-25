@@ -778,7 +778,7 @@ CONTAINS
 
        IF (FREEZE .EQ. 1) CALL FREEZE_ATOMS(FTOT,V)
 
-       FTOT_OUT = 0.0D0
+       !FTOT_OUT = 0.0D0 Carefull here - the host code could have some forces already.
        IF(MAXVAL(FTOT_OUT) .NE. 0.0d0)THEN
           IF(VERBOSE >= 1) WRITE(*,*)"Adding force components and energies from application code ..."
           IF(VERBOSE >= 1) WRITE(*,*)"APPCODE,LATTE",VENERG,TRRHOH + EREP - ENTE - ECOUL + ESPIN
