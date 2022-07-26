@@ -802,10 +802,11 @@ CONTAINS
        WRITE(*,*)"FORCES LATTE JUST AFTER ATOM 4",FTOT_OUT(1:3,4)
 
 !       CALL GETPRESSURE
-#ifdef MDION
        SYSVOL = ABS(BOX(1,1)*(BOX(2,2)*BOX(3,3) - BOX(3,2)*BOX(2,3)) + &
        BOX(1,2)*(BOX(2,1)*BOX(3,3) - BOX(3,1)*BOX(2,3)) + &
        BOX(1,3)*(BOX(2,1)*BOX(3,2) - BOX(3,1)*BOX(2,2)))
+
+       WRITE(*,*)"SYSVOL",SYSVOL
 
 !       STRTEN(1) = ( -VIRIAL(1) + KETEN(1)/F2V ) / SYSVOL
 !       STRTEN(2) = ( -VIRIAL(2) + KETEN(2)/F2V ) / SYSVOL
@@ -814,17 +815,22 @@ CONTAINS
 !       STRTEN(5) = ( -VIRIAL(5) + KETEN(5)/F2V ) / SYSVOL
 !       STRTEN(6) = ( -VIRIAL(6) + KETEN(6)/F2V ) / SYSVOL
 
-       STRTEN(1) = ( -VIRIAL(1) )! / SYSVOL
-       STRTEN(2) = ( -VIRIAL(2) )! / SYSVOL
-       STRTEN(3) = ( -VIRIAL(3) )! / SYSVOL
-       STRTEN(4) = ( -VIRIAL(4) )! / SYSVOL
-       STRTEN(5) = ( -VIRIAL(5) )! / SYSVOL
-       STRTEN(6) = ( -VIRIAL(6) )! / SYSVOL
+       STRTEN(1) = ( -VIRIAL(1) ) / SYSVOL
+       STRTEN(2) = ( -VIRIAL(2) ) / SYSVOL
+       STRTEN(3) = ( -VIRIAL(3) ) / SYSVOL
+       STRTEN(4) = ( -VIRIAL(4) ) / SYSVOL
+       STRTEN(5) = ( -VIRIAL(5) ) / SYSVOL
+       STRTEN(6) = ( -VIRIAL(6) ) / SYSVOL
 
 
        !STRTEN = STRTEN * TOGPA 
 
-       PRESSURE = (STRTEN(1) + STRTEN(2) + STRTEN(3))/THREE
+!       PRESSURE = (STRTEN(1) + STRTEN(2) + STRTEN(3))/THREE
+!       PRESSURE = PRESSURE * TOGPA
+!       WRITE(*,*)"PRESSURE",PRESSURE
+
+
+#ifdef MDION
        STRESS_INOUT = 0.0d0
        
        STRESS_INOUT(1) = STRTEN(1) !xx
@@ -840,11 +846,11 @@ CONTAINS
        STRESS_INOUT(3) = STRTEN(6) !xz
        STRESS_INOUT(7) = STRTEN(6) !zx
 
-       WRITE(*,*)"STRESS_INOUT",STRTEN(1),STRTEN(2),STRTEN(3) 
+!       WRITE(*,*)"STRESS_INOUT",STRTEN(1),STRTEN(2),STRTEN(3) 
 
 #else
        VIRIAL_INOUT = -VIRIAL
-       WRITE(*,*)"STRESS_INOUT",-VIRIAL(1),-VIRIAL(2),-VIRIAL(3) 
+ !      WRITE(*,*)"STRESS_INOUT",-VIRIAL(1),-VIRIAL(2),-VIRIAL(3) 
 #endif
 
        LIBINIT = .TRUE.
