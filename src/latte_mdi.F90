@@ -275,14 +275,23 @@ CONTAINS
 
     WRITE(*,*)"DEBUG: Outside the loop, now deallocating variables at MDI_ENGINE_INVOKE"
 
+    WRITE(*,*)"DEBUG: Outside the loop, now deallocating variables: TYPES"
     IF(ALLOCATED(TYPES)) DEALLOCATE(TYPES)
+    WRITE(*,*)"DEBUG: Outside the loop, now deallocating variables: AUX"
     IF(ALLOCATED(AUX)) DEALLOCATE(AUX)
+    WRITE(*,*)"DEBUG: Outside the loop, now deallocating variables: CELL"
     IF(ALLOCATED(CELL)) DEALLOCATE(CELL)
+    WRITE(*,*)"DEBUG: Outside the loop, now deallocating variables: SYMB"
     IF(ALLOCATED(SYMB)) DEALLOCATE(SYMB)
+    WRITE(*,*)"DEBUG: Outside the loop, now deallocating variables: ELEMENTS"
     IF(ALLOCATED(ELEMENTS)) DEALLOCATE(ELEMENTS)
+    WRITE(*,*)"DEBUG: Outside the loop, now deallocating variables: COORDS"
     IF(ALLOCATED(COORDS)) DEALLOCATE(COORDS)
+    WRITE(*,*)"DEBUG: Outside the loop, now deallocating variables: MASSES"
     IF(ALLOCATED(MASSES)) DEALLOCATE(MASSES)
+    WRITE(*,*)"DEBUG: Outside the loop, now deallocating variables: FORCES"
     IF(ALLOCATED(FORCES)) DEALLOCATE(FORCES)
+    WRITE(*,*)"DEBUG: Outside the loop, now deallocating variables: COMMAND"
     IF(ALLOCATED(COMMAND)) DEALLOCATE(COMMAND)
 
   END SUBROUTINE MDI_ENGINE_INVOKE
