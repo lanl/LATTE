@@ -49,6 +49,7 @@ SUBROUTINE ALLOCATEXBO
   IF (XBODISON .EQ. 0) THEN
 
      ALLOCATE(PNK(2,ARRAYDIM))
+     PNK = 0.0D0
 
      !
      ! If we need to propagate the chemical potential
