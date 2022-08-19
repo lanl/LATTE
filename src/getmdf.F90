@@ -228,9 +228,8 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
         ELSE
           IF(VERBOSE >= 1)WRITE(*,*)"Doing XBO ..."
           RESNORM =  norm2(DELTAQ - PNK(1,:))/SQRT(DBLE(NATS))
-          write(*,*)"RESIDUE=",RESIDUE
+          write(*,*)"RESIDUE=",RESNORM
           IF (SPINON .EQ. 0) CALL XBO(1)
-          RESIDUEOLD = RESIDUE
         ENDIF
         IF (CONTROL .EQ. 1 .OR. CONTROL .EQ. 3 &
              .OR. CONTROL .EQ. 5) CALL PROPCHEMPOT(1)
