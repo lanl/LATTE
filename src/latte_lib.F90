@@ -332,7 +332,10 @@ CONTAINS
 
        IF (KBT .LT. 0.0000001 .OR. CONTROL .EQ. 2) ENTE = ZERO
 
-       IF (.NOT. ALLOCATED(V)) ALLOCATE(V(3,NATS))
+       IF (.NOT. ALLOCATED(V)) THEN
+         ALLOCATE(V(3,NATS))
+         V = 0.0d0
+       END IF
        IF(VERBOSE >= 1)WRITE(*,*)"End of INITIALIZATION"
 
     ELSE
