@@ -167,11 +167,11 @@ CONTAINS
 
     EXISTERROR = .FALSE. !We assume we start the lib call without errors
 
-!    IF(VERBOSE <= 0)THEN
-!      OPEN(UNIT=6, FILE="/dev/null", FORM="formatted")
-!    ELSE
-!      OPEN(UNIT=6, FILE=OUTFILE, FORM="formatted")
-!    ENDIF
+    IF(VERBOSE <= 0)THEN
+      OPEN(UNIT=6, FILE="/dev/null", FORM="formatted")
+    ELSE
+      OPEN(UNIT=6, FILE=OUTFILE, FORM="formatted")
+    ENDIF
 
     IF(.NOT. LIBINIT .OR. NEWSYSTEM == 1)THEN
 
