@@ -41,6 +41,10 @@ SUBROUTINE ALLOCATEDM
   ! on-site H matrix elements (in the case of LCN calculations)
   ! or the atomic partial charges (full SCC-TB)
 
+  IF(ALLOCATED(H_INDEX_START))THEN 
+    DEALLOCATE(H_INDEX_START, H_INDEX_END, DELTAQDM, DFTB_U)
+  ENDIF
+
   ALLOCATE(H_INDEX_START(NATS), H_INDEX_END(NATS), DELTAQDM(NATS), DFTB_U(HDIM))
 
   IF (KON .EQ. 0) THEN
