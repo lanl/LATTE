@@ -172,8 +172,10 @@ if (currentstep==0) then
   
   bb = 0.d0
   DO I = 1, NATS
-    !bb(I) = - gradx_in(I,1)
-    bb(I) = - qeq_xi(nint(MASSES_IN(TYPES(I))))
+    ! use lammps value
+    bb(I) = - GRADX_IN(I,1)
+    ! use constant
+    !bb(I) = - qeq_xi(nint(MASSES_IN(TYPES(I))))
   ENDDO
   
   AA(1:NATS,1:NATS) = CC
