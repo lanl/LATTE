@@ -31,7 +31,7 @@ module qeq_parameters
   real(PREC) :: SCF_ERR
   real(PREC) :: Coulomb_Force_Real_I(3), Coulomb_Pot_Real_I
   real(PREC) :: proj_tmp, proj_tmp2
-  real(PREC) :: First, lambda, temp, RMSE, Fel, Temperature
+  real(PREC) :: First, lambda, temp2, temp, RMSE, Fel, Temperature
   real(PREC) :: ERep, ECoul, EBand, EEnt, EPOT
 
 

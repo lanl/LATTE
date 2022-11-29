@@ -191,19 +191,44 @@ if (currentstep==0) then
   xx = Matmul(AAI,bb)
   q(1:NATS) = xx(1:NATS)
   
-  DD = -CC
+  !! OLD
+  !DD = -CC
+  !do I = 1,NATS
+  !  DD(I,:) = -CC(I,:)/Hubbard_U(I) 
+  !enddo
+  !do I = 1,NATS
+  !  VV = sum(DD(:,I))/(1.D0*NATS)
+  !  DD(:,I) = DD(:,I) - VV(:)
+  !enddo
+  !do I = 1,NATS
+  !  DD(I,I) = DD(I,I) - 1.2D0 ! works better in most cases compared to -1.D0 
+  !enddo
+  !call Invert(DD,KK,NATS)
+ 
+  ! NEW can be simplified
   do I = 1,NATS
-    DD(I,:) = -CC(I,:)/Hubbard_U(I) 
+  do J = 1,NATS
+     DD(I,J) = -CC(I,J)/Hubbard_U(I)
   enddo
-  do I = 1,NATS
-    VV = sum(DD(:,I))/(1.D0*NATS)
-    DD(:,I) = DD(:,I) - VV(:)
   enddo
+  temp = 0.D0
   do I = 1,NATS
-    DD(I,I) = DD(I,I) - 1.2D0 ! works better in most cases compared to -1.D0 
+     temp = temp + 1.D0/Hubbard_U(I)
+  enddo
+
+  do I = 1,NATS
+  do J = 1,NATS
+    DD(I,J) = DD(I,J) + (-sum(DD(:,J))/temp)/Hubbard_U(I)
+  enddo
+  enddo
+  !write(*,*) 'nTestar D = ', sum(DD(:,1))
+  !write(*,*) 'nTestar D = ', sum(DD(:,5))
+  do I = 1,NATS
+    DD(I,I) = DD(I,I) - 1.0D0
   enddo
   call Invert(DD,KK,NATS)
-  
+  KK0 = KK
+
   do I = 1,NATS
     call Ewald_Real_Space(Coulomb_Pot_Real_I,Coulomb_Force_Real_I,I,RX,RY,RZ,LBox, &
     q,Hubbard_U,ATELE,NATS,Coulomb_acc,TIMERATIO,nnRx,nnRy,nnRz,nrnnlist,nnType,HDIM,Max_Nr_Neigh)
@@ -219,7 +244,7 @@ if (currentstep==0) then
   
   ECoul = ZERO
   do I = 1,NATS
-    ECoul = ECoul - q(I)*bb(I) + 0.5*q(I)*Hubbard_U(I)*q(I) + 0.5*q(I)*Coulomb_Pot(I)
+    ECoul = ECoul - q(I)*bb(I) + 0.5D0*q(I)*Hubbard_U(I)*q(I) + 0.5D0*q(I)*Coulomb_Pot(I)
   enddo
   
   call nearestneighborlist(nrnnlist,nndist,nnRx,nnRy,nnRz,nnType,nnStruct,nrnnStruct,RX,RY,RZ,LBox,4.0D0, &
@@ -235,6 +260,7 @@ if (currentstep==0) then
   
     write(6,*) 'test-zy: current step=', currentstep
   endif
+
 endif
   
 !!! Coefficients for modified Verlet integration
@@ -301,21 +327,48 @@ do MD_step = 1,MD_Iter
      !write(6,*) 'CoulombMatrix calculation'
      call CoulombMatrix(CC,RX,RY,RZ,LBox,Hubbard_U,ATELE,NATS,Coulomb_acc,TIMERATIO, &
                       nnRx,nnRy,nnRz,nrnnlist,nnType,HDIM,Max_Nr_Neigh)
+
+     !! old
+     !DD = -CC
+     !temp = 0.D0
+     !do I = 1,NATS
+     !  DD(I,:) = -CC(I,:)/Hubbard_U(I)
+     !enddo
+     !do I = 1,NATS
+     !  VV = sum(DD(:,I))/(1.D0*NATS)
+     !  DD(:,I) = DD(:,I) - VV(:)
+     !enddo
+     !do I = 1,NATS
+     !  !DD(I,I) = DD(I,I) - 1.D0
+     !  DD(I,I) = DD(I,I) - 1.2D0
+     !enddo
+     !call Invert(DD,KK,NATS)
+     !KK0 = KK
+
+
+     ! NEW
      DD = -CC
+     do I = 1,NATS
+     do J = 1,NATS
+        DD(I,J) = -CC(I,J)/Hubbard_U(I)
+     enddo
+     enddo
      temp = 0.D0
      do I = 1,NATS
-       DD(I,:) = -CC(I,:)/Hubbard_U(I)
+        temp = temp + 1.D0/Hubbard_U(I)
+     enddo
+
+     do I = 1,NATS
+     do J = 1,NATS
+       DD(I,J) = DD(I,J) + (-sum(DD(:,J))/temp)/Hubbard_U(I)
+     enddo
      enddo
      do I = 1,NATS
-       VV = sum(DD(:,I))/(1.D0*NATS)
-       DD(:,I) = DD(:,I) - VV(:)
-     enddo
-     do I = 1,NATS
-       !DD(I,I) = DD(I,I) - 1.D0
-       DD(I,I) = DD(I,I) - 1.2D0
+       DD(I,I) = DD(I,I) - 1.0D0
      enddo
      call Invert(DD,KK,NATS)
      KK0 = KK
+
      !KK_IN = KK0
      write(6,*) 'preconditioner is generated'
   else
@@ -352,12 +405,25 @@ do MD_step = 1,MD_Iter
       call Ewald_k_Space(Coulomb_Pot_k,Coulomb_Force_k,RX,RY,RZ,LBox,v,NATS,Coulomb_acc,TIMERATIO,Max_Nr_Neigh)
       Coulomb_Pot = Coulomb_Pot_Real+Coulomb_Pot_k
 
+      ! OLD
+      !      temp = 0.D0
+      !      do J = 1,NATS
+      !         dq_dv(J) = -Coulomb_Pot(J)/Hubbard_U(J)
+      !         temp = temp + Coulomb_Pot(J)/Hubbard_U(J)
+      !      enddo
+      !      dq_dv = dq_dv + temp/(1.D0*NATS)
+      
+      ! NEW
       temp = 0.D0
+      temp2 = 0.D0
       do J = 1,NATS
          dq_dv(J) = -Coulomb_Pot(J)/Hubbard_U(J)
-         temp = temp + Coulomb_Pot(J)/Hubbard_U(J)
+         temp = temp - dq_dv(J)
+         temp2 = temp2 + 1.D0/Hubbard_U(J)
       enddo
-      dq_dv = dq_dv + temp/(1.D0*NATS)
+      do J = 1,NATS
+        dq_dv(J) = dq_dv(J) + (temp/temp2)/Hubbard_U(J)
+      enddo
  
       dr = dq_dv - v       !! dr = df/dlambda, last row in Eq. (42) Ref[*]
       dr = MATMUL(KK0,dr)  !! dr = K0*(df/dlambda), last row in Eq. (42) Ref[*]
@@ -392,7 +458,7 @@ do MD_step = 1,MD_Iter
 
    qqx = n - KRes ! Newton-Raphson 
    !write(23,'(f9.4,8f15.6)')  Time/1000, Energy, Temperature, norm2(qx-n)/sqrt(ONE*NATS),n(1),qx(1),qqx(1),q(1), sum(q)
-   write(23,'(f9.4,8f15.6)')  Time/1000, Energy, Temperature, norm2(qx-n), n(1),qx(1),qqx(1),q(1), sum(q)
+   write(23,'(f9.4,8f15.6)')  Time/1000, Energy, Temperature, norm2(qx-n)/sqrt(ONE*NATS), sum(q)
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! XL-BOMD !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! Integrate XL-BOMD equation of motion for charge density, kappa*d^2n/dt^2 = -dt^2*w^2*K*(q-n) !
