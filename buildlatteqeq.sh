@@ -17,7 +17,15 @@ cmake ../cmake -DCMAKE_INSTALL_PREFIX=$topdir/install -DCMAKE_Fortran_FLAGS='-O3
 VERBOSE=2 make
 make install
 
+
+
 #cd ~/path/to/lammps_compute_pace/build_latte/
 #rm CMakeFiles/lammps.dir/vast/home/zhy/ecp/lammps/src/LATTEQEQ/fix_latteqeq.cpp.o
 #~/path/to/lammps_compute_pace//build_pace_latteqeq.sh 
 #make -j
+
+cd ~/ecp/mylammps/build_latte
+rm CMakeFiles/lammps.dir/vast/home/zhy/ecp/lammps/src/LATTEQEQ/fix_latteqeq.cpp.o
+~/ecp/mylammps/build_pace_latteqeq.sh 
+
+

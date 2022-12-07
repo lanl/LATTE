@@ -62,6 +62,8 @@ real(PREC), parameter :: eps = 1e-7, SCF_EPS = 1e-9, dx = 0.001D0
 real(PREC), parameter :: OccErrLim = 1e-9
 real(PREC), parameter :: SEVEN = 7.D0
 
+real(PREC) :: mls(8)
+integer    :: timevector(8)
 
 real(PREC) :: dt
 real(PREC) :: t_start, t_end
@@ -76,6 +78,9 @@ integer :: I,J,K,L,SCF_IT, MD_step, Cnt
 OPEN(UNIT=6, FILE=OUTFILE, FORM="formatted")
 
 call cpu_time(t_start)
+call date_and_time(values=timevector)
+mls(1) = timevector(5)*60*60*1000.D0 + timevector(6)*60*1000 + &
+         timevector(7)*1000 + timevector(8)
 
 DO I = 1, 3
   LBox(I) = XHI(I) - XLO(I)
@@ -154,6 +159,9 @@ Do i = 1, NATS
   k = TYPES(i)
 ENDDO
 
+call date_and_time(values=timevector)
+mls(2) = timevector(5)*60*60*1000.D0 + timevector(6)*60*1000 + &
+         timevector(7)*1000 + timevector(8)
 
 if (currentstep==0) then
 !if (.true.) then
@@ -262,7 +270,14 @@ if (currentstep==0) then
   endif
 
 endif
-  
+
+call date_and_time(values=timevector)
+mls(3) = timevector(5)*60*60*1000.D0 + timevector(6)*60*1000 + &
+         timevector(7)*1000 + timevector(8)
+
+write(6,*) 'Time of latteqeq initialization =', mls(2) - mls(1)
+if (currentstep==0) write(6,*) 'Time of latteqeq step 0         =', mls(2) - mls(1)
+
 !!! Coefficients for modified Verlet integration
 C0 = -14; C1 = 36; C2 = -27; C3 = -2; C4 = 12;  C5 = -6; C6 = 1;
 coeff(1) = -14; coeff(2) = 36; coeff(3) = -27; coeff(4)=-2;coeff(5)=12;coeff(6)=-6;coeff(7)=1;
@@ -376,7 +391,11 @@ do MD_step = 1,MD_Iter
      write(6,*) 'preconditioner is reused'
   endif
 
-  
+  call date_and_time(values=timevector)
+  mls(4) = timevector(5)*60*60*1000.D0 + timevector(6)*60*1000 + &
+           timevector(7)*1000 + timevector(8)
+  write(6,*) 'time of getting kernel KK =', mls(4) - mls(3)
+
 !!! Calculate KRes ~= -(K0*J)^(-1)*K0*(q[n]-n) as in Eq. (43) in Ref. [*] but without the w^2 as in KK0Res
 !!! [*] Niklasson JCP, 152 104103 (2020)
   !if (MD_step > 1) then
@@ -455,6 +474,11 @@ do MD_step = 1,MD_Iter
       deallocate(OO, MM)
    enddo
    endif
+  
+   call date_and_time(values=timevector)
+   mls(5) = timevector(5)*60*60*1000.D0 + timevector(6)*60*1000 + &
+            timevector(7)*1000 + timevector(8)
+   write(6,*) 'time of getting KRES = ', mls(5) - mls(4)
 
    qqx = n - KRes ! Newton-Raphson 
    !write(23,'(f9.4,8f15.6)')  Time/1000, Energy, Temperature, norm2(qx-n)/sqrt(ONE*NATS),n(1),qx(1),qqx(1),q(1), sum(q)
@@ -473,20 +497,25 @@ do MD_step = 1,MD_Iter
   n_6 = n_5; n_5 = n_4; n_4 = n_3; n_3 = n_2; n_2 = n_1; n_1 = n_0; n_0 = n
 
 
-!!! Exact solution
-  call nearestneighborlist(nrnnlist,nndist,nnRx,nnRy,nnRz,nnType,nnStruct,nrnnStruct,RX,RY,RZ,LBox,COULCUT, &
-                            NATS,Max_Nr_Neigh)
-  call CoulombMatrix(CC,RX,RY,RZ,LBox,Hubbard_U,ATELE,NATS,Coulomb_acc,TIMERATIO, &
-                      nnRx,nnRy,nnRz,nrnnlist,nnType,HDIM,Max_Nr_Neigh)
-  AA(1:NATS,1:NATS) = CC
-  do I = 1,NATS
-    AA(I,I) = AA(I,I) + Hubbard_U(I)
-  enddo
-  AA(NATS+1, NATS+1) = 0.D0
+  !!!! Exact solution
+  !call nearestneighborlist(nrnnlist,nndist,nnRx,nnRy,nnRz,nnType,nnStruct,nrnnStruct,RX,RY,RZ,LBox,COULCUT, &
+  !                          NATS,Max_Nr_Neigh)
+  !call CoulombMatrix(CC,RX,RY,RZ,LBox,Hubbard_U,ATELE,NATS,Coulomb_acc,TIMERATIO, &
+  !                    nnRx,nnRy,nnRz,nrnnlist,nnType,HDIM,Max_Nr_Neigh)
+  !AA(1:NATS,1:NATS) = CC
+  !do I = 1,NATS
+  !  AA(I,I) = AA(I,I) + Hubbard_U(I)
+  !enddo
+  !AA(NATS+1, NATS+1) = 0.D0
 
-  call Invert(AA,AAI,NATS+1)
-  xx = Matmul(AAI,bb)
-  q(1:NATS) = xx(1:NATS)
+  !call Invert(AA,AAI,NATS+1)
+  !xx = Matmul(AAI,bb)
+  !q(1:NATS) = xx(1:NATS)
+  
+  call date_and_time(values=timevector)
+  mls(6) = timevector(5)*60*60*1000.D0 + timevector(6)*60*1000 + &
+           timevector(7)*1000 + timevector(8)
+  write(6,*) 'time of getting exact solution = ', mls(6) - mls(5)
 !!!
 
   call nearestneighborlist(nrnnlist,nndist,nnRx,nnRy,nnRz,nnType,nnStruct,nrnnStruct,RX,RY,RZ,LBox,COULCUT, &
@@ -499,6 +528,11 @@ do MD_step = 1,MD_Iter
     Coulomb_Force_Real(:,I) = Coulomb_Force_Real_I(:)
   enddo
 !$OMP END PARALLEL DO
+  call date_and_time(values=timevector)
+  mls(7) = timevector(5)*60*60*1000.D0 + timevector(6)*60*1000 + &
+           timevector(7)*1000 + timevector(8)
+  write(6,*) 'time of getting ewald_real = ', mls(7) - mls(6)
+  
   call Ewald_k_Space(Coulomb_Pot_k,Coulomb_Force_k,RX,RY,RZ,LBox,n,NATS,Coulomb_acc,TIMERATIO,Max_Nr_Neigh)
   Coulomb_Pot = Coulomb_Pot_Real+Coulomb_Pot_k
   Coulomb_Force = Coulomb_Force_Real + Coulomb_Force_k
@@ -530,8 +564,7 @@ do MD_step = 1,MD_Iter
   enddo
 
   FTOT = Coulomb_Force
-
-  write(6,*) 'test-zy: Coulomb_force', Coulomb_Force
+  !write(6,*) 'test-zy: Coulomb_force', Coulomb_Force
 
   FORCES = FORCES + FTOT
 
@@ -542,6 +575,11 @@ do MD_step = 1,MD_Iter
   Temperature = (TWO/THREE)*KE2T*EKIN/NATS
   Energy = EKIN+EPOT
   VENERG = EPOT
+   
+  call date_and_time(values=timevector)
+  mls(8) = timevector(5)*60*60*1000.D0 + timevector(6)*60*1000 + &
+           timevector(7)*1000 + timevector(8)
+  write(6,*) 'time of getting coulomb force = ', mls(8) - mls(7)
 
   write(6,*) ' Time = ', Time, ' Etotal = ', Energy, 'Temperature = ', Temperature 
   write(6,*) ' ----- RMS = ',  norm2(qx-n)/sqrt(ONE*NATS), 'Nr Resp Cal = ', Cnt*1.D0/(MD_step*1.D0),  &
