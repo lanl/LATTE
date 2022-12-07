@@ -266,7 +266,7 @@ if (currentstep==0) then
     n = q; n_0 = q; n_1 = q; n_2 = q; n_3 = q; n_4 = q; n_5 = q; n_6 = q;   ! Set all "old" n-vectors to the same at t = t0
     qx = q; qqx = q;
   
-    write(6,*) 'test-zy: current step=', currentstep
+    !write(6,*) 'test-zy: current step=', currentstep
   endif
 
 endif
