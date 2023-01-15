@@ -1,0 +1,8 @@
+
+Comparison of the LATTE runs with BML libraries, with/without MAGMA
+--------------------------------------------------------------------------------
+VERSION                BLDH      QCONS          GETFORCE          MDF    
+BML/PROGRESS-MAGMA     4621      2373             4305            12099 
+BML/PROGRESS-NOMAGMA   24328     27224            7763            67401 
+
+

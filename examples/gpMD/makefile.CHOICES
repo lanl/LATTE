@@ -1,0 +1,84 @@
+#
+# Compilation and link flags for LATTE
+#
+
+MY_PATH=$(shell pwd)
+
+# Precision - double or single
+PRECISION = DOUBLE
+
+# Make the latte library
+# AR and RUNLIB executable default path to compile 
+# latte as a library (change accordingly)
+MAKELIB = ON
+AR = /usr/bin/ar cq
+RANLIB = /usr/bin/ranlib
+
+# Use PROGRESS and BML libraries
+PROGRESS = ON
+PROGRESS_PATH= $(MY_PATH)/../../qmd-progress/install_magma/lib64
+BML_PATH= $(MY_PATH)/../../bml/install_magma/lib64
+#MAGMA_PATH = $(MY_PATH)/../../magma
+#METIS_PATH= $(MEMBERWORK)/metis/metis-5.1.0/install
+
+METIS_PATH=/sw/crusher/spack-envs/base/opt/cray-sles15-zen3/gcc-11.2.0/metis-5.1.0-lxe5bhakcmkcf7zuqcagulm7tihcav7q/
+#MAGMA_PATH=$(OLCF_MAGMA_ROOT)
+MAGMA_PATH=/ccs/home/kurzak1/magma
+
+# Use METIS library for graph partitioning
+METIS = OFF
+
+# GPU available - OFF or ON
+GPUOPT = OFF
+
+# Using DBCSR library from cp2k? OFF or ON
+DBCSR_OPT = OFF
+
+# Parallelizing over k-points?
+MPIOPT = OFF
+
+#
+# CPU Fortran options
+#
+
+FC = gfortran
+FCL = $(FC)
+
+#FFLAGS =  -ffree-line-length-none -fopenmp -lpthread 
+
+LINKFLAG = -fopenmp
+
+#BLAS/LAPACK libraries:
+#LIB = -fopenmp -lpthread 
+#LIB += -L${CUDA_LIB} -L/usr/local/cuda-10.2/lib64 -I${CUDA_INCLUDE} -lcublas -lcudart
+#LIB += -L${CUDA_TOOLKIT_ROOT_DIR}/lib64/ -lcublas -lcusolver 
+#LIB += -L${MAGMA_PATH}/lib -lmagma 
+#LIB += -fopenmp -lpthread  -llapack -lblas
+LIB = -fopenmp -lpthread -L${OLCF_OPENBLAS_ROOT}/lib -lopenblas
+LIB += -L${ROCM_PATH}/lib -lrocblas
+LIB += -L${MAGMA_PATH}/lib -lmagma
+
+# Uncomment for coverage
+#CVR = OFF
+ifeq ($(CVR), ON)
+	FFLAGS += -fprofile-arcs -ftest-coverage
+	LINKFLAG += -fprofile-arcs -ftest-coverage
+endif
+
+ifeq ($(PROGRESS), ON)
+	LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml_fortran -lbml
+	FFLAGS += -I$(BML_PATH)/../include -I$(PROGRESS_PATH)/../include
+endif
+
+ifeq ($(GRAPH), ON) 
+	LIB += -L$(METIS_PATH)/lib -lmetis
+	FFLAGS += -I$(METIS_PATH)/include
+endif
+
+#
+# GPU options
+#
+
+#GPU_CUDA_LIB = -L${OLCF_CUDA_ROOT}/lib64/ -lcublas -lcudart
+
+GPU_ARCH = sm_70 
