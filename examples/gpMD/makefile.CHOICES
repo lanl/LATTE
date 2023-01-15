@@ -22,8 +22,7 @@ BML_PATH= $(MY_PATH)/../../bml/install_magma/lib64
 #METIS_PATH= $(MEMBERWORK)/metis/metis-5.1.0/install
 
 METIS_PATH=/sw/crusher/spack-envs/base/opt/cray-sles15-zen3/gcc-11.2.0/metis-5.1.0-lxe5bhakcmkcf7zuqcagulm7tihcav7q/
-#MAGMA_PATH=$(OLCF_MAGMA_ROOT)
-MAGMA_PATH=/ccs/home/kurzak1/magma
+MAGMA_PATH=$(OLCF_MAGMA_ROOT)
 
 # Use METIS library for graph partitioning
 METIS = OFF
