@@ -34,7 +34,7 @@ MODULE QEQ_LIB
 !!        IF MAXITER > 0, MAXITER is passed trough the library call.
 SUBROUTINE LATTEQEQ(NTYPES, TYPES, CR_IN, MASSES_IN, XLO, XHI, XY, XZ, YZ, FORCES, &
        MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIAL_INOUT, CURRENTSTEP, GRADX_IN, &
-       NEWSYSTEM, EXISTERROR_INOUT, FNAME)
+       NEWSYSTEM, EXISTERROR_INOUT) !FNAME)
 
 use qeq_parameters
 use omp_lib
@@ -49,7 +49,7 @@ REAL(PREC), INTENT(OUT)  :: VIRIAL_INOUT(6)
 INTEGER, INTENT(IN) ::  NTYPES, TYPES(:), MAXITER_IN
 LOGICAL(1), INTENT(INOUT) :: EXISTERROR_INOUT
 INTEGER, INTENT(INOUT) :: NEWSYSTEM
-CHARACTER(LEN=*), OPTIONAL, INTENT(IN) :: FNAME
+!CHARACTER(LEN=*), OPTIONAL, INTENT(IN) :: FNAME
 
 
 integer,    parameter :: Max_Nr_Neigh = 500   ! 100 Water
@@ -73,14 +73,24 @@ integer    :: MD_Iter = 40001
 !!!!!!!!!!!!!!!!!!!!!!!!    
 integer :: step
 integer :: I,J,K,L,SCF_IT, MD_step, Cnt
+CHARACTER :: FNAME
 
-
+FNAME = "latteqeq.in"
 OPEN(UNIT=6, FILE=OUTFILE, FORM="formatted")
 
 call cpu_time(t_start)
 call date_and_time(values=timevector)
 mls(1) = timevector(5)*60*60*1000.D0 + timevector(6)*60*1000 + &
          timevector(7)*1000 + timevector(8)
+
+exact_solution = .False.
+printcharges = .False.
+
+INQUIRE( FILE=trim(FNAME), exist=LATTEINEXISTS )
+IF (LATTEINEXISTS) THEN
+   CALL PARSE_CONTROL(FNAME)
+ENDIF
+
 
 DO I = 1, 3
   LBox(I) = XHI(I) - XLO(I)
@@ -89,10 +99,12 @@ enddo
 !open(UNIT=22,STATUS="OLD",FILE="MD.xyz")
 open(UNIT=23,STATUS="UNKNOWN",FILE="Energy.dat", position="append")
 
+if(printcharges) open(UNIT=24,STATUS="UNKNOWN",FILE="charges.dat", position="append")
+
 NATS = SIZE(CR_IN,DIM=2)
 dt = DT_IN * 1000.D0 ! ps to fs
 
-write(6,*) 'test:currentstep=', currentstep
+!write(6,*) 'test:currentstep=', currentstep
 
 if (.not.allocated(ATELE)) THEN
   ALLOCATE(ATELE(NATS))
@@ -482,7 +494,6 @@ do MD_step = 1,MD_Iter
 
    qqx = n - KRes ! Newton-Raphson 
    !write(23,'(f9.4,8f15.6)')  Time/1000, Energy, Temperature, norm2(qx-n)/sqrt(ONE*NATS),n(1),qx(1),qqx(1),q(1), sum(q)
-   write(23,'(f9.4,8f15.6)')  Time/1000, Energy, Temperature, norm2(qx-n)/sqrt(ONE*NATS), sum(q)
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! XL-BOMD !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! Integrate XL-BOMD equation of motion for charge density, kappa*d^2n/dt^2 = -dt^2*w^2*K*(q-n) !
@@ -496,27 +507,34 @@ do MD_step = 1,MD_Iter
   n = 2*n_0 - n_1 - kappa*dn2dt2 + alpha*(C0*n_0+C1*n_1+C2*n_2+C3*n_3+C4*n_4+C5*n_5+C6*n_6)
   n_6 = n_5; n_5 = n_4; n_4 = n_3; n_3 = n_2; n_2 = n_1; n_1 = n_0; n_0 = n
 
+  !!! Exact solution
+  if(exact_solution) then
+  call nearestneighborlist(nrnnlist,nndist,nnRx,nnRy,nnRz,nnType,nnStruct,nrnnStruct,RX,RY,RZ,LBox,COULCUT, &
+                            NATS,Max_Nr_Neigh)
+  call CoulombMatrix(CC,RX,RY,RZ,LBox,Hubbard_U,ATELE,NATS,Coulomb_acc,TIMERATIO, &
+                      nnRx,nnRy,nnRz,nrnnlist,nnType,HDIM,Max_Nr_Neigh)
+  AA(1:NATS,1:NATS) = CC
+  do I = 1,NATS
+    AA(I,I) = AA(I,I) + Hubbard_U(I)
+  enddo
+  AA(NATS+1, NATS+1) = 0.D0
 
-  !!!! Exact solution
-  !call nearestneighborlist(nrnnlist,nndist,nnRx,nnRy,nnRz,nnType,nnStruct,nrnnStruct,RX,RY,RZ,LBox,COULCUT, &
-  !                          NATS,Max_Nr_Neigh)
-  !call CoulombMatrix(CC,RX,RY,RZ,LBox,Hubbard_U,ATELE,NATS,Coulomb_acc,TIMERATIO, &
-  !                    nnRx,nnRy,nnRz,nrnnlist,nnType,HDIM,Max_Nr_Neigh)
-  !AA(1:NATS,1:NATS) = CC
-  !do I = 1,NATS
-  !  AA(I,I) = AA(I,I) + Hubbard_U(I)
-  !enddo
-  !AA(NATS+1, NATS+1) = 0.D0
-
-  !call Invert(AA,AAI,NATS+1)
-  !xx = Matmul(AAI,bb)
-  !q(1:NATS) = xx(1:NATS)
+  call Invert(AA,AAI,NATS+1)
+  xx = Matmul(AAI,bb)
+  q(1:NATS) = xx(1:NATS)
   
   call date_and_time(values=timevector)
   mls(6) = timevector(5)*60*60*1000.D0 + timevector(6)*60*1000 + &
            timevector(7)*1000 + timevector(8)
   write(6,*) 'time of getting exact solution = ', mls(6) - mls(5)
-!!!
+  endif
+  if (printcharges) then
+     if (exact_solution) then
+        write(24,'(f9.4,10000f15.6)')  Time/1000, qx, q, n
+     else
+        write(24,'(f9.4,10000f15.6)')  Time/1000, qx 
+     endif
+  endif
 
   call nearestneighborlist(nrnnlist,nndist,nnRx,nnRy,nnRz,nnType,nnStruct,nrnnStruct,RX,RY,RZ,LBox,COULCUT, &
                            NATS,Max_Nr_Neigh)
@@ -564,7 +582,6 @@ do MD_step = 1,MD_Iter
   enddo
 
   FTOT = Coulomb_Force
-  !write(6,*) 'test-zy: Coulomb_force', Coulomb_Force
 
   FORCES = FORCES + FTOT
 
@@ -580,6 +597,7 @@ do MD_step = 1,MD_Iter
   mls(8) = timevector(5)*60*60*1000.D0 + timevector(6)*60*1000 + &
            timevector(7)*1000 + timevector(8)
   write(6,*) 'time of getting coulomb force = ', mls(8) - mls(7)
+  write(23,'(f9.4,8f15.6)')  Time/1000, Energy, EPOT, Temperature, norm2(qx-n)/sqrt(ONE*NATS), sum(q)
 
   write(6,*) ' Time = ', Time, ' Etotal = ', Energy, 'Temperature = ', Temperature 
   write(6,*) ' ----- RMS = ',  norm2(qx-n)/sqrt(ONE*NATS), 'Nr Resp Cal = ', Cnt*1.D0/(MD_step*1.D0),  &
@@ -588,6 +606,7 @@ enddo
 
 !close(22)
 close(23)
+if(printcharges) close(24)
 
 call cpu_time(t_end)
 write(6,*) 'cpu time of latteqeq=', t_end - t_start

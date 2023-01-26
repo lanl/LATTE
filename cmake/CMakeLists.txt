@@ -46,7 +46,7 @@ message(STATUS "Linking LAPACK via ${LAPACK_LIBRARIES}")
 #  message(FATAL_ERROR "Can not compile against BLAS/LAPACK. Please see error log.")
 #endif()
 
-set(MYMODULES latteqeq_lib.F90  qeq_parameters.F90)
+set(MYMODULES latteqeq_lib.F90  qeq_parameters.F90 openfiles_mod.F90 kernelparser_mod.F90)
 
 set(MYSUBS  Ewald_k_Space.F90 CoulombMatrix.F90
 	#LoadBondIntegralParameters_H.F90 BondIntegral.F90
@@ -59,7 +59,10 @@ set(MYSUBS  Ewald_k_Space.F90 CoulombMatrix.F90
  #LoadBondIntegralParameters_S.F90  Build_S.F90  Build_H0.F90
  #ScaleTail.F90 PairPotential_Forces.F90
  nearestneighborlist.F90  Initiate.F90  masses2symbols.F90
- latteqeq_lib.F90  
+ latteqeq_lib.F90
+ openfiles_mod.F90
+ kernelparser_mod.F90 
+ latteqeq_parser.F90
  latteqeq_c_bind.F90  qeq_parameters.F90)
 
 foreach(_m MYMODULES MYSUBS)

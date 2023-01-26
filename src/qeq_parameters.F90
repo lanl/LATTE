@@ -34,7 +34,9 @@ module qeq_parameters
   real(PREC) :: First, lambda, temp2, temp, RMSE, Fel, Temperature
   real(PREC) :: ERep, ECoul, EBand, EEnt, EPOT
 
-
+logical :: exact_solution, LATTEINEXISTS
+logical :: printcharges
+logical :: printpot
 
 character(10), allocatable :: ATELE(:)
 integer, allocatable :: H_INDEX_START(:), H_INDEX_END(:), NrOrb(:)
@@ -71,7 +73,7 @@ real(PREC), allocatable :: QQ(:,:), ee(:), Fe_vec(:)  ! Eigenvectors, eigenvalue
 
 real(PREC) :: PotCoef(16,10)
 
-
+integer :: VERBOSE
 
 !  qeq_params = 0.D0
 
