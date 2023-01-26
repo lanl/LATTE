@@ -73,7 +73,7 @@ integer    :: MD_Iter = 40001
 !!!!!!!!!!!!!!!!!!!!!!!!    
 integer :: step
 integer :: I,J,K,L,SCF_IT, MD_step, Cnt
-CHARACTER :: FNAME
+CHARACTER*20 :: FNAME
 
 FNAME = "latteqeq.in"
 OPEN(UNIT=6, FILE=OUTFILE, FORM="formatted")
@@ -86,11 +86,12 @@ mls(1) = timevector(5)*60*60*1000.D0 + timevector(6)*60*1000 + &
 exact_solution = .False.
 printcharges = .False.
 
-INQUIRE( FILE=trim(FNAME), exist=LATTEINEXISTS )
+INQUIRE(FILE=trim(FNAME), exist=LATTEINEXISTS )
 IF (LATTEINEXISTS) THEN
    CALL PARSE_CONTROL(FNAME)
+ELSE
+   WRITE(6,*) 'latteqeq.in is not found!'
 ENDIF
-
 
 DO I = 1, 3
   LBox(I) = XHI(I) - XLO(I)
@@ -528,6 +529,7 @@ do MD_step = 1,MD_Iter
            timevector(7)*1000 + timevector(8)
   write(6,*) 'time of getting exact solution = ', mls(6) - mls(5)
   endif
+  
   if (printcharges) then
      if (exact_solution) then
         write(24,'(f9.4,10000f15.6)')  Time/1000, qx, q, n
