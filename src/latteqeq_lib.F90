@@ -530,14 +530,6 @@ do MD_step = 1,MD_Iter
   write(6,*) 'time of getting exact solution = ', mls(6) - mls(5)
   endif
   
-  if (printcharges) then
-     if (exact_solution) then
-        write(24,'(f9.4,10000f15.6)')  Time/1000, qx, q, n
-     else
-        write(24,'(f9.4,10000f15.6)')  Time/1000, qx 
-     endif
-  endif
-
   call nearestneighborlist(nrnnlist,nndist,nnRx,nnRy,nnRz,nnType,nnStruct,nrnnStruct,RX,RY,RZ,LBox,COULCUT, &
                            NATS,Max_Nr_Neigh)
 !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(I,Coulomb_Pot_Real_I,Coulomb_Force_Real_I)
@@ -569,6 +561,14 @@ do MD_step = 1,MD_Iter
   do I = 1,NATS
      qx(I) = (bb(I)-Coulomb_Pot(I) + lambda)/Hubbard_U(I)
   enddo
+
+  if (printcharges) then
+     if (exact_solution) then
+        write(24,'(f9.4,10000f15.6)')  Time/1000, qx, q, n
+     else
+        write(24,'(f9.4,10000f15.6)')  Time/1000, qx 
+     endif
+  endif
 
   ECoul = ZERO
   do I = 1,NATS
