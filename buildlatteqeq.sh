@@ -26,8 +26,8 @@ make install
 
 
 #cd ~/ecp/lammps/build_latte
-cd ~/ecp/mylammps/build_latte
-rm CMakeFiles/lammps.dir/vast/home/zhy/ecp/lammps/src/LATTEQEQ/fix_latteqeq.cpp.o
-~/ecp/mylammps/build_pace_latteqeq.sh 
-
+#cd ~/ecp/mylammps/build_latte
+#rm CMakeFiles/lammps.dir/vast/home/zhy/ecp/lammps/src/LATTEQEQ/fix_latteqeq.cpp.o
+#~/ecp/mylammps/build_pace_latteqeq.sh 
+#
 

@@ -70,6 +70,7 @@ real(PREC), allocatable :: HOrth(:,:)
 real(PREC), allocatable :: dSx(:,:), dSy(:,:), dSz(:,:)
 real(PREC), allocatable :: dHx(:,:), dHy(:,:), dHz(:,:)
 real(PREC), allocatable :: QQ(:,:), ee(:), Fe_vec(:)  ! Eigenvectors, eigenvalues and Fermi occupation
+real(PREC), allocatable :: Coulomb_Pot_Exact(:)       !! ANDERS NEW FEB 9 2023
 
 real(PREC) :: PotCoef(16,10)
 

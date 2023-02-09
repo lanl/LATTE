@@ -61,6 +61,7 @@ real(PREC), parameter :: THREE = 3.D0
 real(PREC), parameter :: eps = 1e-7, SCF_EPS = 1e-9, dx = 0.001D0  
 real(PREC), parameter :: OccErrLim = 1e-9
 real(PREC), parameter :: SEVEN = 7.D0
+real(PREC)            :: Err_qn, Err_qxn, ECoul_Exact, Err_ECoul !! ANDERS NEW FEB 9 2023
 
 real(PREC) :: mls(8)
 integer    :: timevector(8)
@@ -108,6 +109,7 @@ dt = DT_IN * 1000.D0 ! ps to fs
 !write(6,*) 'test:currentstep=', currentstep
 
 if (.not.allocated(ATELE)) THEN
+  ALLOCATE(Coulomb_Pot_Exact(NATS)) 
   ALLOCATE(ATELE(NATS))
   Allocate(H_INDEX_START(NATS), H_INDEX_END(NATS), NrOrb(NATS))
   ALLOCATE(RX(NATS), RY(NATS), RZ(NATS), q(NATS), qx(NATS), qqx(NATS))
@@ -267,6 +269,7 @@ if (currentstep==0) then
   do I = 1,NATS
     ECoul = ECoul - q(I)*bb(I) + 0.5D0*q(I)*Hubbard_U(I)*q(I) + 0.5D0*q(I)*Coulomb_Pot(I)
   enddo
+  ECoul_Exact = ECoul  !! ANDERS NEW FEB 9 2023  The same initially
   
   call nearestneighborlist(nrnnlist,nndist,nnRx,nnRy,nnRz,nnType,nnStruct,nrnnStruct,RX,RY,RZ,LBox,4.0D0, &
                            NATS,Max_Nr_Neigh)
@@ -496,6 +499,15 @@ do MD_step = 1,MD_Iter
    qqx = n - KRes ! Newton-Raphson 
    !write(23,'(f9.4,8f15.6)')  Time/1000, Energy, Temperature, norm2(qx-n)/sqrt(ONE*NATS),n(1),qx(1),qqx(1),q(1), sum(q)
 
+ !! ANDERS NEW PRINT OUT  FEB 9 2023
+   Err_qn = Err_qn + norm2(q-n)/sqrt(ONE*NATS)
+   Err_qxn = Err_qxn + norm2(qx-n)/sqrt(ONE*NATS)
+   Err_ECoul = Err_ECoul + abs(ECoul_Exact-ECoul)/sqrt(ONE*NATS)
+   write(*,*) ' Err |q-n| = ', Err_qn/(One*MD_step), ' Err |q[n]-n| ', Err_qxn/(One*MD_step), &
+              ' ERR ECOUL = ', Err_ECoul/(One*MD_step)
+ !! |q-n| and |q[n]-n| should scale as dt^2, whereas Err_ECoul scales as dt^4
+ !! ANDERS NEW END PRINT OUT FEB 9 2023 |q-n| and |q[n]-n| should scale as dt^2, whereas ERR ECOUL scales as dt^4
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! XL-BOMD !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! Integrate XL-BOMD equation of motion for charge density, kappa*d^2n/dt^2 = -dt^2*w^2*K*(q-n) !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -532,6 +544,18 @@ do MD_step = 1,MD_Iter
   
   call nearestneighborlist(nrnnlist,nndist,nnRx,nnRy,nnRz,nnType,nnStruct,nrnnStruct,RX,RY,RZ,LBox,COULCUT, &
                            NATS,Max_Nr_Neigh)
+
+!!!!!!!! EXACT COULOMB POTENTIAL ANDERS NEW FEB 9 2023
+  do I = 1,NATS
+    call Ewald_Real_Space(Coulomb_Pot_Real_I,Coulomb_Force_Real_I,I,RX,RY,RZ,LBox, &
+    q,Hubbard_U,ATELE,NATS,Coulomb_acc,TIMERATIO,nnRx,nnRy,nnRz,nrnnlist,nnType,HDIM,Max_Nr_Neigh)
+    Coulomb_Pot_Real(I) = Coulomb_Pot_Real_I
+    Coulomb_Force_Real(:,I) = Coulomb_Force_Real_I(:)
+  enddo
+  call Ewald_k_Space(Coulomb_Pot_k,Coulomb_Force_k,RX,RY,RZ,LBox,q,NATS,Coulomb_acc,TIMERATIO,Max_Nr_Neigh)
+  Coulomb_Pot_Exact = Coulomb_Pot_Real+Coulomb_Pot_k
+!!!!!!!!!!!!!!!!!!!! END EXACT COULOMB POTENTIAL ANDERS NEW FEB 9 2023
+
 !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(I,Coulomb_Pot_Real_I,Coulomb_Force_Real_I)
   do I = 1,NATS
     call Ewald_Real_Space(Coulomb_Pot_Real_I,Coulomb_Force_Real_I,I,RX,RY,RZ,LBox, &
@@ -553,7 +577,7 @@ do MD_step = 1,MD_Iter
   temp = 0.D0
   do I = 1,NATS
      lambda = lambda + (-bb(I) + Coulomb_Pot(I))/Hubbard_U(I)
-     temp = temp + 1./Hubbard_U(I)
+     temp = temp + 1.D0/Hubbard_U(I)
   enddo
   lambda = lambda/temp
 
@@ -564,6 +588,7 @@ do MD_step = 1,MD_Iter
 
   if (printcharges) then
      if (exact_solution) then
+             ! q[n], 
         write(24,'(f9.4,10000f15.6)')  Time/1000, qx, q, n
      else
         write(24,'(f9.4,10000f15.6)')  Time/1000, qx 
@@ -571,8 +596,10 @@ do MD_step = 1,MD_Iter
   endif
 
   ECoul = ZERO
+  ECoul_Exact = ZERO !! ANDERS NEW FEB 9 2023
   do I = 1,NATS
     ECoul = ECoul  - qx(I)*bb(I) + 0.5D0*qx(I)*Hubbard_U(I)*qx(I) + 0.5D0*(2.D0*qx(I)-n(I))* Coulomb_Pot(I)
+    ECoul_Exact = ECoul_Exact  - q(I)*bb(I) + 0.5D0*q(I)*Hubbard_U(I)*q(I) + 0.5D0*q(I)*Coulomb_Pot_Exact(I)  !! ANDERS NEW FEB 9 2023
   enddo
 
   EPOT = ECoul !+ energies from charge negativities
