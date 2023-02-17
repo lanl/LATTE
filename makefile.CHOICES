@@ -59,15 +59,15 @@ ifeq ($(CVR), ON)
 	LINKFLAG += -fprofile-arcs -ftest-coverage
 endif
 
-#ifeq ($(PROGRESS), ON)
+ifeq ($(PROGRESS), ON)
 	LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml_fortran -lbml
 	FFLAGS += -I$(BML_PATH)/../include -I$(PROGRESS_PATH)/../include
-#endif
+endif
 
-#ifeq ($(GRAPH), ON) 
+ifeq ($(GRAPH), ON) 
 	LIB += -L$(METIS_PATH)/lib -lmetis
 	FFLAGS += -I$(METIS_PATH)/include
-#endif
+endif
 
 #
 # GPU options
