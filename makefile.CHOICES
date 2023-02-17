@@ -49,7 +49,6 @@ LINKFLAG = -fopenmp
 LIB = -fopenmp -lpthread 
 LIB += -L${CUDA_LIB} -L/usr/local/cuda-10.2/lib64 -I${CUDA_INCLUDE} -lcublas -lcudart
 LIB += -L${CUDA_TOOLKIT_ROOT_DIR}/lib64/ -lcublas -lcusolver 
-LIB += -L${MAGMA_PATH}/lib -lmagma 
 LIB += -fopenmp -lpthread  -llapack -lblas
 
 # Uncomment for coverage
@@ -57,6 +56,10 @@ LIB += -fopenmp -lpthread  -llapack -lblas
 ifeq ($(CVR), ON)
 	FFLAGS += -fprofile-arcs -ftest-coverage
 	LINKFLAG += -fprofile-arcs -ftest-coverage
+endif
+
+ifeq ($(MAGMA), ON)
+	LIB += -L${MAGMA_PATH}/lib -lmagma 
 endif
 
 ifeq ($(PROGRESS), ON)
