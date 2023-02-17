@@ -10,12 +10,12 @@ PRECISION = DOUBLE
 # Make the latte library
 # AR and RUNLIB executable default path to compile 
 # latte as a library (change accordingly)
-MAKELIB = ON
+MAKELIB = OFF
 AR = /usr/bin/ar cq
 RANLIB = /usr/bin/ranlib
 
 # Use PROGRESS and BML libraries
-PROGRESS = ON
+PROGRESS = OFF
 PROGRESS_PATH= $(MY_PATH)/../../qmd-progress/install/lib64
 BML_PATH= $(MY_PATH)/../../bml/install/lib64
 MAGMA_PATH = $(MY_PATH)/../../magma
