@@ -138,6 +138,11 @@ else
 		$(RANLIB) ../liblatte.a
 		#$(RANLIB) ../liblattetools.a  
 		$(FC) $(FFLAGS) -c latte_c_bind.F90
+
+ifeq ($(SHARED), ON)
+		(echo "Building shared lib")
+		$(FC) $(FFLAGS) $(PPFLAGS) -shared -fpic  -o ../liblatte.so latte_c_bind.F90 $(XMYMODULES) $(XMYSUBS) $(LIB)
+endif
 endif
 endif
 

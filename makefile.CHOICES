@@ -11,6 +11,7 @@ PRECISION = DOUBLE
 # AR and RUNLIB executable default path to compile 
 # latte as a library (change accordingly)
 MAKELIB = OFF
+SHARED = OFF
 AR = /usr/bin/ar cq
 RANLIB = /usr/bin/ranlib
 
