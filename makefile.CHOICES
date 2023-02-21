@@ -65,7 +65,7 @@ endif
 
 ifeq ($(PROGRESS), ON)
 	LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml_fortran -lbml
-	FFLAGS += -I$(BML_PATH)/../include -I$(PROGRESS_PATH)/../include
+	FFLAGS += -I$(BML_PATH)/../include -I$(PROGRESS_PATH)/../include  -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml_fortran -lbml
 endif
 
 ifeq ($(GRAPH), ON) 
