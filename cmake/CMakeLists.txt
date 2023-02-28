@@ -152,8 +152,8 @@ if(PROGRESS)
     ${PROGRESS_LIBRARIES})
 else()
   target_link_libraries(latte PRIVATE
-    ${PROGRESS_LIBRARIES}
-    ${BML_LIBRARIES}
+    #    ${PROGRESS_LIBRARIES}
+    #   ${BML_LIBRARIES}
     ${CUDA_cublas_LIBRARY}
     ${CUDA_cusparse_LIBRARY}
     ${CUDA_CUDART_LIBRARY}
@@ -186,7 +186,7 @@ else()
   set(LATTE LATTE_${PRECISION})
 endif()
 add_executable(${LATTE} ${CMAKE_CURRENT_SOURCE_DIR}/../src/latte.F90)
-target_link_libraries(${LATTE} latte ${PROGRESS_LIBRARIES})
+target_link_libraries(${LATTE} latte ${PROGRESS_LIBRARIES} ${PROGRESS_LIBRARIES} ${BML_LIBRARIES})
 target_include_directories(${LATTE} PRIVATE ${MPI_Fortran_INCLUDE_PATH} ${PROGRESS_INCLUDE_DIRS} ${BML_INCLUDE_DIRS})
 target_compile_definitions(${LATTE} PRIVATE XSYEV ${PRECISION}PREC GPU${GPUOPT} DBCSR_${DBCSR_OPT} MPI_${DO_MPI} PROGRESS${PROGRESS})
 install(TARGETS ${LATTE} DESTINATION ${CMAKE_INSTALL_BINDIR})
