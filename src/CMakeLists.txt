@@ -74,6 +74,7 @@ add_library(latte ${MYMODULES_SOURCES} ${MYSUBS_SOURCES}
 target_compile_options(latte PRIVATE -cpp)
 add_library(LATTE::latte ALIAS latte)
 if(PROGRESS)
+  target_include_directories(latte PRIVATE ${MPI_Fortran_INCLUDE_PATH} ${PROGRESS_INCLUDE_DIR} ${BML_INCLUDE_DIR})
   target_link_libraries(latte PRIVATE ${PROGRESS_LIBRARIES})
 else()
   target_link_libraries(latte PRIVATE
@@ -89,10 +90,10 @@ else()
   )
 endif()
 
+target_include_directories(latte PRIVATE ${MPI_Fortran_INCLUDE_PATH} ${PROGRESS_INCLUDE_DIRS} ${BML_INCLUDE_DIRS})
 if(OPENMP)
   target_link_libraries(latte PUBLIC OpenMP::OpenMP_Fortran)
 endif()
-target_include_directories(latte PRIVATE ${MPI_Fortran_INCLUDE_PATH} ${PROGRESS_INCLUDE_DIRS} ${BML_INCLUDE_DIRS})
 
 #only "ON" and "OFF" support
 foreach(_def GPUOPT DBCSR_OPT DO_MPI PROGRESS)
@@ -103,10 +104,12 @@ foreach(_def GPUOPT DBCSR_OPT DO_MPI PROGRESS)
   endif()
 endforeach()
 
-target_compile_definitions(latte PRIVATE XSYEV ${PRECISION}PREC GPU${GPUOPT} DBCSR_${DBCSR_OPT} MPI_${DO_MPI} PROGRESS${PROGRESS})
+message(STATUS "BMLDIR: ${BML_INCLUDEDIR}")
+message(STATUS "BMLDRI: ${BML_INCLUDE_DIRS}")
+target_compile_definitions(latte PRIVATE XSYEV ${PRECISION}PREC GPU${GPUOPT} DBCSR_${DBCSR_OPT} MPI_${DO_MPI} PROGRESS${PROGRESS} LINK_LIBRARIES )
 
 add_executable(${LATTE} ${CMAKE_CURRENT_SOURCE_DIR}/../src/latte.F90)
-target_link_libraries(${LATTE} latte ${PROGRESS_LIBRARIES})
+target_link_libraries(${LATTE} latte ${PROGRESS_LIBRARIES} ${LINK_LIBRARIES})
 
-target_include_directories(latte PRIVATE ${MPI_Fortran_INCLUDE_PATH} ${PROGRESS_INCLUDE_DIRS} ${BML_INCLUDE_DIRS})
-target_compile_definitions(latte PRIVATE XSYEV ${PRECISION}PREC GPU${GPUOPT} DBCSR_${DBCSR_OPT} MPI_${DO_MPI} PROGRESS${PROGRESS})
+target_include_directories(latte PRIVATE ${MPI_Fortran_INCLUDE_PATH} ${PROGRESS_INCLUDE_DIRS} ${BML_INCLUDE_DIRS}  ${PROGRESS_INCLUDEDIR} ${BML_INCLUDEDIR})
+target_compile_definitions(latte PRIVATE XSYEV ${PRECISION}PREC GPU${GPUOPT} DBCSR_${DBCSR_OPT} MPI_${DO_MPI} PROGRESS${PROGRESS} LINK_LIBRARIES)
