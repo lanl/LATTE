@@ -21,6 +21,7 @@ endif()
 
 option(OPENMP "Use OpenMP" OFF)
 if(OPENMP)
+  message(STATUS "Use OpenMP")
   find_package(OpenMP REQUIRED)
 endif()
 
@@ -31,20 +32,6 @@ if(DO_MPI)
     message(FATAL_ERROR "Can not find suitable MPI library")
   endif()
 endif()
-
-find_package(BLAS REQUIRED)
-find_package(LAPACK REQUIRED)
-
-message(STATUS "Linking BLAS via ${BLAS_LIBRARIES}")
-message(STATUS "Linking LAPACK via ${LAPACK_LIBRARIES}")
-#include(CheckFortranSourceCompiles)
-#set(CMAKE_REQUIRED_FLAGS ${OpenMP_Fortran_FLAGS})
-#set(CMAKE_REQUIRED_LIBRARIES ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
-#check_Fortran_source_compiles("      program blas\n      call dgemm()\n      end program blas" BLAS_WORKS)
-#check_Fortran_source_compiles("      program lapack\n      call dsyev()\n      end program lapack" LAPACK_WORKS)
-#if(NOT BLAS_WORKS OR NOT LAPACK_WORKS)
-#  message(FATAL_ERROR "Can not compile against BLAS/LAPACK. Please see error log.")
-#endif()
 
 option(PROGRESS "Use progress library" OFF)
 if(PROGRESS)
@@ -58,6 +45,11 @@ if(PROGRESS)
     find_package(PROGRESS MODULE REQUIRED)
   endif()
   message(STATUS "Found PROGRESS: ${PROGRESS_LIBRARIES} ${BML_LIBRARIES}")
+else()
+  find_package(BLAS REQUIRED)
+  find_package(LAPACK REQUIRED)
+  message(STATUS "Linking BLAS via ${BLAS_LIBRARIES}")
+  message(STATUS "Linking LAPACK via ${LAPACK_LIBRARIES}")
 endif()  
 
 option(DBCSR_OPT "Whether to use DBCSR" OFF)
@@ -155,17 +147,23 @@ configure_file(LATTEConfig.cmakein ${CMAKE_CURRENT_BINARY_DIR}/LATTEConfig.cmake
 write_basic_package_version_file("LATTEConfigVersion.cmake" VERSION ${PROJECT_VERSION} COMPATIBILITY ExactVersion)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/LATTEConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/LATTEConfigVersion.cmake" DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/LATTE)
 add_library(LATTE::latte ALIAS latte)
-target_link_libraries(latte PRIVATE
-  ${PROGRESS_LIBRARIES}
-  ${BML_LIBRARIES}
-  ${CUDA_cublas_LIBRARY}
-  ${CUDA_cusparse_LIBRARY}
-  ${CUDA_CUDART_LIBRARY}
-  ${MPI_Fortran_LIBRARIES}
-  PUBLIC
-  ${LAPACK_LIBRARIES}
-  ${BLAS_LIBRARIES}
+if(PROGRESS)
+  target_link_libraries(latte PRIVATE
+    ${PROGRESS_LIBRARIES})
+else()
+  target_link_libraries(latte PRIVATE
+    ${PROGRESS_LIBRARIES}
+    ${BML_LIBRARIES}
+    ${CUDA_cublas_LIBRARY}
+    ${CUDA_cusparse_LIBRARY}
+    ${CUDA_CUDART_LIBRARY}
+    ${MPI_Fortran_LIBRARIES}
+    PUBLIC
+    ${LAPACK_LIBRARIES}
+    ${BLAS_LIBRARIES}
 )
+endif()
+
 if(OPENMP)
   target_link_libraries(latte PUBLIC OpenMP::OpenMP_Fortran)
 endif()
