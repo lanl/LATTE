@@ -133,17 +133,15 @@ ifeq ($(GPUOPT), ON)
 		#$(RANLIB) ../liblattetools.a  
 		$(FC) $(FFLAGS) -c latte_c_bind.F90  $(GPU_LINKFLAG) $(GPU_LIB)
 else
-
-ifeq ($(SHARED), ON)
-		(echo "Building shared lib")
-		$(FC) $(FFLAGS) $(PPFLAGS) -shared -fpic  -o ../liblatte.so latte_c_bind.F90 $(LINKFLAG) $(XMYMODULES) $(XMYSUBS) $(LIB)
-else
-		$(AR) ../liblatte.a latte_lib.o $(XMYMODULES) $(XMYSUBS) $(LIB)
+		$(AR) ../liblatte.a latte_lib.o $(XMYMODULES) $(XMYSUBS)
 		#$(AR) ../liblattetools.a latte_lib_tools.o $(XMYMODULES) $(XMYSUBS) 
 		$(RANLIB) ../liblatte.a
 		#$(RANLIB) ../liblattetools.a  
 		$(FC) $(FFLAGS) -c latte_c_bind.F90
 
+ifeq ($(SHARED), ON)
+		(echo "Building shared lib")
+		$(FC) $(FFLAGS) $(PPFLAGS) -shared -fpic  -o ../liblatte.so latte_c_bind.F90 $(XMYMODULES) $(XMYSUBS) $(LIB)
 endif
 endif
 endif
