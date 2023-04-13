@@ -268,7 +268,6 @@ for name in 0scf fullscf sp2 ; do
 
 done
 
-mv latte.in.tmp latte.in
 rm out *.dat mylastLATTEcalc *.cfg
 
 echo -e "\nEnd of run and test"
