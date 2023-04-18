@@ -7,8 +7,8 @@ CONTROL{
   DEBUGON= 0
   FERMIM= 6
   CGORLIB= 1 CGTOL= 1.0e-6
-  KBT= 0.1
-  NORECS= 10   #rank for DM update
+  KBT= 0.3
+  NORECS= 10
   ENTROPYKIND= 1
   PPOTON= 2 VDWON= 0
   SPINON= 0 SPINTOL= 1.0e-4
@@ -42,16 +42,16 @@ CONTROL{
   PPBETA= 1000.0 PPSIGMA= 0.01 PPNMOL= 10 PPNGEOM= 200
   PARREP= 0
   ER= 1.0
-  DFTBU= T       #turn on DFTB+U
-  S_DFTB_U= 0.0  #U parameter for s orbital
-  P_DFTB_U= 2.0  #U parameter for p orbital
-  D_DFTB_U= 2.0  #U parameter for d orbital
-  F_DFTB_U= 2.0  #U parameter for f orbital
+  DFTBU= T
+  S_DFTB_U= 0.0
+  P_DFTB_U= 2.0
+  D_DFTB_U= 2.0
+  F_DFTB_U= 2.0
   DOKERNEL= T
 }
 
 MDCONTROL{
-MAXITER= 20
+MAXITER= 2000
 UDNEIGH= 1
 DT= 0.5
 TEMPERATURE= 1.0e-10 RNDIST= GAUSSIAN SEEDINIT= UNIFORM
@@ -70,13 +70,3 @@ UPARTICLE= 500.0 USHOCK= -4590.0 C0= 1300.0
 MDADAPT= 0
 GETHUG= 0 E0= -795.725  V0= 896.984864 P0= 0.083149
 }
-
-MIXER{
-  Verbose=           10
-  MPulay=           5
-  MixCoeff=  0.01
-  MixerType= Pulay
-  #MixerType= PulayLinear
-  MixerON= T
-}
-

@@ -251,11 +251,11 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         IF (DFTBU .AND. KON==0) then 
 #ifdef  PROGRESSON
-           CALL BML_COPY_NEW(ORTHOBO_BML,PNO_BML)
+           !CALL BML_COPY_NEW(ORTHOBO_BML,PNO_BML)
            CALL BML_COPY_NEW(ORTHOBO_BML,DO_BML)
 #elif defined(PROGRESSOFF)
            DOrth = BO 
-           PNO   = BO
+           !PNO   = BO
 #endif
         ENDIF
 
@@ -333,7 +333,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            DELTAQ = QMIX*DELTAQ + (ONE - QMIX)*OLDDELTAQS
 #endif
           ELSE
-           !ZY: mixing DM
            !IF (KON==0) THEN
              IF (DOKERNEL) THEN
                !CALL DMKERNELMIXER(ITER,MAXDQ)              ! Rank1-1 updated DM kernel mixer
@@ -514,7 +513,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         CALL ADDQDEP
 #ifdef PROGRESSON
         IF (DFTBU) CALL ADDDFTBUPRG(.false.) 
-        !IF (DFTBU) CALL ADDDFTBU(.false.) 
 #elif defined(PROGRESSOFF)
         IF (DFTBU) CALL ADDDFTBU(.false.) 
 #endif
@@ -618,7 +616,8 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
           CALL BML_COPY_NEW(ORTHOBO_BML, DO_BML_OLD)
           CALL DEORTHOMYRHOPRG
 #elif defined(PROGRESSOFF)
-          BO = DOrth_old + QMIX*(DOrth - DOrth_old) 
+          CALL dP2MIXER(ITER,SCF_ERR,MAXDQ)            ! Rank1-1 updated DM kernel mixer
+          !BO = DOrth_old + QMIX*(DOrth - DOrth_old) 
           DOrth_old = BO                           
           CALL DEORTHOMYRHO
 #endif

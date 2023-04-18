@@ -134,7 +134,7 @@ done
 
 # Testing for MD simulations:
 for name in tableread 0scf 2scf fullscf fullscf.etemp sp2 sp2.sparse fullscf.nvt \
-       	fullscf.npt fullscf.vdw fullscf.spin fullscf.kon fullscf.rspace dokernel1 dokernel2; do
+       	fullscf.npt fullscf.vdw fullscf.spin fullscf.kon fullscf.rspace dokernel1 dokernel2 dftbu ; do
 
   INLATTEFILE="latte."$name".in"
   REF="energy."$name".out"

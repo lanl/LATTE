@@ -1740,7 +1740,7 @@ CONTAINS
     DEALLOCATE(BO_SAVE, DELTA_DS, X, YY, ORTHOH_SAVE, DELTA_DO, NDELTA_DO)
     DEALLOCATE(H_0, H_1, H1, DU, H_SAVE)
   END SUBROUTINE DMKERNELMIXER
-  !
+!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
@@ -1832,7 +1832,7 @@ CONTAINS
 #endif
 
   END SUBROUTINE dP2MD
-  !
+!
   SUBROUTINE dP2MIXER(PITER,SCF_ERR,MAXDQ)
     IMPLICIT NONE
     INTEGER, INTENT(IN) :: PITER
@@ -1887,7 +1887,7 @@ CONTAINS
 
     !IF(SCF_ERR > 0.01D0) THEN
 #ifdef PROGRESSON
-    IF(SCF_ERR > 0.1D0) THEN
+    IF(SCF_ERR > 0.01D0) THEN
       CALL BML_COPY_NEW(AUX_BML, DU_BML)
       CALL BML_ADD(DU_BML, AUX_BML, QMIX, 0.D0, 1.D-20)
       !dU = QMIX*Delta_DO
@@ -1900,7 +1900,7 @@ CONTAINS
     CALL BML_ADD(ORTHOBO_BML,DU_BML,1.0_DP,1.0_DP,NUMTHRESH)
 #elif defined(PROGRESSOFF)
     !write(*,*) ' LINEAR MIX MIXER_MOD', QMIX, SCF_ERR
-    IF(SCF_ERR > 0.1D0) THEN
+    IF(SCF_ERR > 0.01D0) THEN
       dU = QMIX*Delta_DO
     ELSE
       !write(*,*) ' RESPONSE MIX MIXER_MOD', SCF_ERR
@@ -1908,6 +1908,7 @@ CONTAINS
       !dU = QMIX*Delta_DO
     ENDIF
     BO = DOrth_old + dU
+    DOrth = BO
 #endif
 
     DEALLOCATE(DU, DELTA_DO)
@@ -1968,9 +1969,9 @@ CONTAINS
 
     K = 0
     ALLOCATE(MMX(1,1),MMX_I(1,1))
+    H0 = 0.D0  ! SUCH THAT ADDQDEP ONLY INCLUDES RESPONSE PART
     do while ( ErrDM > KERNELTOL .AND. K < NRANK)
       DEALLOCATE(MMX,MMX_I)
-      H0 = 0.D0  ! SUCH THAT ADDQDEP ONLY INCLUDES RESPONSE PART
       K = K + 1
       DM_V(:,:,K) = dU(:,:)
 
@@ -2009,7 +2010,7 @@ CONTAINS
       DELTAQ = 0.0
       do I = 1,NATS
         do J = H_INDEX_START(I),H_INDEX_END(I)
-          DELTAQ(I) = DELTAQ(I) + 2*Delta_DS(J,J)
+          DELTAQ(I) = DELTAQ(I) + 2.0D0*Delta_DS(J,J)
         enddo
       enddo
 
@@ -2022,8 +2023,8 @@ CONTAINS
       beta = 1.D0/KBT
 
       ! call canonical response
-      call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
-      !call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
+      !call can_resp(ORTHOH,Nocc,beta,EVECS,EVALS,FERMIOCC,CHEMPOT,eps,HDIM)
+      call Canon_DM_PRT(ORTHOH,beta,EVECS,EVALS,CHEMPOT,16,HDIM)
 
       UU(:,:,K) = BO(:,:) - DM_V(:,:,K)
       dU(:,:) = UU(:,:,K)
@@ -2069,7 +2070,7 @@ CONTAINS
       IF(ErrDMn<1.d-20) ErrDMn = ErrDMn + 1.d-20
 
       ErrDM = sqrt(ErrDM)/sqrt(ErrDMn) ! Relative Error
-      !write(*,*) ' ErrDM = ', ErrDM  !! Should go down as a function of K
+      write(*,*) ' ErrDM = ', K, ErrDM  !! Should go down as a function of K
       !-----
     enddo
 
@@ -2086,7 +2087,6 @@ CONTAINS
       enddo
     enddo
     DEALLOCATE(MMX,MMX_I)
-
 
     write(6,*) 'maxval(dP)=', maxval(dabs(dP))
 
