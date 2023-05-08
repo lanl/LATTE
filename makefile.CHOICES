@@ -16,10 +16,10 @@ AR = /usr/bin/ar cq
 RANLIB = /usr/bin/ranlib
 
 # Use PROGRESS and BML libraries
-PROGRESS = OFF
+PROGRESS = ON
 PROGRESS_PATH= $(MY_PATH)/../../qmd-progress/install/lib64
 BML_PATH= $(MY_PATH)/../../bml/install/lib64
-MAGMA_PATH = $(MY_PATH)/../../magma
+MAGMA_PATH = $(OLCF_MAGMA_ROOT)
 METIS_PATH = $(MY_PATH)/../../metis-5.1.0/
 
 
@@ -43,14 +43,24 @@ FC = gfortran
 FCL = $(FC)
 
 FFLAGS =  -ffree-line-length-none -fopenmp -lpthread 
+FFLAGS += -g -I/opt/rocm-5.2.0/include 
+FFLAGS += -O2 -g -DNDEBUG -fopenmp -fopenmp
+FFLAGS += -I/opt/rocm-5.2.0/include -I${PROGRESS_PATH}/../../build/src -isystem ${BML_PATH}/../include
+FFLAGS += -I/opt/rocm-5.2.0/include -I${PROGRESS_PATH}/../../build/src -I${PROGRESS_PATH}/../include
+FFLAGS += -ffree-line-length-none  -O2 -g -DNDEBUG -fopenmp -fopenmp
+LINKFLAG = $(FFLAGS)
 
-LINKFLAG = -fopenmp
+LIB = -fopenmp -lpthread -L${OLCF_OPENBLAS_ROOT}/lib -lopenblas
+LIB += -L${ROCM_PATH}/lib -lrocblas
+LIB += -L${MAGMA_PATH}/lib -lmagma
+LIB  += -L${PROGRESS_PATH} -lprogress -L${BML_PATH} -lbml_fortran -lbml
+LIB += -fopenmp -L${OLCF_MAGMA_ROOT}/lib  -lmagma -L${ROCM_PATH}/lib -lrocblas -lamdhip64 -lrocsolver
+LIB += -lm -lgfortran
+LIB += -fopenmp -lpthread -L/sw/crusher/spack-envs/base/opt/cray-sles15-zen3/gcc-11.2.0/openblas-0.3.17-fip547hyhcrii2xgj5rmge3oyxgnfhkp/lib -lopenblas
+# for metis
+LIB += -L$(METIS_PATH)/lib -lmetis
+LIB += $(FFLAGS)
 
-#BLAS/LAPACK libraries:
-LIB = -fopenmp -lpthread 
-LIB += -L${CUDA_LIB} -L/usr/local/cuda-10.2/lib64 -I${CUDA_INCLUDE} -lcublas -lcudart
-LIB += -L${CUDA_TOOLKIT_ROOT_DIR}/lib64/ -lcublas -lcusolver 
-LIB += -fopenmp -lpthread  -llapack -lblas
 
 # Uncomment for coverage
 #CVR = OFF
