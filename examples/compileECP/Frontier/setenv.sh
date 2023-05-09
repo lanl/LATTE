@@ -1,8 +1,6 @@
-#!/bin/bash
 module purge  
 module load PrgEnv-gnu
 module load magma/2.6.1
-module load magma
 module load cmake
 module load openblas
 module load rocm/5.2.0
