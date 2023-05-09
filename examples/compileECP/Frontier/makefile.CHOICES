@@ -1,0 +1,91 @@
+
+
+
+#
+# Compilation and link flags for LATTE
+#
+
+# Precision - double or single
+PRECISION = DOUBLE
+#PRECISION = SINGLE
+
+# Make the latte library
+# AR and RUNLIB executable default path to compile 
+# latte as a library (change accordingly)
+MAKELIB = ON
+AR = /usr/bin/ar cq
+RANLIB = /usr/bin/ranlib
+
+# Use PROGRESS and BML libraries
+PROGRESS = ON
+MY_PATH=$(shell pwd)
+PROGRESS_PATH= $(MY_PATH)/../../qmd-progress/install/lib64
+BML_PATH= $(MY_PATH)/../../bml/install/lib64
+#PROGRESS_PATH= $(MEMBERWORK)/csc304/Crusher/qmd-progress/install/lib64
+#BML_PATH= $(MEMBERWORK)/csc304/Crusher/bml/install/lib64
+MAGMA_PATH = $(OLCF_MAGMA_ROOT)
+#METIS_PATH=/sw/crusher/spack-envs/base/opt/cray-sles15-zen3/gcc-11.2.0/metis-5.1.0-lxe5bhakcmkcf7zuqcagulm7tihcav7q/
+
+# Use METIS library for graph partitioning
+METIS = OFF
+
+# GPU available - OFF or ON
+GPUOPT = OFF
+
+# Using DBCSR library from cp2k? OFF or ON
+DBCSR_OPT = OFF
+
+# Parallelizing over k-points?
+MPIOPT = OFF
+
+#
+# CPU Fortran options
+#
+
+FC = gfortran
+FCL = $(FC)
+
+FFLAGS =  -ffree-line-length-none -fopenmp -lpthread 
+FFLAGS += -g -I/opt/rocm-5.3.0/include 
+FFLAGS += -O2 -g -DNDEBUG -fopenmp -fopenmp -I${OLCF_OPENBLAS_ROOT}/include 
+FFLAGS += -I/opt/rocm-5.3.0/include -I${PROGRESS_PATH}/../../build/src -isystem ${BML_PATH}/../include
+FFLAGS += -I/opt/rocm-5.3.0/include -I${PROGRESS_PATH}/../../build/src -I${PROGRESS_PATH}/../include
+FFLAGS += -ffree-line-length-none  -O2 -g -DNDEBUG -fopenmp -fopenmp
+LINKFLAG = $(FFLAGS)
+
+
+
+LIB = -fopenmp -lpthread -L${OLCF_OPENBLAS_ROOT}/lib -lopenblas
+LIB += -L${ROCM_PATH}/lib -lrocblas
+LIB += -L${MAGMA_PATH}/lib -lmagma
+LIB  += -L${PROGRESS_PATH} -lprogress -L${BML_PATH} -lbml_fortran -lbml
+LIB += -fopenmp -L${OLCF_MAGMA_ROOT}/lib  -lmagma -L${ROCM_PATH}/lib -lrocblas -lamdhip64 -lrocsolver
+LIB += -lm -lgfortran
+LIB += -fopenmp -lpthread -L${OLCF_OPENBLAS_ROOT}/lib -lopenblas
+LIB += $(FFLAGS)
+
+# Uncomment for coverage
+#CVR = OFF
+ifeq ($(CVR), ON)
+  FFLAGS += -fprofile-arcs -ftest-coverage
+  LINKFLAG += -fprofile-arcs -ftest-coverage
+endif
+
+ifeq ($(PROGRESS), ON)
+  LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml_fortran -lbml
+  FFLAGS += -I$(BML_PATH)/../include -I$(PROGRESS_PATH)/../include
+endif
+
+ifeq ($(GRAPH), ON)
+  LIB += -L$(METIS_PATH)/lib -lmetis
+  FFLAGS += -I$(METIS_PATH)/include
+endif
+
+#
+# GPU options
+#
+
+GPU_CUDA_LIB = -L${OLCF_CUDA_ROOT}/lib64/ -lcublas -lcudart
+
+GPU_ARCH = sm_70
+
