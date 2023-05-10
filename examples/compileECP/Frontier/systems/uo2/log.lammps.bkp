@@ -1,0 +1,130 @@
+LAMMPS (23 Jun 2022 - Update 2)
+  using 8 OpenMP thread(s) per MPI task
+#LAMMPS (23 Jun 2022)
+# AIMD test of two UO2 molecules with LATTE in MDI stand-alone mode
+
+units           metal
+atom_style      full
+atom_modify     sort 0 0.0
+
+read_data       uo2.lmp
+Reading data file ...
+  triclinic box = (0 0 0) to (5.471 10.942 10.942) with tilt (0 0 0)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  48 atoms
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0       
+  special bond factors coul:  0        0        0       
+     0 = max # of 1-2 neighbors
+     0 = max # of 1-3 neighbors
+     0 = max # of 1-4 neighbors
+     1 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  read_data CPU = 0.001 seconds
+
+variable  x index 2
+variable  y index 1
+variable  z index 1
+
+variable        nrep equal v_x*v_y*v_z
+if              "${nrep} > 1" then "replicate $x $y $z"
+replicate $x $y $z
+replicate 2 $y $z
+replicate 2 1 $z
+replicate 2 1 1
+Replicating atoms ...
+  triclinic box = (0 0 0) to (10.942 10.942 10.942) with tilt (0 0 0)
+  1 by 1 by 1 MPI processor grid
+  96 atoms
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0       
+  special bond factors coul:  0        0        0       
+     0 = max # of 1-2 neighbors
+     0 = max # of 1-3 neighbors
+     0 = max # of 1-4 neighbors
+     1 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  replicate CPU = 0.001 seconds
+
+velocity        all create 300.0 87287 loop geom
+
+neighbor        0.0 bin
+neigh_modify    every 1 delay 0 check yes
+
+pair_style      zero 1.0
+pair_coeff  * *
+
+timestep        0.00025
+
+fix             1 all nve
+fix   2 all latte NULL
+fix_modify 2 energy yes
+
+thermo 1
+thermo_style    custom step temp pe etotal press
+thermo_modify flush yes
+
+dump            1 all custom 1 dump.mdi.aimd                 id type x y z vx vy vz fx fy fz
+
+run             14
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update every 1 steps, delay 0 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 1
+  ghost atom cutoff = 1
+  binsize = 0.5, bins = 22 22 22
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair zero, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton/tri
+      stencil: half/bin/3d/tri
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 13.38 | 13.38 | 13.38 Mbytes
+   Step          Temp          PotEng         TotEng         Press     
+         0   300           -890.63367     -886.94976     -63126.02     
+         1   299.92215     -890.6306      -886.94764     -63124.92     
+         2   299.68879     -890.62774     -886.94764     -63115.279    
+         3   299.30041     -890.62296     -886.94763     -63099.221    
+         4   298.75781     -890.61628     -886.94762     -63076.741    
+         5   298.06204     -890.60768     -886.94757     -63047.922    
+         6   297.21443     -890.59729     -886.94759     -63012.609    
+         7   296.2166      -890.58508     -886.94763     -62970.981    
+         8   295.07043     -890.57101     -886.94763     -62923.135    
+         9   293.77807     -890.55515     -886.94764     -62869.09     
+        10   292.34191     -890.53751     -886.94764     -62808.953    
+        11   290.76278     -890.51831     -886.94783     -62743.857    
+        12   289.05301     -890.50523     -886.95574     -62664.871    
+        13   287.14941     -891.36972     -887.84361     -61891.105    
+        14   286.25128     -972.61597     -969.10089      27786.829    
+Loop time of 17.9279 on 8 procs for 14 steps with 96 atoms
+
+Performance: 0.017 ns/day, 1422.851 hours/ns, 0.781 timesteps/s
+1125.5% CPU use with 1 MPI tasks x 8 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 1.9228e-05 | 1.9228e-05 | 1.9228e-05 |   0.0 |  0.00
+Bond    | 1.001e-06  | 1.001e-06  | 1.001e-06  |   0.0 |  0.00
+Neigh   | 0.0003717  | 0.0003717  | 0.0003717  |   0.0 |  0.00
+Comm    | 0.00010317 | 0.00010317 | 0.00010317 |   0.0 |  0.00
+Output  | 0.0041724  | 0.0041724  | 0.0041724  |   0.0 |  0.02
+Modify  | 17.923     | 17.923     | 17.923     |   0.0 | 99.97
+Other   |            | 6.289e-05  |            |       |  0.00
+
+Nlocal:             96 ave          96 max          96 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:             31 ave          31 max          31 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:              0 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 0
+Ave neighs/atom = 0
+Ave special neighs/atom = 0
+Neighbor list builds = 14
+Dangerous builds = 14
+
+Total wall time: 0:00:23
