@@ -23,18 +23,18 @@ Finding 1-2 1-3 1-4 neighbors ...
   special bonds CPU = 0.000 seconds
   read_data CPU = 0.002 seconds
 
-variable  x index 1
-variable  y index 2
+variable  x index 2
+variable  y index 1
 variable  z index 1
 
 variable        nrep equal v_x*v_y*v_z
 if              "${nrep} > 1" then "replicate $x $y $z"
 replicate $x $y $z
-replicate 1 $y $z
-replicate 1 2 $z
-replicate 1 2 1
+replicate 2 $y $z
+replicate 2 1 $z
+replicate 2 1 1
 Replicating atoms ...
-  triclinic box = (0 0 0) to (14.405 28.81 14.405) with tilt (1.7641037e-15 8.8205186e-16 8.8205186e-16)
+  triclinic box = (0 0 0) to (28.81 14.405 14.405) with tilt (8.8205186e-16 8.8205186e-16 8.8205186e-16)
   1 by 1 by 1 MPI processor grid
   600 atoms
 Finding 1-2 1-3 1-4 neighbors ...
@@ -75,7 +75,7 @@ Neighbor list info ...
   max neighbors/atom: 2000, page size: 100000
   master list distance cutoff = 1
   ghost atom cutoff = 1
-  binsize = 0.5, bins = 29 58 29
+  binsize = 0.5, bins = 58 29 29
   1 neighbor lists, perpetual/occasional/extra = 1 0 0
   (1) pair zero, perpetual
       attributes: half, newton on
@@ -84,48 +84,48 @@ Neighbor list info ...
       bin: standard
 Per MPI rank memory allocation (min/avg/max) = 13.63 | 13.63 | 13.63 Mbytes
    Step          Temp          PotEng         TotEng         Press     
-         0   300           -2743.4552     -2720.2272     -1491.3004    
-         1   298.60728     -2743.3414     -2720.2212     -1396.532     
-         2   295.21936     -2743.0775     -2720.2196     -635.52218    
-         3   290.19018     -2742.6858     -2720.2173      760.99642    
-         4   284.03001     -2742.2059     -2720.2144      2740.4353    
-         5   277.37406     -2741.6871     -2720.2109      5230.6454    
-         6   270.93876     -2741.1853     -2720.2073      8143.3466    
-         7   265.46122     -2740.7577     -2720.2039      11378.244    
-         8   261.62086     -2740.4577     -2720.2012      14827.653    
-         9   259.94866     -2740.3266     -2720.1996      18381.365    
-        10   260.73658     -2740.3877     -2720.1997      21931.285    
-        11   263.96335     -2740.6398     -2720.202       25379.171    
-        12   269.26086     -2741.0544     -2720.2064      28620.73     
-        13   275.93473     -2741.5768     -2720.212       31583.385    
-        14   283.04013     -2742.1326     -2720.2178      34199.405    
-Loop time of 14.0163 on 8 procs for 14 steps with 600 atoms
+         0   300           -2743.4553     -2720.2272     -1491.3269    
+         1   300.06625     -2743.4555     -2720.2223     -824.26809    
+         2   297.94752     -2743.2908     -2720.2217      497.62921    
+         3   293.80346     -2742.9683     -2720.2201      2431.4803    
+         4   288.00296     -2742.5167     -2720.2175      4912.2208    
+         5   281.11357     -2741.9797     -2720.214       7854.8491    
+         6   273.86659     -2741.4146     -2720.21        11158.017    
+         7   267.09202     -2740.8859     -2720.2058      14708.555    
+         8   261.62369     -2740.4589     -2720.2022      18386.74     
+         9   258.1837      -2740.1899     -2720.1996      22071.908    
+        10   257.26399     -2740.1179     -2720.1987      25647.957    
+        11   259.02569     -2740.2559     -2720.2004      29013.301    
+        12   263.24471     -2740.5866     -2720.2044      32061.355    
+        13   269.32029     -2741.0626     -2720.21        34721.265    
+        14   276.34791     -2741.6126     -2720.2158      36933.083    
+Loop time of 14.0099 on 8 procs for 14 steps with 600 atoms
 
-Performance: 0.022 ns/day, 1112.407 hours/ns, 0.999 timesteps/s
-241.4% CPU use with 1 MPI tasks x 8 OpenMP threads
+Performance: 0.022 ns/day, 1111.898 hours/ns, 0.999 timesteps/s
+236.4% CPU use with 1 MPI tasks x 8 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 4.4596e-05 | 4.4596e-05 | 4.4596e-05 |   0.0 |  0.00
-Bond    | 1.1e-06    | 1.1e-06    | 1.1e-06    |   0.0 |  0.00
-Neigh   | 0.0017788  | 0.0017788  | 0.0017788  |   0.0 |  0.01
-Comm    | 0.00026053 | 0.00026053 | 0.00026053 |   0.0 |  0.00
-Output  | 0.023026   | 0.023026   | 0.023026   |   0.0 |  0.16
-Modify  | 13.991     | 13.991     | 13.991     |   0.0 | 99.82
-Other   |            | 0.0001192  |            |       |  0.00
+Pair    | 4.4105e-05 | 4.4105e-05 | 4.4105e-05 |   0.0 |  0.00
+Bond    | 1.101e-06  | 1.101e-06  | 1.101e-06  |   0.0 |  0.00
+Neigh   | 0.0016595  | 0.0016595  | 0.0016595  |   0.0 |  0.01
+Comm    | 0.00028342 | 0.00028342 | 0.00028342 |   0.0 |  0.00
+Output  | 0.023312   | 0.023312   | 0.023312   |   0.0 |  0.17
+Modify  | 13.984     | 13.984     | 13.984     |   0.0 | 99.82
+Other   |            | 0.0001312  |            |       |  0.00
 
 Nlocal:            600 ave         600 max         600 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
-Nghost:            247 ave         247 max         247 min
+Nghost:            258 ave         258 max         258 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
-Neighs:            395 ave         395 max         395 min
+Neighs:            396 ave         396 max         396 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
 
-Total # of neighbors = 395
-Ave neighs/atom = 0.65833333
+Total # of neighbors = 396
+Ave neighs/atom = 0.66
 Ave special neighs/atom = 0
 Neighbor list builds = 14
 Dangerous builds = 14
 
-Total wall time: 0:00:34
+Total wall time: 0:00:36
