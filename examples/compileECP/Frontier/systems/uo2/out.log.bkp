@@ -1,13 +1,5 @@
 LAMMPS (23 Jun 2022 - Update 2)
   using 8 OpenMP thread(s) per MPI task
-#LAMMPS (23 Jun 2022)
-# AIMD test of two UO2 molecules with LATTE in MDI stand-alone mode
-
-units           metal
-atom_style      full
-atom_modify     sort 0 0.0
-
-read_data       uo2.lmp
 Reading data file ...
   triclinic box = (0 0 0) to (5.471 10.942 10.942) with tilt (0 0 0)
   1 by 1 by 1 MPI processor grid
@@ -22,17 +14,6 @@ Finding 1-2 1-3 1-4 neighbors ...
      1 = max # of special neighbors
   special bonds CPU = 0.000 seconds
   read_data CPU = 0.002 seconds
-
-variable  x index 2
-variable  y index 1
-variable  z index 1
-
-variable        nrep equal v_x*v_y*v_z
-if              "${nrep} > 1" then "replicate $x $y $z"
-replicate $x $y $z
-replicate 2 $y $z
-replicate 2 1 $z
-replicate 2 1 1
 Replicating atoms ...
   triclinic box = (0 0 0) to (10.942 10.942 10.942) with tilt (0 0 0)
   1 by 1 by 1 MPI processor grid
@@ -46,28 +27,6 @@ Finding 1-2 1-3 1-4 neighbors ...
      1 = max # of special neighbors
   special bonds CPU = 0.000 seconds
   replicate CPU = 0.001 seconds
-
-velocity        all create 300.0 87287 loop geom
-
-neighbor        0.0 bin
-neigh_modify    every 1 delay 0 check yes
-
-pair_style      zero 1.0
-pair_coeff  * *
-
-timestep        0.00025
-
-fix             1 all nve
-fix   2 all latte NULL
-fix_modify 2 energy yes
-
-thermo 1
-thermo_style    custom step temp pe etotal press
-thermo_modify flush yes
-
-dump            1 all custom 1 dump.mdi.aimd                 id type x y z vx vy vz fx fy fz
-
-run             14
 Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
 Neighbor list info ...
   update every 1 steps, delay 0 steps, check yes
@@ -81,6 +40,13 @@ Neighbor list info ...
       pair build: half/bin/newton/tri
       stencil: half/bin/3d/tri
       bin: standard
+Setting up Verlet run ...
+  Unit style    : metal
+  Current step  : 0
+  Time step     : 0.00025
+BML version: v2.2.0-108-ge28518b5
+BML uses MAGMA
+magma_queue_create
 Per MPI rank memory allocation (min/avg/max) = 13.38 | 13.38 | 13.38 Mbytes
    Step          Temp          PotEng         TotEng         Press     
          0   300           -890.62903     -886.94512     -63130.386    
@@ -126,5 +92,4 @@ Ave neighs/atom = 0
 Ave special neighs/atom = 0
 Neighbor list builds = 14
 Dangerous builds = 14
-
 Total wall time: 0:00:26

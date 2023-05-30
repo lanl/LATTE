@@ -11,9 +11,9 @@
  IGENX =           2
  
  In buildzdiag ...
- Time for S diag = 7.70000000E+01 ms
+ Time for S diag = 8.20000000E+01 ms
  Out of genx ...
- Time get H   158.00000000000000     
+ Time get H   163.00000000000000     
  Time for GETMDF-PROPCHEMPOT XBO GETDELTASPIN   0.0000000000000000     
  Doing QCONSISTENCY ...
  SCF ITER =           1
@@ -23,25 +23,25 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
- SCF error =   5.5986433174931886E-004
- SCF error (MAXDQ) =   2.0378967635427792E-002  SCF Tol =   1.0000000000000001E-005
+ SCF error =   5.5986081283595460E-004
+ SCF error (MAXDQ) =   2.0360947011742958E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           2
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   86.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    86.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -52,20 +52,20 @@
      0.00207    -1.00000
     -1.00000     0.00000
  dqin
-     0.80712
+     0.80711
  eigen coefs
    1.00000
- SCF error =   4.5547117275291933E-002
- SCF error (MAXDQ) =   1.6301238677675522E-002  SCF Tol =   1.0000000000000001E-005
+ SCF error =   4.5546822714221724E-002
+ SCF error (MAXDQ) =   1.6283595039287224E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           3
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   86.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    87.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -77,22 +77,22 @@
      0.00171     0.00142    -1.00000
     -1.00000    -1.00000     0.00000
  dqin
-     0.80712     0.80712
+     0.80711     0.80711
  eigen coefs
-  -3.89643   4.89643
- SCF error =   3.7680218876586069E-002
- SCF error (MAXDQ) =   1.3169730291466175E-002  SCF Tol =   1.0000000000000001E-005
+  -3.89644   4.89644
+ SCF error =   3.7679964559437527E-002
+ SCF error (MAXDQ) =   1.3152450567436968E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           4
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -103,20 +103,20 @@
      0.00030     0.00028     0.00020    -1.00000
     -1.00000    -1.00000    -1.00000     0.00000
  dqin
-     0.80712     0.80712     0.80711
+     0.80711     0.80711     0.80711
  eigen coefs
-  16.77161 -21.29763   5.52602
- SCF error =   1.4109323290376122E-002
- SCF error (MAXDQ) =   4.9046705790021239E-003  SCF Tol =   1.0000000000000001E-005
+  16.77163 -21.29765   5.52602
+ SCF error =   1.4109122800156311E-002
+ SCF error (MAXDQ) =   4.8890818315456830E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           5
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -130,20 +130,20 @@
      0.00001     0.00001     0.00001     0.00001    -1.00000
     -1.00000    -1.00000    -1.00000    -1.00000     0.00000
  dqin
-     0.80712     0.80712     0.80711     0.80710
+     0.80711     0.80711     0.80711     0.80710
  eigen coefs
- -52.65578  66.85850 -17.34604   4.14332
- SCF error =   2.9198757314330957E-003
- SCF error (MAXDQ) =   8.2875157277939593E-004  SCF Tol =   1.0000000000000001E-005
+ -52.62634  66.82112 -17.33633   4.14156
+ SCF error =   2.9193664296741834E-003
+ SCF error (MAXDQ) =   8.1516290445793338E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           6
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -158,11 +158,11 @@
      0.00002     0.00002     0.00001     0.00001     0.00001    -1.00000
     -1.00000    -1.00000    -1.00000    -1.00000    -1.00000     0.00000
  dqin
-     0.80712     0.80712     0.80711     0.80710     0.80709
+     0.80711     0.80711     0.80711     0.80710     0.80708
  eigen coefs
-   5.64912  -7.19226   1.87682  -1.82261   2.48893
- SCF error =   2.2952454201371169E-003
- SCF error (MAXDQ) =   6.0303074426071301E-004  SCF Tol =   1.0000000000000001E-005
+   5.68252  -7.23467   1.88783  -1.82594   2.49026
+ SCF error =   2.2949268734146033E-003
+ SCF error (MAXDQ) =   5.9682494949142573E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           7
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -170,8 +170,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   86.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    86.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -187,20 +187,20 @@
      0.00001     0.00001     0.00000     0.00000     0.00000     0.00000    -1.00000
     -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000     0.00000
  dqin
-     0.80712     0.80712     0.80711     0.80710     0.80709     0.80707
+     0.80711     0.80711     0.80711     0.80710     0.80708     0.80707
  eigen coefs
- -11.07739  14.40405  -3.88867  29.25569 -49.51810  21.82442
- SCF error =   1.7950825915545926E-003
- SCF error (MAXDQ) =   4.9289173705946432E-004  SCF Tol =   1.0000000000000001E-005
+ -11.05807  14.37943  -3.88228  29.26162 -49.51886  21.81815
+ SCF error =   1.7945899809396148E-003
+ SCF error (MAXDQ) =   4.8758773532131539E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           8
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -217,12 +217,12 @@
      0.00000     0.00000     0.00000     0.00000     0.00000     0.00000     0.00000    -1.00000
     -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000     0.00000
  dqin
-     0.80712     0.80712     0.80711     0.80710     0.80709     0.80707     0.80702
+     0.80711     0.80711     0.80711     0.80710     0.80708     0.80707     0.80702
  eigen coefs
-  14.51850 -21.09765   6.67078-223.72682 386.87651-171.38300
-   9.14168
- SCF error =   8.4008434075915663E-004
- SCF error (MAXDQ) =   2.7591006759086767E-004  SCF Tol =   1.0000000000000001E-005
+  14.52641 -21.10733   6.67336-223.80266 386.91544-171.34754
+   9.14232
+ SCF error =   8.3987476187649234E-004
+ SCF error (MAXDQ) =   2.7065724586572415E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           9
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -230,8 +230,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -249,12 +249,12 @@
     -0.00000    -0.00000     0.00000     0.00000     0.00000     0.00000     0.00000     0.00000    -1.00000
     -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000     0.00000
  dqin
-     0.80712     0.80712     0.80711     0.80710     0.80709     0.80707     0.80702     0.80700
+     0.80711     0.80711     0.80711     0.80710     0.80708     0.80707     0.80702     0.80700
  eigen coefs
-  -9.38778  16.32496  -6.21157 369.04982-639.89911 283.60921
- -15.48763   3.00209
- SCF error =   3.9160696714605423E-004
- SCF error (MAXDQ) =   1.3064964331443996E-004  SCF Tol =   1.0000000000000001E-005
+  -9.38525  16.32251  -6.21166 369.28760-640.16034 283.63797
+ -15.49339   3.00257
+ SCF error =   3.9149430628040142E-004
+ SCF error (MAXDQ) =   1.2771806133926589E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          10
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -262,12 +262,12 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   88.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    88.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -282,12 +282,12 @@
     -0.00000    -0.00000     0.00000     0.00000     0.00000     0.00000     0.00000     0.00000     0.00000    -1.00000
     -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000     0.00000
  dqin
-     0.80712     0.80712     0.80711     0.80710     0.80709     0.80707     0.80702     0.80700     0.80700
+     0.80711     0.80711     0.80711     0.80710     0.80708     0.80707     0.80702     0.80700     0.80700
  eigen coefs
-   0.26283  -0.55754   0.24120 -18.75367  32.59856 -14.49743
-   1.04966  -1.25917   1.91559
- SCF error =   2.0468880430292696E-004
- SCF error (MAXDQ) =   7.7379831675106203E-005  SCF Tol =   1.0000000000000001E-005
+   0.25652  -0.54482   0.23580 -18.36722  31.92041 -14.19256
+   1.03303  -1.25523   1.91407
+ SCF error =   2.0455381536648394E-004
+ SCF error (MAXDQ) =   7.5363595898547686E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          11
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -295,8 +295,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   91.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    91.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -327,12 +327,12 @@
     -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000
      0.00000
  dqin
-     0.80712     0.80712     0.80711     0.80710     0.80709     0.80707     0.80702     0.80700     0.80700     0.80700
+     0.80711     0.80711     0.80711     0.80710     0.80708     0.80707     0.80702     0.80700     0.80700     0.80699
  eigen coefs
-   0.50924  -0.55133   0.22973   8.94351 -17.39152   9.22250
-  -8.71482  35.28918 -59.31681  32.78031
- SCF error =   1.0341306203649575E-004
- SCF error (MAXDQ) =   3.4803296235175196E-005  SCF Tol =   1.0000000000000001E-005
+   0.50722  -0.54759   0.22816   9.04573 -17.56140   9.29711
+  -8.71175  35.26207 -59.30150  32.78195
+ SCF error =   1.0325730661311653E-004
+ SCF error (MAXDQ) =   3.5649761172429351E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          12
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -340,10 +340,10 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -372,21 +372,21 @@
     -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000
      0.00000
  dqin
-     0.80712     0.80711     0.80710     0.80709     0.80707     0.80702     0.80700     0.80700     0.80700     0.80699
+     0.80711     0.80711     0.80710     0.80708     0.80707     0.80702     0.80700     0.80700     0.80699     0.80699
  eigen coefs
-   0.00379  -1.24780  -9.43146  33.69281 -29.45103  80.60692
--338.93291 570.56686-315.53827  10.73109
- SCF error =   3.5494906630340582E-005
- SCF error (MAXDQ) =   1.2711235498397144E-005  SCF Tol =   1.0000000000000001E-005
+   0.00423  -1.24741  -9.39028  33.58025 -29.41148  80.52748
+-338.63090 570.36065-315.52247  10.72993
+ SCF error =   3.5458119819579692E-005
+ SCF error (MAXDQ) =   1.2204448832653370E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          13
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -417,29 +417,29 @@
     -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000    -1.00000
      0.00000
  dqin
-     0.80711     0.80710     0.80709     0.80707     0.80702     0.80700     0.80700     0.80700     0.80699     0.80699
+     0.80711     0.80710     0.80708     0.80707     0.80702     0.80700     0.80700     0.80699     0.80699     0.80699
  eigen coefs
-   0.21014   1.64632  -5.78352   5.01406 -13.60354  57.20800
- -96.30460  53.25498  -1.97656   1.33473
- SCF error =   9.5621950288316151E-006
- SCF error (MAXDQ) =   2.4094640866945127E-006  SCF Tol =   1.0000000000000001E-005
- Time for GETMDF-QNEUTRAL QCONSISTENCY    1315.0000000000000     
+   0.19979   1.56542  -5.49405   4.76803 -12.92823  54.37290
+ -91.58048  50.65780  -1.88785   1.32667
+ SCF error =   9.5286706712250134E-006
+ SCF error (MAXDQ) =   2.4044665891675976E-006  SCF Tol =   1.0000000000000001E-005
+ Time for GETMDF-QNEUTRAL QCONSISTENCY    1370.0000000000000     
  Doing XBO ...
- RESIDUE=   4.1540246947772053E-004
+ RESIDUE=   4.1540036856601729E-004
  Getting forces ...
  In tb_forces.F90 ...
- Time for GETMDF-GETFORCE-TBFORCESPROGRESS   143.00000000000000     
- Time for GETMDF-GETFORCE     144.00000000000000     
+ Time for GETMDF-GETFORCE-TBFORCESPROGRESS   103.00000000000000     
+ Time for GETMDF-GETFORCE     103.00000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
- Time for GETMDF   1617.0000000000000     
- Time for GETMDF =   1617.0000000000000     
- Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.36355032299866        68.325664030605324        65.621848656499679        86.970867754594053     
+ Time getdeltaq   1.0000000000000000     
+ Time for GETMDF   1637.0000000000000     
+ Time for GETMDF =   1637.0000000000000     
+ Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.36356564536186        68.325664030605324        65.621848826604960        86.970861633622576     
  Writing trajectory into trajectory.pdb ...
  Writing trajectory into trajectory.xyz ...
- HOMO= -0.71529721251042222      LUMO= -0.71527181282417140     
- EGAP=   2.5399686250815456E-005
- Dipole Magnitude=   58.585853589958965     
+ HOMO= -0.71529720605795610      LUMO= -0.71527180643076871     
+ EGAP=   2.5399627187394636E-005
+ Dipole Magnitude=   58.585858803299963     
  Lattice vectors:
  a=   10.942000000000000        0.0000000000000000        0.0000000000000000     
  b=   0.0000000000000000        10.942000000000000        0.0000000000000000     
@@ -453,43 +453,43 @@
  IGENX =           3
  
  In buildzdiag ...
- Time for S diag = 7.70000000E+01 ms
+ Time for S diag = 8.20000000E+01 ms
  Out of genx ...
- Time get H   162.00000000000000     
+ Time get H   163.00000000000000     
  XBOON .GT. 0 .AND. CURRITER .GT. 1 .AND. SWITCH .NE. 0 ...
  Doing XBO ...
  Time for GETMDF-PROPCHEMPOT XBO GETDELTASPIN   0.0000000000000000     
  Doing QCONSISTENCY ...
  SCF ITER =           1
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
- In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   7.0000000000000000     
- In getdeltaq.F90 ...
- Time getdeltaq   1.0000000000000000     
- MixerType=Pulay               
- Performing Pulay mixing scheme ...
- SCF error =   5.5983202116813627E-004
- SCF error (MAXDQ) =   2.0408541473887487E-002  SCF Tol =   1.0000000000000001E-005
- SCF ITER =           2
- In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
- In getrho.F90 ...
- In BOEVECSPRG ...
- In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
+ MixerType=Pulay               
+ Performing Pulay mixing scheme ...
+ SCF error =   5.5983428122122832E-004
+ SCF error (MAXDQ) =   2.0408610067789157E-002  SCF Tol =   1.0000000000000001E-005
+ SCF ITER =           2
+ In addqdep.F90 ...
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ In getrho.F90 ...
+ In BOEVECSPRG ...
+ In get_density_t ...
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
+ In deorthomyrhoprogress.F90 ...
+ Time for deorthomyrho   7.0000000000000000     
+ In getdeltaq.F90 ...
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -499,19 +499,19 @@
      0.80699
  eigen coefs
    1.00000
- SCF error =   4.5539818690461975E-002
- SCF error (MAXDQ) =   1.6318933228842925E-002  SCF Tol =   1.0000000000000001E-005
+ SCF error =   4.5539983288287733E-002
+ SCF error (MAXDQ) =   1.6318981492281504E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           3
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -524,21 +524,21 @@
      0.80699     0.80699
  eigen coefs
   -3.89452   4.89452
- SCF error =   3.7670855670414886E-002
- SCF error (MAXDQ) =   1.3179196678144045E-002  SCF Tol =   1.0000000000000001E-005
+ SCF error =   3.7670977531854208E-002
+ SCF error (MAXDQ) =   1.3179230054252811E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           4
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   7.0000000000000000     
+ Time for deorthomyrho   6.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -550,8 +550,8 @@
      0.80699     0.80699     0.80699
  eigen coefs
   16.76647 -21.29337   5.52690
- SCF error =   1.4105669648531818E-002
- SCF error (MAXDQ) =   4.9088993022998739E-003  SCF Tol =   1.0000000000000001E-005
+ SCF error =   1.4105721179215757E-002
+ SCF error (MAXDQ) =   4.9089077127169034E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           5
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -559,10 +559,10 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   7.0000000000000000     
+ Time for deorthomyrho   6.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
@@ -576,9 +576,9 @@
  dqin
      0.80699     0.80699     0.80699     0.80698
  eigen coefs
- -52.24537  66.34454 -17.21904   4.11986
- SCF error =   2.9161089710215433E-003
- SCF error (MAXDQ) =   8.2527501358242716E-004  SCF Tol =   1.0000000000000001E-005
+ -52.24481  66.34386 -17.21888   4.11983
+ SCF error =   2.9161013734229774E-003
+ SCF error (MAXDQ) =   8.2527120885744765E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           6
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -586,8 +586,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -604,20 +604,20 @@
  dqin
      0.80699     0.80699     0.80699     0.80698     0.80696
  eigen coefs
-   6.04778  -7.69960   2.00956  -1.86760   2.50986
- SCF error =   2.2967946666234661E-003
- SCF error (MAXDQ) =   6.0320086987220023E-004  SCF Tol =   1.0000000000000001E-005
+   6.04772  -7.69953   2.00954  -1.86761   2.50987
+ SCF error =   2.2967880633597716E-003
+ SCF error (MAXDQ) =   6.0319611431736142E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           7
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -633,18 +633,18 @@
  dqin
      0.80699     0.80699     0.80699     0.80698     0.80696     0.80695
  eigen coefs
- -12.68795  16.45213  -4.42694  29.23399 -49.08669  21.51546
- SCF error =   1.7944414106641484E-003
- SCF error (MAXDQ) =   4.9249295771924828E-004  SCF Tol =   1.0000000000000001E-005
+ -12.68783  16.45199  -4.42691  29.23417 -49.08681  21.51539
+ SCF error =   1.7944292533875804E-003
+ SCF error (MAXDQ) =   4.9248875038554463E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           8
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -663,23 +663,23 @@
  dqin
      0.80699     0.80699     0.80699     0.80698     0.80696     0.80695     0.80690
  eigen coefs
-  12.52253 -18.15801   5.75814-187.79646 323.34854-142.57741
-   7.90267
- SCF error =   8.5284556177230627E-004
- SCF error (MAXDQ) =   2.7070625240854795E-004  SCF Tol =   1.0000000000000001E-005
+  12.52246 -18.15795   5.75813-187.79685 323.34782-142.57624
+   7.90264
+ SCF error =   8.5284324555030214E-004
+ SCF error (MAXDQ) =   2.7070238687820769E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           9
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   7.0000000000000000     
+ Time for deorthomyrho   6.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -695,10 +695,10 @@
  dqin
      0.80699     0.80699     0.80699     0.80698     0.80696     0.80695     0.80690     0.80688
  eigen coefs
- -12.21571  20.70327  -7.77410 430.96060-743.97356 328.20250
- -18.63856   3.73557
- SCF error =   4.4759183812277735E-004
- SCF error (MAXDQ) =   1.3924812296073341E-004  SCF Tol =   1.0000000000000001E-005
+ -12.21563  20.70315  -7.77407 430.95696-743.96402 328.19636
+ -18.63831   3.73555
+ SCF error =   4.4759287299308073E-004
+ SCF error (MAXDQ) =   1.3924674846954588E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          10
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -706,8 +706,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   91.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    91.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -728,10 +728,10 @@
  dqin
      0.80699     0.80699     0.80699     0.80698     0.80696     0.80695     0.80690     0.80688     0.80687
  eigen coefs
-   0.24439  -0.52063   0.22845 -17.45633  30.21940 -13.38232
-   1.00896  -1.12665   1.78474
- SCF error =   2.1557925091744324E-004
- SCF error (MAXDQ) =   8.0337931094520698E-005  SCF Tol =   1.0000000000000001E-005
+   0.24439  -0.52063   0.22845 -17.45608  30.21882 -13.38199
+   1.00895  -1.12668   1.78476
+ SCF error =   2.1558208897271100E-004
+ SCF error (MAXDQ) =   8.0338525814571682E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          11
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -739,10 +739,10 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -773,19 +773,19 @@
  dqin
      0.80699     0.80699     0.80699     0.80698     0.80696     0.80695     0.80690     0.80688     0.80687     0.80687
  eigen coefs
-   0.55099  -0.60159   0.24295   9.07999 -17.53970   9.30351
-  -8.49044  31.28791 -55.83703  33.00341
- SCF error =   1.0337824425462656E-004
- SCF error (MAXDQ) =   3.4775264634578917E-005  SCF Tol =   1.0000000000000001E-005
+   0.55099  -0.60159   0.24295   9.07979 -17.53932   9.30336
+  -8.49075  31.28894 -55.83777  33.00340
+ SCF error =   1.0337746455092949E-004
+ SCF error (MAXDQ) =   3.4775412621534940E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          12
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -818,19 +818,19 @@
  dqin
      0.80699     0.80699     0.80698     0.80696     0.80695     0.80690     0.80688     0.80687     0.80687     0.80687
  eigen coefs
-   0.04072  -1.11850  -4.80986  22.92023 -22.96413  66.90984
--257.24231 460.02978-272.10913   9.34336
- SCF error =   3.6146914401424170E-005
- SCF error (MAXDQ) =   1.2496925413607585E-005  SCF Tol =   1.0000000000000001E-005
+   0.04072  -1.11852  -4.80983  22.92023 -22.96445  66.91175
+-257.24795 460.03088-272.10610   9.34327
+ SCF error =   3.6146752930040590E-005
+ SCF error (MAXDQ) =   1.2496729220767833E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          13
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -863,25 +863,25 @@
  dqin
      0.80699     0.80698     0.80696     0.80695     0.80690     0.80688     0.80687     0.80687     0.80687     0.80687
  eigen coefs
-   0.48618   3.65386 -12.84012  11.40260 -29.93025 114.85332
--205.37868 121.48253  -4.42560   1.69616
- SCF error =   1.2758526942648250E-005
- SCF error (MAXDQ) =   3.7975529187939117E-006  SCF Tol =   1.0000000000000001E-005
- Time for GETMDF-QNEUTRAL QCONSISTENCY    1314.0000000000000     
+   0.48617   3.65377 -12.83978  11.40241 -29.93016 114.85222
+-205.37270 121.47735  -4.42543   1.69615
+ SCF error =   1.2758603496144485E-005
+ SCF error (MAXDQ) =   3.7975294318037811E-006  SCF Tol =   1.0000000000000001E-005
+ Time for GETMDF-QNEUTRAL QCONSISTENCY    1372.0000000000000     
  Getting forces ...
  In tb_forces.F90 ...
- Time for GETMDF-GETFORCE-TBFORCESPROGRESS   144.00000000000000     
- Time for GETMDF-GETFORCE     144.00000000000000     
+ Time for GETMDF-GETFORCE-TBFORCESPROGRESS   103.00000000000000     
+ Time for GETMDF-GETFORCE     104.00000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
- Time for GETMDF   1620.0000000000000     
- Time for GETMDF =   1620.0000000000000     
- Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.36682783726144        68.331253221720488        65.621756233255311        86.970406250046750     
+ Time for GETMDF   1639.0000000000000     
+ Time for GETMDF =   1639.0000000000000     
+ Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.36682784422203        68.331253221720459        65.621756233332448        86.970406247604913     
  Writing trajectory into trajectory.pdb ...
  Writing trajectory into trajectory.xyz ...
- HOMO= -0.71528722265927347      LUMO= -0.71523517681647752     
- EGAP=   5.2045842795944708E-005
- Dipole Magnitude=   58.590321041526408     
+ HOMO= -0.71528722265679656      LUMO= -0.71523517681311077     
+ EGAP=   5.2045843685788462E-005
+ Dipole Magnitude=   58.590321044124337     
  Lattice vectors:
  a=   10.942000000000000        0.0000000000000000        0.0000000000000000     
  b=   0.0000000000000000        10.942000000000000        0.0000000000000000     
@@ -895,30 +895,30 @@
  IGENX =           4
  
  In buildzdiag ...
- Time for S diag = 7.70000000E+01 ms
+ Time for S diag = 8.20000000E+01 ms
  Out of genx ...
- Time get H   162.00000000000000     
+ Time get H   163.00000000000000     
  XBOON .GT. 0 .AND. CURRITER .GT. 1 .AND. SWITCH .NE. 0 ...
  Doing XBO ...
  Time for GETMDF-PROPCHEMPOT XBO GETDELTASPIN   0.0000000000000000     
  Doing QCONSISTENCY ...
  SCF ITER =           1
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   87.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    87.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
- SCF error =   8.6507688571946055E-004
- SCF error (MAXDQ) =   3.1640985772342978E-002  SCF Tol =   1.0000000000000001E-005
+ SCF error =   8.6508020206794056E-004
+ SCF error (MAXDQ) =   3.1641305836483058E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           2
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -926,10 +926,10 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   91.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    91.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -941,8 +941,8 @@
      0.80694
  eigen coefs
    1.00000
- SCF error =   7.0352896808048820E-002
- SCF error (MAXDQ) =   2.5275464145932736E-002  SCF Tol =   1.0000000000000001E-005
+ SCF error =   7.0353137038067226E-002
+ SCF error (MAXDQ) =   2.5275748599702386E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           3
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -950,8 +950,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -965,9 +965,9 @@
  dqin
      0.80694     0.80694
  eigen coefs
-  -3.89048   4.89048
- SCF error =   5.8185653268555078E-002
- SCF error (MAXDQ) =   2.0395583008645302E-002  SCF Tol =   1.0000000000000001E-005
+  -3.89047   4.89047
+ SCF error =   5.8185830118372098E-002
+ SCF error (MAXDQ) =   2.0395840314122671E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           4
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -975,12 +975,12 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   1.0000000000000000     
+ Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -991,9 +991,9 @@
  dqin
      0.80694     0.80694     0.80693
  eigen coefs
-  16.75154 -21.28054   5.52899
- SCF error =   2.1790748142803247E-002
- SCF error (MAXDQ) =   7.6052064792224705E-003  SCF Tol =   1.0000000000000001E-005
+  16.75154 -21.28054   5.52900
+ SCF error =   2.1790828576426495E-002
+ SCF error (MAXDQ) =   7.6054043708093655E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           5
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -1001,12 +1001,12 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   1.0000000000000000     
+ Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -1018,20 +1018,20 @@
  dqin
      0.80694     0.80694     0.80693     0.80691
  eigen coefs
- -26.00995  33.04050  -8.58615   2.55560
- SCF error =   4.4988669047800979E-003
- SCF error (MAXDQ) =   1.2723605948377070E-003  SCF Tol =   1.0000000000000001E-005
+ -26.00983  33.04036  -8.58612   2.55559
+ SCF error =   4.4988772960916279E-003
+ SCF error (MAXDQ) =   1.2725172768439652E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           6
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   91.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    91.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -1046,9 +1046,9 @@
  dqin
      0.80694     0.80694     0.80693     0.80691     0.80690
  eigen coefs
-   3.96115  -5.06085   1.33478  -3.22219   3.98711
- SCF error =   3.8767917173093899E-003
- SCF error (MAXDQ) =   9.7254180941963586E-004  SCF Tol =   1.0000000000000001E-005
+   3.96096  -5.06061   1.33472  -3.22219   3.98712
+ SCF error =   3.8768019249382632E-003
+ SCF error (MAXDQ) =   9.7260927240194750E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           7
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -1056,8 +1056,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -1075,22 +1075,22 @@
  dqin
      0.80694     0.80694     0.80693     0.80691     0.80690     0.80686
  eigen coefs
- -11.18888  14.72784  -4.14858  57.44986 -76.78416  20.94392
- SCF error =   2.7753541565200437E-003
- SCF error (MAXDQ) =   7.6231644324731285E-004  SCF Tol =   1.0000000000000001E-005
+ -11.18895  14.72794  -4.14862  57.45010 -76.78438  20.94390
+ SCF error =   2.7753577400754710E-003
+ SCF error (MAXDQ) =   7.6237154133096396E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           8
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   1.0000000000000000     
+ Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -1105,19 +1105,19 @@
  dqin
      0.80694     0.80694     0.80693     0.80691     0.80690     0.80686     0.80679
  eigen coefs
-   9.33138 -14.30926   5.25459-269.56393 364.24370 -99.99746
-   6.04097
- SCF error =   1.3776288856758995E-003
- SCF error (MAXDQ) =   4.2291990238885191E-004  SCF Tol =   1.0000000000000001E-005
+   9.33134 -14.30924   5.25459-269.56339 364.24251 -99.99676
+   6.04094
+ SCF error =   1.3776356085587369E-003
+ SCF error (MAXDQ) =   4.2298096990389666E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           9
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   91.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    91.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -1137,10 +1137,10 @@
  dqin
      0.80694     0.80694     0.80693     0.80691     0.80690     0.80686     0.80679     0.80677
  eigen coefs
-  -7.23907  12.49033  -5.30204 361.36205-488.79884 134.28223
-  -8.59573   2.80106
- SCF error =   8.0631512339932585E-004
- SCF error (MAXDQ) =   2.3030354968800459E-004  SCF Tol =   1.0000000000000001E-005
+  -7.23894  12.49013  -5.30194 361.35142-488.78384 134.27762
+  -8.59547   2.80102
+ SCF error =   8.0632245544105341E-004
+ SCF error (MAXDQ) =   2.3034545824307529E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          10
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -1148,10 +1148,10 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   7.0000000000000000     
+ Time for deorthomyrho   8.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -1170,23 +1170,23 @@
  dqin
      0.80694     0.80694     0.80693     0.80691     0.80690     0.80686     0.80679     0.80677     0.80676
  eigen coefs
-   0.12577  -0.28536   0.14305 -13.86580  18.87007  -5.32984
-   1.10532  -2.95389   3.19068
- SCF error =   5.4808350250316233E-004
- SCF error (MAXDQ) =   1.8803444953596760E-004  SCF Tol =   1.0000000000000001E-005
+   0.12579  -0.28539   0.14307 -13.86732  18.87211  -5.33039
+   1.10538  -2.95399   3.19075
+ SCF error =   5.4809394785462339E-004
+ SCF error (MAXDQ) =   1.8806620931832718E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          11
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   1.0000000000000000     
+ Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -1215,10 +1215,10 @@
  dqin
      0.80694     0.80694     0.80693     0.80691     0.80690     0.80686     0.80679     0.80677     0.80676     0.80675
  eigen coefs
-   0.45322  -0.52001   0.41038  10.01358 -16.83210   9.25532
- -25.13917  91.47797-101.13309  33.01391
- SCF error =   1.5980367990293539E-004
- SCF error (MAXDQ) =   5.3261026448758741E-005  SCF Tol =   1.0000000000000001E-005
+   0.45323  -0.52003   0.41040  10.01362 -16.83232   9.25563
+ -25.14072  91.48332-101.13787  33.01474
+ SCF error =   1.5981257985144535E-004
+ SCF error (MAXDQ) =   5.3250983944708175E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          12
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -1226,8 +1226,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -1260,21 +1260,21 @@
  dqin
      0.80694     0.80693     0.80691     0.80690     0.80686     0.80679     0.80677     0.80676     0.80675     0.80674
  eigen coefs
-   0.09236  -1.21964  -4.38747  17.79416 -21.86978  91.50546
--335.58334 371.18965-121.27046   4.74905
- SCF error =   5.8499159048812888E-005
- SCF error (MAXDQ) =   1.9309620748808598E-005  SCF Tol =   1.0000000000000001E-005
+   0.09236  -1.21968  -4.38769  17.79485 -21.87051  91.50883
+-335.59446 371.19774-121.27040   4.74896
+ SCF error =   5.8501679919562588E-005
+ SCF error (MAXDQ) =   1.9315847340051207E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          13
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -1305,10 +1305,10 @@
  dqin
      0.80693     0.80691     0.80690     0.80686     0.80679     0.80677     0.80676     0.80675     0.80674     0.80674
  eigen coefs
-   0.50335   6.41573 -13.93724  11.34244 -40.58406 148.54085
--164.28106  53.69959  -3.21560   2.51601
- SCF error =   3.7781237217411854E-005
- SCF error (MAXDQ) =   1.2954309607016157E-005  SCF Tol =   1.0000000000000001E-005
+   0.50337   6.41590 -13.93767  11.34283 -40.58578 148.54658
+-164.28553  53.69986  -3.21560   2.51604
+ SCF error =   3.7783652739185776E-005
+ SCF error (MAXDQ) =   1.2958826847597749E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          14
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -1316,8 +1316,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -1350,25 +1350,25 @@
  dqin
      0.80691     0.80690     0.80686     0.80679     0.80677     0.80676     0.80675     0.80674     0.80674     0.80674
  eigen coefs
-  -0.00269   0.01922  -0.01041   0.01258  -0.22925   0.26459
-  -0.18542   3.07642  -5.80371   3.85867
- SCF error =   1.9338669282652642E-005
- SCF error (MAXDQ) =   6.2911303839729982E-006  SCF Tol =   1.0000000000000001E-005
- Time for GETMDF-QNEUTRAL QCONSISTENCY    1419.0000000000000     
+  -0.00269   0.01922  -0.01041   0.01259  -0.22928   0.26462
+  -0.18543   3.07658  -5.80394   3.85874
+ SCF error =   1.9340853701772216E-005
+ SCF error (MAXDQ) =   6.2878634661256427E-006  SCF Tol =   1.0000000000000001E-005
+ Time for GETMDF-QNEUTRAL QCONSISTENCY    1483.0000000000000     
  Getting forces ...
  In tb_forces.F90 ...
- Time for GETMDF-GETFORCE-TBFORCESPROGRESS   143.00000000000000     
- Time for GETMDF-GETFORCE     144.00000000000000     
+ Time for GETMDF-GETFORCE-TBFORCESPROGRESS   102.00000000000000     
+ Time for GETMDF-GETFORCE     103.00000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
- Time for GETMDF   1725.0000000000000     
- Time for GETMDF =   1725.0000000000000     
- Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.37227340322465        68.340556752423083        65.621602302960611        86.969638068211538     
+ Time for GETMDF   1749.0000000000000     
+ Time for GETMDF =   1749.0000000000000     
+ Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.37227322558567        68.340556752423339        65.621602300986297        86.969638076611290     
  Writing trajectory into trajectory.pdb ...
  Writing trajectory into trajectory.xyz ...
- HOMO= -0.71527640249362257      LUMO= -0.71519633901716184     
- EGAP=   8.0063476460723315E-005
- Dipole Magnitude=   58.594639453687947     
+ HOMO= -0.71527640256978242      LUMO= -0.71519633909083813     
+ EGAP=   8.0063478944292221E-005
+ Dipole Magnitude=   58.594639391550253     
  Lattice vectors:
  a=   10.942000000000000        0.0000000000000000        0.0000000000000000     
  b=   0.0000000000000000        10.942000000000000        0.0000000000000000     
@@ -1382,41 +1382,41 @@
  IGENX =           5
  
  In buildzdiag ...
- Time for S diag = 7.70000000E+01 ms
+ Time for S diag = 8.30000000E+01 ms
  Out of genx ...
- Time get H   163.00000000000000     
+ Time get H   164.00000000000000     
  XBOON .GT. 0 .AND. CURRITER .GT. 1 .AND. SWITCH .NE. 0 ...
  Doing XBO ...
  Time for GETMDF-PROPCHEMPOT XBO GETDELTASPIN   0.0000000000000000     
  Doing QCONSISTENCY ...
  SCF ITER =           1
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
- SCF error =   8.0344170169204952E-004
- SCF error (MAXDQ) =   2.9469513938067626E-002  SCF Tol =   1.0000000000000001E-005
+ SCF error =   8.0344480220290637E-004
+ SCF error (MAXDQ) =   2.9469957852403139E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           2
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -1428,8 +1428,8 @@
      0.80680
  eigen coefs
    1.00000
- SCF error =   6.5335385389858183E-002
- SCF error (MAXDQ) =   2.3534350135374638E-002  SCF Tol =   1.0000000000000001E-005
+ SCF error =   6.5335610673160238E-002
+ SCF error (MAXDQ) =   2.3534756924519229E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           3
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -1437,8 +1437,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -1452,9 +1452,9 @@
  dqin
      0.80680     0.80680
  eigen coefs
-  -3.88887   4.88887
- SCF error =   5.4032217999666537E-002
- SCF error (MAXDQ) =   1.8985197869396009E-002  SCF Tol =   1.0000000000000001E-005
+  -3.88886   4.88886
+ SCF error =   5.4032384670475352E-002
+ SCF error (MAXDQ) =   1.8985575731786719E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           4
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -1462,10 +1462,10 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -1478,9 +1478,9 @@
  dqin
      0.80680     0.80680     0.80679
  eigen coefs
-  16.75043 -21.28079   5.53035
- SCF error =   2.0236800339336492E-002
- SCF error (MAXDQ) =   7.0815990015118402E-003  SCF Tol =   1.0000000000000001E-005
+  16.75043 -21.28079   5.53036
+ SCF error =   2.0236884562103943E-002
+ SCF error (MAXDQ) =   7.0819060775044740E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           5
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -1488,8 +1488,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -1505,20 +1505,20 @@
  dqin
      0.80680     0.80680     0.80679     0.80677
  eigen coefs
- -29.42444  37.38045  -9.71567   2.75965
- SCF error =   4.1763444882425647E-003
- SCF error (MAXDQ) =   1.1890242186816113E-003  SCF Tol =   1.0000000000000001E-005
+ -29.42462  37.38070  -9.71575   2.75966
+ SCF error =   4.1763924779779325E-003
+ SCF error (MAXDQ) =   1.1892775091950636E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           6
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   91.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    91.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -1533,9 +1533,9 @@
  dqin
      0.80680     0.80680     0.80679     0.80677     0.80676
  eigen coefs
-   4.52891  -5.78102   1.52067  -2.97393   3.70537
- SCF error =   3.5579700261257684E-003
- SCF error (MAXDQ) =   9.0171047516407477E-004  SCF Tol =   1.0000000000000001E-005
+   4.52857  -5.78060   1.52056  -2.97391   3.70537
+ SCF error =   3.5580160685498071E-003
+ SCF error (MAXDQ) =   9.0182225837220908E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           7
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -1543,8 +1543,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -1562,18 +1562,18 @@
  dqin
      0.80680     0.80680     0.80679     0.80677     0.80676     0.80673
  eigen coefs
- -12.37491  16.19604  -4.49408  50.72087 -69.55432  20.50640
- SCF error =   2.5788274829185200E-003
- SCF error (MAXDQ) =   7.1037116101324571E-004  SCF Tol =   1.0000000000000001E-005
+ -12.37520  16.19643  -4.49419  50.72127 -69.55481  20.50650
+ SCF error =   2.5788682322968092E-003
+ SCF error (MAXDQ) =   7.1046229241844561E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           8
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -1592,10 +1592,10 @@
  dqin
      0.80680     0.80680     0.80679     0.80677     0.80676     0.80673     0.80666
  eigen coefs
-   8.48789 -12.99817   4.70797-231.60356 322.12941 -95.67415
-   5.95062
- SCF error =   1.3043997287591391E-003
- SCF error (MAXDQ) =   3.8575121484019093E-004  SCF Tol =   1.0000000000000001E-005
+   8.48790 -12.99824   4.70801-231.60423 322.13010 -95.67415
+   5.95060
+ SCF error =   1.3044239819889774E-003
+ SCF error (MAXDQ) =   3.8585591646866924E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           9
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -1603,8 +1603,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   91.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    91.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -1624,19 +1624,19 @@
  dqin
      0.80680     0.80680     0.80679     0.80677     0.80676     0.80673     0.80666     0.80664
  eigen coefs
-  -9.22548  15.56333  -6.34712 401.53418-559.02622 166.11915
- -10.77591   3.15806
- SCF error =   7.6118519211887045E-004
- SCF error (MAXDQ) =   2.2406286247145246E-004  SCF Tol =   1.0000000000000001E-005
+  -9.22547  15.56331  -6.34709 401.52447-559.01228 166.11464
+ -10.77558   3.15801
+ SCF error =   7.6120322640719628E-004
+ SCF error (MAXDQ) =   2.2413106364571611E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          10
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -1657,10 +1657,10 @@
  dqin
      0.80680     0.80680     0.80679     0.80677     0.80676     0.80673     0.80666     0.80664     0.80663
  eigen coefs
-   0.13098  -0.30066   0.15016 -14.09344  19.72802  -5.98766
-   0.96425  -2.51355   2.92190
- SCF error =   5.0229209377657092E-004
- SCF error (MAXDQ) =   1.6786217632724920E-004  SCF Tol =   1.0000000000000001E-005
+   0.13099  -0.30069   0.15019 -14.09560  19.73102  -5.98854
+   0.96432  -2.51365   2.92197
+ SCF error =   5.0231218699935598E-004
+ SCF error (MAXDQ) =   1.6791332139698412E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          11
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -1668,10 +1668,10 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   87.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    87.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -1702,19 +1702,19 @@
  dqin
      0.80680     0.80680     0.80679     0.80677     0.80676     0.80673     0.80666     0.80664     0.80663     0.80662
  eigen coefs
-   0.51141  -0.59835   0.39455   8.47301 -14.65207   8.23365
- -18.64782  75.65049 -90.75692  32.39205
- SCF error =   1.4881575689041480E-004
- SCF error (MAXDQ) =   4.8676852845708218E-005  SCF Tol =   1.0000000000000001E-005
+   0.51145  -0.59839   0.39459   8.47388 -14.65363   8.23448
+ -18.64981  75.65864 -90.76562  32.39440
+ SCF error =   1.4883988495609230E-004
+ SCF error (MAXDQ) =   4.8660871540762152E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          12
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -1747,19 +1747,19 @@
  dqin
      0.80680     0.80679     0.80677     0.80676     0.80673     0.80666     0.80664     0.80663     0.80662     0.80661
  eigen coefs
-   0.10909  -1.17480  -1.28819  12.97871 -19.38084  73.84327
--302.94338 363.66966-129.92437   5.11086
- SCF error =   5.6903165304412107E-005
- SCF error (MAXDQ) =   1.7815106449825535E-005  SCF Tol =   1.0000000000000001E-005
+   0.10909  -1.17492  -1.28863  12.98044 -19.38256  73.84965
+-302.96976 363.69699-129.93108   5.11076
+ SCF error =   5.6909938082121639E-005
+ SCF error (MAXDQ) =   1.7825694439865813E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          13
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -1792,10 +1792,10 @@
  dqin
      0.80679     0.80677     0.80676     0.80673     0.80666     0.80664     0.80663     0.80662     0.80661     0.80661
  eigen coefs
-   0.68190   7.98604 -18.19285  15.19967 -46.76648 191.18997
--229.47450  82.01594  -3.99731   2.35762
- SCF error =   3.4767901151582928E-005
- SCF error (MAXDQ) =   1.2007369201816331E-005  SCF Tol =   1.0000000000000001E-005
+   0.68195   7.98653 -18.19410  15.20060 -46.76962 191.20296
+-229.48736  82.01860  -3.99719   2.35762
+ SCF error =   3.4773387325911199E-005
+ SCF error (MAXDQ) =   1.2001869330147130E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          14
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -1803,8 +1803,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -1837,25 +1837,25 @@
  dqin
      0.80677     0.80676     0.80673     0.80666     0.80664     0.80663     0.80662     0.80661     0.80661     0.80661
  eigen coefs
-   0.00581   0.00367  -0.00221  -0.00462  -0.16995   0.22431
-  -0.19746   1.93201  -4.47936   3.68780
- SCF error =   2.0915608565491635E-005
- SCF error (MAXDQ) =   6.1984494952316282E-006  SCF Tol =   1.0000000000000001E-005
- Time for GETMDF-QNEUTRAL QCONSISTENCY    1418.0000000000000     
+   0.00581   0.00367  -0.00221  -0.00462  -0.16997   0.22434
+  -0.19745   1.93210  -4.47960   3.68793
+ SCF error =   2.0920896835266430E-005
+ SCF error (MAXDQ) =   6.1927967838215636E-006  SCF Tol =   1.0000000000000001E-005
+ Time for GETMDF-QNEUTRAL QCONSISTENCY    1480.0000000000000     
  Getting forces ...
  In tb_forces.F90 ...
- Time for GETMDF-GETFORCE-TBFORCESPROGRESS   143.00000000000000     
- Time for GETMDF-GETFORCE     144.00000000000000     
+ Time for GETMDF-GETFORCE-TBFORCESPROGRESS   102.00000000000000     
+ Time for GETMDF-GETFORCE     103.00000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
- Time for GETMDF   1725.0000000000000     
- Time for GETMDF =   1725.0000000000000     
- Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.37988904239842        68.353558879006641        65.621387268969045        86.968563940263266     
+ Time for GETMDF   1747.0000000000000     
+ Time for GETMDF =   1747.0000000000000     
+ Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.37988873931113        68.353558879007167        65.621387265594237        86.968563910397947     
  Writing trajectory into trajectory.pdb ...
  Writing trajectory into trajectory.xyz ...
- HOMO= -0.71526481998544011      LUMO= -0.71515530377209546     
- EGAP=   1.0951621334465145E-004
- Dipole Magnitude=   58.598763571236113     
+ HOMO= -0.71526482011964232      LUMO= -0.71515530389773907     
+ EGAP=   1.0951622190324972E-004
+ Dipole Magnitude=   58.598763459808559     
  Lattice vectors:
  a=   10.942000000000000        0.0000000000000000        0.0000000000000000     
  b=   0.0000000000000000        10.942000000000000        0.0000000000000000     
@@ -1869,9 +1869,9 @@
  IGENX =           6
  
  In buildzdiag ...
- Time for S diag = 7.60000000E+01 ms
+ Time for S diag = 8.30000000E+01 ms
  Out of genx ...
- Time get H   161.00000000000000     
+ Time get H   164.00000000000000     
  XBOON .GT. 0 .AND. CURRITER .GT. 1 .AND. SWITCH .NE. 0 ...
  Doing XBO ...
  Time for GETMDF-PROPCHEMPOT XBO GETDELTASPIN   0.0000000000000000     
@@ -1883,16 +1883,16 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
- SCF error =   4.0553304170745652E-004
- SCF error (MAXDQ) =   1.4970942334360915E-002  SCF Tol =   1.0000000000000001E-005
+ SCF error =   4.0553461467899492E-004
+ SCF error (MAXDQ) =   1.4971326719912303E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           2
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -1900,8 +1900,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -1915,17 +1915,17 @@
      0.80658
  eigen coefs
    1.00000
- SCF error =   3.2977917513665973E-002
- SCF error (MAXDQ) =   1.1957595507096075E-002  SCF Tol =   1.0000000000000001E-005
+ SCF error =   3.2978035362163670E-002
+ SCF error (MAXDQ) =   1.1957956692185912E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           3
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -1939,18 +1939,18 @@
  dqin
      0.80658     0.80658
  eigen coefs
-  -3.88792   4.88792
- SCF error =   2.7272093968627741E-002
- SCF error (MAXDQ) =   9.6462358153897032E-003  SCF Tol =   1.0000000000000001E-005
+  -3.88791   4.88791
+ SCF error =   2.7272185019175069E-002
+ SCF error (MAXDQ) =   9.6465783135930572E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           4
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   91.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    91.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -1965,9 +1965,9 @@
  dqin
      0.80658     0.80658     0.80658
  eigen coefs
-  16.76019 -21.29249   5.53229
- SCF error =   1.0216693056129156E-002
- SCF error (MAXDQ) =   3.5955359257331398E-003  SCF Tol =   1.0000000000000001E-005
+  16.76019 -21.29249   5.53230
+ SCF error =   1.0216760429379761E-002
+ SCF error (MAXDQ) =   3.5958253606012125E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           5
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -1975,8 +1975,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   88.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    88.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -1992,9 +1992,9 @@
  dqin
      0.80658     0.80658     0.80658     0.80657
  eigen coefs
- -75.04832  95.33135 -24.76606   5.48303
- SCF error =   2.1131396831737159E-003
- SCF error (MAXDQ) =   6.1862612223428926E-004  SCF Tol =   1.0000000000000001E-005
+ -75.05121  95.33507 -24.76706   5.48320
+ SCF error =   2.1132651910260951E-003
+ SCF error (MAXDQ) =   6.1887206979527321E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           6
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -2002,10 +2002,10 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -2020,18 +2020,18 @@
  dqin
      0.80658     0.80658     0.80658     0.80657     0.80655
  eigen coefs
-  10.75067 -13.67245   3.56060  -1.58428   1.94547
- SCF error =   1.5540545785583345E-003
- SCF error (MAXDQ) =   4.2824390338558338E-004  SCF Tol =   1.0000000000000001E-005
+  10.74974 -13.67128   3.56030  -1.58421   1.94546
+ SCF error =   1.5541754410340338E-003
+ SCF error (MAXDQ) =   4.2834632347166224E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           7
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -2049,9 +2049,9 @@
  dqin
      0.80658     0.80658     0.80658     0.80657     0.80655     0.80654
  eigen coefs
- -21.01044  26.93676  -7.09342  16.43854 -34.25309  19.98165
- SCF error =   1.3046263298192964E-003
- SCF error (MAXDQ) =   3.6245287636638146E-004  SCF Tol =   1.0000000000000001E-005
+ -21.01267  26.93963  -7.09419  16.43921 -34.25434  19.98236
+ SCF error =   1.3047455202973371E-003
+ SCF error (MAXDQ) =   3.6254057639739656E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           8
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -2059,8 +2059,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -2079,19 +2079,19 @@
  dqin
      0.80658     0.80658     0.80658     0.80657     0.80655     0.80654     0.80651
  eigen coefs
-   8.29826 -11.80205   3.55565 -76.10895 172.18332-101.50878
-   6.38255
- SCF error =   6.5370070508701135E-004
- SCF error (MAXDQ) =   1.8880988785952013E-004  SCF Tol =   1.0000000000000001E-005
+   8.29855 -11.80252   3.55581 -76.11153 172.18943-101.51227
+   6.38254
+ SCF error =   6.5376052654938469E-004
+ SCF error (MAXDQ) =   1.8891721264080452E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           9
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -2111,19 +2111,19 @@
  dqin
      0.80658     0.80658     0.80658     0.80657     0.80655     0.80654     0.80651     0.80649
  eigen coefs
- -19.33624  31.34917 -10.77324 407.99742-926.87211 546.62558
- -34.94083   6.95024
- SCF error =   3.7497632589274292E-004
- SCF error (MAXDQ) =   1.1391177024244747E-004  SCF Tol =   1.0000000000000001E-005
+ -19.33782  31.35169 -10.77407 408.00782-926.89702 546.63966
+ -34.94047   6.95019
+ SCF error =   3.7501607571479559E-004
+ SCF error (MAXDQ) =   1.1397609015206811E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          10
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   88.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    88.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -2144,21 +2144,21 @@
  dqin
      0.80658     0.80658     0.80658     0.80657     0.80655     0.80654     0.80651     0.80649     0.80648
  eigen coefs
-   0.35836  -0.74979   0.30676 -17.67438  40.26238 -23.77448
-   1.60881  -0.58765   1.25000
- SCF error =   1.0419517785929660E-004
- SCF error (MAXDQ) =   3.2433767605200003E-005  SCF Tol =   1.0000000000000001E-005
+   0.35830  -0.74977   0.30677 -17.67686  40.26811 -23.77783
+   1.60897  -0.58769   1.25001
+ SCF error =   1.0424050267220680E-004
+ SCF error (MAXDQ) =   3.2465135865855643E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          11
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   88.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    88.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -2189,10 +2189,10 @@
  dqin
      0.80658     0.80658     0.80658     0.80657     0.80655     0.80654     0.80651     0.80649     0.80648     0.80648
  eigen coefs
-   0.89379  -1.02500   0.29508   6.86379 -16.92015  10.75990
-  -3.35661   8.75971 -36.77743  31.50691
- SCF error =   7.6987826781743708E-005
- SCF error (MAXDQ) =   2.3285144466922425E-005  SCF Tol =   1.0000000000000001E-005
+   0.89396  -1.02509   0.29508   6.87121 -16.93755  10.77040
+  -3.35811   8.76265 -36.78903  31.51648
+ SCF error =   7.7041202973399830E-005
+ SCF error (MAXDQ) =   2.3270465456248779E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          12
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -2200,8 +2200,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   88.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    88.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -2234,25 +2234,25 @@
  dqin
      0.80658     0.80658     0.80657     0.80655     0.80654     0.80651     0.80649     0.80648     0.80648     0.80648
  eigen coefs
-   0.19746  -0.53391  10.04337 -16.40181   5.29603  14.80595
- -48.90306 208.81594-179.13471   6.81473
- SCF error =   3.0073857969150933E-005
- SCF error (MAXDQ) =   9.5445963050888594E-006  SCF Tol =   1.0000000000000001E-005
- Time for GETMDF-QNEUTRAL QCONSISTENCY    1204.0000000000000     
+   0.19753  -0.53409  10.04668 -16.40731   5.29824  14.80945
+ -48.91500 208.86473-179.17441   6.81419
+ SCF error =   3.0088222735568007E-005
+ SCF error (MAXDQ) =   9.5548990068916595E-006  SCF Tol =   1.0000000000000001E-005
+ Time for GETMDF-QNEUTRAL QCONSISTENCY    1266.0000000000000     
  Getting forces ...
  In tb_forces.F90 ...
- Time for GETMDF-GETFORCE-TBFORCESPROGRESS   144.00000000000000     
- Time for GETMDF-GETFORCE     144.00000000000000     
+ Time for GETMDF-GETFORCE-TBFORCESPROGRESS   102.00000000000000     
+ Time for GETMDF-GETFORCE     103.00000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
- Time for GETMDF   1509.0000000000000     
- Time for GETMDF =   1509.0000000000000     
- Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.38964887558689        68.370238525115298        65.621111377790328        86.967162142063842     
+ Time for GETMDF   1533.0000000000000     
+ Time for GETMDF =   1533.0000000000000     
+ Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.38964839282846        68.370238525116093        65.621111372397650        86.967161825843689     
  Writing trajectory into trajectory.pdb ...
  Writing trajectory into trajectory.xyz ...
- HOMO= -0.71525258172930295      LUMO= -0.71511209980633761     
- EGAP=   1.4048192296534090E-004
- Dipole Magnitude=   58.602599607922983     
+ HOMO= -0.71525258198860442      LUMO= -0.71511210000389958     
+ EGAP=   1.4048198470484330E-004
+ Dipole Magnitude=   58.602599358652910     
  Lattice vectors:
  a=   10.942000000000000        0.0000000000000000        0.0000000000000000     
  b=   0.0000000000000000        10.942000000000000        0.0000000000000000     
@@ -2266,9 +2266,9 @@
  IGENX =           7
  
  In buildzdiag ...
- Time for S diag = 7.70000000E+01 ms
+ Time for S diag = 8.30000000E+01 ms
  Out of genx ...
- Time get H   162.00000000000000     
+ Time get H   164.00000000000000     
  XBOON .GT. 0 .AND. CURRITER .GT. 1 .AND. SWITCH .NE. 0 ...
  Doing XBO ...
  Time for GETMDF-PROPCHEMPOT XBO GETDELTASPIN   0.0000000000000000     
@@ -2280,25 +2280,25 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
- SCF error =   1.6378109601412338E-004
- SCF error (MAXDQ) =   5.8520046745860199E-003  SCF Tol =   1.0000000000000001E-005
+ SCF error =   1.6378245603675552E-004
+ SCF error (MAXDQ) =   5.8518668031057874E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           2
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -2312,8 +2312,8 @@
      0.80632
  eigen coefs
    1.00000
- SCF error =   1.3333731115725920E-002
- SCF error (MAXDQ) =   4.7164271996058549E-003  SCF Tol =   1.0000000000000001E-005
+ SCF error =   1.3333837462172232E-002
+ SCF error (MAXDQ) =   4.7162843667831744E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           3
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -2321,8 +2321,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   88.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    88.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -2336,22 +2336,22 @@
  dqin
      0.80632     0.80632
  eigen coefs
-  -3.90927   4.90927
- SCF error =   1.1037131888488210E-002
- SCF error (MAXDQ) =   3.8942941025734701E-003  SCF Tol =   1.0000000000000001E-005
+  -3.90925   4.90925
+ SCF error =   1.1037218445145715E-002
+ SCF error (MAXDQ) =   3.8945033250104011E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           4
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   88.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    88.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -2362,22 +2362,22 @@
  dqin
      0.80632     0.80632     0.80632
  eigen coefs
-  16.75773 -21.26286   5.50513
- SCF error =   4.1304553399126301E-003
- SCF error (MAXDQ) =   1.4025392143879323E-003  SCF Tol =   1.0000000000000001E-005
+  16.75775 -21.26291   5.50515
+ SCF error =   4.1305246331495597E-003
+ SCF error (MAXDQ) =   1.4023978973130014E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           5
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -2389,18 +2389,18 @@
  dqin
      0.80632     0.80632     0.80632     0.80633
  eigen coefs
--128.26082 162.70789 -42.11449   8.66741
- SCF error =   8.6885286826868930E-004
- SCF error (MAXDQ) =   2.6029250982606555E-004  SCF Tol =   1.0000000000000001E-005
+-128.27198 162.72217 -42.11826   8.66807
+ SCF error =   8.6899854324965831E-004
+ SCF error (MAXDQ) =   2.6042384980207167E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           6
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   86.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    86.000000000000000     
+ Time to getrho   88.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    88.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -2417,9 +2417,9 @@
  dqin
      0.80632     0.80632     0.80632     0.80633     0.80633
  eigen coefs
-  15.35224 -19.47370   5.04270  -1.20054   1.27931
- SCF error =   5.6612809947591595E-004
- SCF error (MAXDQ) =   1.5873394345944369E-004  SCF Tol =   1.0000000000000001E-005
+  15.35843 -19.48156   5.04474  -1.20097   1.27936
+ SCF error =   5.6626964075474776E-004
+ SCF error (MAXDQ) =   1.5884158726686692E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           7
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -2427,8 +2427,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   88.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    88.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -2446,18 +2446,18 @@
  dqin
      0.80632     0.80632     0.80632     0.80633     0.80633     0.80633
  eigen coefs
-  48.78940 -61.98060  16.07191  -0.61237 -20.50638  19.23804
- SCF error =   5.3849197835335232E-004
- SCF error (MAXDQ) =   1.5750302254624593E-004  SCF Tol =   1.0000000000000001E-005
+  48.79895 -61.99277  16.07509  -0.61271 -20.50751  19.23895
+ SCF error =   5.3862827344855198E-004
+ SCF error (MAXDQ) =   1.5760471522252573E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           8
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   86.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    86.000000000000000     
+ Time to getrho   88.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    88.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -2476,23 +2476,23 @@
  dqin
      0.80632     0.80632     0.80632     0.80633     0.80633     0.80633     0.80634
  eigen coefs
- -12.83607  16.76782  -4.49007 -14.36462 118.71726-109.67691
-   6.88260
- SCF error =   2.6989572716930435E-004
- SCF error (MAXDQ) =   8.0056983307486007E-005  SCF Tol =   1.0000000000000001E-005
+ -12.84103  16.77422  -4.49177 -14.36625 118.72698-109.68487
+   6.88272
+ SCF error =   2.6996516183811170E-004
+ SCF error (MAXDQ) =   8.0126720149342745E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           9
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   87.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    87.000000000000000     
+ Time to getrho   88.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    88.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -2508,21 +2508,21 @@
  dqin
      0.80632     0.80632     0.80632     0.80633     0.80633     0.80633     0.80634     0.80634
  eigen coefs
-  11.57651 -17.72895   5.53387  94.89071-746.21836 688.85301
- -43.76311   7.85632
- SCF error =   1.5389782161425022E-004
- SCF error (MAXDQ) =   4.4488149169463753E-005  SCF Tol =   1.0000000000000001E-005
+  11.57701 -17.73002   5.53431  94.89817-746.24257 688.86883
+ -43.76172   7.85598
+ SCF error =   1.5394174574175705E-004
+ SCF error (MAXDQ) =   4.4525903438730197E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          10
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
  Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -2541,21 +2541,21 @@
  dqin
      0.80632     0.80632     0.80632     0.80633     0.80633     0.80633     0.80634     0.80634     0.80635
  eigen coefs
-  -3.93525   6.47821  -2.13807 -46.45535 364.44990-336.42409
-  21.38147  -3.85911   1.50230
- SCF error =   3.6299735469723872E-005
- SCF error (MAXDQ) =   1.2571960974705476E-005  SCF Tol =   1.0000000000000001E-005
+  -3.94263   6.48946  -2.14159 -46.51136 364.87392-336.81233
+  21.40497  -3.86330   1.50286
+ SCF error =   3.6351484285081328E-005
+ SCF error (MAXDQ) =   1.2579150524105742E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          11
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -2586,19 +2586,19 @@
  dqin
      0.80632     0.80632     0.80632     0.80633     0.80633     0.80633     0.80634     0.80634     0.80635     0.80635
  eigen coefs
-  -3.48769   4.49403  -1.18142  -2.03415  17.09769 -15.72510
-   0.84221   0.20272 -22.26301  23.05472
- SCF error =   3.4909594629518443E-005
- SCF error (MAXDQ) =   1.2084365122899676E-005  SCF Tol =   1.0000000000000001E-005
+  -3.48930   4.49564  -1.18170  -2.02017  16.98829 -15.62393
+   0.83567   0.20408 -22.26689  23.05831
+ SCF error =   3.4959353321214830E-005
+ SCF error (MAXDQ) =   1.2091083909093747E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          12
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -2631,25 +2631,25 @@
  dqin
      0.80632     0.80632     0.80633     0.80633     0.80633     0.80634     0.80634     0.80635     0.80635     0.80635
  eigen coefs
-  -0.38705   0.19970  12.66154 -95.30094  87.47468  -4.62374
-  -1.26807 133.22249-138.07633   7.09770
- SCF error =   1.3072991039463826E-005
- SCF error (MAXDQ) =   4.7195651300402375E-006  SCF Tol =   1.0000000000000001E-005
- Time for GETMDF-QNEUTRAL QCONSISTENCY    1218.0000000000000     
+  -0.38738   0.19989  12.67160 -95.37360  87.54068  -4.62747
+  -1.26804 133.21630-138.06826   7.09630
+ SCF error =   1.3083297854095397E-005
+ SCF error (MAXDQ) =   4.7268858385240975E-006  SCF Tol =   1.0000000000000001E-005
+ Time for GETMDF-QNEUTRAL QCONSISTENCY    1264.0000000000000     
  Getting forces ...
  In tb_forces.F90 ...
- Time for GETMDF-GETFORCE-TBFORCESPROGRESS   144.00000000000000     
- Time for GETMDF-GETFORCE     144.00000000000000     
+ Time for GETMDF-GETFORCE-TBFORCESPROGRESS   103.00000000000000     
+ Time for GETMDF-GETFORCE     103.00000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
- Time for GETMDF   1524.0000000000000     
- Time for GETMDF =   1524.0000000000000     
- Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.40159377146881        68.390569325676637        65.620775613636198        86.965493335029393     
+ Time for GETMDF   1531.0000000000000     
+ Time for GETMDF =   1531.0000000000000     
+ Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.40159363121381        68.390569325677490        65.620775612106726        86.965493218715906     
  Writing trajectory into trajectory.pdb ...
  Writing trajectory into trajectory.xyz ...
- HOMO= -0.71523958568301871      LUMO= -0.71506672755275902     
- EGAP=   1.7285813025968988E-004
- Dipole Magnitude=   58.606530955553218     
+ HOMO= -0.71523958569413426      LUMO= -0.71506672761007672     
+ EGAP=   1.7285808405753667E-004
+ Dipole Magnitude=   58.606530992547818     
  Lattice vectors:
  a=   10.942000000000000        0.0000000000000000        0.0000000000000000     
  b=   0.0000000000000000        10.942000000000000        0.0000000000000000     
@@ -2663,30 +2663,30 @@
  IGENX =           8
  
  In buildzdiag ...
- Time for S diag = 7.70000000E+01 ms
+ Time for S diag = 8.30000000E+01 ms
  Out of genx ...
- Time get H   161.00000000000000     
+ Time get H   164.00000000000000     
  XBOON .GT. 0 .AND. CURRITER .GT. 1 .AND. SWITCH .NE. 0 ...
  Doing XBO ...
  Time for GETMDF-PROPCHEMPOT XBO GETDELTASPIN   0.0000000000000000     
  Doing QCONSISTENCY ...
  SCF ITER =           1
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
- SCF error =   6.6186104865822374E-004
- SCF error (MAXDQ) =   2.4022426066456104E-002  SCF Tol =   1.0000000000000001E-005
+ SCF error =   6.6186407960443488E-004
+ SCF error (MAXDQ) =   2.4022580062298404E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           2
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -2694,10 +2694,10 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   83.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    83.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -2709,21 +2709,21 @@
      0.80607
  eigen coefs
    1.00000
- SCF error =   5.3862266663742220E-002
- SCF error (MAXDQ) =   1.9234298318821175E-002  SCF Tol =   1.0000000000000001E-005
+ SCF error =   5.3862487426272442E-002
+ SCF error (MAXDQ) =   1.9234423884780361E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           3
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -2733,9 +2733,9 @@
  dqin
      0.80607     0.80607
  eigen coefs
-  -3.90046   4.90046
- SCF error =   4.4567611229096443E-002
- SCF error (MAXDQ) =   1.5545474959878680E-002  SCF Tol =   1.0000000000000001E-005
+  -3.90045   4.90045
+ SCF error =   4.4567774307462477E-002
+ SCF error (MAXDQ) =   1.5545579273692711E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           4
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -2743,8 +2743,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   83.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    83.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -2759,20 +2759,20 @@
  dqin
      0.80607     0.80607     0.80608
  eigen coefs
-  16.73192 -21.23778   5.50586
- SCF error =   1.6677142025843378E-002
- SCF error (MAXDQ) =   5.7862015157059687E-003  SCF Tol =   1.0000000000000001E-005
+  16.73191 -21.23778   5.50587
+ SCF error =   1.6677208839278736E-002
+ SCF error (MAXDQ) =   5.7862659151119988E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           5
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   7.0000000000000000     
+ Time for deorthomyrho   8.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -2786,9 +2786,9 @@
  dqin
      0.80607     0.80607     0.80608     0.80609
  eigen coefs
- -48.38750  61.39628 -15.91227   3.90350
- SCF error =   3.4498886139193267E-003
- SCF error (MAXDQ) =   9.5189966935738113E-004  SCF Tol =   1.0000000000000001E-005
+ -48.38691  61.39556 -15.91211   3.90347
+ SCF error =   3.4498699627187623E-003
+ SCF error (MAXDQ) =   9.5186333166519255E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           6
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -2796,12 +2796,12 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   88.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    88.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   1.0000000000000000     
+ Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -2814,18 +2814,18 @@
  dqin
      0.80607     0.80607     0.80608     0.80609     0.80611
  eigen coefs
-  -1.60426   2.05165  -0.52770  -1.44808   2.52839
- SCF error =   2.7304985443851334E-003
- SCF error (MAXDQ) =   7.0247785146626551E-004  SCF Tol =   1.0000000000000001E-005
+  -1.60424   2.05162  -0.52770  -1.44809   2.52841
+ SCF error =   2.7304801962959925E-003
+ SCF error (MAXDQ) =   7.0249272814826291E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           7
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -2843,22 +2843,22 @@
  dqin
      0.80607     0.80607     0.80608     0.80609     0.80611     0.80613
  eigen coefs
-  11.16759 -14.55342   3.75769  31.07733 -52.19765  21.74847
- SCF error =   2.1279743194446048E-003
- SCF error (MAXDQ) =   5.7407195456182780E-004  SCF Tol =   1.0000000000000001E-005
+  11.16746 -14.55326   3.75765  31.07743 -52.19760  21.74833
+ SCF error =   2.1279488597614397E-003
+ SCF error (MAXDQ) =   5.7408462293839779E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           8
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -2873,19 +2873,19 @@
  dqin
      0.80607     0.80607     0.80608     0.80609     0.80611     0.80613     0.80618
  eigen coefs
-  -9.54848  14.23560  -3.60052-176.96352 291.38613-121.33014
-   6.82094
- SCF error =   1.0435564994615738E-003
- SCF error (MAXDQ) =   2.6523389130761466E-004  SCF Tol =   1.0000000000000001E-005
+  -9.54836  14.23545  -3.60049-176.96355 291.38506-121.32904
+   6.82092
+ SCF error =   1.0435485311942976E-003
+ SCF error (MAXDQ) =   2.6521389357148095E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           9
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
  Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -2905,10 +2905,10 @@
  dqin
      0.80607     0.80607     0.80608     0.80609     0.80611     0.80613     0.80618     0.80619
  eigen coefs
-  15.86264 -25.08730   6.29753 414.42384-681.71302 283.82122
- -16.27500   3.67009
- SCF error =   5.9003127175066589E-004
- SCF error (MAXDQ) =   1.8581182460986057E-004  SCF Tol =   1.0000000000000001E-005
+  15.86233 -25.08683   6.29742 414.41592-681.69741 283.81319
+ -16.27466   3.67005
+ SCF error =   5.9002822188906282E-004
+ SCF error (MAXDQ) =   1.8582159800351050E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          10
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -2916,12 +2916,12 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -2938,10 +2938,10 @@
  dqin
      0.80607     0.80607     0.80608     0.80609     0.80611     0.80613     0.80618     0.80619     0.80620
  eigen coefs
-  -0.02912   0.12534  -0.03140  -7.34125  12.11872  -5.08065
-   0.39208  -1.30083   2.14711
- SCF error =   3.2745035689789575E-004
- SCF error (MAXDQ) =   1.0369679681065946E-004  SCF Tol =   1.0000000000000001E-005
+  -0.02910   0.12531  -0.03139  -7.34099  12.11824  -5.08043
+   0.39208  -1.30088   2.14715
+ SCF error =   3.2745216285145562E-004
+ SCF error (MAXDQ) =   1.0370583300600700E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          11
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -2949,8 +2949,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -2983,23 +2983,23 @@
  dqin
      0.80607     0.80607     0.80608     0.80609     0.80611     0.80613     0.80618     0.80619     0.80620     0.80621
  eigen coefs
-  -0.61297   0.75203  -0.10917  -0.21500  -1.72161   1.82948
-  -3.16536  37.72536 -65.05968  31.57693
- SCF error =   1.2269244647836652E-004
- SCF error (MAXDQ) =   4.3004549235003964E-005  SCF Tol =   1.0000000000000001E-005
+  -0.61293   0.75198  -0.10916  -0.21480  -1.72196   1.82965
+  -3.16553  37.72625 -65.05997  31.57647
+ SCF error =   1.2268771928833976E-004
+ SCF error (MAXDQ) =   4.3001706290901609E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          12
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   83.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    83.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -3028,10 +3028,10 @@
  dqin
      0.80607     0.80608     0.80609     0.80611     0.80613     0.80618     0.80619     0.80620     0.80621     0.80621
  eigen coefs
-  -0.03739  -0.54662  18.62465 -16.87099  -0.12087  19.57041
--241.00532 415.86022-201.99745   7.52336
- SCF error =   4.9684803382715924E-005
- SCF error (MAXDQ) =   1.5552338173741020E-005  SCF Tol =   1.0000000000000001E-005
+  -0.03739  -0.54663  18.62434 -16.87027  -0.12142  19.57147
+-241.01109 415.86218-201.99455   7.52336
+ SCF error =   4.9683595948961178E-005
+ SCF error (MAXDQ) =   1.5550189474744514E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          13
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -3039,12 +3039,12 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   83.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    83.000000000000000     
+ Time to getrho   88.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    88.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -3073,25 +3073,25 @@
  dqin
      0.80608     0.80609     0.80611     0.80613     0.80618     0.80619     0.80620     0.80621     0.80621     0.80621
  eigen coefs
-   0.74353 -20.75625  15.71610   3.03054 -26.39549 322.97136
--557.23958 270.66036 -10.21628   2.48571
- SCF error =   2.2168371437649334E-005
- SCF error (MAXDQ) =   6.9153108055441947E-006  SCF Tol =   1.0000000000000001E-005
- Time for GETMDF-QNEUTRAL QCONSISTENCY    1310.0000000000000     
+   0.74346 -20.75370  15.71380   3.03071 -26.39384 322.94167
+-557.17764 270.62510 -10.21511   2.48556
+ SCF error =   2.2167497378240044E-005
+ SCF error (MAXDQ) =   6.9142518501763561E-006  SCF Tol =   1.0000000000000001E-005
+ Time for GETMDF-QNEUTRAL QCONSISTENCY    1374.0000000000000     
  Getting forces ...
  In tb_forces.F90 ...
- Time for GETMDF-GETFORCE-TBFORCESPROGRESS   144.00000000000000     
- Time for GETMDF-GETFORCE     144.00000000000000     
+ Time for GETMDF-GETFORCE-TBFORCESPROGRESS   103.00000000000000     
+ Time for GETMDF-GETFORCE     104.00000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
- Time for GETMDF   1615.0000000000000     
- Time for GETMDF =   1615.0000000000000     
- Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.41567341203768        68.414519679797792        65.620380253348699        86.963548050798877     
+ Time for GETMDF   1642.0000000000000     
+ Time for GETMDF =   1642.0000000000000     
+ Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.41567346848512        68.414519679799312        65.620380253970765        86.963548036884234     
  Writing trajectory into trajectory.pdb ...
  Writing trajectory into trajectory.xyz ...
- HOMO= -0.71522616678914563      LUMO= -0.71501923617478025     
- EGAP=   2.0693061436538596E-004
- Dipole Magnitude=   58.610054201613849     
+ HOMO= -0.71522616676731465      LUMO= -0.71501923615101703     
+ EGAP=   2.0693061629761811E-004
+ Dipole Magnitude=   58.610054217812682     
  Lattice vectors:
  a=   10.942000000000000        0.0000000000000000        0.0000000000000000     
  b=   0.0000000000000000        10.942000000000000        0.0000000000000000     
@@ -3105,43 +3105,43 @@
  IGENX =           9
  
  In buildzdiag ...
- Time for S diag = 7.80000000E+01 ms
+ Time for S diag = 8.30000000E+01 ms
  Out of genx ...
- Time get H   163.00000000000000     
+ Time get H   164.00000000000000     
  XBOON .GT. 0 .AND. CURRITER .GT. 1 .AND. SWITCH .NE. 0 ...
  Doing XBO ...
  Time for GETMDF-PROPCHEMPOT XBO GETDELTASPIN   0.0000000000000000     
  Doing QCONSISTENCY ...
  SCF ITER =           1
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
- SCF error =   8.8007895437473393E-004
- SCF error (MAXDQ) =   3.2091941908940491E-002  SCF Tol =   1.0000000000000001E-005
+ SCF error =   8.8008267263426927E-004
+ SCF error (MAXDQ) =   3.2092323500205078E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           2
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   83.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    83.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -3151,8 +3151,8 @@
      0.80588
  eigen coefs
    1.00000
- SCF error =   7.1617067638927889E-002
- SCF error (MAXDQ) =   2.5692556481165640E-002  SCF Tol =   1.0000000000000001E-005
+ SCF error =   7.1617338134901981E-002
+ SCF error (MAXDQ) =   2.5692898801137565E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           3
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -3160,8 +3160,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -3175,22 +3175,22 @@
  dqin
      0.80588     0.80588
  eigen coefs
-  -3.89871   4.89871
- SCF error =   5.9255024264617200E-002
- SCF error (MAXDQ) =   2.0761164755581207E-002  SCF Tol =   1.0000000000000001E-005
+  -3.89870   4.89870
+ SCF error =   5.9255223543330439E-002
+ SCF error (MAXDQ) =   2.0761476684122204E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           4
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -3201,9 +3201,9 @@
  dqin
      0.80588     0.80588     0.80589
  eigen coefs
-  16.71666 -21.21945   5.50279
- SCF error =   2.2177198351051242E-002
- SCF error (MAXDQ) =   7.7276402426234014E-003  SCF Tol =   1.0000000000000001E-005
+  16.71665 -21.21945   5.50280
+ SCF error =   2.2177279621216160E-002
+ SCF error (MAXDQ) =   7.7278831585423369E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           5
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -3211,12 +3211,12 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   88.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    88.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -3228,18 +3228,18 @@
  dqin
      0.80588     0.80588     0.80589     0.80591
  eigen coefs
- -32.88988  41.73022 -10.81930   2.97897
- SCF error =   4.5853955561946111E-003
- SCF error (MAXDQ) =   1.2584322342761300E-003  SCF Tol =   1.0000000000000001E-005
+ -32.88933  41.72953 -10.81914   2.97894
+ SCF error =   4.5853717543461901E-003
+ SCF error (MAXDQ) =   1.2586258533437977E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           6
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -3256,18 +3256,18 @@
  dqin
      0.80588     0.80588     0.80589     0.80591     0.80592
  eigen coefs
-  -1.55983   2.00185  -0.51193  -2.24559   3.31550
- SCF error =   3.8270244824860928E-003
- SCF error (MAXDQ) =   9.6214609208766788E-004  SCF Tol =   1.0000000000000001E-005
+  -1.55965   2.00162  -0.51187  -2.24564   3.31553
+ SCF error =   3.8270034496823645E-003
+ SCF error (MAXDQ) =   9.6223029270381399E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           7
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   87.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    87.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -3285,22 +3285,22 @@
  dqin
      0.80588     0.80588     0.80589     0.80591     0.80592     0.80595
  eigen coefs
-   9.10678 -12.06713   3.05258  47.10834 -67.72487  21.52429
- SCF error =   2.8268129330668371E-003
- SCF error (MAXDQ) =   7.6696373386164751E-004  SCF Tol =   1.0000000000000001E-005
+   9.10676 -12.06710   3.05258  47.10854 -67.72490  21.52413
+ SCF error =   2.8267806663836723E-003
+ SCF error (MAXDQ) =   7.6703380719223002E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           8
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   88.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    88.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -3315,19 +3315,19 @@
  dqin
      0.80588     0.80588     0.80589     0.80591     0.80592     0.80595     0.80602
  eigen coefs
- -10.08131  15.41412  -3.59674-245.41481 349.34595-111.07182
-   6.40461
- SCF error =   1.3991509108729054E-003
- SCF error (MAXDQ) =   3.4284561345510056E-004  SCF Tol =   1.0000000000000001E-005
+ -10.08118  15.41397  -3.59671-245.41444 349.34413-111.07035
+   6.40458
+ SCF error =   1.3991387522601527E-003
+ SCF error (MAXDQ) =   3.4276417864687048E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           9
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   91.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    91.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -3347,10 +3347,10 @@
  dqin
      0.80588     0.80588     0.80589     0.80591     0.80592     0.80595     0.80602     0.80605
  eigen coefs
-   8.74737 -14.00147   3.19143 271.69551-386.56467 122.90316
-  -7.34702   2.37569
- SCF error =   8.0474493642431367E-004
- SCF error (MAXDQ) =   2.5972970000154305E-004  SCF Tol =   1.0000000000000001E-005
+   8.74713 -14.00109   3.19136 271.68629-386.55013 122.89755
+  -7.34677   2.37566
+ SCF error =   8.0473914956451947E-004
+ SCF error (MAXDQ) =   2.5977944589761215E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          10
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -3358,12 +3358,12 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   88.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    88.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -3380,10 +3380,10 @@
  dqin
      0.80588     0.80588     0.80589     0.80591     0.80592     0.80595     0.80602     0.80605     0.80606
  eigen coefs
-  -0.01477   0.08411  -0.01761  -5.99393   8.62086  -2.80344
-   0.45048  -2.87399   3.54828
- SCF error =   5.7502303478525879E-004
- SCF error (MAXDQ) =   1.9341074762757593E-004  SCF Tol =   1.0000000000000001E-005
+  -0.01471   0.08403  -0.01759  -5.99323   8.61984  -2.80310
+   0.45048  -2.87408   3.54836
+ SCF error =   5.7502198346490771E-004
+ SCF error (MAXDQ) =   1.9345190847364080E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          11
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -3391,12 +3391,12 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   88.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    88.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   8.0000000000000000     
+ Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   0.0000000000000000     
+ Time getdeltaq   1.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -3425,10 +3425,10 @@
  dqin
      0.80588     0.80588     0.80589     0.80591     0.80592     0.80595     0.80602     0.80605     0.80606     0.80607
  eigen coefs
-  -0.36791   0.41605   0.06396   0.04554  -3.31308   2.94885
-  -8.65959  84.55794-105.63558  30.94383
- SCF error =   1.6178911351622373E-004
- SCF error (MAXDQ) =   5.5818236599058935E-005  SCF Tol =   1.0000000000000001E-005
+  -0.36787   0.41599   0.06398   0.04577  -3.31338   2.94899
+  -8.65995  84.55874-105.63534  30.94307
+ SCF error =   1.6177971958710754E-004
+ SCF error (MAXDQ) =   5.5805669045061457E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          12
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -3436,8 +3436,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -3470,10 +3470,10 @@
  dqin
      0.80588     0.80589     0.80591     0.80592     0.80595     0.80602     0.80605     0.80606     0.80607     0.80607
  eigen coefs
-  -0.02044  -0.97178  27.72216 -21.54522  -3.45545  46.24903
--458.56173 573.05027-168.01493   6.54809
- SCF error =   6.8817152915326332E-005
- SCF error (MAXDQ) =   2.1156253558141103E-005  SCF Tol =   1.0000000000000001E-005
+  -0.02044  -0.97182  27.72165 -21.54418  -3.45630  46.25185
+-458.57501 573.06013-168.01408   6.54819
+ SCF error =   6.8814555207454944E-005
+ SCF error (MAXDQ) =   2.1147907316221293E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          13
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -3481,8 +3481,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -3515,25 +3515,25 @@
  dqin
      0.80589     0.80591     0.80592     0.80595     0.80602     0.80605     0.80606     0.80607     0.80607     0.80607
  eigen coefs
-   0.41035 -10.86596   7.92770   1.82068 -19.51015 193.09698
--241.29503  70.73518  -2.97424   1.65449
- SCF error =   3.3878808668037742E-005
- SCF error (MAXDQ) =   9.4166588755495440E-006  SCF Tol =   1.0000000000000001E-005
- Time for GETMDF-QNEUTRAL QCONSISTENCY    1318.0000000000000     
+   0.41015 -10.86013   7.92338   1.81990 -19.50071 192.99742
+-241.16778  70.69628  -2.97276   1.65426
+ SCF error =   3.3877054014985485E-005
+ SCF error (MAXDQ) =   9.4212454408992841E-006  SCF Tol =   1.0000000000000001E-005
+ Time for GETMDF-QNEUTRAL QCONSISTENCY    1372.0000000000000     
  Getting forces ...
  In tb_forces.F90 ...
- Time for GETMDF-GETFORCE-TBFORCESPROGRESS   144.00000000000000     
- Time for GETMDF-GETFORCE     144.00000000000000     
+ Time for GETMDF-GETFORCE-TBFORCESPROGRESS   103.00000000000000     
+ Time for GETMDF-GETFORCE     104.00000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   1.0000000000000000     
- Time for GETMDF   1626.0000000000000     
- Time for GETMDF =   1626.0000000000000     
- Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.43186281328508        68.442052817744084        65.619925854064249        86.961274834700291     
+ Time getdeltaq   0.0000000000000000     
+ Time for GETMDF   1640.0000000000000     
+ Time for GETMDF =   1640.0000000000000     
+ Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.43186312489672        68.442052817745818        65.619925857511660        86.961274781031264     
  Writing trajectory into trajectory.pdb ...
  Writing trajectory into trajectory.xyz ...
- HOMO= -0.71521229630436001      LUMO= -0.71496966507758308     
- EGAP=   2.4263122677692373E-004
- Dipole Magnitude=   58.613524305185962     
+ HOMO= -0.71521229618413051      LUMO= -0.71496966494771264     
+ EGAP=   2.4263123641787843E-004
+ Dipole Magnitude=   58.613524392572593     
  Lattice vectors:
  a=   10.942000000000000        0.0000000000000000        0.0000000000000000     
  b=   0.0000000000000000        10.942000000000000        0.0000000000000000     
@@ -3547,9 +3547,9 @@
  IGENX =          10
  
  In buildzdiag ...
- Time for S diag = 7.70000000E+01 ms
+ Time for S diag = 8.30000000E+01 ms
  Out of genx ...
- Time get H   163.00000000000000     
+ Time get H   164.00000000000000     
  XBOON .GT. 0 .AND. CURRITER .GT. 1 .AND. SWITCH .NE. 0 ...
  Doing XBO ...
  Time for GETMDF-PROPCHEMPOT XBO GETDELTASPIN   0.0000000000000000     
@@ -3561,16 +3561,16 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   7.0000000000000000     
+ Time for deorthomyrho   10.000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
- SCF error =   7.2814503116926945E-004
- SCF error (MAXDQ) =   2.6724329780721146E-002  SCF Tol =   1.0000000000000001E-005
+ SCF error =   7.2814798714188609E-004
+ SCF error (MAXDQ) =   2.6724778673305583E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           2
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -3578,8 +3578,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -3593,17 +3593,17 @@
      0.80577
  eigen coefs
    1.00000
- SCF error =   5.9241463949644253E-002
- SCF error (MAXDQ) =   2.1371782447245025E-002  SCF Tol =   1.0000000000000001E-005
+ SCF error =   5.9241679432295011E-002
+ SCF error (MAXDQ) =   2.1372196595762061E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           3
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   91.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    91.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -3617,18 +3617,18 @@
  dqin
      0.80577     0.80577
  eigen coefs
-  -3.89479   4.89479
- SCF error =   4.9007996553018997E-002
- SCF error (MAXDQ) =   1.7252435165634017E-002  SCF Tol =   1.0000000000000001E-005
+  -3.89478   4.89478
+ SCF error =   4.9008155615114103E-002
+ SCF error (MAXDQ) =   1.7252821784957462E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           4
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -3643,9 +3643,9 @@
  dqin
      0.80577     0.80577     0.80577
  eigen coefs
-  16.72644 -21.23693   5.51049
- SCF error =   1.8350768578695685E-002
- SCF error (MAXDQ) =   6.4246393264850710E-003  SCF Tol =   1.0000000000000001E-005
+  16.72642 -21.23692   5.51050
+ SCF error =   1.8350835558731272E-002
+ SCF error (MAXDQ) =   6.4249561337903494E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           5
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -3653,8 +3653,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -3670,9 +3670,9 @@
  dqin
      0.80577     0.80577     0.80577     0.80579
  eigen coefs
- -42.85876  54.39516 -14.11063   3.57423
- SCF error =   3.7897161156833616E-003
- SCF error (MAXDQ) =   1.0471170962282894E-003  SCF Tol =   1.0000000000000001E-005
+ -42.85805  54.39428 -14.11042   3.57419
+ SCF error =   3.7897088717453371E-003
+ SCF error (MAXDQ) =   1.0473782978250856E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           6
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -3680,10 +3680,10 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
- Time for deorthomyrho   7.0000000000000000     
+ Time for deorthomyrho   8.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
@@ -3698,9 +3698,9 @@
  dqin
      0.80577     0.80577     0.80577     0.80579     0.80580
  eigen coefs
-  -1.92893   2.46684  -0.63505  -1.65294   2.75008
- SCF error =   3.0563067429179181E-003
- SCF error (MAXDQ) =   7.8291385378648215E-004  SCF Tol =   1.0000000000000001E-005
+  -1.92854   2.46635  -0.63492  -1.65301   2.75011
+ SCF error =   3.0563034760779620E-003
+ SCF error (MAXDQ) =   7.8302909108840524E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           7
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -3708,8 +3708,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -3727,9 +3727,9 @@
  dqin
      0.80577     0.80577     0.80577     0.80579     0.80580     0.80583
  eigen coefs
-  11.72505 -15.29738   3.93739  34.17936 -54.38870  20.84428
- SCF error =   2.3384390762028798E-003
- SCF error (MAXDQ) =   6.3432161830045963E-004  SCF Tol =   1.0000000000000001E-005
+  11.72513 -15.29749   3.93742  34.17967 -54.38885  20.84411
+ SCF error =   2.3384243468203255E-003
+ SCF error (MAXDQ) =   6.3441822715681884E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           8
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -3737,8 +3737,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -3757,19 +3757,19 @@
  dqin
      0.80577     0.80577     0.80577     0.80579     0.80580     0.80583     0.80589
  eigen coefs
-  -7.95868  12.10597  -2.98141-169.61951 264.76565-101.44926
-   6.13725
- SCF error =   1.1968398838216961E-003
- SCF error (MAXDQ) =   2.9044240766862295E-004  SCF Tol =   1.0000000000000001E-005
+  -7.95853  12.10580  -2.98138-169.62024 264.76508-101.44796
+   6.13722
+ SCF error =   1.1968340659765646E-003
+ SCF error (MAXDQ) =   2.9033200492234457E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           9
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -3789,10 +3789,10 @@
  dqin
      0.80577     0.80577     0.80577     0.80579     0.80580     0.80583     0.80589     0.80591
  eigen coefs
-  14.98411 -23.68472   5.77838 394.96887-616.18876 236.08756
- -14.57720   3.63177
- SCF error =   6.8843004982541405E-004
- SCF error (MAXDQ) =   2.2071437004167471E-004  SCF Tol =   1.0000000000000001E-005
+  14.98393 -23.68443   5.77832 394.96064-616.17202 236.07863
+ -14.57678   3.63171
+ SCF error =   6.8842668646794055E-004
+ SCF error (MAXDQ) =   2.2078346751763789E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          10
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -3800,8 +3800,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -3822,19 +3822,19 @@
  dqin
      0.80577     0.80577     0.80577     0.80579     0.80580     0.80583     0.80589     0.80591     0.80592
  eigen coefs
-   0.01343   0.06052  -0.01347  -6.48653  10.17329  -3.94632
-   0.39064  -1.69881   2.50724
- SCF error =   4.2162692873559427E-004
- SCF error (MAXDQ) =   1.3934323078212962E-004  SCF Tol =   1.0000000000000001E-005
+   0.01356   0.06033  -0.01342  -6.48497  10.17079  -3.94532
+   0.39059  -1.69886   2.50730
+ SCF error =   4.2162937073748566E-004
+ SCF error (MAXDQ) =   1.3939676511820487E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          11
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -3867,10 +3867,10 @@
  dqin
      0.80577     0.80577     0.80577     0.80579     0.80580     0.80583     0.80589     0.80591     0.80592     0.80592
  eigen coefs
-  -0.56755   0.70151  -0.06706  -1.57723   0.25230   1.29862
-  -4.19151  46.00486 -69.95472  29.10078
- SCF error =   1.3308814649262688E-004
- SCF error (MAXDQ) =   4.5464024513885981E-005  SCF Tol =   1.0000000000000001E-005
+  -0.56748   0.70141  -0.06702  -1.57662   0.25136   1.29903
+  -4.19166  46.00561 -69.95479  29.10016
+ SCF error =   1.3308230921200853E-004
+ SCF error (MAXDQ) =   4.5447152259847634E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          12
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -3878,8 +3878,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -3912,19 +3912,19 @@
  dqin
      0.80577     0.80577     0.80579     0.80580     0.80583     0.80589     0.80591     0.80592     0.80592     0.80592
  eigen coefs
-  -0.06619  -0.61076  22.86738 -23.48660   1.50701  21.90980
--246.06083 374.33042-155.92789   6.53766
- SCF error =   6.1142642286912314E-005
- SCF error (MAXDQ) =   1.9781623677994631E-005  SCF Tol =   1.0000000000000001E-005
+  -0.06618  -0.61079  22.86689 -23.48563   1.50618  21.91085
+-246.06839 374.33615-155.92682   6.53774
+ SCF error =   6.1140928332103681E-005
+ SCF error (MAXDQ) =   1.9768931301511472E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          13
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -3957,19 +3957,19 @@
  dqin
      0.80577     0.80579     0.80580     0.80583     0.80589     0.80591     0.80592     0.80592     0.80592     0.80592
  eigen coefs
-   0.86915 -24.06570  20.56914   2.57186 -30.86827 343.41385
--522.34778 217.57410  -9.27670   2.56036
- SCF error =   2.9986921503463292E-005
- SCF error (MAXDQ) =   1.0043393879000106E-005  SCF Tol =   1.0000000000000001E-005
+   0.86893 -24.05871  20.56311   2.57163 -30.86046 343.32154
+-522.19935 217.50743  -9.27407   2.55995
+ SCF error =   2.9985702001902177E-005
+ SCF error (MAXDQ) =   1.0035051128065575E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          14
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -4002,25 +4002,25 @@
  dqin
      0.80579     0.80580     0.80583     0.80589     0.80591     0.80592     0.80592     0.80592     0.80592     0.80592
  eigen coefs
-  -0.01347   0.01219  -0.00281   0.00386   0.12499  -0.18726
-   0.08597   0.01907  -1.60286   2.56033
- SCF error =   2.0898683711937095E-005
- SCF error (MAXDQ) =   6.9470404933102969E-006  SCF Tol =   1.0000000000000001E-005
- Time for GETMDF-QNEUTRAL QCONSISTENCY    1416.0000000000000     
+  -0.01347   0.01219  -0.00281   0.00386   0.12499  -0.18725
+   0.08599   0.01909  -1.60330   2.56072
+ SCF error =   2.0898488642698453E-005
+ SCF error (MAXDQ) =   6.9411948988573613E-006  SCF Tol =   1.0000000000000001E-005
+ Time for GETMDF-QNEUTRAL QCONSISTENCY    1481.0000000000000     
  Getting forces ...
  In tb_forces.F90 ...
- Time for GETMDF-GETFORCE-TBFORCESPROGRESS   143.00000000000000     
- Time for GETMDF-GETFORCE     145.00000000000000     
+ Time for GETMDF-GETFORCE-TBFORCESPROGRESS   104.00000000000000     
+ Time for GETMDF-GETFORCE     104.00000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
- Time for GETMDF   1724.0000000000000     
- Time for GETMDF =   1724.0000000000000     
- Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.45015144710658        68.473126882017411        65.619413367864965        86.958708742817407     
+ Time for GETMDF   1749.0000000000000     
+ Time for GETMDF =   1749.0000000000000     
+ Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.45015178618246        68.473126882020054        65.619413371619544        86.958708746424534     
  Writing trajectory into trajectory.pdb ...
  Writing trajectory into trajectory.xyz ...
- HOMO= -0.71519819669193208      LUMO= -0.71491803582258395     
- EGAP=   2.8016086934812279E-004
- Dipole Magnitude=   58.616770020138979     
+ HOMO= -0.71519819654166772      LUMO= -0.71491803568418411     
+ EGAP=   2.8016085748361341E-004
+ Dipole Magnitude=   58.616770128178821     
  Lattice vectors:
  a=   10.942000000000000        0.0000000000000000        0.0000000000000000     
  b=   0.0000000000000000        10.942000000000000        0.0000000000000000     
@@ -4034,9 +4034,9 @@
  IGENX =          11
  
  In buildzdiag ...
- Time for S diag = 7.80000000E+01 ms
+ Time for S diag = 8.30000000E+01 ms
  Out of genx ...
- Time get H   163.00000000000000     
+ Time get H   164.00000000000000     
  XBOON .GT. 0 .AND. CURRITER .GT. 1 .AND. SWITCH .NE. 0 ...
  Doing XBO ...
  Time for GETMDF-PROPCHEMPOT XBO GETDELTASPIN   0.0000000000000000     
@@ -4048,25 +4048,25 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
- SCF error =   2.7150577057096338E-004
- SCF error (MAXDQ) =   1.0154707450150235E-002  SCF Tol =   1.0000000000000001E-005
+ SCF error =   2.7150670931619858E-004
+ SCF error (MAXDQ) =   1.0155033756240828E-002  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           2
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -4080,17 +4080,17 @@
      0.80572
  eigen coefs
    1.00000
- SCF error =   2.2075012480707944E-002
- SCF error (MAXDQ) =   8.0952428183671543E-003  SCF Tol =   1.0000000000000001E-005
+ SCF error =   2.2075082062442818E-002
+ SCF error (MAXDQ) =   8.0955528743620331E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           3
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -4105,17 +4105,17 @@
      0.80572     0.80572
  eigen coefs
   -3.88118   4.88118
- SCF error =   1.8252569322435509E-002
- SCF error (MAXDQ) =   6.5162167433254758E-003  SCF Tol =   1.0000000000000001E-005
+ SCF error =   1.8252621578096317E-002
+ SCF error (MAXDQ) =   6.5165132679358972E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           4
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   88.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    88.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -4130,9 +4130,9 @@
  dqin
      0.80572     0.80572     0.80572
  eigen coefs
-  16.76226 -21.29986   5.53760
- SCF error =   6.8501266602847633E-003
- SCF error (MAXDQ) =   2.4266080995949402E-003  SCF Tol =   1.0000000000000001E-005
+  16.76225 -21.29985   5.53760
+ SCF error =   6.8501512264760919E-003
+ SCF error (MAXDQ) =   2.4268628198902409E-003  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           5
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -4140,12 +4140,12 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   1.0000000000000000     
+ Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -4157,18 +4157,18 @@
  dqin
      0.80572     0.80572     0.80572     0.80573
  eigen coefs
--106.74806 135.61301 -35.24928   7.38433
- SCF error =   1.4117280239264306E-003
- SCF error (MAXDQ) =   3.9471683601255414E-004  SCF Tol =   1.0000000000000001E-005
+-106.74775 135.61266 -35.24923   7.38431
+ SCF error =   1.4117408265453611E-003
+ SCF error (MAXDQ) =   3.9493314055971673E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           6
  In addqdep.F90 ...
- Time for ORTHOMYH =   14.000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    14.000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -4185,22 +4185,22 @@
  dqin
      0.80572     0.80572     0.80572     0.80573     0.80574
  eigen coefs
-   1.23092  -1.55806   0.40750  -0.43258   1.35221
- SCF error =   9.4576369887267584E-004
- SCF error (MAXDQ) =   2.5846879409752166E-004  SCF Tol =   1.0000000000000001E-005
+   1.23355  -1.56140   0.40837  -0.43277   1.35225
+ SCF error =   9.4577550366731244E-004
+ SCF error (MAXDQ) =   2.5855797758300714E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           7
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   1.0000000000000000     
+ Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -4214,9 +4214,9 @@
  dqin
      0.80572     0.80572     0.80572     0.80573     0.80574     0.80574
  eigen coefs
-  32.39314 -41.30313  10.74943   3.70960 -23.57782  19.02879
- SCF error =   8.7197481438388213E-004
- SCF error (MAXDQ) =   2.3351080023770177E-004  SCF Tol =   1.0000000000000001E-005
+  32.39445 -41.30482  10.74988   3.70959 -23.57754  19.02844
+ SCF error =   8.7198324009865732E-004
+ SCF error (MAXDQ) =   2.3359235009412505E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           8
  In addqdep.F90 ...
  Time for ORTHOMYH =   8.0000000000000000     
@@ -4224,8 +4224,8 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -4244,10 +4244,10 @@
  dqin
      0.80572     0.80572     0.80572     0.80573     0.80574     0.80574     0.80576
  eigen coefs
-  -4.41733   6.32184  -1.69693 -28.17693 114.54873 -91.69274
-   6.11337
- SCF error =   4.7122832396457687E-004
- SCF error (MAXDQ) =   1.1090551598780252E-004  SCF Tol =   1.0000000000000001E-005
+  -4.41650   6.32081  -1.69667 -28.17718 114.54670 -91.69049
+   6.11333
+ SCF error =   4.7123155960896931E-004
+ SCF error (MAXDQ) =   1.1081256735545608E-004  SCF Tol =   1.0000000000000001E-005
  SCF ITER =           9
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
@@ -4255,12 +4255,12 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
- Time getdeltaq   1.0000000000000000     
+ Time getdeltaq   0.0000000000000000     
  MixerType=Pulay               
  Performing Pulay mixing scheme ...
  coefs
@@ -4276,19 +4276,19 @@
  dqin
      0.80572     0.80572     0.80572     0.80573     0.80574     0.80574     0.80576     0.80577
  eigen coefs
-  18.70383 -29.23369   8.01912 218.05407-882.29809 706.10360
- -47.56270   9.21386
- SCF error =   2.6252981098802316E-004
- SCF error (MAXDQ) =   8.4125437535442771E-005  SCF Tol =   1.0000000000000001E-005
+  18.70468 -29.23492   8.01943 218.05533-882.28170 706.08570
+ -47.56237   9.21384
+ SCF error =   2.6253091961238144E-004
+ SCF error (MAXDQ) =   8.4184256334385310E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          10
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    85.000000000000000     
+ Time to getrho   90.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -4309,19 +4309,19 @@
  dqin
      0.80572     0.80572     0.80572     0.80573     0.80574     0.80574     0.80576     0.80577     0.80578
  eigen coefs
-  -0.17967   0.54324  -0.16571 -12.60666  50.79484 -40.65404
-   2.75535  -0.59798   1.11064
- SCF error =   5.1832998676851280E-005
- SCF error (MAXDQ) =   1.6832960852752876E-005  SCF Tol =   1.0000000000000001E-005
+  -0.17906   0.54241  -0.16549 -12.60435  50.78410 -40.64517
+   2.75480  -0.59788   1.11063
+ SCF error =   5.1832999960796561E-005
+ SCF error (MAXDQ) =   1.6818111004734959E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          11
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   89.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -4354,19 +4354,19 @@
  dqin
      0.80572     0.80572     0.80572     0.80573     0.80574     0.80574     0.80576     0.80577     0.80578     0.80578
  eigen coefs
-  -1.94969   2.64213  -0.68567  -6.83205  27.39212 -21.72501
-   1.09627   1.23402 -24.47767  24.30555
- SCF error =   4.8599289510609083E-005
- SCF error (MAXDQ) =   1.6385756728465317E-005  SCF Tol =   1.0000000000000001E-005
+  -1.94940   2.64173  -0.68557  -6.83097  27.38703 -21.72079
+   1.09601   1.23412 -24.47789  24.30571
+ SCF error =   4.8599212367034596E-005
+ SCF error (MAXDQ) =   1.6371756614064203E-005  SCF Tol =   1.0000000000000001E-005
  SCF ITER =          12
  In addqdep.F90 ...
- Time for ORTHOMYH =   8.0000000000000000     
- Time for GETMDF-QCONSISTENCY-ORTHOMYH    8.0000000000000000     
+ Time for ORTHOMYH =   7.0000000000000000     
+ Time for GETMDF-QCONSISTENCY-ORTHOMYH    7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   84.000000000000000     
- Time for GETMDF-QCONSISTENCY-BUILDRHO    84.000000000000000     
+ Time to getrho   93.000000000000000     
+ Time for GETMDF-QCONSISTENCY-BUILDRHO    93.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
  In getdeltaq.F90 ...
@@ -4399,25 +4399,25 @@
  dqin
      0.80572     0.80572     0.80573     0.80574     0.80574     0.80576     0.80577     0.80578     0.80578     0.80578
  eigen coefs
-  -0.34214   0.04553  15.45643 -59.04800  46.19514  -1.24922
-  -7.09848 124.50989-123.86848   6.39932
- SCF error =   2.5246779754553568E-005
- SCF error (MAXDQ) =   8.3397548273911326E-006  SCF Tol =   1.0000000000000001E-005
- Time for GETMDF-QNEUTRAL QCONSISTENCY    1226.0000000000000     
+  -0.34211   0.04552  15.45533 -59.04214  46.19010  -1.24895
+  -7.09879 124.51132-123.86962   6.39934
+ SCF error =   2.5246700282739811E-005
+ SCF error (MAXDQ) =   8.3269683852638110E-006  SCF Tol =   1.0000000000000001E-005
+ Time for GETMDF-QNEUTRAL QCONSISTENCY    1271.0000000000000     
  Getting forces ...
  In tb_forces.F90 ...
- Time for GETMDF-GETFORCE-TBFORCESPROGRESS   144.00000000000000     
- Time for GETMDF-GETFORCE     144.00000000000000     
+ Time for GETMDF-GETFORCE-TBFORCESPROGRESS   103.00000000000000     
+ Time for GETMDF-GETFORCE     104.00000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
- Time for GETMDF   1533.0000000000000     
- Time for GETMDF =   1533.0000000000000     
- Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.47050829645980        68.507695009000912        65.618843322108944        86.955856811570555     
+ Time for GETMDF   1539.0000000000000     
+ Time for GETMDF =   1539.0000000000000     
+ Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.47050898569557        68.507695009004181        65.618843329761447        86.955857441270084     
  Writing trajectory into trajectory.pdb ...
  Writing trajectory into trajectory.xyz ...
- HOMO= -0.71518370914402307      LUMO= -0.71486444835238783     
- EGAP=   3.1926079163524523E-004
- Dipole Magnitude=   58.619980859159696     
+ HOMO= -0.71518370885683291      LUMO= -0.71486444806532035     
+ EGAP=   3.1926079151256559E-004
+ Dipole Magnitude=   58.619981084825980     
  Lattice vectors:
  a=   10.942000000000000        0.0000000000000000        0.0000000000000000     
  b=   0.0000000000000000        10.942000000000000        0.0000000000000000     
@@ -4431,38 +4431,38 @@
  IGENX =          12
  
  In buildzdiag ...
- Time for S diag = 7.80000000E+01 ms
+ Time for S diag = 8.30000000E+01 ms
  Out of genx ...
- Time get H   162.00000000000000     
+ Time get H   164.00000000000000     
  XBOON .GT. 0 .AND. CURRITER .GT. 1 .AND. SWITCH .NE. 0 ...
  Doing XBO ...
  Time for GETMDF-PROPCHEMPOT XBO GETDELTASPIN   0.0000000000000000     
  Doing QCONSISTENCY ...
  Time for COULOMBRSPACE   0.0000000000000000     
- Time for COULOMBEWALD   2.0000000000000000     
+ Time for COULOMBEWALD   1.0000000000000000     
  In addqdep.F90 ...
  Time for ORTHOMYH =   7.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   86.000000000000000     
+ Time to getrho   90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
- Time for GETMDF-QNEUTRAL QCONSISTENCY    102.00000000000000     
+ Time for GETMDF-QNEUTRAL QCONSISTENCY    106.00000000000000     
  Getting forces ...
  In tb_forces.F90 ...
- Time for GETMDF-GETFORCE-TBFORCESPROGRESS   144.00000000000000     
- Time for GETMDF-GETFORCE     144.00000000000000     
+ Time for GETMDF-GETFORCE-TBFORCESPROGRESS   103.00000000000000     
+ Time for GETMDF-GETFORCE     104.00000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
- Time for GETMDF   408.00000000000000     
- Time for GETMDF =   408.00000000000000     
- Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.49364947274034        68.545705419250922        65.617358964450190        86.953010996576793     
+ Time for GETMDF   374.00000000000000     
+ Time for GETMDF =   374.00000000000000     
+ Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.49365500831368        68.545705419254006        65.617359021024541        86.953005406287033     
  Writing trajectory into trajectory.pdb ...
  Writing trajectory into trajectory.xyz ...
- HOMO= -0.71516996717674219      LUMO= -0.71481139843828245     
- EGAP=   3.5856873845974135E-004
- Dipole Magnitude=   58.539062065580069     
+ HOMO= -0.71516996519043652      LUMO= -0.71481139577866382     
+ EGAP=   3.5856941177270230E-004
+ Dipole Magnitude=   58.539062757613230     
  Lattice vectors:
  a=   10.942000000000000        0.0000000000000000        0.0000000000000000     
  b=   0.0000000000000000        10.942000000000000        0.0000000000000000     
@@ -4476,38 +4476,38 @@
  IGENX =          13
  
  In buildzdiag ...
- Time for S diag = 7.80000000E+01 ms
+ Time for S diag = 8.30000000E+01 ms
  Out of genx ...
- Time get H   162.00000000000000     
+ Time get H   169.00000000000000     
  XBOON .GT. 0 .AND. CURRITER .GT. 1 .AND. SWITCH .NE. 0 ...
  Doing XBO ...
  Time for GETMDF-PROPCHEMPOT XBO GETDELTASPIN   0.0000000000000000     
  Doing QCONSISTENCY ...
  Time for COULOMBRSPACE   0.0000000000000000     
- Time for COULOMBEWALD   1.0000000000000000     
+ Time for COULOMBEWALD   2.0000000000000000     
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   86.000000000000000     
+ Time to getrho   90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
- Time for GETMDF-QNEUTRAL QCONSISTENCY    102.00000000000000     
+ Time for GETMDF-QNEUTRAL QCONSISTENCY    107.00000000000000     
  Getting forces ...
  In tb_forces.F90 ...
- Time for GETMDF-GETFORCE-TBFORCESPROGRESS   144.00000000000000     
- Time for GETMDF-GETFORCE     144.00000000000000     
+ Time for GETMDF-GETFORCE-TBFORCESPROGRESS   103.00000000000000     
+ Time for GETMDF-GETFORCE     103.00000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
- Time for GETMDF   408.00000000000000     
- Time for GETMDF =   408.00000000000000     
- Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.52563126453981        68.587101140804819        65.616496694656860        86.950204300693741     
+ Time for GETMDF   379.00000000000000     
+ Time for GETMDF =   379.00000000000000     
+ Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -806.52562236589688        68.587101140804421        65.616496531078738        86.950213505301804     
  Writing trajectory into trajectory.pdb ...
  Writing trajectory into trajectory.xyz ...
- HOMO= -0.71449790576691208      LUMO= -0.71410230536112462     
- EGAP=   3.9560040578745514E-004
- Dipole Magnitude=   60.095298895943543     
+ HOMO= -0.71449789796400509      LUMO= -0.71410229272527459     
+ EGAP=   3.9560523873050091E-004
+ Dipole Magnitude=   60.095308565933081     
  Lattice vectors:
  a=   10.942000000000000        0.0000000000000000        0.0000000000000000     
  b=   0.0000000000000000        10.942000000000000        0.0000000000000000     
@@ -4521,9 +4521,9 @@
  IGENX =          14
  
  In buildzdiag ...
- Time for S diag = 7.70000000E+01 ms
+ Time for S diag = 8.30000000E+01 ms
  Out of genx ...
- Time get H   161.00000000000000     
+ Time get H   164.00000000000000     
  XBOON .GT. 0 .AND. CURRITER .GT. 1 .AND. SWITCH .NE. 0 ...
  Doing XBO ...
  Time for GETMDF-PROPCHEMPOT XBO GETDELTASPIN   0.0000000000000000     
@@ -4531,28 +4531,28 @@
  Time for COULOMBRSPACE   0.0000000000000000     
  Time for COULOMBEWALD   1.0000000000000000     
  In addqdep.F90 ...
- Time for ORTHOMYH =   7.0000000000000000     
+ Time for ORTHOMYH =   8.0000000000000000     
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
+ Time to getrho   89.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
- Time for GETMDF-QNEUTRAL QCONSISTENCY    101.00000000000000     
+ Time for GETMDF-QNEUTRAL QCONSISTENCY    105.00000000000000     
  Getting forces ...
  In tb_forces.F90 ...
- Time for GETMDF-GETFORCE-TBFORCESPROGRESS   145.00000000000000     
- Time for GETMDF-GETFORCE     145.00000000000000     
+ Time for GETMDF-GETFORCE-TBFORCESPROGRESS   104.00000000000000     
+ Time for GETMDF-GETFORCE     104.00000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
- Time for GETMDF   407.00000000000000     
- Time for GETMDF =   407.00000000000000     
- Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -807.99839102462090        68.631822933612781        65.023881286519540        86.979273646695489     
+ Time for GETMDF   373.00000000000000     
+ Time for GETMDF =   373.00000000000000     
+ Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -807.99840226678475        68.631822933625088        65.023870485130558        86.979289937087728     
  Writing trajectory into trajectory.pdb ...
  Writing trajectory into trajectory.xyz ...
- HOMO= -0.67924154117439250      LUMO= -0.67758915797547570     
- EGAP=   1.6523831989168070E-003
- Dipole Magnitude=   42.897331234231494     
+ HOMO= -0.67924188658376228      LUMO= -0.67759013027318760     
+ EGAP=   1.6517563105746813E-003
+ Dipole Magnitude=   42.897250339960586     
  Lattice vectors:
  a=   10.942000000000000        0.0000000000000000        0.0000000000000000     
  b=   0.0000000000000000        10.942000000000000        0.0000000000000000     
@@ -4566,9 +4566,9 @@
  IGENX =          15
  
  In buildzdiag ...
- Time for S diag = 7.80000000E+01 ms
+ Time for S diag = 8.30000000E+01 ms
  Out of genx ...
- Time get H   163.00000000000000     
+ Time get H   164.00000000000000     
  XBOON .GT. 0 .AND. CURRITER .GT. 1 .AND. SWITCH .NE. 0 ...
  Doing XBO ...
  Time for GETMDF-PROPCHEMPOT XBO GETDELTASPIN   0.0000000000000000     
@@ -4580,21 +4580,21 @@
  In getrho.F90 ...
  In BOEVECSPRG ...
  In get_density_t ...
- Time to getrho   85.000000000000000     
+ Time to getrho   90.000000000000000     
  In deorthomyrhoprogress.F90 ...
  Time for deorthomyrho   7.0000000000000000     
- Time for GETMDF-QNEUTRAL QCONSISTENCY    101.00000000000000     
+ Time for GETMDF-QNEUTRAL QCONSISTENCY    106.00000000000000     
  Getting forces ...
  In tb_forces.F90 ...
- Time for GETMDF-GETFORCE-TBFORCESPROGRESS   144.00000000000000     
- Time for GETMDF-GETFORCE     145.00000000000000     
+ Time for GETMDF-GETFORCE-TBFORCESPROGRESS   103.00000000000000     
+ Time for GETMDF-GETFORCE     104.00000000000000     
  In getdeltaq.F90 ...
  Time getdeltaq   0.0000000000000000     
- Time for GETMDF   409.00000000000000     
- Time for GETMDF =   409.00000000000000     
- Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -899.54878230238080        68.679788819800820        51.058582740875856        90.688392576450326     
+ Time for GETMDF   374.00000000000000     
+ Time for GETMDF =   374.00000000000000     
+ Energy Components (TRRHOH, EREP, ENTE, ECOUL)  -899.55000387685322        68.679788819744857        51.058681345020446        90.688472279003108     
  Writing trajectory into trajectory.pdb ...
  Writing trajectory into trajectory.xyz ...
- HOMO=  -2.1522789247118963      LUMO=  -2.1353389722530518     
- EGAP=   1.6939952458844498E-002
- Dipole Magnitude=   242.93899512960996     
+ HOMO=  -2.1522960112315088      LUMO=  -2.1353563356898633     
+ EGAP=   1.6939675541645549E-002
+ Dipole Magnitude=   242.94113833738348     
