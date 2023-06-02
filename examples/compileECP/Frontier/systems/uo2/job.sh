@@ -12,4 +12,4 @@ module load cmake
 module load openblas
 module load rocm/5.2.0 
 
-$MEMBERWORK/csc304/Frontier1/lammps/src/lmp_serial < in.md 
+$MEMBERWORK/csc304/Frontier1/lammps/src/lmp_serial < in.md | tee out.log 
