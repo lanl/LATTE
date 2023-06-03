@@ -863,9 +863,12 @@ CONTAINS
              SY%COORDINATE = CR
              SY%SYMBOL = ATELE
              SY%LATTICE_VECTOR = BOX
-             SY%NET_CHARGE = DELTAQ
-             !if(LIBCALLS == 0) MAXDN2DT = abs(maxval(DN2DT2(:,1)))
-             !SY%NET_CHARGE = abs(DN2DT2(:,1))
+             IF (DOKERNEL) THEN
+                if(LIBCALLS == 0) MAXDN2DT = abs(maxval(DN2DT2(:,1)))
+                SY%NET_CHARGE = abs(DN2DT2(:,1))
+             ELSE
+                SY%NET_CHARGE = DELTAQ
+             ENDIF
              CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT,"trajectory","pdb")
              CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT,"trajectory","xyz")
 
