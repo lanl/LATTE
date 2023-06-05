@@ -1,0 +1,83 @@
+LATTE INPUT FILE
+================
+#This input file resumes the content of MDcontroller and TBparam/control.in
+#The parser will only read it if it's present inside the running folder. 
+#In case this file is not present Latte will read the two files as original.
+#The order of the kewords is not important in this file. 
+#To get a full description of these keywords please see: 
+## https://github.com/lanl/LATTE/blob/master/Manual/LATTE_manual.pdf
+
+#General controls
+CONTROL{
+  XCONTROL= 1
+  SCLTYPE= TABLE
+  BASISTYPE= NONORTHO
+  PARAMPATH= "./"
+  KBT= 0.5
+  VERBOSE= 3
+  ENTROPYKIND= 1
+  PPOTON= 2
+  SPINON= 0 SPINTOL= 1.0e-4
+  ELECTRO= 1 ELECMETH= 0 ELEC_QTOL= 1.0e-5
+  MAXSCF= 200
+  BREAKTOL= 1.0E-6 MINSP2ITER= 22 SP2CONV= REL
+  FULLQCONV= 0 QITER= 0
+  QMIX= 0.1 SPINMIX= 0.25 MDMIX= 0.25
+  SPARSEON= 0 THRESHOLDON= 0 NUMTHRESH= 1.0e-5 FILLINSTOP= 100 BLKSZ= 4
+  MSPARSE= 1000
+  RELAX= 0 RELAXTYPE= SD MAXITER= 100000 RLXFTOL= 0.0000001
+  SKIN= 1.0
+  CHARGE= 0
+  XBO= 1
+  XBODISON= 1
+  XBODISORDER= 5
+  KON= 0
+  #ER= 1.0
+  DOKERNEL= F
+  KERNELSCHEME= 2
+  NORECS= 3
+  SAVEKERNEL= T
+  READKERNEL= F
+  #RESTARTLIB= 1
+  #MIXER= 1
+  #FAILSAFE= T
+}
+
+#Controls for QMD (if using lammps MAXITER must be set to -1)
+MDCONTROL{
+  MAXITER= -1
+  WRTFREQ= 1
+  RSFREQ= 100000
+  RSLEVEL= 0
+}
+
+MIXER{
+   MixerType= Pulay
+   Verbose= 3
+   MPulay= 10
+   MixCoeff= 0.01
+   MixerON= T
+ }
+
+ SP2{
+   MDim=        -1
+   MinSP2Iter=          10
+   MaxSP2Iter=         100
+   Verbose=          10
+   NumThresh=   1.0e-5
+   SP2Tol=   1.0E-006
+   SP2Conv= REL
+   Flavor= Alg1
+   BMLType= Dense
+ }
+
+ ZSP{
+   MDim= -1
+   Verbose= 10
+   NumthreshI= 1.0e-8
+   NumthreshF= 1.0e-5
+   #BMLType= CSR
+   BMLType= Dense
+   ZSP= F
+ }
+
