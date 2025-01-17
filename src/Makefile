@@ -58,7 +58,7 @@ parawrite.F90 parafileopen.F90 wrtcfgs.F90 wrtrestart.F90 pbc.F90 \
 addqdep.F90 allocatecoulomb.F90 allocatenebarrays.F90  allocatexbo.F90  \
 atomcharge.F90 avepress.F90 avetemp.F90 bldnewH.F90 bldspinH.F90 \
 conjgradient.F90 coulomb_ewald.F90 coulomb_oldskool.F90 coulomb_rspace.F90 \
-coultailcoef.F90 deallocateall.F90 deallocatecoulomb.F90 \
+coultailcoef.F90 deallocateall.F90 deallocateallprogress.F90 deallocatecoulomb.F90 \
 deallocatenebarrays.F90  deallocatexbo.F90 \
 fermiallocate.F90 fermideallocate.F90 \
    gershgorin.F90 getbndfil.F90 \
