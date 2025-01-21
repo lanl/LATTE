@@ -1,4 +1,4 @@
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Copyright 2010.  Los Alamos National Security, LLC. This material was    !
 ! produced under U.S. Government contract DE-AC52-06NA25396 for Los Alamos !
 ! National Laboratory (LANL), which is operated by Los Alamos National     !
@@ -19,78 +19,24 @@
 ! Public License for more details.                                         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SUBROUTINE SETUPTBMD(NEWSYSTEM)
+SUBROUTINE DEALLOCATEALLPROGRESS
 
-  USE CONSTANTS_MOD
   USE SETUPARRAY
-  USE PPOTARRAY
-  USE MDARRAY
-  USE NEBLISTARRAY
-  USE COULOMBARRAY
-  USE SPINARRAY
-  USE VIRIALARRAY
-  USE NONOARRAY
-  USE MYPRECISION
-  USE LATTEPARSER
+  USE nonoarrayprogress
+  USE CONSTANTS_MOD
+  USE GENXPROGRESS
+  USE BML 
 
   IMPLICIT NONE
-
-  INTEGER :: I
-  INTEGER :: ITER
-  INTEGER :: CURRITER, TOTSCF
-  INTEGER :: START_CLOCK, STOP_CLOCK, CLOCK_RATE, CLOCK_MAX
-  REAL(LATTEPREC) :: THETIME, NEWESPIN, NEWECOUL
-  REAL(LATTEPREC) :: RN, MYVOL
-  INTEGER :: FLAGAND, NEWSYSTEM
-
   IF (EXISTERROR) RETURN
 
-  !
-  ! Read MDcontroller to determine what kind of MD simulation to do
-  !
-
-  IF(NEWSYSTEM == 1 .OR. (.NOT.LIBINIT))THEN
-
-     IF (LATTEINEXISTS) THEN
-        CALL PARSE_MD(LATTEINNAME)
-     ELSE
-        CALL READMDCONTROLLER
-     ENDIF
-
-     !
-     ! Allocate stuff for building the neighbor lists, then build them
-     !
-     CALL ALLOCATENEBARRAYS
-
-     FLUSH(6)
-
-  ENDIF
-
-  CALL NEBLISTS(0)
-
-  !
-  ! Allocate things depending on which method we're using
-  ! to get the bond-order
-  !
-  IF(NEWSYSTEM == 1 .OR. .NOT.LIBINIT)THEN
-     IF (CONTROL .EQ. 1) THEN
-        CALL ALLOCATEDIAG
-     ELSEIF (CONTROL .EQ. 2 .OR. CONTROL .EQ. 4 .OR. CONTROL .EQ. 5) THEN
-        CALL ALLOCATEPURE
-     ELSEIF (CONTROL .EQ. 3) THEN
-        CALL FERMIALLOCATE
-     ENDIF
-  ENDIF
-
-  IF (PLUSDON .EQ. 1 .AND. (.NOT. ALLOCATED(FPLUSD))) ALLOCATE(FPLUSD(3,NATS))
-
-  IF(VERBOSE >= 1)WRITE(*,*)"Getting MD forces ..."
-  IF (RESTART .EQ. 0) CALL GETMDF(0,1)
-
-  CUMDT = ZERO
-
-  TOTSCF = 0
+  IF (BML_ALLOCATED (HAM_BML)) CALL BML_DEALLOCATE(HAM_BML)
+  IF (BML_ALLOCATED (ZMAT_BML)) CALL BML_DEALLOCATE(ZMAT_BML)
+  IF (BML_ALLOCATED (OVER_BML)) CALL BML_DEALLOCATE(OVER_BML)
+  IF (BML_ALLOCATED (ORTHOH_BML)) CALL BML_DEALLOCATE(ORTHOH_BML)
+  IF (BML_ALLOCATED (ORTHOBO_BML)) CALL BML_DEALLOCATE(ORTHOBO_BML)
+  IF (BML_ALLOCATED (BO_BML)) CALL BML_DEALLOCATE(BO_BML)
 
   RETURN
 
-END SUBROUTINE SETUPTBMD
+END SUBROUTINE DEALLOCATEALLPROGRESS
