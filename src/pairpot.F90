@@ -51,7 +51,11 @@ SUBROUTINE PAIRPOT
 
   IF (PPOTON .EQ. 1) THEN
 
-     DO I = 1, NATS
+#ifdef MAKELIBON
+     DO I = 1, NCOREATOMS ! do i up to ncores
+#else
+     DO I = 1, NATS 
+#endif
 
         FUNIV = ZERO
         FCUT = ZERO

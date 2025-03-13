@@ -31,6 +31,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   USE SPINARRAY, ONLY: OLDSUMSPIN,DELTASPIN, OLDDELTASPIN, SUMSPIN, DELTADIM
   USE TIMER_MOD
   USE MIXER_MOD
+  USE LATTE_LIB
 
   IMPLICIT NONE
 
@@ -41,7 +42,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
   MLSI0 = TIME_MLS()
 
-  if (SWITCH .NE. 0) THEN
+  IF (SWITCH .NE. 0) THEN
 
    !IF(DOKERNEL .EQV. .TRUE.) THEN
    IF(DOKERNEL .AND. (.NOT.DFTBU)) THEN 
@@ -74,12 +75,16 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
    ENDIF 
 
   ENDIF
- 
+
+#ifdef MAKELIBON
+  IF (NEWSYSTEM == 1 .AND. .NOT. LIBINIT) THEN
+    ! IF (NEWSYSTEM == 1) THEN
+#endif
   !
   ! The atoms have moved, so we have to build a new H (and overlap matrix)
 
   MLSI = TIME_MLS()
-  
+
   IF (KON .EQ. 0) THEN
      IF(VERBOSE >= 1)WRITE(*,*)"KON = 0 ..."
      !IF (SPONLY .EQ. 0) THEN
@@ -93,9 +98,18 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
      CALL KBLDNEWH
 
   ENDIF
+  WRITE(*,*) "Time get H",  TIME_MLS() - MLSI
   FLUSH(6)
 
-  WRITE(*,*) "Time get H",  TIME_MLS() - MLSI
+#ifdef MAKELIBON
+  ENDIF
+#endif
+
+#ifdef MAKELIBON
+  IF (COMPFLAG == 1) THEN
+    RETURN
+  ENDIF
+#endif
 
   MLSI = TIME_MLS()
 
@@ -169,6 +183,11 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
 
   WRITE(*,*) "Time for GETMDF-PROPCHEMPOT XBO GETDELTASPIN",  TIME_MLS() - MLSI
   MLSI = TIME_MLS()
+#ifdef MAKELIBON
+  IF (COMPFLAG .EQ. 4 .AND. SWITCH .EQ. 1) THEN
+    !DO nothing
+  ELSE
+#endif
   !
   ! If SWITCH = 0, then we don't have a set of partials charges
   ! yet and we'll have to get them from the charge-independent
@@ -178,7 +197,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   ! or only a user-specified number of iterations is determined by the
   ! value of FULLQCONV
   !
-
+  
   IF (ELECTRO .EQ. 0) THEN
      IF(VERBOSE >= 1)WRITE(*,*)"Doing QNEUTRAL ..."
      CALL QNEUTRAL(SWITCH, CURRITER) ! Local charge neutrality
@@ -205,6 +224,16 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   ENDIF  
 
   WRITE(*,*) "Time for GETMDF-QNEUTRAL QCONSISTENCY ",  TIME_MLS() - MLSI
+
+#ifdef MAKELIBON
+  ENDIF 
+
+  IF (COMPFLAG == 2 .OR. COMPFLAG == 3) THEN
+    RETURN
+  ENDIF
+
+#endif
+
   ! Run to self-consistency QITER = 0 -> only H(P) + D calculated 
 
   !
@@ -267,6 +296,10 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   CALL GETFORCE
 
   WRITE(*,*) "Time for GETMDF-GETFORCE  ",  TIME_MLS() - MLSI
+
+#ifdef MAKELIBON
+  RETURN ! FCOUL will be calculated in sedacs
+#endif
 
   MLSI = TIME_MLS()
 

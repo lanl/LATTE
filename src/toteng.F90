@@ -45,10 +45,12 @@ SUBROUTINE TOTENG
   IF (SPINON .EQ. 0) THEN
 
      IF (KON .EQ. 0) THEN
-
-        DO I = 1, HDIM
+#ifdef MAKELIBON
+        DO I = 1, NCORES ! do 1 to ncores
+#else
+        DO I = 1, HDIM 
+#endif
            DO J = 1, HDIM
-
               TRRHOH = TRRHOH + BO(J,I)*H(J,I)
               TRRHOH0 = TRRHOH0 + BO(J,I)*H0(J,I)
 

@@ -184,9 +184,9 @@ SUBROUTINE BLDNEWHS
                     ! Precompute the integrals outide the MKET loop
 
                     DO MP = 0, MIN(LBRA, LKET)
-                       
+
                        MYBONDINT(MP) = UNIVSCALE(I, J, LBRA, LKET, MP, MAGR, "H")
-                       
+
                        IF (BASISTYPE .EQ. "NONORTHO") &
                             MYOVERLAPINT(MP) = UNIVSCALE(I, J, LBRA, LKET, MP, MAGR, "S")
 

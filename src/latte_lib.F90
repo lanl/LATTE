@@ -38,6 +38,7 @@ MODULE LATTE_LIB
   USE NEBLISTARRAY
   USE NONOARRAY
   USE CONSTRAINTS_MOD
+  USE UNIVARRAY
 
 #ifdef PROGRESSON
   USE PRG_PROGRESS_MOD, ONLY: PRG_VERSION
@@ -66,7 +67,10 @@ MODULE LATTE_LIB
   ! version of the LATTE library is used.
   INTEGER, PARAMETER :: LATTE_ABIVERSION = 20180622
 
-  PUBLIC :: LATTE, LATTE_ABIVERSION, COMPUTE, COMPUTE_HS
+  PUBLIC :: LATTE, LATTE_ABIVERSION, COMPUTE, COMPUTE_HS, COMPUTE_ALL, COMPUTE_OLD
+
+  INTEGER, PUBLIC :: NEWSYSTEM
+
 
 CONTAINS
 
@@ -122,7 +126,7 @@ CONTAINS
        MAXITER_IN, VENERG, STRESS_INOUT, NEWSYSTEM, EXISTERROR_INOUT, SYMBOLS, FNAME)
 #else
   SUBROUTINE LATTE(NTYPES, TYPES, CR_IN, MASSES_IN, XLO, XHI, XY, XZ, YZ, FTOT_OUT, &
-       MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIAL_INOUT, NEWSYSTEM, EXISTERROR_INOUT, FNAME)
+       MAXITER_IN, VENERG, VEL_IN, DT_IN, VIRIAL_INOUT, CHARGES_OUT, NEWSYSTEM_IN, EXISTERROR_INOUT, FNAME)
 #endif
 
     USE CONSTANTS_MOD, ONLY: EXISTERROR
@@ -146,13 +150,14 @@ CONTAINS
     REAL(LATTEPREC), INTENT(IN)  :: XY, XZ, YZ, XLO(3),XHI(3)
     REAL(LATTEPREC), INTENT(OUT) :: VIRIAL_INOUT(6)
 #endif
-    REAL(LATTEPREC), INTENT(OUT) :: FTOT_OUT(:,:), VENERG
+    REAL(LATTEPREC), INTENT(OUT) :: FTOT_OUT(:,:), VENERG, CHARGES_OUT(:)
     REAL(LATTEPREC) ::  DIPOLEMAG
     INTEGER, INTENT(IN) ::  NTYPES, TYPES(:), MAXITER_IN
     LOGICAL(1), INTENT(INOUT) :: EXISTERROR_INOUT
     LOGICAL :: ANIMATEEXISTS
-    INTEGER, INTENT(INOUT) :: NEWSYSTEM
+    INTEGER, INTENT(IN) :: NEWSYSTEM_IN
     CHARACTER(LEN=*), OPTIONAL, INTENT(IN) :: FNAME
+    INTEGER :: NEWSYSTEM
 
 #ifdef PROGRESSON
     TYPE(SYSTEM_TYPE) :: SY
@@ -167,6 +172,8 @@ CONTAINS
 #endif
 
     EXISTERROR = .FALSE. !We assume we start the lib call without errors
+    VERBOSE = 3
+    NEWSYSTEM = NEWSYSTEM_IN
 
     IF(VERBOSE <= 0)THEN
       OPEN(UNIT=6, FILE="/dev/null", FORM="formatted")
@@ -239,11 +246,11 @@ CONTAINS
       BOX(3,3) = XHI(3) - XLO(3)
 #endif
       IF(VERBOSE >= 1)THEN
-         WRITE(*,*)"Lattice vectors:"
-         WRITE(*,*)"a=",BOX(1,1),BOX(1,2),BOX(1,3)
-         WRITE(*,*)"b=",BOX(2,1),BOX(2,2),BOX(2,3)
-         WRITE(*,*)"c=",BOX(3,1),BOX(3,2),BOX(3,3)
-         WRITE(*,*)""
+        WRITE(*,*)"Lattice vectors:"
+        WRITE(*,*)"a=",BOX(1,1),BOX(1,2),BOX(1,3)
+        WRITE(*,*)"b=",BOX(2,1),BOX(2,2),BOX(2,3)
+        WRITE(*,*)"c=",BOX(3,1),BOX(3,2),BOX(3,3)
+        WRITE(*,*)""
       ENDIF
 
       BOX_OLD = BOX
@@ -326,8 +333,8 @@ CONTAINS
 #endif
 
         IF (DFTBU) THEN
-           CALL ALLOCATEDM  ! ANDERS CHANGE
-           CALL INITIATEDM  ! ANDERS CHANGE
+          CALL ALLOCATEDM  ! ANDERS CHANGE
+          CALL INITIATEDM  ! ANDERS CHANGE
         ENDIF
 
         IF (KBT .LT. 0.0000001 .OR. CONTROL .EQ. 2) ENTE = ZERO
@@ -353,11 +360,11 @@ CONTAINS
 #endif
 
       IF(VERBOSE >= 1)THEN
-         WRITE(*,*)"Lattice vectors:"
-         WRITE(*,*)"a=",BOX(1,1),BOX(1,2),BOX(1,3)
-         WRITE(*,*)"b=",BOX(2,1),BOX(2,2),BOX(2,3)
-         WRITE(*,*)"c=",BOX(3,1),BOX(3,2),BOX(3,3)
-         WRITE(*,*)""
+        WRITE(*,*)"Lattice vectors:"
+        WRITE(*,*)"a=",BOX(1,1),BOX(1,2),BOX(1,3)
+        WRITE(*,*)"b=",BOX(2,1),BOX(2,2),BOX(2,3)
+        WRITE(*,*)"c=",BOX(3,1),BOX(3,2),BOX(3,3)
+        WRITE(*,*)""
       ENDIF
 
       LIBCALLS = LIBCALLS + 1
@@ -397,9 +404,9 @@ CONTAINS
 
       IF (ELECTRO .EQ. 1) THEN
 
-         CALL ALLOCATECOULOMB
+        CALL ALLOCATECOULOMB
 
-         CALL INITCOULOMB
+        CALL INITCOULOMB
 
       ENDIF
 
@@ -415,11 +422,11 @@ CONTAINS
 
       IF (KON .EQ. 0) THEN
 
-         CALL BLDNEWHS
+        CALL BLDNEWHS
 
       ELSE
 
-         CALL KBLDNEWH
+        CALL KBLDNEWH
 
       ENDIF
 
@@ -435,16 +442,16 @@ CONTAINS
       !
 
       IF (SPINON .EQ. 1) THEN
-         CALL GETDELTASPIN
-         CALL BLDSPINH
+        CALL GETDELTASPIN
+        CALL BLDSPINH
       ENDIF
 
       IF (CONTROL .EQ. 1) THEN
-         CALL ALLOCATEDIAG
+        CALL ALLOCATEDIAG
       ELSEIF (CONTROL .EQ. 2 .OR. CONTROL .EQ. 4 .OR. CONTROL .EQ. 5) THEN
-         CALL ALLOCATEPURE
+        CALL ALLOCATEPURE
       ELSEIF (CONTROL .EQ. 3) THEN
-         CALL FERMIALLOCATE
+        CALL FERMIALLOCATE
       ENDIF
 
       !  ELSE
@@ -458,8 +465,8 @@ CONTAINS
 
       IF (CONTROL .EQ. 5) THEN
 
-         CALL GERSHGORIN
-         CALL SP2FERMIINIT
+        CALL GERSHGORIN
+        CALL SP2FERMIINIT
 
       ENDIF
 
@@ -573,11 +580,11 @@ CONTAINS
 
       IF (CONTROL .NE. 1 .AND. CONTROL .NE. 2 .AND. KBT .GT. 0.000001 ) THEN
 
-         ! We get the entropy automatically when using diagonalization.
-         ! This is only required when employing the recursive expansion
-         ! of the Fermi-operator at finite electronic temperature
+        ! We get the entropy automatically when using diagonalization.
+        ! This is only required when employing the recursive expansion
+        ! of the Fermi-operator at finite electronic temperature
 
-         CALL ENTROPY
+        CALL ENTROPY
 
       ENDIF
 
@@ -742,22 +749,22 @@ CONTAINS
       IF(VERBOSE >= 1) MLSI = TIME_MLS()
       IF(LIBCALLS > 0) CALL GETMDF(1, LIBCALLS)
       IF(VERBOSE >= 1) WRITE(*,*)"Time for GETMDF =", TIME_MLS()-MLSI
-
+        
       CALL TOTENG
-
+      
       ! For the 0 SCF MD the coulomb energy is calculated in GETMDF
 
       IF (PPOTON .EQ. 1) THEN
-         CALL PAIRPOT
+        CALL PAIRPOT
       ELSEIF (PPOTON .EQ. 2) THEN
-         CALL PAIRPOTTAB
+        CALL PAIRPOTTAB
       ELSEIF (PPOTON .EQ. 3) THEN
-         CALL PAIRPOTSPLINE
+        CALL PAIRPOTSPLINE
       ENDIF
 
       IF (QITER .NE. 0) THEN
-         ECOUL = ZERO
-         IF (ELECTRO .EQ. 1) CALL GETCOULE
+        ECOUL = ZERO
+        IF (ELECTRO .EQ. 1) CALL GETCOULE
       ENDIF
 
       ESPIN = ZERO
@@ -765,14 +772,14 @@ CONTAINS
 
       IF (CONTROL .NE. 1 .AND. CONTROL .NE. 2 .AND. KBT .GT. 0.000001 ) THEN
 
-         ! Only required when using the recursive expansion of the Fermi operator
+        ! Only required when using the recursive expansion of the Fermi operator
 
-         ! 2/26/13
-         ! The entropy is now calculated when we get the density
-         ! matrix in the spin polarized case with diagonalization,
-         ! as it should be...
+        ! 2/26/13
+        ! The entropy is now calculated when we get the density
+        ! matrix in the spin polarized case with diagonalization,
+        ! as it should be...
 
-         CALL ENTROPY
+        CALL ENTROPY
 
       ENDIF
 
@@ -780,16 +787,15 @@ CONTAINS
 
 
       IF (FREEZE .EQ. 1) CALL FREEZE_ATOMS(FTOT,V)
-
       FTOT_OUT = 0.0D0 !Carefull here - the host code could have some forces already.
       IF(MAXVAL(FTOT_OUT) .NE. 0.0D0)THEN
-         IF(VERBOSE >= 1) WRITE(*,*)"Adding force components and energies from application code ..."
-         IF(VERBOSE >= 1) WRITE(*,*)"APPCODE,LATTE",VENERG,TRRHOH + EREP - ENTE - ECOUL + ESPIN
-         VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
-         FTOT_OUT = FTOT_OUT +  FTOT
+        IF(VERBOSE >= 1) WRITE(*,*)"Adding force components and energies from application code ..."
+        IF(VERBOSE >= 1) WRITE(*,*)"APPCODE,LATTE",VENERG,TRRHOH + EREP - ENTE - ECOUL + ESPIN
+        VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
+        FTOT_OUT = FTOT_OUT +  FTOT
       ELSE
-         VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
-         FTOT_OUT = FTOT
+        VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
+        FTOT_OUT = FTOT
       ENDIF
 
       ! Get the seccond virial coefficient to pass it to the application program
@@ -799,7 +805,7 @@ CONTAINS
       IF (SPINON .EQ. 1) VIRIAL = VIRIAL + VIRSSPIN
 
       IF (BASISTYPE .EQ. "NONORTHO") THEN
-         VIRIAL = VIRIAL - VIRPUL + VIRSCOUL
+        VIRIAL = VIRIAL - VIRPUL + VIRSCOUL
       ENDIF
 
 !       CALL GETPRESSURE
@@ -857,82 +863,82 @@ CONTAINS
 #ifdef PROGRESSON
       IF(MOD(LIBCALLS,WRTFREQ) == 0)THEN
          IF(VERBOSE >= 1) THEN
-            WRITE(*,*)"Writing trajectory into trajectory.pdb ..."
-            SY%NATS = NATS
-            IF(.NOT. ALLOCATED(SY%COORDINATE))ALLOCATE(SY%COORDINATE(3,NATS))
-            SY%COORDINATE = CR
-            SY%SYMBOL = ATELE
-            SY%LATTICE_VECTOR = BOX
-            IF (DOKERNEL) THEN
-               IF(LIBCALLS == 0) MAXDN2DT = ABS(MAXVAL(DN2DT2(:,1)))
-               SY%NET_CHARGE = ABS(DN2DT2(:,1))
-            ELSE
-               SY%NET_CHARGE = DELTAQ
-            ENDIF
-            CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT,"trajectory","pdb")
-            CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT,"trajectory","xyz")
+           WRITE(*,*)"Writing trajectory into trajectory.pdb ..."
+           SY%NATS = NATS
+           IF(.NOT. ALLOCATED(SY%COORDINATE))ALLOCATE(SY%COORDINATE(3,NATS))
+           SY%COORDINATE = CR
+           SY%SYMBOL = ATELE
+           SY%LATTICE_VECTOR = BOX
+           IF (DOKERNEL) THEN
+             IF(LIBCALLS == 0) MAXDN2DT = ABS(MAXVAL(DN2DT2(:,1)))
+             SY%NET_CHARGE = ABS(DN2DT2(:,1))
+           ELSE
+             SY%NET_CHARGE = DELTAQ
+           ENDIF
+           CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT,"trajectory","pdb")
+           CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT,"trajectory","xyz")
 
-            WRITE(*,*)"Writing trajectory into trajectory.xyz ..."
-            IF(LIBCALLS .EQ. 0)THEN
-               OPEN(UNIT=20,FILE="trajectory_ext.xyz",STATUS='unknown')
-            ELSE
-               OPEN(UNIT=20,FILE="trajectory_ext.xyz",POSITION='append',STATUS='old')
-            ENDIF
-            !Extended xyz file.
-            WRITE(20,*)NATS
-            WRITE(20,*) 'Lattice="',BOX(1,1),BOX(1,2),BOX(1,3),&
-                 &BOX(2,1),BOX(2,2),BOX(2,3),BOX(3,1),BOX(3,2),BOX(3,3),'"',&
-                 &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT
-            DO I=1,NATS
-               WRITE(20,*)ATELE(I),CR(1,I),CR(2,I),CR(3,I),V(1,I),V(2,I),V(3,I),&
-                    &FTOT(1,I),FTOT(2,I),FTOT(3,I),-DELTAQ(I)
-            ENDDO
-            CLOSE(20)
+           WRITE(*,*)"Writing trajectory into trajectory.xyz ..."
+           IF(LIBCALLS .EQ. 0)THEN
+             OPEN(UNIT=20,FILE="trajectory_ext.xyz",STATUS='unknown')
+           ELSE
+             OPEN(UNIT=20,FILE="trajectory_ext.xyz",POSITION='append',STATUS='old')
+           ENDIF
+           !Extended xyz file.
+           WRITE(20,*)NATS
+           WRITE(20,*) 'Lattice="',BOX(1,1),BOX(1,2),BOX(1,3),&
+                &BOX(2,1),BOX(2,2),BOX(2,3),BOX(3,1),BOX(3,2),BOX(3,3),'"',&
+                &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT
+           DO I=1,NATS
+             WRITE(20,*)ATELE(I),CR(1,I),CR(2,I),CR(3,I),V(1,I),V(2,I),V(3,I),&
+                  &FTOT(1,I),FTOT(2,I),FTOT(3,I),-DELTAQ(I)
+           ENDDO
+           CLOSE(20)
          ENDIF
       ENDIF
 #else
       IF(MOD(LIBCALLS,WRTFREQ) == 0)THEN
-         IF(VERBOSE >= 1) THEN
-            WRITE(*,*)"Writing trajectory into trajectory.xyz ..."
-            IF(LIBCALLS .EQ. 0)THEN
-               OPEN(UNIT=20,FILE="trajectory.xyz",STATUS='unknown')
-            ELSE
-               OPEN(UNIT=20,FILE="trajectory.xyz",ACCESS='append',STATUS='old')
-            ENDIF
-            !Extended xyz file.
-            WRITE(20,*)NATS
-            WRITE(20,*) 'Lattice="',BOX(1,1),BOX(1,2),BOX(1,3),&
-                 &BOX(2,1),BOX(2,2),BOX(2,3),BOX(3,1),BOX(3,2),BOX(3,3),'"',&
-                 &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT
-            DO I=1,NATS
-               WRITE(20,*)ATELE(I),CR(1,I),CR(2,I),CR(3,I),V(1,I),V(2,I),V(3,I),&
-                    &FTOT(1,I),FTOT(2,I),FTOT(3,I),-DELTAQ(I)
-            ENDDO
-            CLOSE(20)
-         ENDIF
+        IF(VERBOSE >= 1) THEN
+          WRITE(*,*)"Writing trajectory into trajectory.xyz ..."
+          IF(LIBCALLS .EQ. 0)THEN
+             OPEN(UNIT=20,FILE="trajectory.xyz",STATUS='unknown')
+          ELSE
+             OPEN(UNIT=20,FILE="trajectory.xyz",ACCESS='append',STATUS='old')
+          ENDIF
+          !Extended xyz file.
+          WRITE(20,*)NATS
+          WRITE(20,*) 'Lattice="',BOX(1,1),BOX(1,2),BOX(1,3),&
+               &BOX(2,1),BOX(2,2),BOX(2,3),BOX(3,1),BOX(3,2),BOX(3,3),'"',&
+               &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT
+          DO I=1,NATS
+             WRITE(20,*)ATELE(I),CR(1,I),CR(2,I),CR(3,I),V(1,I),V(2,I),V(3,I),&
+                  &FTOT(1,I),FTOT(2,I),FTOT(3,I),-DELTAQ(I)
+          ENDDO
+          CLOSE(20)
+        ENDIF
       ENDIF
 #endif
 
       IF(VERBOSE >= 1  .AND. CONTROL == 1 .AND. KON == 0)THEN
-         IF(SPINON == 0) THEN
-            HOMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM)))
-            LUMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1)
-            WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
-            WRITE(*,*)"EGAP=",LUMO - HOMO
-         ELSE
-            HOMO = MAX(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))))
-            LUMO = MIN(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1))
-            WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
-            WRITE(*,*)"EGAP=",LUMO - HOMO
-         ENDIF
+        IF(SPINON == 0) THEN
+          HOMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM)))
+          LUMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1)
+          WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
+          WRITE(*,*)"EGAP=",LUMO - HOMO
+        ELSE
+          HOMO = MAX(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))))
+          LUMO = MIN(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1))
+          WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
+          WRITE(*,*)"EGAP=",LUMO - HOMO
+        ENDIF
       ENDIF
 
       IF (MOD(LIBCALLS, RSFREQ) .EQ. 0)THEN
-         IF(VERBOSE >= 0) CALL WRTRESTARTLIB(LIBCALLS)
+        IF(VERBOSE >= 0) CALL WRTRESTARTLIB(LIBCALLS)
       ENDIF
 
       IF(RESTARTLIB == 1 .AND. LIBCALLS == 0)THEN
-         CALL READRESTARTLIB(LIBCALLS)
+        CALL READRESTARTLIB(LIBCALLS)
       ENDIF
 
 #ifdef PROGRESSON
@@ -944,6 +950,7 @@ CONTAINS
 
       FLUSH(6) !To force writing to file at every call
 
+      CHARGES_OUT = DELTAQ
       EXISTERROR_INOUT = EXISTERROR
 
       RETURN
@@ -955,8 +962,8 @@ CONTAINS
       IF (XBOON .EQ. 1) CALL ALLOCATEXBO
 
       IF (ELECTRO .EQ. 1) THEN
-         CALL ALLOCATECOULOMB
-         CALL INITCOULOMB
+        CALL ALLOCATECOULOMB
+        CALL INITCOULOMB
       ENDIF
 
       ! Start the timers
@@ -1094,7 +1101,7 @@ CONTAINS
   END SUBROUTINE LATTE
 
   !> ...
-  SUBROUTINE COMPUTE(COORDS_IN,ATOMTYPES_IN,ATOMIC_NUMBERS_IN,LATTICE_VECTORS_IN,&
+  SUBROUTINE COMPUTE_OLD(COORDS_IN,ATOMTYPES_IN,ATOMIC_NUMBERS_IN,LATTICE_VECTORS_IN,&
          &FIELD_IN,CHARGES_OUT,FTOT_OUT,DIPOLE_OUT,ENERGY_OUT,VERB_IN)
 
     USE CONSTANTS_MOD, ONLY: EXISTERROR
@@ -1104,7 +1111,6 @@ CONTAINS
     REAL(LATTEPREC), ALLOCATABLE, INTENT(IN) :: FIELD_IN(:)
     REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: CHARGES_OUT(:)
     REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: FTOT_OUT(:,:)
-    !real(LATTEPREC), allocatable, intent(inout) :: bornch_out(:,:)
     REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: DIPOLE_OUT(:)
     INTEGER, ALLOCATABLE, INTENT(IN) :: ATOMTYPES_IN(:)
     REAL(LATTEPREC) :: ENERGY_OUT(1)
@@ -1125,7 +1131,6 @@ CONTAINS
     REAL(LATTEPREC) ::  DIPOLEMAG
     REAL(LATTEPREC) :: DT_IN
     LOGICAL :: EXISTERROR_INOUT
-    !REAL(LATTEPREC), ALLOCATABLE :: FTOT_OUT(:, :)
     REAL(LATTEPREC), ALLOCATABLE :: VEL_IN(:, :)
     REAL(LATTEPREC), ALLOCATABLE :: VIRIAL_INOUT(:)
     REAL(LATTEPREC) :: HOMO, LUMO
@@ -1301,527 +1306,6 @@ CONTAINS
 
 #ifdef GPUON
 
-       CALL INITIALIZE( NGPU )
-
-#endif
-
-#ifdef DBCSR_ON
-
-       IF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 1) CALL INIT_DBCSR
-
-#endif
-
-       IF (DFTBU) THEN
-          CALL ALLOCATEDM  ! ANDERS CHANGE
-          CALL INITIATEDM  ! ANDERS CHANGE
-       ENDIF
-
-       IF (KBT .LT. 0.0000001 .OR. CONTROL .EQ. 2) ENTE = ZERO
-
-       IF (.NOT. ALLOCATED(V)) THEN
-         ALLOCATE(V(3,NATS))
-         V = 0.0D0
-       END IF
-       IF(VERBOSE >= 1)WRITE(*,*)"End of INITIALIZATION"
-
-    ELSE
-
-       BOX = LATTICE_VECTORS_IN
-
-       LIBCALLS = LIBCALLS + 1
-
-       NATS = SIZE(COORDS_IN,DIM=2)
-
-       IF(.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
-       CR = COORDS_IN
-
-       FLUSH(6)
-
-    ENDIF
-    !End of initialization
-
-    !Control for implicit geometry optimization.
-    !This will need to be replaced by a proper flag.
-    IF (DT == 0) THEN
-       IF (VERBOSE >= 1) WRITE(*,*)"NOTE: DT = 0 => FULLQCONV = 1"
-       IF (VERBOSE >= 1) WRITE(*,*)"NOTE: DT = 0 => MDMIX = QMIX"
-       FULLQCONV = 1
-       MDMIX = QMIX
-       FLUSH(6)
-    ENDIF
-
-    IF (LIBCALLS == 0) THEN
-
-      IF (VERBOSE >= 1)WRITE(*,*)"Allocating nonorthogonal arrays ..."
-      IF (BASISTYPE .EQ. "NONORTHO") CALL ALLOCATENONO
-
-      IF (VERBOSE >= 1)WRITE(*,*)"Allocating XLBO arrays ..."
-      IF (XBOON .EQ. 1) CALL ALLOCATEXBO
-
-      IF (VERBOSE >= 1)WRITE(*,*)"Allocating COULOMB arrays ..."
-      IF (ELECTRO .EQ. 1) THEN
-         CALL ALLOCATECOULOMB
-         CALL INITCOULOMB
-      ENDIF
-
-      ! Start the timers
-      IF (VERBOSE >= 1)WRITE(*,*)"Starting timers ..."
-      CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
-
-#ifndef FCIDxlf
-      CALL DTIME(TARRAY, RESULT)
-#endif
-
-      IF (VERBOSE >= 1)WRITE(*,*)"Setting up TBMD ..."
-      CALL SETUPTBMD(NEWSYSTEM)
-
-      FLUSH(6)
-
-      ELSEIF (LIBCALLS > 0 .AND. RESTARTLIB == 0) THEN
-
-        DBOX = SQRT((BOX(1,1)-BOX_OLD(1,1))**2 + &
-             & (BOX(2,2)-BOX_OLD(2,2))**2 + (BOX(3,3)-BOX_OLD(3,3))**2)
-
-        ! Reinitializing Coulombic contribution if Kpoints are used
-        IF ((ELECTRO .EQ. 1 .AND. ELECMETH .EQ. 0) .OR. DBOX .GT. 0.0D0) THEN
-           CALL INITCOULOMB
-        ENDIF
-
-        IF (MOD(LIBCALLS, UDNEIGH) .EQ. 0) THEN
-           !If box is changing
-           IF (DBOX .GT. 0.0D0) THEN
-              CALL NEBLISTS(0)
-              CALL INITCOULOMB !If the box is changing we need to recompute the kspace list
-           ELSE
-              CALL NEBLISTS(1)
-           ENDIF
-        ENDIF
-
-        BOX_OLD = BOX
-
-      ENDIF
-
-      IF (QITER .NE. 0) THEN
-        ECOUL = ZERO
-        IF (ELECTRO .EQ. 1) CALL GETCOULE
-      ENDIF
-
-      IF(VERBOSE >= 1) WRITE(*,*)"LIBCALLS",LIBCALLS
-
-      IF(VERBOSE >= 1) MLSI = TIME_MLS()
-      IF(LIBCALLS > 0) CALL GETMDF(1, LIBCALLS)
-      IF(VERBOSE >= 1) WRITE(*,*)"Time for GETMDF =", TIME_MLS()-MLSI
-
-      CALL TOTENG
-
-      ! For the 0 SCF MD the coulomb energy is calculated in GETMDF
-
-      IF (PPOTON .EQ. 1) THEN
-        CALL PAIRPOT
-      ELSEIF (PPOTON .EQ. 2) THEN
-        CALL PAIRPOTTAB
-      ELSEIF (PPOTON .EQ. 3) THEN
-        CALL PAIRPOTSPLINE
-      ENDIF
-
-      IF (QITER .NE. 0) THEN
-        ECOUL = ZERO
-        IF (ELECTRO .EQ. 1) CALL GETCOULE
-      ENDIF
-
-      ESPIN = ZERO
-      IF (SPINON .EQ. 1) CALL GETSPINE
-
-      IF (CONTROL .NE. 1 .AND. CONTROL .NE. 2 .AND. KBT .GT. 0.000001 ) THEN
-
-        ! Only required when using the recursive expansion of the Fermi operator
-
-        ! 2/26/13
-        ! The entropy is now calculated when we get the density
-        ! matrix in the spin polarized case with diagonalization,
-        ! as it should be...
-
-        CALL ENTROPY
-
-      ENDIF
-
-      IF(VERBOSE >= 1) WRITE(*,*)"Energy Components (TRRHOH, EREP, ENTE, ECOUL)",TRRHOH, EREP, ENTE, ECOUL
-
-
-      IF (FREEZE .EQ. 1) CALL FREEZE_ATOMS(FTOT,V)
-
-      FTOT_OUT = 0.0D0 !Carefull here - the host code could have some forces already.
-      IF(MAXVAL(FTOT_OUT) .NE. 0.0D0)THEN
-        IF(VERBOSE >= 1) WRITE(*,*)"Adding force components and energies from application code ..."
-        IF(VERBOSE >= 1) WRITE(*,*)"APPCODE,LATTE",VENERG,TRRHOH + EREP - ENTE - ECOUL + ESPIN
-        VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
-        FTOT_OUT = FTOT_OUT +  FTOT
-      ELSE
-         VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
-         FTOT_OUT = FTOT
-      ENDIF
-
-      ! Get the seccond virial coefficient to pass it to the application program
-      IF (ELECTRO .EQ. 0) VIRCOUL = ZERO
-      VIRIAL = VIRBOND + VIRPAIR + VIRCOUL
-
-      IF (SPINON .EQ. 1) VIRIAL = VIRIAL + VIRSSPIN
-
-      IF (BASISTYPE .EQ. "NONORTHO") THEN
-         VIRIAL = VIRIAL - VIRPUL + VIRSCOUL
-      ENDIF
-
-!       CALL GETPRESSURE
-      SYSVOL = ABS(BOX(1,1)*(BOX(2,2)*BOX(3,3) - BOX(3,2)*BOX(2,3)) + &
-      BOX(1,2)*(BOX(2,1)*BOX(3,3) - BOX(3,1)*BOX(2,3)) + &
-      BOX(1,3)*(BOX(2,1)*BOX(3,2) - BOX(3,1)*BOX(2,2)))
-
-!       STRTEN(1) = ( -VIRIAL(1) + KETEN(1)/F2V ) / SYSVOL
-!       STRTEN(2) = ( -VIRIAL(2) + KETEN(2)/F2V ) / SYSVOL
-!       STRTEN(3) = ( -VIRIAL(3) + KETEN(3)/F2V ) / SYSVOL
-!       STRTEN(4) = ( -VIRIAL(4) + KETEN(4)/F2V ) / SYSVOL
-!       STRTEN(5) = ( -VIRIAL(5) + KETEN(5)/F2V ) / SYSVOL
-!       STRTEN(6) = ( -VIRIAL(6) + KETEN(6)/F2V ) / SYSVOL
-
-      STRTEN(1) = ( -VIRIAL(1) ) / SYSVOL
-      STRTEN(2) = ( -VIRIAL(2) ) / SYSVOL
-      STRTEN(3) = ( -VIRIAL(3) ) / SYSVOL
-      STRTEN(4) = ( -VIRIAL(4) ) / SYSVOL
-      STRTEN(5) = ( -VIRIAL(5) ) / SYSVOL
-      STRTEN(6) = ( -VIRIAL(6) ) / SYSVOL
-
-
-      !STRTEN = STRTEN * TOGPA 
-
-      PRESSURE = (STRTEN(1) + STRTEN(2) + STRTEN(3))/THREE
-      PRESSURE = PRESSURE * TOGPA
-
-
-#ifdef MDION
-      STRESS_INOUT = 0.0D0
-      
-      STRESS_INOUT(1) = STRTEN(1) !xx
-      STRESS_INOUT(5) = STRTEN(2) !yy
-      STRESS_INOUT(9) = STRTEN(3) !zz
-
-      STRESS_INOUT(2) = STRTEN(4) !xy
-      STRESS_INOUT(4) = STRTEN(4) !yx
-      
-      STRESS_INOUT(6) = STRTEN(5) !yz
-      STRESS_INOUT(8) = STRTEN(5) !zy
-
-      STRESS_INOUT(3) = STRTEN(6) !xz
-      STRESS_INOUT(7) = STRTEN(6) !zx
-
-!       WRITE(*,*)"STRESS_INOUT",STRTEN(1),STRTEN(2),STRTEN(3) 
-
-#else
-      VIRIAL_INOUT = -VIRIAL
- !      WRITE(*,*)"STRESS_INOUT",-VIRIAL(1),-VIRIAL(2),-VIRIAL(3) 
-#endif
-
-      LIBINIT = .TRUE.
-      NEWSYSTEM = 0 !Setting newsystem back to 0.
-
-#ifdef PROGRESSON
-      IF(MOD(LIBCALLS,WRTFREQ) == 0)THEN
-         IF(VERBOSE >= 1) THEN
-            WRITE(*,*)"Writing trajectory into trajectory.pdb ..."
-            SY%NATS = NATS
-            IF(.NOT. ALLOCATED(SY%COORDINATE))ALLOCATE(SY%COORDINATE(3,NATS))
-            SY%COORDINATE = CR
-            SY%SYMBOL = ATELE
-            SY%LATTICE_VECTOR = BOX
-            IF (DOKERNEL) THEN
-               IF(LIBCALLS == 0) MAXDN2DT = ABS(MAXVAL(DN2DT2(:,1)))
-               SY%NET_CHARGE = ABS(DN2DT2(:,1))
-            ELSE
-               SY%NET_CHARGE = DELTAQ
-            ENDIF
-            CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT,"trajectory","pdb")
-            CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT,"trajectory","xyz")
-
-            WRITE(*,*)"Writing trajectory into trajectory.xyz ..."
-            IF(LIBCALLS .EQ. 0)THEN
-               OPEN(UNIT=20,FILE="trajectory_ext.xyz",STATUS='unknown')
-            ELSE
-               OPEN(UNIT=20,FILE="trajectory_ext.xyz",POSITION='append',STATUS='old')
-            ENDIF
-            !Extended xyz file.
-            WRITE(20,*)NATS
-            WRITE(20,*) 'Lattice="',BOX(1,1),BOX(1,2),BOX(1,3),&
-                 &BOX(2,1),BOX(2,2),BOX(2,3),BOX(3,1),BOX(3,2),BOX(3,3),'"',&
-                 &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT
-            DO I=1,NATS
-               WRITE(20,*)ATELE(I),CR(1,I),CR(2,I),CR(3,I),V(1,I),V(2,I),V(3,I),&
-                    &FTOT(1,I),FTOT(2,I),FTOT(3,I),-DELTAQ(I)
-            ENDDO
-            CLOSE(20)
-         ENDIF
-      ENDIF
-#else
-      IF(MOD(LIBCALLS,WRTFREQ) == 0)THEN
-         IF(VERBOSE >= 1) THEN
-            WRITE(*,*)"Writing trajectory into trajectory.xyz ..."
-            IF(LIBCALLS .EQ. 0)THEN
-               OPEN(UNIT=20,FILE="trajectory.xyz",STATUS='unknown')
-            ELSE
-               OPEN(UNIT=20,FILE="trajectory.xyz",ACCESS='append',STATUS='old')
-            ENDIF
-            !Extended xyz file.
-            WRITE(20,*)NATS
-            WRITE(20,*) 'Lattice="',BOX(1,1),BOX(1,2),BOX(1,3),&
-                 &BOX(2,1),BOX(2,2),BOX(2,3),BOX(3,1),BOX(3,2),BOX(3,3),'"',&
-                 &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT
-            DO I=1,NATS
-               WRITE(20,*)ATELE(I),CR(1,I),CR(2,I),CR(3,I),V(1,I),V(2,I),V(3,I),&
-                    &FTOT(1,I),FTOT(2,I),FTOT(3,I),-DELTAQ(I)
-            ENDDO
-            CLOSE(20)
-         ENDIF
-      ENDIF
-#endif
-
-      IF(VERBOSE >= 1  .AND. CONTROL == 1 .AND. KON == 0)THEN
-         IF(SPINON == 0) THEN
-            HOMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM)))
-            LUMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1)
-            WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
-            WRITE(*,*)"EGAP=",LUMO - HOMO
-         ELSE
-            HOMO = MAX(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))))
-            LUMO = MIN(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1))
-            WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
-            WRITE(*,*)"EGAP=",LUMO - HOMO
-         ENDIF
-      ENDIF
-
-      IF (MOD(LIBCALLS, RSFREQ) .EQ. 0)THEN
-         IF(VERBOSE >= 0) CALL WRTRESTARTLIB(LIBCALLS)
-      ENDIF
-
-      IF(RESTARTLIB == 1 .AND. LIBCALLS == 0)THEN
-         CALL READRESTARTLIB(LIBCALLS)
-      ENDIF
-
-#ifdef PROGRESSON
-      IF(VERBOSE >= 3)THEN
-        CALL GETDIPOLE(DIPOLEMAG)
-        WRITE(*,*)"Dipole Magnitude=",DIPOLEMAG
-      ENDIF
-#endif
-
-      FLUSH(6) !To force writing to file at every call
-
-      EXISTERROR_INOUT = EXISTERROR
-
-  END SUBROUTINE COMPUTE
-
-  !> ...
-  SUBROUTINE COMPUTE_HS(NORBS,COORDS_IN,ATOMTYPES_IN,ATOMIC_NUMBERS_IN,LATTICE_VECTORS_IN,&
-         &FIELD_IN,HAM_OUT,OVER_OUT,VERB_IN)
-
-    USE CONSTANTS_MOD, ONLY: EXISTERROR
-
-    IMPLICIT NONE
-    REAL(LATTEPREC), ALLOCATABLE, INTENT(IN) :: COORDS_IN(:,:), LATTICE_VECTORS_IN(:,:)
-    REAL(LATTEPREC), ALLOCATABLE, INTENT(IN) :: FIELD_IN(:)
-    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: HAM_OUT(:,:)
-    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: OVER_OUT(:,:)
-    INTEGER, ALLOCATABLE, INTENT(IN) :: ATOMTYPES_IN(:)
-    INTEGER, INTENT(IN) :: VERB_IN, NORBS
-    INTEGER :: K
-    INTEGER, ALLOCATABLE, INTENT(IN) :: ATOMIC_NUMBERS_IN(:)
-
-    REAL(LATTEPREC) :: FACTOR,DR,DFX,DFY,DFZ
-    INTEGER :: ATOMI
-    INTEGER :: VERBOSE
-    LOGICAL :: ANIMATEEXISTS 
-    INTEGER :: I
-    INTEGER :: NEWSYSTEM
-    INTEGER :: START_CLOCK, STOP_CLOCK, CLOCK_RATE, CLOCK_MAX
-    REAL(LATTEPREC) :: DBOX
-    REAL(LATTEPREC) :: DT_IN
-    LOGICAL :: EXISTERROR_INOUT
-    REAL(LATTEPREC) :: HOMO, LUMO
-    REAL(LATTEPREC) :: MLSI 
-    REAL(LATTEPREC) :: VENERG 
-    REAL :: TARRAY(2), RESULT, SYSTDIAG, SYSTPURE
-
-#ifdef PROGRESSON
-    TYPE(SYSTEM_TYPE) :: SY
-#endif
-
-    !> Element symbol
-    !!
-    CHARACTER(2), PARAMETER :: ELEMENT_SYMBOL(103) = [CHARACTER(2) :: &
-           "H" ,          "He" ,         "Li" ,         "Be" ,         &
-           "B" ,          "C" ,          "N" ,          "O" ,          &
-           "F" ,          "Ne" ,         "Na" ,         "Mg" ,         &
-           "Al" ,         "Si" ,         "P" ,          "S" ,          &
-           "Cl" ,         "Ar" ,         "K" ,          "Ca" ,         &
-           "Sc" ,         "Ti" ,         "V" ,          "Cr" ,         &
-           "Mn" ,         "Fe" ,         "Co" ,         "Ni" ,         &
-           "Cu" ,         "Zn" ,         "Ga" ,         "Ge" ,         &
-           "As" ,         "Se" ,         "Br" ,         "Kr" ,         &
-           "Rb" ,         "Sr" ,         "Y" ,          "Zr" ,         &
-           "Nb" ,         "Mo" ,         "Tc" ,         "Ru" ,         &
-           "Rh" ,         "Pd" ,         "Ag" ,         "Cd" ,         &
-           "In" ,         "Sn" ,         "Sb" ,         "Te" ,         &
-           "I" ,          "Xe" ,         "Cs" ,         "Ba" ,         &
-           "La" ,         "Ce" ,         "Pr" ,         "Nd" ,         &
-           "Pm" ,         "Sm" ,         "Eu" ,         "Gd" ,         &
-           "Tb" ,         "Dy" ,         "Ho" ,         "Er" ,         &
-           "Tm" ,         "Yb" ,         "Lu" ,         "Hf" ,         &
-           "Ta" ,         "W" ,          "Re" ,         "Os" ,         &
-           "Ir" ,         "Pt" ,         "Au" ,         "Hg" ,         &
-           "Tl" ,         "Pb" ,         "Bi" ,         "Po" ,         &
-           "At" ,         "Rn" ,         "Fr" ,         "Ra" ,         &
-           "Ac" ,         "Th" ,         "Pa" ,         "U" ,          &
-           "Np" ,         "Pu" ,         "Am" ,         "Cm" ,         &
-           "Bk" ,         "Cf" ,         "Es" ,         "Fm" ,         &
-           "Md" ,         "No" ,         "Lr"                          &
-        ]
-
-    
-    EXISTERROR = .FALSE. !We assume we start the lib call without errors
-    VERBOSE = VERB_IN
-    DT_IN = 0.1D0
-    !DT = 0.0D0
-
-    LIBINIT = .FALSE. 
-    NEWSYSTEM = 1
-    IF(VERBOSE <= 0)THEN
-      OPEN(UNIT=6, FILE="/dev/null", FORM="formatted")
-    ELSE
-      OPEN(UNIT=6, FILE=OUTFILE, FORM="formatted")
-    ENDIF
- 
-    IF(.NOT. LIBINIT .OR. NEWSYSTEM == 1)THEN
-
-      CALL DEALLOCATEALL()
-#ifdef PROGRESSON
-      CALL DEALLOCATEALLPROGRESS()
-#endif
-      LIBRUN = .TRUE.
-
-      LIBCALLS = 0 ; MAXITER = -10
-
-     ! Only LATTE main code will create the animate folder
-      INQUIRE( FILE="animate/.", EXIST=ANIMATEEXISTS)
-      IF (.NOT. ANIMATEEXISTS) CALL SYSTEM("mkdir animate")
-
-      NUMSCF = 0
-      CHEMPOT = ZERO
-       
-      ! Start timers
-      TX = INIT_TIMER()
-      TX = START_TIMER(LATTE_TIMER)
-
-      INQUIRE( FILE=LATTEINNAME, EXIST=LATTEINEXISTS )
-
-      IF (LATTEINEXISTS) THEN
-        CALL PARSE_CONTROL(LATTEINNAME)
-
-#ifdef PROGRESSON
-        CALL PRG_PARSE_MIXER(MX,LATTEINNAME)
-#endif
-
-      ELSE
-        CALL READCONTROLS
-      ENDIF
-
-      IF(VERBOSE >= 1)THEN
-        WRITE(*,*)"# The log file for latte_lib"
-        WRITE(*,*)""
-        CALL TIMEDATE_TAG("LATTE started at : ")
-
-#ifdef PROGRESSON
-        WRITE(*,*)""
-        WRITE(*,*)"Using PROGRESS and BML ..."
-        CALL PRG_VERSION()
-#endif
-
-      ENDIF
-
-      CALL READTB
-
-      IF (RESTART .EQ. 0) THEN
-
-        BOX = LATTICE_VECTORS_IN 
-
-        IF(VERBOSE >= 1)THEN
-           WRITE(*,*)"Lattice vectors:"
-           WRITE(*,*)"a=",BOX(1,1),BOX(1,2),BOX(1,3)
-           WRITE(*,*)"b=",BOX(2,1),BOX(2,2),BOX(2,3)
-           WRITE(*,*)"c=",BOX(3,1),BOX(3,2),BOX(3,3)
-           WRITE(*,*)""
-        ENDIF
-
-        BOX_OLD = BOX
-
-        NATS = SIZE(COORDS_IN,DIM=2)
-
-        IF (.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
-        CR = COORDS_IN
-        WRITE(*,*) "size!!!!!", SIZE(CR,DIM=2)  
-        WRITE(*,*) "size!!!!!", SIZE(CR,DIM=1)  
-
-        IF(.NOT. ALLOCATED(ATELE)) ALLOCATE(ATELE(NATS))
-        DO I = 1, NATS
-          ATELE(I) = TRIM(ADJUSTL(ELEMENT_SYMBOL(ATOMIC_NUMBERS_IN(ATOMTYPES_IN(I)))))
-        ENDDO
-        !Forces, charges and element pointers are allocated in readcr
-
-        CALL READCR
-
-        FLUSH(6)
-      ELSE
-
-        IF(VERBOSE >= 1)WRITE(*,*)"Restarting calculation from file ..."
-        CALL READRESTART
-
-      ENDIF
-
-      CALL GENORBITALLIST
-
-      CALL GENCUTOFFLIST
-
-      IF (VERBOSE >= 1) WRITE(*,*)"Reading ppots from file (if PPOTON >= 1) ..."
-      IF (PPOTON .EQ. 1) CALL READPPOT
-      IF (PPOTON .EQ. 2) CALL READPPOTTAB
-      IF (PPOTON .EQ. 3) CALL READPPOTSPLINE
-
-      IF (DEBUGON .EQ. 1) THEN
-         CALL PLOTUNIV
-         IF (PPOTON .EQ. 1) CALL PLOTPPOT
-      ENDIF
-
-      CALL GETHDIM
-
-      CALL GETMATINDLIST
-
-      IF (VERBOSE >= 1) WRITE(*,*)"Getting rho0 ..."
-      CALL RHOZERO
-
-      CALL GENHONSITE
-
-      CALL GETBNDFIL()
- 
-      CALL BUILD_INTEGRAL_MAP 
-
-      IF(VERBOSE >= 1)THEN
-        WRITE(*,*)""
-        WRITE(*,*)"Number of orbitals", FLOAT(HDIM)
-        WRITE(*,*)"Number of occupied orbitals", BNDFIL*FLOAT(HDIM)
-        WRITE(*,*)"Number of electrons", 2.0*BNDFIL*FLOAT(HDIM)
-        WRITE(*,*)""
-      ENDIF
-
-      FLUSH(6)
-
-#ifdef GPUON
-
       CALL INITIALIZE( NGPU )
 
 #endif
@@ -1905,17 +1389,17 @@ CONTAINS
 
         ! Reinitializing Coulombic contribution if Kpoints are used
         IF ((ELECTRO .EQ. 1 .AND. ELECMETH .EQ. 0) .OR. DBOX .GT. 0.0D0) THEN
-           CALL INITCOULOMB
+          CALL INITCOULOMB
         ENDIF
 
         IF (MOD(LIBCALLS, UDNEIGH) .EQ. 0) THEN
-           !If box is changing
-           IF (DBOX .GT. 0.0D0) THEN
-              CALL NEBLISTS(0)
-              CALL INITCOULOMB !If the box is changing we need to recompute the kspace list
-           ELSE
-              CALL NEBLISTS(1)
-           ENDIF
+          !If box is changing
+          IF (DBOX .GT. 0.0D0) THEN
+             CALL NEBLISTS(0)
+             CALL INITCOULOMB !If the box is changing we need to recompute the kspace list
+          ELSE
+             CALL NEBLISTS(1)
+          ENDIF
         ENDIF
 
         BOX_OLD = BOX
@@ -1971,32 +1455,1735 @@ CONTAINS
 
       IF (FREEZE .EQ. 1) CALL FREEZE_ATOMS(FTOT,V)
 
+      FTOT_OUT = 0.0D0 !Carefull here - the host code could have some forces already.
+      IF(MAXVAL(FTOT_OUT) .NE. 0.0D0)THEN
+        IF(VERBOSE >= 1) WRITE(*,*)"Adding force components and energies from application code ..."
+        IF(VERBOSE >= 1) WRITE(*,*)"APPCODE,LATTE",VENERG,TRRHOH + EREP - ENTE - ECOUL + ESPIN
+        VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
+        FTOT_OUT = FTOT_OUT +  FTOT
+      ELSE
+        VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
+        FTOT_OUT = FTOT
+      ENDIF
+
+      ! Get the seccond virial coefficient to pass it to the application program
+      IF (ELECTRO .EQ. 0) VIRCOUL = ZERO
+      VIRIAL = VIRBOND + VIRPAIR + VIRCOUL
+
+      IF (SPINON .EQ. 1) VIRIAL = VIRIAL + VIRSSPIN
+
+      IF (BASISTYPE .EQ. "NONORTHO") THEN
+        VIRIAL = VIRIAL - VIRPUL + VIRSCOUL
+      ENDIF
+
+!       CALL GETPRESSURE
+      SYSVOL = ABS(BOX(1,1)*(BOX(2,2)*BOX(3,3) - BOX(3,2)*BOX(2,3)) + &
+      BOX(1,2)*(BOX(2,1)*BOX(3,3) - BOX(3,1)*BOX(2,3)) + &
+      BOX(1,3)*(BOX(2,1)*BOX(3,2) - BOX(3,1)*BOX(2,2)))
+
+!       STRTEN(1) = ( -VIRIAL(1) + KETEN(1)/F2V ) / SYSVOL
+!       STRTEN(2) = ( -VIRIAL(2) + KETEN(2)/F2V ) / SYSVOL
+!       STRTEN(3) = ( -VIRIAL(3) + KETEN(3)/F2V ) / SYSVOL
+!       STRTEN(4) = ( -VIRIAL(4) + KETEN(4)/F2V ) / SYSVOL
+!       STRTEN(5) = ( -VIRIAL(5) + KETEN(5)/F2V ) / SYSVOL
+!       STRTEN(6) = ( -VIRIAL(6) + KETEN(6)/F2V ) / SYSVOL
+
+      STRTEN(1) = ( -VIRIAL(1) ) / SYSVOL
+      STRTEN(2) = ( -VIRIAL(2) ) / SYSVOL
+      STRTEN(3) = ( -VIRIAL(3) ) / SYSVOL
+      STRTEN(4) = ( -VIRIAL(4) ) / SYSVOL
+      STRTEN(5) = ( -VIRIAL(5) ) / SYSVOL
+      STRTEN(6) = ( -VIRIAL(6) ) / SYSVOL
+
+
+      !STRTEN = STRTEN * TOGPA 
+
+      PRESSURE = (STRTEN(1) + STRTEN(2) + STRTEN(3))/THREE
+      PRESSURE = PRESSURE * TOGPA
+
+
+#ifdef MDION
+      STRESS_INOUT = 0.0D0
+      
+      STRESS_INOUT(1) = STRTEN(1) !xx
+      STRESS_INOUT(5) = STRTEN(2) !yy
+      STRESS_INOUT(9) = STRTEN(3) !zz
+
+      STRESS_INOUT(2) = STRTEN(4) !xy
+      STRESS_INOUT(4) = STRTEN(4) !yx
+      
+      STRESS_INOUT(6) = STRTEN(5) !yz
+      STRESS_INOUT(8) = STRTEN(5) !zy
+
+      STRESS_INOUT(3) = STRTEN(6) !xz
+      STRESS_INOUT(7) = STRTEN(6) !zx
+
+!       WRITE(*,*)"STRESS_INOUT",STRTEN(1),STRTEN(2),STRTEN(3) 
+
+#else
+      VIRIAL_INOUT = -VIRIAL
+ !      WRITE(*,*)"STRESS_INOUT",-VIRIAL(1),-VIRIAL(2),-VIRIAL(3) 
+#endif
+
       LIBINIT = .TRUE.
       NEWSYSTEM = 0 !Setting newsystem back to 0.
 
+#ifdef PROGRESSON
+      IF(MOD(LIBCALLS,WRTFREQ) == 0)THEN
+        IF(VERBOSE >= 1) THEN
+          WRITE(*,*)"Writing trajectory into trajectory.pdb ..."
+          SY%NATS = NATS
+          IF(.NOT. ALLOCATED(SY%COORDINATE))ALLOCATE(SY%COORDINATE(3,NATS))
+          SY%COORDINATE = CR
+          SY%SYMBOL = ATELE
+          SY%LATTICE_VECTOR = BOX
+          IF (DOKERNEL) THEN
+            IF(LIBCALLS == 0) MAXDN2DT = ABS(MAXVAL(DN2DT2(:,1)))
+            SY%NET_CHARGE = ABS(DN2DT2(:,1))
+          ELSE
+            SY%NET_CHARGE = DELTAQ
+          ENDIF
+          CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT,"trajectory","pdb")
+          CALL PRG_WRITE_TRAJECTORY(SY,LIBCALLS,WRTFREQ,DT,"trajectory","xyz")
 
-      IF(VERBOSE >= 1  .AND. CONTROL == 1 .AND. KON == 0)THEN
-        IF(SPINON == 0) THEN
-          HOMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM)))
-          LUMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1)
-          WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
-          WRITE(*,*)"EGAP=",LUMO - HOMO
-        ELSE
-          HOMO = MAX(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))))
-          LUMO = MIN(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1))
-          WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
-          WRITE(*,*)"EGAP=",LUMO - HOMO
+          WRITE(*,*)"Writing trajectory into trajectory.xyz ..."
+          IF(LIBCALLS .EQ. 0)THEN
+            OPEN(UNIT=20,FILE="trajectory_ext.xyz",STATUS='unknown')
+          ELSE
+            OPEN(UNIT=20,FILE="trajectory_ext.xyz",POSITION='append',STATUS='old')
+          ENDIF
+          !Extended xyz file.
+          WRITE(20,*)NATS
+          WRITE(20,*) 'Lattice="',BOX(1,1),BOX(1,2),BOX(1,3),&
+               &BOX(2,1),BOX(2,2),BOX(2,3),BOX(3,1),BOX(3,2),BOX(3,3),'"',&
+               &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT
+          DO I=1,NATS
+            WRITE(20,*)ATELE(I),CR(1,I),CR(2,I),CR(3,I),V(1,I),V(2,I),V(3,I),&
+                 &FTOT(1,I),FTOT(2,I),FTOT(3,I),-DELTAQ(I)
+          ENDDO
+          CLOSE(20)
         ENDIF
       ENDIF
+#else
+      IF(MOD(LIBCALLS,WRTFREQ) == 0)THEN
+         IF(VERBOSE >= 1) THEN
+           WRITE(*,*)"Writing trajectory into trajectory.xyz ..."
+           IF(LIBCALLS .EQ. 0)THEN
+              OPEN(UNIT=20,FILE="trajectory.xyz",STATUS='unknown')
+           ELSE
+              OPEN(UNIT=20,FILE="trajectory.xyz",ACCESS='append',STATUS='old')
+           ENDIF
+           !Extended xyz file.
+           WRITE(20,*)NATS
+           WRITE(20,*) 'Lattice="',BOX(1,1),BOX(1,2),BOX(1,3),&
+                &BOX(2,1),BOX(2,2),BOX(2,3),BOX(3,1),BOX(3,2),BOX(3,3),'"',&
+                &"Properties=species:S:1:pos:R:3:vel:R:3:for:R:3:cha:R:1  Time=",LIBCALLS*DT
+           DO I=1,NATS
+              WRITE(20,*)ATELE(I),CR(1,I),CR(2,I),CR(3,I),V(1,I),V(2,I),V(3,I),&
+                   &FTOT(1,I),FTOT(2,I),FTOT(3,I),-DELTAQ(I)
+           ENDDO
+           CLOSE(20)
+         ENDIF
+      ENDIF
+#endif
 
+      IF(VERBOSE >= 1  .AND. CONTROL == 1 .AND. KON == 0)THEN
+         IF(SPINON == 0) THEN
+           HOMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM)))
+           LUMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1)
+           WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
+           WRITE(*,*)"EGAP=",LUMO - HOMO
+         ELSE
+           HOMO = MAX(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))))
+           LUMO = MIN(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1))
+           WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
+           WRITE(*,*)"EGAP=",LUMO - HOMO
+         ENDIF
+      ENDIF
+
+      IF (MOD(LIBCALLS, RSFREQ) .EQ. 0)THEN
+        IF(VERBOSE >= 0) CALL WRTRESTARTLIB(LIBCALLS)
+      ENDIF
+
+      IF(RESTARTLIB == 1 .AND. LIBCALLS == 0)THEN
+        CALL READRESTARTLIB(LIBCALLS)
+      ENDIF
+
+#ifdef PROGRESSON
+      IF(VERBOSE >= 3)THEN
+        CALL GETDIPOLE(DIPOLEMAG)
+        WRITE(*,*)"Dipole Magnitude=",DIPOLEMAG
+      ENDIF
+#endif
 
       FLUSH(6) !To force writing to file at every call
 
       EXISTERROR_INOUT = EXISTERROR
 
-      HAM_OUT = H
-      OVER_OUT = SMAT
+  END SUBROUTINE COMPUTE_OLD
+
+  !> ...
+  SUBROUTINE COMPUTE_HS(NORBS,COORDS_IN,ATOMTYPES_IN,ATOMIC_NUMBERS_IN,LATTICE_VECTORS_IN,&
+         &FIELD_IN,HAM_OUT,OVER_OUT,VERB_IN)
+
+    USE CONSTANTS_MOD, ONLY: EXISTERROR
+
+    IMPLICIT NONE
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(IN) :: COORDS_IN(:,:), LATTICE_VECTORS_IN(:,:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(IN) :: FIELD_IN(:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: HAM_OUT(:,:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: OVER_OUT(:,:)
+    INTEGER, ALLOCATABLE, INTENT(IN) :: ATOMTYPES_IN(:)
+    INTEGER, INTENT(IN) :: VERB_IN, NORBS
+    INTEGER :: K
+    INTEGER, ALLOCATABLE, INTENT(IN) :: ATOMIC_NUMBERS_IN(:)
+
+    REAL(LATTEPREC) :: FACTOR,DR,DFX,DFY,DFZ
+    INTEGER :: ATOMI
+    INTEGER :: VERBOSE
+    LOGICAL :: ANIMATEEXISTS 
+    INTEGER :: I
+    INTEGER :: NEWSYSTEM
+    INTEGER :: START_CLOCK, STOP_CLOCK, CLOCK_RATE, CLOCK_MAX
+    REAL(LATTEPREC) :: DBOX
+    REAL(LATTEPREC) :: DT_IN
+    LOGICAL :: EXISTERROR_INOUT
+    REAL(LATTEPREC) :: HOMO, LUMO
+    REAL(LATTEPREC) :: MLSI 
+    REAL(LATTEPREC) :: VENERG 
+    REAL :: TARRAY(2), RESULT, SYSTDIAG, SYSTPURE
+
+#ifdef PROGRESSON
+    TYPE(SYSTEM_TYPE) :: SY
+#endif
+
+    !> Element symbol
+    !!
+    CHARACTER(2), PARAMETER :: ELEMENT_SYMBOL(103) = [CHARACTER(2) :: &
+           "H" ,          "He" ,         "Li" ,         "Be" ,         &
+           "B" ,          "C" ,          "N" ,          "O" ,          &
+           "F" ,          "Ne" ,         "Na" ,         "Mg" ,         &
+           "Al" ,         "Si" ,         "P" ,          "S" ,          &
+           "Cl" ,         "Ar" ,         "K" ,          "Ca" ,         &
+           "Sc" ,         "Ti" ,         "V" ,          "Cr" ,         &
+           "Mn" ,         "Fe" ,         "Co" ,         "Ni" ,         &
+           "Cu" ,         "Zn" ,         "Ga" ,         "Ge" ,         &
+           "As" ,         "Se" ,         "Br" ,         "Kr" ,         &
+           "Rb" ,         "Sr" ,         "Y" ,          "Zr" ,         &
+           "Nb" ,         "Mo" ,         "Tc" ,         "Ru" ,         &
+           "Rh" ,         "Pd" ,         "Ag" ,         "Cd" ,         &
+           "In" ,         "Sn" ,         "Sb" ,         "Te" ,         &
+           "I" ,          "Xe" ,         "Cs" ,         "Ba" ,         &
+           "La" ,         "Ce" ,         "Pr" ,         "Nd" ,         &
+           "Pm" ,         "Sm" ,         "Eu" ,         "Gd" ,         &
+           "Tb" ,         "Dy" ,         "Ho" ,         "Er" ,         &
+           "Tm" ,         "Yb" ,         "Lu" ,         "Hf" ,         &
+           "Ta" ,         "W" ,          "Re" ,         "Os" ,         &
+           "Ir" ,         "Pt" ,         "Au" ,         "Hg" ,         &
+           "Tl" ,         "Pb" ,         "Bi" ,         "Po" ,         &
+           "At" ,         "Rn" ,         "Fr" ,         "Ra" ,         &
+           "Ac" ,         "Th" ,         "Pa" ,         "U" ,          &
+           "Np" ,         "Pu" ,         "Am" ,         "Cm" ,         &
+           "Bk" ,         "Cf" ,         "Es" ,         "Fm" ,         &
+           "Md" ,         "No" ,         "Lr"                          &
+        ]
+
+    
+    EXISTERROR = .FALSE. !We assume we start the lib call without errors
+    VERBOSE = VERB_IN
+    DT_IN = 0.1D0
+    DT = 0.1D0
+
+    LIBINIT = .FALSE. 
+    NEWSYSTEM = 1
+    IF(VERBOSE <= 0)THEN
+      OPEN(UNIT=6, FILE="/dev/null", FORM="formatted")
+    ELSE
+      OPEN(UNIT=6, FILE=OUTFILE, FORM="formatted")
+    ENDIF
+ 
+    IF(.NOT. LIBINIT .OR. NEWSYSTEM == 1)THEN
+
+      CALL DEALLOCATEALL()
+#ifdef PROGRESSON
+      CALL DEALLOCATEALLPROGRESS()
+#endif
+      LIBRUN = .TRUE.
+
+      LIBCALLS = 0 ; MAXITER = -10
+
+     ! Only LATTE main code will create the animate folder
+      INQUIRE( FILE="animate/.", EXIST=ANIMATEEXISTS)
+      IF (.NOT. ANIMATEEXISTS) CALL SYSTEM("mkdir animate")
+
+      NUMSCF = 0
+      CHEMPOT = ZERO
+       
+      ! Start timers
+      TX = INIT_TIMER()
+      TX = START_TIMER(LATTE_TIMER)
+
+      INQUIRE( FILE=LATTEINNAME, EXIST=LATTEINEXISTS )
+
+      IF (LATTEINEXISTS) THEN
+        CALL PARSE_CONTROL(LATTEINNAME)
+
+#ifdef PROGRESSON
+        CALL PRG_PARSE_MIXER(MX,LATTEINNAME)
+#endif
+
+      ELSE
+        CALL READCONTROLS
+      ENDIF
+
+      IF(VERBOSE >= 1)THEN
+        WRITE(*,*)"# The log file for latte_lib"
+        WRITE(*,*)""
+        CALL TIMEDATE_TAG("LATTE started at : ")
+
+#ifdef PROGRESSON
+        WRITE(*,*)""
+        WRITE(*,*)"Using PROGRESS and BML ..."
+        CALL PRG_VERSION()
+#endif
+
+      ENDIF
+
+      CALL READTB
+
+      IF (RESTART .EQ. 0) THEN
+
+        BOX = LATTICE_VECTORS_IN 
+
+        IF(VERBOSE >= 1)THEN
+          WRITE(*,*)"Lattice vectors:"
+          WRITE(*,*)"a=",BOX(1,1),BOX(1,2),BOX(1,3)
+          WRITE(*,*)"b=",BOX(2,1),BOX(2,2),BOX(2,3)
+          WRITE(*,*)"c=",BOX(3,1),BOX(3,2),BOX(3,3)
+          WRITE(*,*)""
+        ENDIF
+
+        BOX_OLD = BOX
+
+        NATS = SIZE(COORDS_IN,DIM=2)
+
+        IF (.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
+        CR = COORDS_IN
+        WRITE(*,*) "size!!!!!", SIZE(CR,DIM=2)  
+        WRITE(*,*) "size!!!!!", SIZE(CR,DIM=1)  
+
+        IF(.NOT. ALLOCATED(ATELE)) ALLOCATE(ATELE(NATS))
+        DO I = 1, NATS
+          ATELE(I) = TRIM(ADJUSTL(ELEMENT_SYMBOL(ATOMIC_NUMBERS_IN(ATOMTYPES_IN(I)))))
+        ENDDO
+        !Forces, charges and element pointers are allocated in readcr
+
+        CALL READCR
+
+        FLUSH(6)
+      ELSE
+
+        IF(VERBOSE >= 1)WRITE(*,*)"Restarting calculation from file ..."
+        CALL READRESTART
+
+      ENDIF
+
+      CALL GENORBITALLIST
+
+      CALL GENCUTOFFLIST
+
+      IF (VERBOSE >= 1) WRITE(*,*)"Reading ppots from file (if PPOTON >= 1) ..."
+      IF (PPOTON .EQ. 1) CALL READPPOT
+      IF (PPOTON .EQ. 2) CALL READPPOTTAB
+      IF (PPOTON .EQ. 3) CALL READPPOTSPLINE
+
+      IF (DEBUGON .EQ. 1) THEN
+        CALL PLOTUNIV
+        IF (PPOTON .EQ. 1) CALL PLOTPPOT
+      ENDIF
+
+      CALL GETHDIM
+
+      CALL GETMATINDLIST
+
+      IF (VERBOSE >= 1) WRITE(*,*)"Getting rho0 ..."
+      CALL RHOZERO
+
+      CALL GENHONSITE
+
+      CALL GETBNDFIL()
+ 
+      CALL BUILD_INTEGRAL_MAP 
+
+      IF(VERBOSE >= 1)THEN
+        WRITE(*,*)""
+        WRITE(*,*)"Number of orbitals", FLOAT(HDIM)
+        WRITE(*,*)"Number of occupied orbitals", BNDFIL*FLOAT(HDIM)
+        WRITE(*,*)"Number of electrons", 2.0*BNDFIL*FLOAT(HDIM)
+        WRITE(*,*)""
+      ENDIF
+
+      FLUSH(6)
+
+#ifdef GPUON
+
+      CALL INITIALIZE( NGPU )
+
+#endif
+
+#ifdef DBCSR_ON
+
+      IF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 1) CALL INIT_DBCSR
+
+#endif
+
+      IF (DFTBU) THEN
+        CALL ALLOCATEDM  ! ANDERS CHANGE
+        CALL INITIATEDM  ! ANDERS CHANGE
+      ENDIF
+
+      IF (KBT .LT. 0.0000001 .OR. CONTROL .EQ. 2) ENTE = ZERO
+
+      IF (.NOT. ALLOCATED(V)) THEN
+        ALLOCATE(V(3,NATS))
+        V = 0.0D0
+      END IF
+      IF(VERBOSE >= 1)WRITE(*,*)"End of INITIALIZATION"
+
+    ELSE
+
+      BOX = LATTICE_VECTORS_IN
+
+      LIBCALLS = LIBCALLS + 1
+
+      NATS = SIZE(COORDS_IN,DIM=2)
+
+      IF(.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
+      CR = COORDS_IN
+
+      FLUSH(6)
+
+    ENDIF
+    !End of initialization
+
+    !Control for implicit geometry optimization.
+    !This will need to be replaced by a proper flag.
+    IF (DT == 0) THEN
+      IF (VERBOSE >= 1) WRITE(*,*)"NOTE: DT = 0 => FULLQCONV = 1"
+      IF (VERBOSE >= 1) WRITE(*,*)"NOTE: DT = 0 => MDMIX = QMIX"
+      FULLQCONV = 1
+      MDMIX = QMIX
+      FLUSH(6)
+    ENDIF
+
+    IF (LIBCALLS == 0) THEN
+
+      IF (VERBOSE >= 1)WRITE(*,*)"Allocating nonorthogonal arrays ..."
+      IF (BASISTYPE .EQ. "NONORTHO") CALL ALLOCATENONO
+
+      IF (VERBOSE >= 1)WRITE(*,*)"Allocating XLBO arrays ..."
+      IF (XBOON .EQ. 1) CALL ALLOCATEXBO
+
+      IF (VERBOSE >= 1)WRITE(*,*)"Allocating COULOMB arrays ..."
+      IF (ELECTRO .EQ. 1) THEN
+         CALL ALLOCATECOULOMB
+         CALL INITCOULOMB
+      ENDIF
+
+      ! Start the timers
+      IF (VERBOSE >= 1)WRITE(*,*)"Starting timers ..."
+      CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
+
+#ifndef FCIDxlf
+      CALL DTIME(TARRAY, RESULT)
+#endif
+
+      IF (VERBOSE >= 1)WRITE(*,*)"Setting up TBMD ..."
+      CALL SETUPTBMD(NEWSYSTEM)
+
+      FLUSH(6)
+
+    ELSEIF (LIBCALLS > 0 .AND. RESTARTLIB == 0) THEN
+
+      DBOX = SQRT((BOX(1,1)-BOX_OLD(1,1))**2 + &
+           & (BOX(2,2)-BOX_OLD(2,2))**2 + (BOX(3,3)-BOX_OLD(3,3))**2)
+
+      ! Reinitializing Coulombic contribution if Kpoints are used
+      IF ((ELECTRO .EQ. 1 .AND. ELECMETH .EQ. 0) .OR. DBOX .GT. 0.0D0) THEN
+        CALL INITCOULOMB
+      ENDIF
+
+      IF (MOD(LIBCALLS, UDNEIGH) .EQ. 0) THEN
+        !If box is changing
+        IF (DBOX .GT. 0.0D0) THEN
+           CALL NEBLISTS(0)
+           CALL INITCOULOMB !If the box is changing we need to recompute the kspace list
+        ELSE
+           CALL NEBLISTS(1)
+        ENDIF
+      ENDIF
+
+      BOX_OLD = BOX
+
+    ENDIF
+
+    IF (QITER .NE. 0) THEN
+      ECOUL = ZERO
+      IF (ELECTRO .EQ. 1) CALL GETCOULE
+    ENDIF
+
+    IF(VERBOSE >= 1) WRITE(*,*)"LIBCALLS",LIBCALLS
+
+    IF(VERBOSE >= 1) MLSI = TIME_MLS()
+    IF(LIBCALLS > 0) CALL GETMDF(1, LIBCALLS)
+    IF(VERBOSE >= 1) WRITE(*,*)"Time for GETMDF =", TIME_MLS()-MLSI
+
+    CALL TOTENG
+
+    ! For the 0 SCF MD the coulomb energy is calculated in GETMDF
+
+    IF (PPOTON .EQ. 1) THEN
+      CALL PAIRPOT
+    ELSEIF (PPOTON .EQ. 2) THEN
+      CALL PAIRPOTTAB
+    ELSEIF (PPOTON .EQ. 3) THEN
+      CALL PAIRPOTSPLINE
+    ENDIF
+
+    IF (QITER .NE. 0) THEN
+      ECOUL = ZERO
+      IF (ELECTRO .EQ. 1) CALL GETCOULE
+    ENDIF
+
+    ESPIN = ZERO
+    IF (SPINON .EQ. 1) CALL GETSPINE
+
+    IF (CONTROL .NE. 1 .AND. CONTROL .NE. 2 .AND. KBT .GT. 0.000001 ) THEN
+
+      ! Only required when using the recursive expansion of the Fermi operator
+
+      ! 2/26/13
+      ! The entropy is now calculated when we get the density
+      ! matrix in the spin polarized case with diagonalization,
+      ! as it should be...
+
+      CALL ENTROPY
+
+    ENDIF
+
+    IF(VERBOSE >= 1) WRITE(*,*)"Energy Components (TRRHOH, EREP, ENTE, ECOUL)",TRRHOH, EREP, ENTE, ECOUL
+
+    IF (FREEZE .EQ. 1) CALL FREEZE_ATOMS(FTOT,V)
+
+    LIBINIT = .TRUE.
+    NEWSYSTEM = 0 !Setting newsystem back to 0.
+
+    IF(VERBOSE >= 1  .AND. CONTROL == 1 .AND. KON == 0)THEN
+      IF(SPINON == 0) THEN
+        HOMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM)))
+        LUMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1)
+        WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
+        WRITE(*,*)"EGAP=",LUMO - HOMO
+      ELSE
+        HOMO = MAX(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))))
+        LUMO = MIN(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1))
+        WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
+        WRITE(*,*)"EGAP=",LUMO - HOMO
+      ENDIF
+    ENDIF
+
+
+    FLUSH(6) !To force writing to file at every call
+
+    EXISTERROR_INOUT = EXISTERROR
+
+    HAM_OUT = H
+    OVER_OUT = SMAT
 
   END SUBROUTINE COMPUTE_HS
 
+  !> ...
+  SUBROUTINE COMPUTE_ALL(COORDS_IN,ATOMTYPES_IN,ATOMIC_NUMBERS_IN,LATTICE_VECTORS_IN,&
+         &FIELD_IN,HAM_OUT,OVER_OUT,DM_OUT,CHARGES_OUT,VERB_IN,NEWSYSTEM_IN)
+
+    USE CONSTANTS_MOD, ONLY: EXISTERROR
+
+    IMPLICIT NONE
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(IN) :: COORDS_IN(:,:), LATTICE_VECTORS_IN(:,:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(IN) :: FIELD_IN(:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: HAM_OUT(:,:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: OVER_OUT(:,:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: DM_OUT(:,:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: CHARGES_OUT(:)
+    INTEGER, ALLOCATABLE, INTENT(IN) :: ATOMTYPES_IN(:)
+    INTEGER, INTENT(IN) :: VERB_IN, NEWSYSTEM_IN
+    INTEGER :: K
+    INTEGER, ALLOCATABLE, INTENT(IN) :: ATOMIC_NUMBERS_IN(:)
+
+    REAL(LATTEPREC) :: FACTOR,DR,DFX,DFY,DFZ
+    INTEGER :: VERBOSE
+    LOGICAL :: ANIMATEEXISTS 
+    INTEGER :: I
+    INTEGER :: NEWSYSTEM
+    INTEGER :: START_CLOCK, STOP_CLOCK, CLOCK_RATE, CLOCK_MAX
+    REAL(LATTEPREC) :: DBOX
+    LOGICAL :: EXISTERROR_INOUT
+    REAL :: TARRAY(2), RESULT, SYSTDIAG, SYSTPURE
+
+#ifdef PROGRESSON
+    TYPE(SYSTEM_TYPE) :: SY
+#endif
+
+    !> Element symbol
+    !!
+    CHARACTER(2), PARAMETER :: ELEMENT_SYMBOL(103) = [CHARACTER(2) :: &
+           "H" ,          "He" ,         "Li" ,         "Be" ,         &
+           "B" ,          "C" ,          "N" ,          "O" ,          &
+           "F" ,          "Ne" ,         "Na" ,         "Mg" ,         &
+           "Al" ,         "Si" ,         "P" ,          "S" ,          &
+           "Cl" ,         "Ar" ,         "K" ,          "Ca" ,         &
+           "Sc" ,         "Ti" ,         "V" ,          "Cr" ,         &
+           "Mn" ,         "Fe" ,         "Co" ,         "Ni" ,         &
+           "Cu" ,         "Zn" ,         "Ga" ,         "Ge" ,         &
+           "As" ,         "Se" ,         "Br" ,         "Kr" ,         &
+           "Rb" ,         "Sr" ,         "Y" ,          "Zr" ,         &
+           "Nb" ,         "Mo" ,         "Tc" ,         "Ru" ,         &
+           "Rh" ,         "Pd" ,         "Ag" ,         "Cd" ,         &
+           "In" ,         "Sn" ,         "Sb" ,         "Te" ,         &
+           "I" ,          "Xe" ,         "Cs" ,         "Ba" ,         &
+           "La" ,         "Ce" ,         "Pr" ,         "Nd" ,         &
+           "Pm" ,         "Sm" ,         "Eu" ,         "Gd" ,         &
+           "Tb" ,         "Dy" ,         "Ho" ,         "Er" ,         &
+           "Tm" ,         "Yb" ,         "Lu" ,         "Hf" ,         &
+           "Ta" ,         "W" ,          "Re" ,         "Os" ,         &
+           "Ir" ,         "Pt" ,         "Au" ,         "Hg" ,         &
+           "Tl" ,         "Pb" ,         "Bi" ,         "Po" ,         &
+           "At" ,         "Rn" ,         "Fr" ,         "Ra" ,         &
+           "Ac" ,         "Th" ,         "Pa" ,         "U" ,          &
+           "Np" ,         "Pu" ,         "Am" ,         "Cm" ,         &
+           "Bk" ,         "Cf" ,         "Es" ,         "Fm" ,         &
+           "Md" ,         "No" ,         "Lr"                          &
+        ]
+
+    
+    EXISTERROR = .FALSE. !We assume we start the lib call without errors
+    VERBOSE = VERB_IN
+
+    NEWSYSTEM = NEWSYSTEM_IN 
+    IF(VERBOSE <= 0)THEN
+      OPEN(UNIT=6, FILE="/dev/null", FORM="formatted")
+    ELSE
+      OPEN(UNIT=6, FILE=OUTFILE, FORM="formatted")
+    ENDIF
+ 
+    IF(VERBOSE >= 1) WRITE(*,*)"LIBCALLS",LIBCALLS
+
+    LIBINIT = .TRUE.
+    NEWSYSTEM = 0 !Setting newsystem back to 0.
+
+    write(*,*) 'NEWSYSTEM' , NEWSYSTEM
+    FLUSH(6) !To force writing to file at every call
+
+    EXISTERROR_INOUT = EXISTERROR
+
+    HAM_OUT = H
+    OVER_OUT = SMAT
+    DM_OUT = BO
+    CHARGES_OUT = DELTAQ
+
+  END SUBROUTINE COMPUTE_ALL
+
+  !> Subroutine for calling LATTE for computation
+  !! \param COMPFLAG_IN Different control flags that can be passed to LATTE
+  !!        COMPFLAG_IN = 1: Compute Hamiltonian and Overlap Matrices
+  !!        COMPFLAG_IN = 2: Compute 1 & Density Matrix, Charges, Eigenvalues, and Dvals 
+  !!        COMPFLAG_IN = 3: Compute 1 + 2 & Energy and Forces
+  !! \param NCORES Number of orbitals in the core region  
+  !! \param CHEMPOT_IN Chemical potential for the whole system
+  !! \param COULOMBV_IN Coulomb potential for each atom 
+  !! \param COORDS_IN Coordinates. Example: y-coordinate of atom 1 = COORDS_IN(2,1)
+  !! \param ATOMTYPES_IN An index for all the different atoms in the system (Number of atoms,)
+  !! \param ATOMIC_NUMBERS_IN Atomic numbers for each species (Number of atom types,)
+  !! \param LATTICE_VECTORS_IN System PBC slab edge vectors. The first vector's coordinates 
+  !!        are LATTICE_VECTORS_IN(1,1:3) 
+  !! \param HAM_OUT Hailtonian matrix as output (Number of atomic orbitals, Number of atomic orbitals)
+  !! \param OVER_OUT Overlap matrix as output (Number of atomic orbitals, Number of atomic orbitals)
+  !! \param DM_OUT Denisty matrix as output (Number of atomic orbitals, Number of atomic orbitals)
+  !! \param CHARGES_OUT charges vector as output (Number of atoms,)
+  !! \param EVALS_OUT Eigenvalues as output (Number of atomic orbitals,) 
+  !! \param DVALS_OUT Contribution to the eigenvectors of the system from the "core" as output (Number of atomic orbitals,) 
+  !! \param ENERGY_OUT This is the potential Energy that is given back from latte to the hosting code 
+  !! \param FORCES_OUT Forces for every atom as output (3, Number of atoms)
+  !! \param VERB_IN Verbosity setting for LATTE 
+  !! \param NEWSYSTEM_IN Tells LATTE if a new system is passed.
+  !! \param EXISTERROR_INOUT Returns an error flag (.true.) to the hosting code.
+  !! \brief Note: All units are LATTE units by default. See https://github.com/losalamos/LATTE/blob/master/Manual/LATTE_manual.pdf
+  !! \brief Note: Control needs to be set to 1 to compute hamiltonian diagonalization when calling LATTE
+  !!
+  SUBROUTINE COMPUTE_(COMPFLAG_IN,NCORES,CHEMPOT_IN,COULOMBV_IN,COORDS_IN,ATOMTYPES_IN,ATOMIC_NUMBERS_IN,LATTICE_VECTORS_IN,&
+         &HAM_OUT,OVER_OUT,DM_OUT,CHARGES_OUT,EVALS_OUT,DVALS_OUT,ENERGY_OUT,FTOT_OUT,VERB_IN,NEWSYSTEM_IN,EXISTERROR_INOUT)
+
+    USE CONSTANTS_MOD, ONLY: EXISTERROR
+
+    IMPLICIT NONE
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(IN) :: COORDS_IN(:,:), LATTICE_VECTORS_IN(:,:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(IN) :: COULOMBV_IN(:) 
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: HAM_OUT(:,:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: OVER_OUT(:,:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: DM_OUT(:,:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: CHARGES_OUT(:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: EVALS_OUT(:)
+    REAL(LATTEPREC), ALLOCATABLE :: DVALS_OUT(:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: FTOT_OUT(:,:)
+    REAL(LATTEPREC), INTENT(INOUT) :: ENERGY_OUT(1)
+    REAL(LATTEPREC), INTENT(IN) :: CHEMPOT_IN 
+    INTEGER, ALLOCATABLE, INTENT(IN) :: ATOMTYPES_IN(:)
+    INTEGER, INTENT(IN) :: VERB_IN, COMPFLAG_IN, NEWSYSTEM_IN
+    INTEGER, ALLOCATABLE, INTENT(IN) :: ATOMIC_NUMBERS_IN(:)
+    INTEGER, INTENT(IN) :: NCORES
+
+    INTEGER :: VERBOSE
+    LOGICAL :: ANIMATEEXISTS 
+    INTEGER :: I
+    INTEGER :: START_CLOCK, CLOCK_RATE, CLOCK_MAX
+    REAL(LATTEPREC) :: DBOX
+    LOGICAL(1) :: EXISTERROR_INOUT
+    REAL(LATTEPREC) :: HOMO, LUMO
+    REAL(LATTEPREC) :: MLSI
+    REAL(LATTEPREC) :: VENERG 
+    REAL :: TARRAY(2), RESULT
+
+#ifdef PROGRESSON
+    TYPE(SYSTEM_TYPE) :: SY
+#endif
+
+    !> Element symbol
+    !!
+    CHARACTER(2), PARAMETER :: ELEMENT_SYMBOL(103) = [CHARACTER(2) :: &
+           "H" ,          "He" ,         "Li" ,         "Be" ,         &
+           "B" ,          "C" ,          "N" ,          "O" ,          &
+           "F" ,          "Ne" ,         "Na" ,         "Mg" ,         &
+           "Al" ,         "Si" ,         "P" ,          "S" ,          &
+           "Cl" ,         "Ar" ,         "K" ,          "Ca" ,         &
+           "Sc" ,         "Ti" ,         "V" ,          "Cr" ,         &
+           "Mn" ,         "Fe" ,         "Co" ,         "Ni" ,         &
+           "Cu" ,         "Zn" ,         "Ga" ,         "Ge" ,         &
+           "As" ,         "Se" ,         "Br" ,         "Kr" ,         &
+           "Rb" ,         "Sr" ,         "Y" ,          "Zr" ,         &
+           "Nb" ,         "Mo" ,         "Tc" ,         "Ru" ,         &
+           "Rh" ,         "Pd" ,         "Ag" ,         "Cd" ,         &
+           "In" ,         "Sn" ,         "Sb" ,         "Te" ,         &
+           "I" ,          "Xe" ,         "Cs" ,         "Ba" ,         &
+           "La" ,         "Ce" ,         "Pr" ,         "Nd" ,         &
+           "Pm" ,         "Sm" ,         "Eu" ,         "Gd" ,         &
+           "Tb" ,         "Dy" ,         "Ho" ,         "Er" ,         &
+           "Tm" ,         "Yb" ,         "Lu" ,         "Hf" ,         &
+           "Ta" ,         "W" ,          "Re" ,         "Os" ,         &
+           "Ir" ,         "Pt" ,         "Au" ,         "Hg" ,         &
+           "Tl" ,         "Pb" ,         "Bi" ,         "Po" ,         &
+           "At" ,         "Rn" ,         "Fr" ,         "Ra" ,         &
+           "Ac" ,         "Th" ,         "Pa" ,         "U" ,          &
+           "Np" ,         "Pu" ,         "Am" ,         "Cm" ,         &
+           "Bk" ,         "Cf" ,         "Es" ,         "Fm" ,         &
+           "Md" ,         "No" ,         "Lr"                          &
+        ]
+
+    EXISTERROR = .FALSE. !We assume we start the lib call without errors
+    VERBOSE = VERB_IN
+
+    COMPFLAG = COMPFLAG_IN ! COMPFLAG 1=hamiltonian and overlap, 
+                           ! 2=1+density matrix, charges, eigenvalues, dvals
+                           ! 3=1+2+energy and forces
+    NEWSYSTEM = NEWSYSTEM_IN
+    CHEMPOT = CHEMPOT_IN 
+    IF(VERBOSE <= 0)THEN
+      OPEN(UNIT=6, FILE="/dev/null", FORM="formatted")
+    ELSE
+      OPEN(UNIT=6, FILE=OUTFILE, FORM="formatted", POSITION="append")
+    ENDIF
+ 
+    IF(NEWSYSTEM == 1)THEN
+
+      CALL DEALLOCATEALL()
+#ifdef PROGRESSON
+      CALL DEALLOCATEALLPROGRESS()
+#endif
+      LIBRUN = .TRUE.
+
+      LIBCALLS = 0 ; MAXITER = -10
+
+     ! Only LATTE main code will create the animate folder
+      INQUIRE( FILE="animate/.", EXIST=ANIMATEEXISTS)
+      IF (.NOT. ANIMATEEXISTS) CALL SYSTEM("mkdir animate")
+
+      NUMSCF = 0
+       
+      ! Start timers
+      TX = INIT_TIMER()
+      TX = START_TIMER(LATTE_TIMER)
+
+      INQUIRE( FILE=LATTEINNAME, EXIST=LATTEINEXISTS )
+
+      IF (LATTEINEXISTS) THEN
+        CALL PARSE_CONTROL(LATTEINNAME)
+
+#ifdef PROGRESSON
+        CALL PRG_PARSE_MIXER(MX,LATTEINNAME)
+#endif
+
+      ELSE
+        CALL READCONTROLS
+      ENDIF
+
+      IF(VERBOSE >= 1)THEN
+        WRITE(*,*)"# The log file for latte_lib"
+        WRITE(*,*)""
+        CALL TIMEDATE_TAG("LATTE started at : ")
+
+#ifdef PROGRESSON
+        WRITE(*,*)""
+        WRITE(*,*)"Using PROGRESS and BML ..."
+        CALL PRG_VERSION()
+#endif
+
+      ENDIF
+
+      CALL READTB
+
+      IF (RESTART .EQ. 0) THEN
+
+        BOX = LATTICE_VECTORS_IN 
+
+        IF(VERBOSE >= 1)THEN
+          WRITE(*,*)"Lattice vectors:"
+          WRITE(*,*)"a=",BOX(1,1),BOX(1,2),BOX(1,3)
+          WRITE(*,*)"b=",BOX(2,1),BOX(2,2),BOX(2,3)
+          WRITE(*,*)"c=",BOX(3,1),BOX(3,2),BOX(3,3)
+          WRITE(*,*)""
+        ENDIF
+
+        BOX_OLD = BOX
+
+        NATS = SIZE(COORDS_IN,DIM=2)
+
+        IF (.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
+        CR = COORDS_IN
+        WRITE(*,*) "size!!!!!", SIZE(CR,DIM=2)  
+        WRITE(*,*) "size!!!!!", SIZE(CR,DIM=1)  
+
+        IF(.NOT. ALLOCATED(ATELE)) ALLOCATE(ATELE(NATS))
+        DO I = 1, NATS
+          ATELE(I) = TRIM(ADJUSTL(ELEMENT_SYMBOL(ATOMIC_NUMBERS_IN(ATOMTYPES_IN(I)))))
+        ENDDO
+        !Forces, charges and element pointers are allocated in readcr
+
+        CALL READCR
+        DELTAQ(:) = 0.0D0
+
+        FLUSH(6)
+      ELSE
+
+        IF(VERBOSE >= 1)WRITE(*,*)"Restarting calculation from file ..."
+        CALL READRESTART
+
+      ENDIF
+
+      CALL GENORBITALLIST
+
+      CALL GENCUTOFFLIST
+
+      IF (VERBOSE >= 1) WRITE(*,*)"Reading ppots from file (if PPOTON >= 1) ..."
+      IF (PPOTON .EQ. 1) CALL READPPOT
+      IF (PPOTON .EQ. 2) CALL READPPOTTAB
+      IF (PPOTON .EQ. 3) CALL READPPOTSPLINE
+
+      IF (DEBUGON .EQ. 1) THEN
+        CALL PLOTUNIV
+        IF (PPOTON .EQ. 1) CALL PLOTPPOT
+      ENDIF
+
+      CALL GETHDIM
+
+      CALL GETMATINDLIST
+
+      IF (VERBOSE >= 1) WRITE(*,*)"Getting rho0 ..."
+      CALL RHOZERO
+
+      CALL GENHONSITE
+
+      CALL GETBNDFIL()
+ 
+      CALL BUILD_INTEGRAL_MAP 
+
+      IF(VERBOSE >= 1)THEN
+        WRITE(*,*)""
+        WRITE(*,*)"Number of orbitals", FLOAT(HDIM)
+        WRITE(*,*)"Number of occupied orbitals", BNDFIL*FLOAT(HDIM)
+        WRITE(*,*)"Number of electrons", 2.0*BNDFIL*FLOAT(HDIM)
+        WRITE(*,*)""
+      ENDIF
+
+      FLUSH(6)
+
+#ifdef GPUON
+
+      CALL INITIALIZE( NGPU )
+
+#endif
+
+#ifdef DBCSR_ON
+
+      IF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 1) CALL INIT_DBCSR
+
+#endif
+
+      IF (DFTBU) THEN
+        CALL ALLOCATEDM  ! ANDERS CHANGE
+        CALL INITIATEDM  ! ANDERS CHANGE
+      ENDIF
+
+      IF (KBT .LT. 0.0000001 .OR. CONTROL .EQ. 2) ENTE = ZERO
+
+      IF (.NOT. ALLOCATED(V)) THEN
+        ALLOCATE(V(3,NATS))
+        V = 0.0D0
+      END IF
+      IF(VERBOSE >= 1)WRITE(*,*)"End of INITIALIZATION"
+
+    ELSE
+
+      BOX = LATTICE_VECTORS_IN
+
+      LIBCALLS = LIBCALLS + 1
+
+      NATS = SIZE(COORDS_IN,DIM=2)
+
+      IF(.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
+      CR = COORDS_IN
+
+      FLUSH(6)
+
+    ENDIF
+    !End of initialization
+
+#ifdef MAKELIBON
+
+    ! If the system is not new, read the hamiltonian and overlap from memory
+    IF(NEWSYSTEM == 0)THEN
+      IF(.NOT. ALLOCATED(H) .OR. .NOT. ALLOCATED(SMAT))THEN
+        CALL ERRORS("latte_lib","Attempt to read hamiltonian and overlap matrices.&
+        & No hamiltonian or overlap exist. Please call LATTE with NEWSYSTEM=1")
+        EXISTERROR_INOUT = EXISTERROR
+        FLUSH(6)
+        RETURN
+      ELSE
+        WRITE(*,*) "Retrieve hamiltonian and overlap from memory ..."
+      ENDIF
+      IF(COMPFLAG == 1)THEN
+        HAM_OUT = H
+        OVER_OUT = SMAT
+        FLUSH(6)
+        RETURN         
+      ELSEIF (COMPFLAG == 2)THEN
+        !IF(ALLOCATED(BO) .AND. ALLOCATED(DELTAQ))THEN
+        IF(MAXVAL(DELTAQ) .NE. 0.0D0 .AND. MINVAL(DELTAQ) .NE. 0.0D0)THEN
+          WRITE(*,*) "Retrieve density matrix and charges from memory ..."
+          HAM_OUT = H
+          OVER_OUT = SMAT
+          DM_OUT = BO
+          CHARGES_OUT = DELTAQ
+          EVALS_OUT = EVALS
+          DVALS_OUT = DVALS
+          FLUSH(6)
+          RETURN
+        ENDIF
+      ELSEIF (COMPFLAG == 3)THEN
+      !  IF(ALLOCATED(BO) .AND. ALLOCATED(DELTAQ))THEN
+        IF(MAXVAL(DELTAQ) .NE. 0.0D0 .AND. MINVAL(DELTAQ) .NE. 0.0D0)THEN
+          WRITE(*,*) "Retrieve density matrix and charges from memory ..."
+        ENDIF
+      ENDIF
+    ENDIF
+
+#endif
+
+    IF (LIBCALLS == 0) THEN
+
+      IF (VERBOSE >= 1)WRITE(*,*)"Allocating nonorthogonal arrays ..."
+      IF (BASISTYPE .EQ. "NONORTHO") CALL ALLOCATENONO
+
+      IF (VERBOSE >= 1)WRITE(*,*)"Allocating XLBO arrays ..."
+      IF (XBOON .EQ. 1) CALL ALLOCATEXBO
+
+      IF (VERBOSE >= 1)WRITE(*,*)"Allocating COULOMB arrays ..."
+      IF (ELECTRO .EQ. 1) THEN
+         CALL ALLOCATECOULOMB
+         CALL INITCOULOMB
+         COULOMBV(:) = COULOMBV_IN(:)
+      ENDIF
+
+      ! Start the timers
+      IF (VERBOSE >= 1)WRITE(*,*)"Starting timers ..."
+      CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
+
+#ifndef FCIDxlf
+      CALL DTIME(TARRAY, RESULT)
+#endif
+
+      IF (VERBOSE >= 1)WRITE(*,*)"Setting up TBMD ..."
+      CALL SETUPTBMD(NEWSYSTEM)
+      CALL GETDVALS(NCORES)
+      FLUSH(6)
+
+#ifdef MAKELIBON
+
+      ! Return corresponding matrices/vectors according to the coputation flag
+      IF (COMPFLAG == 1) THEN
+        HAM_OUT = H
+        OVER_OUT = SMAT
+        FLUSH(6)
+        RETURN
+      ELSEIF (COMPFLAG == 2) THEN
+        HAM_OUT = H
+        OVER_OUT = SMAT
+        DM_OUT = BO
+        CHARGES_OUT = DELTAQ
+        EVALS_OUT = EVALS
+        DVALS_OUT = DVALS
+        FLUSH(6)
+        RETURN
+      ENDIF
+
+#endif
+
+    ELSEIF (LIBCALLS > 0 .AND. RESTARTLIB == 0) THEN
+
+      DBOX = SQRT((BOX(1,1)-BOX_OLD(1,1))**2 + &
+           & (BOX(2,2)-BOX_OLD(2,2))**2 + (BOX(3,3)-BOX_OLD(3,3))**2)
+
+      ! Reinitializing Coulombic contribution if Kpoints are used
+      IF ((ELECTRO .EQ. 1 .AND. ELECMETH .EQ. 0) .OR. DBOX .GT. 0.0D0) THEN
+        CALL INITCOULOMB
+      ENDIF
+
+      IF (MOD(LIBCALLS, UDNEIGH) .EQ. 0) THEN
+        !If box is changing
+        IF (DBOX .GT. 0.0D0) THEN
+           CALL NEBLISTS(0)
+           CALL INITCOULOMB !If the box is changing we need to recompute the kspace list
+        ELSE
+           CALL NEBLISTS(1)
+        ENDIF
+      ENDIF
+
+      COULOMBV(:) = COULOMBV_IN(:)
+      BOX_OLD = BOX
+
+    ENDIF
+
+    IF (QITER .NE. 0) THEN
+      ECOUL = ZERO
+      IF (ELECTRO .EQ. 1) CALL GETCOULE
+    ENDIF
+
+    IF(VERBOSE >= 1) WRITE(*,*)"LIBCALLS",LIBCALLS
+
+    IF(VERBOSE >= 1) MLSI = TIME_MLS()
+    IF(LIBCALLS > 0) THEN
+!      IF (MAXVAL(DELTAQ) == 0.D0 .AND. MINVAL(DELTAQ) == 0.D0) THEN ! Check if we have already computed charges
+      IF (MAXVAL(COULOMBV) == 0.D0 .AND. MINVAL(COULOMBV) == 0.D0) THEN
+        IF(VERBOSE >= 1) WRITE(*,*) "Partial charges not computed yet ..."
+        CALL GETMDF(0, LIBCALLS) 
+      ELSE
+        CALL GETMDF(1, LIBCALLS) 
+      ENDIF
+      CALL GETDVALS(NCORES)
+    ENDIF
+    IF(VERBOSE >= 1) WRITE(*,*)"Time for GETMDF =", TIME_MLS()-MLSI
+
+#ifdef MAKELIBON
+
+    ! Return corresponding matrices/vectors according to the coputation flag
+    IF (COMPFLAG == 2) THEN
+      HAM_OUT = H
+      OVER_OUT = SMAT
+      DM_OUT = BO
+      CHARGES_OUT = DELTAQ
+      EVALS_OUT = EVALS
+      DVALS_OUT = DVALS
+      RETURN
+    ENDIF
+
+#endif
+    CALL TOTENG
+
+    ! For the 0 SCF MD the coulomb energy is calculated in GETMDF
+
+    IF (PPOTON .EQ. 1) THEN
+      CALL PAIRPOT
+    ELSEIF (PPOTON .EQ. 2) THEN
+      CALL PAIRPOTTAB
+    ELSEIF (PPOTON .EQ. 3) THEN
+      CALL PAIRPOTSPLINE
+    ENDIF
+
+    IF (QITER .NE. 0) THEN
+      ECOUL = ZERO
+      IF (ELECTRO .EQ. 1) CALL GETCOULE
+    ENDIF
+
+    ESPIN = ZERO
+    IF (SPINON .EQ. 1) CALL GETSPINE
+
+    IF (CONTROL .NE. 1 .AND. CONTROL .NE. 2 .AND. KBT .GT. 0.000001 ) THEN
+
+      ! Only required when using the recursive expansion of the Fermi operator
+
+      ! 2/26/13
+      ! The entropy is now calculated when we get the density
+      ! matrix in the spin polarized case with diagonalization,
+      ! as it should be...
+
+      CALL ENTROPY
+
+    ENDIF
+
+    IF(VERBOSE >= 1) WRITE(*,*)"Energy Components (TRRHOH, EREP, ENTE, ECOUL)",TRRHOH, EREP, ENTE, ECOUL
+
+    IF (FREEZE .EQ. 1) CALL FREEZE_ATOMS(FTOT,V)
+
+    FTOT_OUT = 0.0D0 !Carefull here - the host code could have some forces already.
+    IF(MAXVAL(FTOT_OUT) .NE. 0.0D0)THEN
+      IF(VERBOSE >= 1) WRITE(*,*)"Adding force components and energies from application code ..."
+      IF(VERBOSE >= 1) WRITE(*,*)"APPCODE,LATTE",VENERG,TRRHOH + EREP - ENTE - ECOUL + ESPIN
+      VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
+      FTOT_OUT = FTOT_OUT +  FTOT
+    ELSE
+      VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
+      FTOT_OUT = FTOT
+    ENDIF
+
+    LIBINIT = .TRUE.
+    NEWSYSTEM = 0 !Setting newsystem back to 0.
+
+    IF(VERBOSE >= 1  .AND. CONTROL == 1 .AND. KON == 0)THEN
+      IF(SPINON == 0) THEN
+        HOMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM)))
+        LUMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1)
+        WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
+        WRITE(*,*)"EGAP=",LUMO - HOMO
+      ELSE
+        HOMO = MAX(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))))
+        LUMO = MIN(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1))
+        WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
+        WRITE(*,*)"EGAP=",LUMO - HOMO
+      ENDIF
+    ENDIF
+
+    EXISTERROR_INOUT = EXISTERROR
+
+    HAM_OUT = H
+    OVER_OUT = SMAT
+    DM_OUT = BO
+    CHARGES_OUT = DELTAQ
+    EVALS_OUT = EVALS
+    DVALS_OUT = DVALS
+    ENERGY_OUT = VENERG
+
+    FLUSH(6) !To force writing to file at every call
+
+    RETURN
+    
+  END SUBROUTINE COMPUTE_
+
+  !> Subroutine for calling LATTE for computation
+  !! \param COMPFLAG_IN Different control flags that can be passed to LATTE
+  !!        COMPFLAG_IN = 1: Compute Hamiltonian and Overlap Matrices
+  !!        COMPFLAG_IN = 2: Compute 1 & Density Matrix, Charges, Eigenvalues, and Dvals 
+  !!        COMPFLAG_IN = 3: Compute 1 + 2 & Energy and Forces
+  !! \param NCORES Number of cores in the graph partition scheme 
+  !! \param CHEMPOT_IN Chemical potential for the whole system
+  !! \param COULOMBV_IN Coulomb potential for each atom 
+  !! \param COORDS_IN Coordinates. Example: y-coordinate of atom 1 = COORDS_IN(2,1)
+  !! \param ATOMTYPES_IN An index for all the different atoms in the system (Number of atoms,)
+  !! \param ATOMIC_NUMBERS_IN Atomic numbers for each species (Number of atom types,)
+  !! \param LATTICE_VECTORS_IN System PBC slab edge vectors. The first vector's coordinates 
+  !!        are LATTICE_VECTORS_IN(1,1:3) 
+  !! \param HAM_OUT Hailtonian matrix as output (Number of atomic orbitals, Number of atomic orbitals)
+  !! \param OVER_OUT Overlap matrix as output (Number of atomic orbitals, Number of atomic orbitals)
+  !! \param DM_OUT Denisty matrix as output (Number of atomic orbitals, Number of atomic orbitals)
+  !! \param CHARGES_OUT charges vector as output (Number of atoms,)
+  !! \param EVALS_OUT Eigenvalues as output (Number of atomic orbitals,) 
+  !! \param DVALS_OUT Contribution to the eigenvectors of the system from the "core" as output (Number of atomic orbitals,) 
+  !! \param ENERGY_OUT This is the potential Energy that is given back from latte to the hosting code 
+  !! \param FORCES_OUT Forces for every atom as output (3, Number of atoms)
+  !! \param VERB_IN Verbosity setting for LATTE 
+  !! \param NEWSYSTEM_IN Tells LATTE if a new system is passed.
+  !! \param EXISTERROR_INOUT Returns an error flag (.true.) to the hosting code.
+  !! \brief Note: All units are LATTE units by default. See https://github.com/losalamos/LATTE/blob/master/Manual/LATTE_manual.pdf
+  !! \brief Note: Control needs to be set to 1 to compute hamiltonian diagonalization when calling LATTE
+  !!
+  SUBROUTINE COMPUTE(COMPFLAG_IN,SY_IDX,NUM_SY,NCORES_IN,NCOREATOMS_IN,CHEMPOT_IN,COULOMBV_IN,COORDS_IN,ATOMTYPES_IN,ATOMIC_NUMBERS_IN,LATTICE_VECTORS_IN,&
+         &HAM_OUT,OVER_OUT,DM_OUT,CHARGES_OUT,EVALS_OUT,DVALS_OUT,ENERGY_OUT,FTOT_OUT,VERB_IN,NEWSYSTEM_IN,KEEPMEM_IN,EXISTERROR_INOUT)
+
+    USE CONSTANTS_MOD, ONLY: EXISTERROR
+
+    IMPLICIT NONE
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(IN) :: COORDS_IN(:,:), LATTICE_VECTORS_IN(:,:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(IN) :: COULOMBV_IN(:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: HAM_OUT(:,:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: OVER_OUT(:,:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: DM_OUT(:,:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: CHARGES_OUT(:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: EVALS_OUT(:)
+    REAL(LATTEPREC), ALLOCATABLE :: DVALS_OUT(:)
+    REAL(LATTEPREC), ALLOCATABLE, INTENT(INOUT) :: FTOT_OUT(:,:)
+    REAL(LATTEPREC), INTENT(INOUT) :: ENERGY_OUT(1)
+    REAL(LATTEPREC), INTENT(IN) :: CHEMPOT_IN 
+    INTEGER, ALLOCATABLE, INTENT(IN) :: ATOMTYPES_IN(:)
+    INTEGER, INTENT(IN) :: VERB_IN, COMPFLAG_IN, NEWSYSTEM_IN, KEEPMEM_IN
+    INTEGER, ALLOCATABLE, INTENT(IN) :: ATOMIC_NUMBERS_IN(:)
+    INTEGER, INTENT(IN) :: NCORES_IN, NCOREATOMS_IN
+    INTEGER, INTENT(IN) :: NUM_SY, SY_IDX
+
+    INTEGER :: VERBOSE, KEEPMEM
+    LOGICAL :: ANIMATEEXISTS 
+    INTEGER :: I
+    INTEGER :: START_CLOCK, CLOCK_RATE, CLOCK_MAX
+    REAL(LATTEPREC) :: DBOX
+    LOGICAL(1) :: EXISTERROR_INOUT
+    REAL(LATTEPREC) :: HOMO, LUMO
+    REAL(LATTEPREC) :: MLSI
+    REAL(LATTEPREC) :: VENERG 
+    REAL :: TARRAY(2), RESULT
+
+! #ifdef MAKELIBON
+    !TYPE(SYSTEM_TYPE) :: SY
+    ! TYPE(ESTRUCT_TYPE) :: ESTRUCT
+! #endif
+
+    !> Element symbol
+    !!
+    CHARACTER(2), PARAMETER :: ELEMENT_SYMBOL(103) = [CHARACTER(2) :: &
+           "H" ,          "He" ,         "Li" ,         "Be" ,         &
+           "B" ,          "C" ,          "N" ,          "O" ,          &
+           "F" ,          "Ne" ,         "Na" ,         "Mg" ,         &
+           "Al" ,         "Si" ,         "P" ,          "S" ,          &
+           "Cl" ,         "Ar" ,         "K" ,          "Ca" ,         &
+           "Sc" ,         "Ti" ,         "V" ,          "Cr" ,         &
+           "Mn" ,         "Fe" ,         "Co" ,         "Ni" ,         &
+           "Cu" ,         "Zn" ,         "Ga" ,         "Ge" ,         &
+           "As" ,         "Se" ,         "Br" ,         "Kr" ,         &
+           "Rb" ,         "Sr" ,         "Y" ,          "Zr" ,         &
+           "Nb" ,         "Mo" ,         "Tc" ,         "Ru" ,         &
+           "Rh" ,         "Pd" ,         "Ag" ,         "Cd" ,         &
+           "In" ,         "Sn" ,         "Sb" ,         "Te" ,         &
+           "I" ,          "Xe" ,         "Cs" ,         "Ba" ,         &
+           "La" ,         "Ce" ,         "Pr" ,         "Nd" ,         &
+           "Pm" ,         "Sm" ,         "Eu" ,         "Gd" ,         &
+           "Tb" ,         "Dy" ,         "Ho" ,         "Er" ,         &
+           "Tm" ,         "Yb" ,         "Lu" ,         "Hf" ,         &
+           "Ta" ,         "W" ,          "Re" ,         "Os" ,         &
+           "Ir" ,         "Pt" ,         "Au" ,         "Hg" ,         &
+           "Tl" ,         "Pb" ,         "Bi" ,         "Po" ,         &
+           "At" ,         "Rn" ,         "Fr" ,         "Ra" ,         &
+           "Ac" ,         "Th" ,         "Pa" ,         "U" ,          &
+           "Np" ,         "Pu" ,         "Am" ,         "Cm" ,         &
+           "Bk" ,         "Cf" ,         "Es" ,         "Fm" ,         &
+           "Md" ,         "No" ,         "Lr"                          &
+        ]
+
+    EXISTERROR = .FALSE. !We assume we start the lib call without errors
+    VERBOSE = VERB_IN
+
+    COMPFLAG = COMPFLAG_IN ! COMPFLAG 1=hamiltonian and overlap,
+                           ! 2=1+eigenvalues and dvals 
+                           ! 3=1+2+density matrix, charges
+                           ! 4=1+2+3+energy and forces
+    NEWSYSTEM = NEWSYSTEM_IN
+    KEEPMEM = KEEPMEM_IN
+    CHEMPOT = CHEMPOT_IN 
+    NCORES = NCORES_IN
+    NCOREATOMS = NCOREATOMS_IN
+#ifdef MAKELIBON
+    IF (.NOT. ALLOCATED(ESTRUCT_LIST))THEN ! Create an list to store electronic strucutre
+      ALLOCATE(ESTRUCT_LIST(NUM_SY))       ! information for each system/part of graph  
+    ENDIF
+#endif
+    IF(VERBOSE <= 0)THEN
+      OPEN(UNIT=6, FILE="/dev/null", FORM="formatted")
+    ELSE
+      OPEN(UNIT=6, FILE=OUTFILE, FORM="formatted", POSITION="append")
+    ENDIF
+ 
+    IF(NEWSYSTEM == 1)THEN
+
+      CALL DEALLOCATEALL()
+#ifdef PROGRESSON
+      CALL DEALLOCATEALLPROGRESS()
+#endif
+      LIBRUN = .TRUE.
+
+      LIBINIT = .FALSE.  
+      LIBCALLS = 0 ; MAXITER = -10
+
+     ! Only LATTE main code will create the animate folder
+      INQUIRE( FILE="animate/.", EXIST=ANIMATEEXISTS)
+      IF (.NOT. ANIMATEEXISTS) CALL SYSTEM("mkdir animate")
+
+      NUMSCF = 0
+       
+      ! Start timers
+      TX = INIT_TIMER()
+      TX = START_TIMER(LATTE_TIMER)
+
+      INQUIRE( FILE=LATTEINNAME, EXIST=LATTEINEXISTS )
+
+      IF (LATTEINEXISTS) THEN
+        CALL PARSE_CONTROL(LATTEINNAME)
+
+#ifdef PROGRESSON
+        CALL PRG_PARSE_MIXER(MX,LATTEINNAME)
+#endif
+
+      ELSE
+        CALL READCONTROLS
+      ENDIF
+
+      IF(VERBOSE >= 1)THEN
+        WRITE(*,*)"# The log file for latte_lib"
+        WRITE(*,*)""
+        CALL TIMEDATE_TAG("LATTE started at : ")
+
+#ifdef PROGRESSON
+        WRITE(*,*)""
+        WRITE(*,*)"Using PROGRESS and BML ..."
+        CALL PRG_VERSION()
+#endif
+
+      ENDIF
+
+      CALL READTB
+      IF (RESTART .EQ. 0) THEN
+
+        BOX = LATTICE_VECTORS_IN 
+
+        IF(VERBOSE >= 1)THEN
+          WRITE(*,*)"Lattice vectors:"
+          WRITE(*,*)"a=",BOX(1,1),BOX(1,2),BOX(1,3)
+          WRITE(*,*)"b=",BOX(2,1),BOX(2,2),BOX(2,3)
+          WRITE(*,*)"c=",BOX(3,1),BOX(3,2),BOX(3,3)
+          WRITE(*,*)""
+        ENDIF
+
+        BOX_OLD = BOX
+
+        NATS = SIZE(COORDS_IN,DIM=2)
+
+        IF (.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
+        CR = COORDS_IN
+        WRITE(*,*) "size!!!!!", SIZE(CR,DIM=2)  
+        WRITE(*,*) "size!!!!!", SIZE(CR,DIM=1)  
+
+        IF(.NOT. ALLOCATED(ATELE)) ALLOCATE(ATELE(NATS))
+        IF(.NOT. ALLOCATED(ATTYPE)) ALLOCATE(ATTYPE(NATS))
+        DO I = 1, NATS
+          ATELE(I) = TRIM(ADJUSTL(ELEMENT_SYMBOL(ATOMIC_NUMBERS_IN(ATOMTYPES_IN(I)))))
+          ATTYPE(I) = FINDLOC(ATOMTYPES, ATELE(I), DIM=1)
+        ENDDO
+        write(*,*) 'ATTYPE', ATTYPE
+        !Forces, charges and element pointers are allocated in readcr
+        CALL READCR
+        DELTAQ(:) = 0.0D0
+
+        FLUSH(6)
+      ELSE
+
+        IF(VERBOSE >= 1)WRITE(*,*)"Restarting calculation from file ..."
+        CALL READRESTART
+
+      ENDIF
+
+      CALL GENORBITALLIST
+
+      CALL GENCUTOFFLIST
+
+      IF (VERBOSE >= 1) WRITE(*,*)"Reading ppots from file (if PPOTON >= 1) ..."
+      IF (PPOTON .EQ. 1) CALL READPPOT
+      IF (PPOTON .EQ. 2) CALL READPPOTTAB
+      IF (PPOTON .EQ. 3) CALL READPPOTSPLINE
+
+      IF (DEBUGON .EQ. 1) THEN
+        CALL PLOTUNIV
+        IF (PPOTON .EQ. 1) CALL PLOTPPOT
+      ENDIF
+
+      CALL GETHDIM
+
+      CALL GETMATINDLIST
+
+      IF (VERBOSE >= 1) WRITE(*,*)"Getting rho0 ..."
+      CALL RHOZERO
+
+      CALL GENHONSITE
+
+      CALL GETBNDFIL()
+#ifdef MAKELIBON
+      IF (.NOT. ALLOCATED(IGL_MAP)) CALL BUILD_GENERAL_INTEGRAL_MAP
+#else 
+      CALL BUILD_INTEGRAL_MAP 
+#endif
+
+      IF(VERBOSE >= 1)THEN
+        WRITE(*,*)""
+        WRITE(*,*)"Number of orbitals", FLOAT(HDIM)
+        WRITE(*,*)"Number of occupied orbitals", BNDFIL*FLOAT(HDIM)
+        WRITE(*,*)"Number of electrons", 2.0*BNDFIL*FLOAT(HDIM)
+        WRITE(*,*)""
+      ENDIF
+
+      FLUSH(6)
+
+#ifdef GPUON
+
+      CALL INITIALIZE( NGPU )
+
+#endif
+
+#ifdef DBCSR_ON
+
+      IF (CONTROL .EQ. 2 .AND. SPARSEON .EQ. 1) CALL INIT_DBCSR
+
+#endif
+
+      IF (DFTBU) THEN
+        CALL ALLOCATEDM  ! ANDERS CHANGE
+        CALL INITIATEDM  ! ANDERS CHANGE
+      ENDIF
+
+      IF (KBT .LT. 0.0000001 .OR. CONTROL .EQ. 2) ENTE = ZERO
+
+      IF (.NOT. ALLOCATED(V)) THEN
+        ALLOCATE(V(3,NATS))
+        V = 0.0D0
+      END IF
+      IF(VERBOSE >= 1)WRITE(*,*)"End of INITIALIZATION"
+
+    ELSE
+
+      BOX = LATTICE_VECTORS_IN
+
+      LIBCALLS = LIBCALLS + 1
+
+      NATS = SIZE(COORDS_IN,DIM=2)
+
+      IF(.NOT.ALLOCATED(CR)) ALLOCATE(CR(3,NATS))
+      CR = COORDS_IN
+
+      FLUSH(6)
+
+    ENDIF
+    !End of initialization
+#ifdef MAKELIBON
+
+    ! If the system is not new, read the hamiltonian and overlap from memory
+    IF(NEWSYSTEM == 0)THEN
+      !IF(.NOT. ALLOCATED(H) .OR. .NOT. ALLOCATED(SMAT))THEN
+      IF(.NOT. BML_ALLOCATED(ESTRUCT_LIST(SY_IDX)%HAM) .OR. .NOT. BML_ALLOCATED(ESTRUCT_LIST(SY_IDX)%OVER))THEN
+        CALL ERRORS("latte_lib","Attempt to read hamiltonian and overlap matrices.&
+        & No hamiltonian or overlap exist. Please call LATTE with NEWSYSTEM=1")
+        EXISTERROR_INOUT = EXISTERROR
+        FLUSH(6)
+        RETURN
+      ELSE
+        WRITE(*,*) "Retrieve hamiltonian and overlap from memory ..."
+      ENDIF
+      IF(COMPFLAG == 1)THEN
+        CALL BML_EXPORT_TO_DENSE(ESTRUCT_LIST(SY_IDX)%HAM, HAM_OUT)
+        CALL BML_EXPORT_TO_DENSE(ESTRUCT_LIST(SY_IDX)%OVER, OVER_OUT)
+        FLUSH(6)
+        RETURN         
+      ! ELSEIF (COMPFLAG == 2)THEN
+      !   !IF(ALLOCATED(BO) .AND. ALLOCATED(DELTAQ))THEN
+      !   IF(MAXVAL(DELTAQ) .NE. 0.0D0 .AND. MINVAL(DELTAQ) .NE. 0.0D0)THEN
+      !     WRITE(*,*) "Retrieve density matrix and charges from memory ..."
+      !     HAM_OUT = H
+      !     OVER_OUT = SMAT
+      !     DM_OUT = BO
+      !     CHARGES_OUT = DELTAQ
+      !     EVALS_OUT = EVALS
+      !     DVALS_OUT = DVALS
+      !     FLUSH(6)
+      !     RETURN
+      !   ENDIF
+      ! ELSEIF (COMPFLAG == 3)THEN
+      ! !  IF(ALLOCATED(BO) .AND. ALLOCATED(DELTAQ))THEN
+      !   IF(MAXVAL(DELTAQ) .NE. 0.0D0 .AND. MINVAL(DELTAQ) .NE. 0.0D0)THEN
+      !     WRITE(*,*) "Retrieve density matrix and charges from memory ..."
+      !   ENDIF
+      ENDIF
+    ENDIF
+
+#endif
+
+
+    IF (LIBCALLS == 0) THEN
+
+      IF (VERBOSE >= 1)WRITE(*,*)"Allocating nonorthogonal arrays ..."
+      IF (BASISTYPE .EQ. "NONORTHO") CALL ALLOCATENONO
+
+      IF (VERBOSE >= 1)WRITE(*,*)"Allocating XLBO arrays ..."
+      IF (XBOON .EQ. 1) CALL ALLOCATEXBO
+
+      IF (VERBOSE >= 1)WRITE(*,*)"Allocating COULOMB arrays ..."
+      IF (ELECTRO .EQ. 1) THEN
+         CALL ALLOCATECOULOMB
+         CALL INITCOULOMB
+         COULOMBV(:) = COULOMBV_IN(:)
+      ENDIF
+
+      ! Start the timers
+      IF (VERBOSE >= 1)WRITE(*,*)"Starting timers ..."
+      CALL SYSTEM_CLOCK(START_CLOCK, CLOCK_RATE, CLOCK_MAX)
+
+#ifndef FCIDxlf
+      CALL DTIME(TARRAY, RESULT)
+#endif
+
+      IF (VERBOSE >= 1)WRITE(*,*)"Setting up TBMD ..."
+#ifdef MAKELIBON
+      IF (KEEPMEM == 1)THEN
+        LIBINIT = .TRUE.
+        LIBCALLS = LIBCALLS + 1
+        CALL BML_EXPORT_TO_DENSE(ESTRUCT_LIST(SY_IDX)%HAM, H)
+        CALL BML_EXPORT_TO_DENSE(ESTRUCT_LIST(SY_IDX)%OVER, SMAT)
+        CALL BML_EXPORT_TO_DENSE(ESTRUCT_LIST(SY_IDX)%ZMAT, XMAT)
+!        IF (ALLOCATED(ESTRUCT_LIST(SY_IDX)%EVALS))THEN
+        EVALS = ESTRUCT_LIST(SY_IDX)%EVALS 
+        CALL BML_EXPORT_TO_DENSE(ESTRUCT_LIST(SY_IDX)%EVECTS, EVECS) 
+!        ELSE
+!          EVALS = 0.0D0
+!        ENDIF
+      ENDIF
+#endif
+      CALL SETUPTBMD(NEWSYSTEM)
+#ifdef MAKELIBON
+      IF (COMPFLAG > 1) CALL GETDVALS(NCORES)
+#endif
+      FLUSH(6)
+
+#ifdef MAKELIBON
+
+      ! Return corresponding matrices/vectors according to the coputation flag
+      IF (COMPFLAG .GE. 1)THEN
+!        CALL BML_IMPORT_FROM_DENSE(BML_MATRIX_DENSE, &
+!             H, ESTRUCT_LIST(SY_IDX)%HAM0, ZERO, HDIM)
+        CALL BML_IMPORT_FROM_DENSE(BML_MATRIX_DENSE, &
+             H, ESTRUCT_LIST(SY_IDX)%HAM, ZERO, HDIM)
+        CALL BML_IMPORT_FROM_DENSE(BML_MATRIX_DENSE, &
+             SMAT, ESTRUCT_LIST(SY_IDX)%OVER, ZERO, HDIM)
+        CALL BML_IMPORT_FROM_DENSE(BML_MATRIX_DENSE, &
+             XMAT, ESTRUCT_LIST(SY_IDX)%ZMAT, ZERO, HDIM)
+
+        HAM_OUT = H 
+        OVER_OUT = SMAT 
+      ENDIF
+      IF (COMPFLAG .GE. 2)THEN
+        CALL BML_IMPORT_FROM_DENSE(BML_MATRIX_DENSE, &
+          EVECS, ESTRUCT_LIST(SY_IDX)%EVECTS, ZERO, HDIM)
+        ESTRUCT_LIST(SY_IDX)%EVALS = EVALS
+        ESTRUCT_LIST(SY_IDX)%DVALS = DVALS
+
+        EVALS_OUT = EVALS
+        DVALS_OUT = DVALS
+      ENDIF
+      IF (COMPFLAG .GE. 3)THEN
+        CALL BML_IMPORT_FROM_DENSE(BML_MATRIX_DENSE, &
+          BO, ESTRUCT_LIST(SY_IDX)%RHO, ZERO, HDIM)
+
+        DM_OUT = BO 
+        CHARGES_OUT = DELTAQ
+      ENDIF
+      IF (COMPFLAG .LE. 3)THEN
+        FLUSH(6)
+        RETURN
+      ENDIF
+
+#endif
+
+    ELSEIF (LIBCALLS > 0 .AND. RESTARTLIB == 0) THEN
+
+      DBOX = SQRT((BOX(1,1)-BOX_OLD(1,1))**2 + &
+           & (BOX(2,2)-BOX_OLD(2,2))**2 + (BOX(3,3)-BOX_OLD(3,3))**2)
+
+      ! Reinitializing Coulombic contribution if Kpoints are used
+      IF ((ELECTRO .EQ. 1 .AND. ELECMETH .EQ. 0) .OR. DBOX .GT. 0.0D0) THEN
+        CALL INITCOULOMB
+      ENDIF
+
+      IF (MOD(LIBCALLS, UDNEIGH) .EQ. 0) THEN
+        !If box is changing
+        IF (DBOX .GT. 0.0D0) THEN
+           CALL NEBLISTS(0)
+           CALL INITCOULOMB !If the box is changing we need to recompute the kspace list
+        ELSE
+           CALL NEBLISTS(1)
+        ENDIF
+      ENDIF
+
+      COULOMBV(:) = COULOMBV_IN(:)
+      BOX_OLD = BOX
+
+    ENDIF
+
+    IF (QITER .NE. 0) THEN
+      ECOUL = ZERO
+      IF (ELECTRO .EQ. 1) CALL GETCOULE
+    ENDIF
+
+    IF(VERBOSE >= 1) WRITE(*,*)"LIBCALLS",LIBCALLS
+
+    IF(VERBOSE >= 1) MLSI = TIME_MLS()
+    IF(LIBCALLS > 0) THEN
+!      IF (MAXVAL(DELTAQ) == 0.D0 .AND. MINVAL(DELTAQ) == 0.D0) THEN ! Check if we have already computed charges
+#ifdef MAKELIBON
+      IF (MAXVAL(COULOMBV) == 0.D0 .AND. MINVAL(COULOMBV) == 0.D0) THEN
+        IF(VERBOSE >= 1) WRITE(*,*) "Partial charges not computed yet ..."
+        CALL GETMDF(0, LIBCALLS) 
+      ELSE
+        CALL GETMDF(1, LIBCALLS) 
+      ENDIF
+#else
+      CALL GETMDF(1, LIBCALLS)   
+#endif
+      CALL GETDVALS(NCORES)
+      write(*,*) "DVALS", DVALS
+      flush(6)
+    ENDIF
+    IF(VERBOSE >= 1) WRITE(*,*)"Time for GETMDF =", TIME_MLS()-MLSI
+
+#ifdef MAKELIBON
+
+    ! Return corresponding matrices/vectors according to the coputation flag
+    IF (COMPFLAG .GE. 2)THEN
+      CALL BML_IMPORT_FROM_DENSE(BML_MATRIX_DENSE, &
+        EVECS, ESTRUCT_LIST(SY_IDX)%EVECTS, ZERO, HDIM)
+      CALL BML_IMPORT_FROM_DENSE(BML_MATRIX_DENSE, &
+        H, ESTRUCT_LIST(SY_IDX)%HAM, ZERO, HDIM)
+      CALL BML_IMPORT_FROM_DENSE(BML_MATRIX_DENSE, &
+        SMAT, ESTRUCT_LIST(SY_IDX)%OVER, ZERO, HDIM)
+      CALL BML_IMPORT_FROM_DENSE(BML_MATRIX_DENSE, &
+           XMAT, ESTRUCT_LIST(SY_IDX)%ZMAT, ZERO, HDIM)
+      ESTRUCT_LIST(SY_IDX)%EVALS = EVALS
+      ESTRUCT_LIST(SY_IDX)%DVALS = DVALS
+
+      HAM_OUT = H 
+      OVER_OUT = SMAT 
+      EVALS_OUT = EVALS
+      DVALS_OUT = DVALS 
+    ENDIF
+    IF (COMPFLAG .GE. 3)THEN
+      CALL BML_IMPORT_FROM_DENSE(BML_MATRIX_DENSE, &
+        BO, ESTRUCT_LIST(SY_IDX)%RHO, ZERO, HDIM)
+      DM_OUT = BO 
+      CHARGES_OUT = DELTAQ
+    ENDIF
+    IF (COMPFLAG .LE. 3)THEN
+      FLUSH(6)
+      RETURN
+    ENDIF
+
+#endif
+    !CALL BML_EXPORT_TO_DENSE(ESTRUCT_LIST(SY_IDX)%HAM, H)
+    !CALL BML_EXPORT_TO_DENSE(ESTRUCT_LIST(SY_IDX)%OVER, SMAT)
+    !CALL BML_EXPORT_TO_DENSE(ESTRUCT_LIST(SY_IDX)%ZMAT, XMAT)
+    CALL TOTENG
+
+    ! For the 0 SCF MD the coulomb energy is calculated in GETMDF
+
+    IF (PPOTON .EQ. 1) THEN
+      CALL PAIRPOT
+    ELSEIF (PPOTON .EQ. 2) THEN
+      CALL PAIRPOTTAB
+    ELSEIF (PPOTON .EQ. 3) THEN
+      CALL PAIRPOTSPLINE
+    ENDIF
+
+    IF (QITER .NE. 0) THEN
+      ECOUL = ZERO
+      IF (ELECTRO .EQ. 1) CALL GETCOULE
+    ENDIF
+
+    ESPIN = ZERO
+    IF (SPINON .EQ. 1) CALL GETSPINE
+
+    IF (CONTROL .NE. 1 .AND. CONTROL .NE. 2 .AND. KBT .GT. 0.000001 ) THEN
+
+      ! Only required when using the recursive expansion of the Fermi operator
+
+      ! 2/26/13
+      ! The entropy is now calculated when we get the density
+      ! matrix in the spin polarized case with diagonalization,
+      ! as it should be...
+
+      CALL ENTROPY
+
+    ENDIF
+
+    IF(VERBOSE >= 1) WRITE(*,*)"Energy Components (TRRHOH, EREP, ENTE, ECOUL)",TRRHOH, EREP, ENTE, ECOUL
+
+!    IF (FREEZE .EQ. 1) CALL FREEZE_ATOMS(FTOT,V)
+
+    FTOT_OUT = 0.0D0 !Carefull here - the host code could have some forces already.
+    IF(MAXVAL(FTOT_OUT) .NE. 0.0D0)THEN
+      IF(VERBOSE >= 1) WRITE(*,*)"Adding force components and energies from application code ..."
+      IF(VERBOSE >= 1) WRITE(*,*)"APPCODE,LATTE",VENERG,TRRHOH + EREP - ENTE - ECOUL + ESPIN
+#ifdef MAKELIBON
+      VENERG = TRRHOH + EREP !- ENTE - ECOUL + ESPIN
+#else
+      VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
+#endif
+      FTOT_OUT = FTOT_OUT +  FTOT
+    ELSE
+#ifdef MAKELIBON
+      VENERG = TRRHOH + EREP !- ENTE - ECOUL + ESPIN
+#else
+      VENERG = TRRHOH + EREP - ENTE - ECOUL + ESPIN
+#endif
+      FTOT_OUT = FTOT
+    ENDIF
+    write(*,*) "FTOT_OUT", FTOT_OUT 
+    write(*,*) "FCOUL", FCOUL
+    LIBINIT = .TRUE.
+    NEWSYSTEM = 0 !Setting newsystem back to 0.
+
+    IF(VERBOSE >= 1  .AND. CONTROL == 1 .AND. KON == 0)THEN
+      IF(SPINON == 0) THEN
+        HOMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM)))
+        LUMO = EVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1)
+        WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
+        WRITE(*,*)"EGAP=",LUMO - HOMO
+      ELSE
+        HOMO = MAX(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))))
+        LUMO = MIN(DOWNEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1),UPEVALS(FLOOR(BNDFIL*FLOAT(HDIM))+1))
+        WRITE(*,*)"HOMO=",HOMO, "LUMO=",LUMO
+        WRITE(*,*)"EGAP=",LUMO - HOMO
+      ENDIF
+    ENDIF
+
+    EXISTERROR_INOUT = EXISTERROR
+
+    HAM_OUT = H
+    OVER_OUT = SMAT
+    DM_OUT = BO
+    CHARGES_OUT = DELTAQ
+    EVALS_OUT = EVALS
+    DVALS_OUT = DVALS
+    ENERGY_OUT = VENERG
+
+    FLUSH(6) !To force writing to file at every call
+
+    RETURN
+    
+  END SUBROUTINE COMPUTE
 END MODULE LATTE_LIB

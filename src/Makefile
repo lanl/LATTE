@@ -20,7 +20,7 @@ ifeq ($(SHARED), ON)
 endif
 
 PPFLAGS = -DXSYEVD -DXHEEVD -D$(PRECISION)PREC -DGPU$(GPUOPT) -DDBCSR_$(DBCSR_OPT) -DMPI_$(MPIOPT)
-PPFLAGS += -DPROGRESS$(PROGRESS) -DFCID$(FCID) -DMDI$(MDI)
+PPFLAGS += -DPROGRESS$(PROGRESS) -DFCID$(FCID) -DMDI$(MDI) -DMAKELIB$(MAKELIB)
 
 # Flags for linking GPU libraries
 #GPU_LINKFLAG = -I../MATRIX -lstdc++ $(GPU_LINK_LIB)
@@ -34,14 +34,14 @@ else
 	mainSource = latte.F90
 endif
 
-MYMODULES = myprecision.F90 constants_mod.F90 setuparray.F90 coulombarray.F90 nonoarrayprogress.F90\
+MYMODULES = nvtx_mod.F90 myprecision.F90 constants_mod.F90 setuparray.F90 coulombarray.F90 nonoarrayprogress.F90\
 diagarray.F90 fermicommon.F90 mdarray.F90 neblistarray.F90 dmarray.F90 \
 nonoarray.F90 ppotarray.F90 purearray.F90 relaxcommon.F90 restartarray.F90 \
 sparsearray.F90 spinarray.F90 univarray.F90 virialarray.F90 xboarray.F90 \
 kspacearray.F90 timer_mod.F90 subgraph.F90 matrixio.F90 sparsemath.F90 \
 sparsesp2.F90 subgraphsp2.F90 homolumo.F90 openfiles_mod.F90 kernelparser_mod.F90 \
 latteparser_latte_mod.F90 sp2progress.F90 genXprogress.F90 mixer_mod.F90 \
-bodirectprogress.F90 constraints_mod.F90 latte_lib.F90 wignerarray.F90
+bodirectprogress.F90 constraints_mod.F90 latte_lib.F90 wignerarray.F90 
 
 DBCSRMODS = dbcsr_var_mod.F90 init_dbcsr.F90 shutdown_dbcsr.F90
 
@@ -88,9 +88,9 @@ wrtrestartlib.F90 deorthomyrhoprogress.F90 orthomyHprogress.F90 readrestartlib.F
 readppotspline.F90 pairpotspline.F90 errors.F90 initcoulombklist.F90 \
   dosfittab.F90 \
 readppotD.F90 pairpot_plusD.F90  tbfit.F90 fire.F90 angfactor.F90 \
-build_integral_map.F90 tb_forces.F90 dfdx_HS.F90 genorbitallist.F90 tb_forcesprogress.F90\
+build_integral_map.F90 build_general_integral_map.F90 tb_forces.F90 dfdx_HS.F90 genorbitallist.F90 tb_forcesprogress.F90\
 ktb_forces.F90 genHonsite.F90 gencutofflist.F90 getcorrs.F90 \
-Canon_DM_PRT.F90 can_resp.F90 getdeltaq_resp.F90 getdeltaspin_resp.F90  bldnewHS_sp.F90
+Canon_DM_PRT.F90 can_resp.F90 getdeltaq_resp.F90 getdeltaspin_resp.F90  bldnewHS_sp.F90 getdvals.F90 
 
 # dependencies
 #DEP_FILE = makefile.dep

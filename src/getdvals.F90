@@ -19,47 +19,38 @@
 ! Public License for more details.                                         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-MODULE SETUPARRAY
-
-  USE MYPRECISION
+!> Subroutine for computing the weight (contributions) from the cores to the 
+!! eigenvectors of the full system 
+!! \brief Given a subsystem, a set of eigenvectors for the subsystem, the number
+!! of orbitals for a core region belonging to the subsystem. This routine would 
+!! give back an array containing information on the contribution from the core
+!! region to every eigenvector. The size of the output is N (total number of 
+!! orbitals of the system).  
+!! \param SYEVECS 2D array containing the eigenvectors of the system. 
+!! \param NCORES Number of orbitals in the core region. 
+!!
+SUBROUTINE GETDVALS(NCORES)
 #ifdef PROGRESSON
-  USE PRG_SYSTEM_MOD    
+  USE BML
 #endif
-
+  USE DIAGARRAY
   IMPLICIT NONE
-  SAVE
+  INTEGER, INTENT(IN) :: NCORES
+  INTEGER :: NORBS
+  INTEGER :: I, J 
 
-  INTEGER, ALLOCATABLE :: ELEMPOINTER(:)
-  INTEGER, ALLOCATABLE :: MATINDLIST(:), SPININDLIST(:)
-  INTEGER, ALLOCATABLE :: BTYPE_INT(:,:)
-  INTEGER, ALLOCATABLE :: ORBITAL_LIST(:,:),NORBINDEX(:,:)
-  INTEGER, ALLOCATABLE :: ATTYPE(:)
-  REAL(LATTEPREC), ALLOCATABLE :: CR(:,:)
-  REAL(LATTEPREC), ALLOCATABLE :: HR0(:)
-  REAL(LATTEPREC), ALLOCATABLE :: HES(:), HEP(:), HED(:), HEF(:), ATOCC(:)
-  REAL(LATTEPREC), ALLOCATABLE :: H(:,:), BO(:,:), BOZERO(:), H0(:,:), HDIAG(:)
-  REAL(LATTEPREC), ALLOCATABLE :: H_ONSITE(:)
-  REAL(LATTEPREC), ALLOCATABLE :: ORTHORHO(:,:)
-  REAL(LATTEPREC), ALLOCATABLE :: F(:,:), FPP(:,:), FTOT(:,:), FCOUL(:,:), FPLUSD(:,:)
-  REAL(LATTEPREC), ALLOCATABLE :: FPUL(:,:), FSCOUL(:,:), FSSPIN(:,:), FSLCN(:,:)
-  REAL(LATTEPREC), ALLOCATABLE :: DELTAQ(:), MYCHARGE(:), QLIST(:), OLDQLIST(:)
-  REAL(LATTEPREC), ALLOCATABLE :: QSLIST(:,:) ! SPIN resolved QLIST
-  REAL(LATTEPREC), ALLOCATABLE :: LCNSHIFT(:)
-  REAL(LATTEPREC), ALLOCATABLE :: HUBBARDU(:)
-  REAL(LATTEPREC), ALLOCATABLE :: RESPCHI(:)
-  REAL(LATTEPREC), ALLOCATABLE :: CUTOFF_LIST(:,:)
-  CHARACTER(LEN=1), ALLOCATABLE :: RELAXATOM(:,:)
-  CHARACTER(LEN=2), ALLOCATABLE :: ELE(:), ELE1(:), ELE2(:), ATELE(:)
-  CHARACTER(LEN=3), ALLOCATABLE :: BTYPE(:)
-  CHARACTER(LEN=4), ALLOCATABLE :: BASIS(:)
+  NORBS = SIZE(EVECS, DIM=1)
+  IF (ALLOCATED(DVALS)) DEALLOCATE(DVALS)
+  ALLOCATE(DVALS(NORBS))
+  DVALS = 0.D0
 
-  ! More Coulomb related data
+  ! DVALS = SUM(EVECS[1:NCORES, 1:NORBS] ** 2)
+  DO I = 1, NORBS 
+    DO J = 1, NCORES
+        DVALS(I) = DVALS(I) + (EVECS(J, I) ** 2)
+    ENDDO
+  ENDDO 
 
-  REAL(LATTEPREC), ALLOCATABLE :: COULOMBV(:)
-    
-#ifdef MAKELIBON
-  TYPE(ESTRUCT_TYPE), ALLOCATABLE :: ESTRUCT_LIST(:)
-#endif
+  RETURN 
 
-
-END MODULE SETUPARRAY
+END SUBROUTINE GETDVALS

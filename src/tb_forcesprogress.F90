@@ -101,7 +101,15 @@ SUBROUTINE TBFORCESPROGRESS
 
 
         ! XMAT * XMAT = S^-1
-    
+#ifdef MAKELIBON    
+!        CALL BML_IMPORT_FROM_DENSE(LT%BML_TYPE, &
+!          XMAT, ZMAT_BML, LT%THRESHOLD, LT%MDIM)
+!        CALL BML_IMPORT_FROM_DENSE(LT%BML_TYPE, &
+!          H, HAM_BML, LT%THRESHOLD, LT%MDIM)
+#endif
+        write(*,*) "SUM XMAT:", SUM(XMAT)
+        write(*,*) "SUM H:", SUM(H)
+        write(*,*) "SUM BO:", SUM(BO)
         CALL BML_MULTIPLY_X2(ZMAT_BML,AUX_BML,LT%THRESHOLD,TR)
 
         ! S^-1 * H
@@ -573,10 +581,12 @@ SUBROUTINE TBFORCESPROGRESS
            VIRPUL(6) = VIRPUL(6) - RIJ(3) * FTMP_PULAY(1)
 
            IF (ELECTRO .EQ. 1) THEN
-
+#ifdef MAKELIBON
+              FTMP_COUL = FTMP_COUL * ( COULOMBV(J) + COULOMBV(I) ) 
+#else
               FTMP_COUL = FTMP_COUL * ( HUBBARDU(ELEMPOINTER(J))*DELTAQ(J) + COULOMBV(J) &
                     +HUBBARDU(ELEMPOINTER(I))*DELTAQ(I) + COULOMBV(I))
-
+#endif
               FPUL(1,I) = FPUL(1,I) + FTMP_COUL(1)
               FPUL(2,I) = FPUL(2,I) + FTMP_COUL(2)
               FPUL(3,I) = FPUL(3,I) + FTMP_COUL(3)
@@ -630,6 +640,12 @@ SUBROUTINE TBFORCESPROGRESS
         ENDIF
 
      ENDDO
+!     if (I .eq. NATS) then
+!        write(*,*) "FTMP_BOND", SUM(FTMP_BOND) 
+!        write(*,*) "FTMP_PULAY", SUM(FTMP_PULAY)
+!        write(*,*) "FTMP_COUL", SUM(FTMP_COUL)
+!        write(*,*) "COULOMBV", COULOMBV
+!     endif
 
   ENDDO
 
@@ -643,7 +659,6 @@ SUBROUTINE TBFORCESPROGRESS
   !  ENDDO
 
   !10 FORMAT(I4, 3F12.6)
-
   Write(*,*)"Time for GETMDF-GETFORCE-TBFORCESPROGRESS",time_mls()-mlsi
   RETURN
 

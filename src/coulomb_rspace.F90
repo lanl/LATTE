@@ -93,7 +93,6 @@ SUBROUTINE COULOMBRSPACE
              REAL(PBCK)*BOX(3,3) - CR(3,I)
 
         MAGR2 = RIJ(1)*RIJ(1) + RIJ(2)*RIJ(2) + RIJ(3)*RIJ(3)
-
         IF (MAGR2 .LE. COULCUT2) THEN
 
            TJ = TFACT*HUBBARDU(ELEMPOINTER(J)) 
@@ -107,7 +106,6 @@ SUBROUTINE COULOMBRSPACE
            DC = RIJ/MAGR
 
            ! Using Numerical Recipes ERFC
-
            Z = ABS(CALPHA*MAGR)
 
            T = ONE/(ONE + HALF*Z)
@@ -156,7 +154,7 @@ SUBROUTINE COULOMBRSPACE
               SD = TJ
               SE = TI4*TJ/(TWO * TJ2MTI2 * TJ2MTI2)
               SF = (TI6 - THREE*TI4*TJ2)/(TJ2MTI2 * TJ2MTI2 * TJ2MTI2)
-
+              
               COULOMBV(I) = COULOMBV(I) - (DELTAQ(J) * &
                    (EXPTI*(SB - (SC/MAGR)) + EXPTJ*(SE - (SF/MAGR))))
 

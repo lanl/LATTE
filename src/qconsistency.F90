@@ -31,10 +31,15 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   USE KSPACEARRAY, ONLY : KBO
   USE DMARRAY
   USE LATTEPARSER 
+  USE NVTX_MOD
 #ifdef  PROGRESSON
   USE SPARSEARRAY, ONLY : NUMTHRESH
   USE BML
   USE NONOARRAYPROGRESS
+#endif
+#ifdef MAKELIBON
+  USE DIAGARRAY
+  USE NONOARRAY
 #endif
 
   IMPLICIT NONE
@@ -104,6 +109,11 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ELSE
            CALL KGETRHO
         ENDIF
+#ifdef MAKELIBON
+        IF (COMPFLAG == 2)THEN 
+            RETURN ! Return w/o caluculate density matrix/charges
+        ENDIF
+#endif
 
 #ifdef PROGRESSON
         IF (DFTBU .AND. KON==0) CALL BML_COPY_NEW(ORTHOBO_BML,DO_BML_OLD)
@@ -144,6 +154,11 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         IF (SPINON .EQ. 1) CALL GETDELTASPIN
 
+#ifdef MAKELIBON
+      ! We must return here because we already have diagonalize hamiltonian 
+      ! or/and calculate density matrix and charges     
+      RETURN 
+#endif 
      ENDIF
 
      !
@@ -162,14 +177,18 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         IF(VERBOSE >= 1)WRITE(*,*)"SCF ITER =", ITER
         FLUSH(6)
 
-
+#ifdef MAKELIBON
+        ! Calculate COULOMBV if it's empty
+        !IF (MAXVAL(COULOMBV) == 0 .AND. MINVAL(COULOMBV) == 0) THEN
+        !    RETURN
+        IF (.FALSE.) THEN ! We solve Coulomb interaction in sedacs
+#endif
         IF (ELECMETH .EQ. 0) THEN
 
            !
            ! First do the real space part of the electrostatics
            ! This subroutine is based on Sanville's work
            !
-
            CALL COULOMBRSPACE
 
            !
@@ -189,13 +208,29 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            CALL GASPCOULOMB
 
         ENDIF
+#ifdef MAKELIBON
+        !DO I = 1, NATS
+        !  COULOMBV(I) = HUBBARDU(ELEMPOINTER(I))*DELTAQ(I) + COULOMBV(I)
+        !ENDDO
+!          RETURN  
+        ELSE
+          FIRSTCALL = .FALSE.
+        ENDIF
+#endif
 
         !
         ! Now let's modify the diagonal elements of our H matrix according
         ! to the electrostatic potential experienced by each atom
         !
-
+#ifdef MAKELIBON
+        ! only add coulomb potential at the stage of get_evals_dvals (compflag=2)
+        IF (MAXVAL(EVALS) == 0.0D0 .AND. MINVAL(EVALS) == 0.0D0)THEN
+#endif        
         CALL ADDQDEP
+#ifdef MAKELIBON
+        ENDIF 
+      !   EVALS = 0.0D0
+#endif
 
 #ifdef PROGRESSON
         IF (DFTBU) CALL ADDDFTBUPRG(.true.) 
@@ -216,7 +251,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         ! We've made changes to the H matrix so we have to re-orthogonalize
         MLSI = TIME_MLS()
-
         IF (BASISTYPE .EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
 #ifdef PROGRESSON
@@ -248,6 +282,11 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ELSE
            CALL KGETRHO
         ENDIF
+#ifdef MAKELIBON        
+        IF (COMPFLAG == 2)THEN
+           RETURN ! Return w/o calculate density matrix/charges
+        ENDIF
+#endif
 
         IF (DFTBU .AND. KON==0) then 
 #ifdef  PROGRESSON
@@ -272,7 +311,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         !
 
 !        CALL ENTROPY
-
+        
         IF (BASISTYPE.EQ. "NONORTHO") THEN
            IF (KON .EQ. 0) THEN
 #ifdef PROGRESSON
@@ -302,6 +341,13 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
         !CALL GETDELTAQ
         IF (.NOT.DFTBU) CALL GETDELTAQ
+
+#ifdef MAKELIBON
+        RETURN
+        !IF (.FALSE.) THEN
+        !IF (FIRSTCALL) THEN
+        !IF (.TRUE.) THEN
+#endif
 
         !
         ! Let's check for convergence
@@ -421,7 +467,6 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 #elif defined(PROGRESSOFF)
         IF (DFTBU.AND.KON==0) DOrth = DOrth_old
 #endif
-
         IF(VERBOSE >= 1)WRITE(*,*)"SCF error (MAXDQ) =",MAXDQ," SCF Tol =",ELEC_QTOL
 
         IF (MAXDQ .GT. ELEC_QTOL) ALLOKQ = 1
@@ -457,6 +502,9 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ENDIF
 
         ALLOK = ALLOKQ + ALLOKM
+#ifdef MAKELIBON
+!        ENDIF 
+#endif
 
         IF (ITER .EQ. MAXSCF) THEN
 

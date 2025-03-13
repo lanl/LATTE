@@ -171,7 +171,7 @@ SUBROUTINE NEBLISTS(AMIALLO)
               DO II = -XRANGE, XRANGE
                  DO JJ = -YRANGE, YRANGE
                     DO KK = -ZRANGE, ZRANGE
-                       
+                     
                        RIJ(1) = CR(1,J) + REAL(II)*BOX(1,1) + &
                             REAL(JJ)*BOX(2,1) + REAL(KK)*BOX(3,1) - CR(1,I)
                        

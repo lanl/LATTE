@@ -2,7 +2,7 @@
 # Compilation and link flags for LATTE
 #
 
-MY_PATH=$(shell pwd)
+MY_PATH=${HOME}
 
 # Precision - double or single
 PRECISION = DOUBLE
@@ -10,17 +10,17 @@ PRECISION = DOUBLE
 # Make the latte library
 # AR and RUNLIB executable default path to compile 
 # latte as a library (change accordingly)
-MAKELIB = OFF
-SHARED = OFF
+MAKELIB = ON
+SHARED = ON
 AR = /usr/bin/ar cq
 RANLIB = /usr/bin/ranlib
 
 # Use PROGRESS and BML libraries
 PROGRESS = ON
-PROGRESS_PATH= $(MY_PATH)/../../qmd-progress/install/lib64
-BML_PATH= $(MY_PATH)/../../bml/install/lib64
+PROGRESS_PATH= $(MY_PATH)/qmd-progress/install/
+BML_PATH= $(MY_PATH)/bml/install/
 MAGMA_PATH = $(OLCF_MAGMA_ROOT)
-METIS_PATH = $(MY_PATH)/../../metis-5.1.0/
+#METIS_PATH = $(MY_PATH)/metis-5.1.0/
 
 
 # Use METIS library for graph partitioning
@@ -43,22 +43,21 @@ FC = gfortran
 FCL = $(FC)
 
 FFLAGS =  -ffree-line-length-none -fopenmp -lpthread 
-FFLAGS += -g -I/opt/rocm-5.2.0/include 
-FFLAGS += -O2 -g -DNDEBUG -fopenmp -fopenmp
-FFLAGS += -I/opt/rocm-5.2.0/include -I${PROGRESS_PATH}/../../build/src -isystem ${BML_PATH}/../include
-FFLAGS += -I/opt/rocm-5.2.0/include -I${PROGRESS_PATH}/../../build/src -I${PROGRESS_PATH}/../include
-FFLAGS += -ffree-line-length-none  -O2 -g -DNDEBUG -fopenmp -fopenmp
+FFLAGS += -O2 -g 
+FFLAGS += -I${BML_PATH}include
+FFLAGS += -I${PROGRESS_PATH}include
+FFLAGS += -L/projects/shared/spack/var/spack/environments/cheng-han/.spack-env/._view/4l2ndkdhuy7g6cjzb2ocqusx6y2zqv7r/targets/x86_64-linux/lib -lnvToolsExt
+FFLAGS += -ffree-line-length-none 
+FFLAGS += -L/projects/shared/spack/var/spack/environments/cheng-han/.spack-env/view/lib -lopenblas
+FFLAGS += -fopenmp -lm -fPIC -g -O0 -fcheck=all --check=bounds -lm -fPIC 
 LINKFLAG = $(FFLAGS)
 
-LIB = -fopenmp -lpthread -L${OLCF_OPENBLAS_ROOT}/lib -lopenblas
-LIB += -L${ROCM_PATH}/lib -lrocblas
-LIB += -L${MAGMA_PATH}/lib -lmagma
-LIB  += -L${PROGRESS_PATH} -lprogress -L${BML_PATH} -lbml_fortran -lbml
-LIB += -fopenmp -L${OLCF_MAGMA_ROOT}/lib  -lmagma -L${ROCM_PATH}/lib -lrocblas -lamdhip64 -lrocsolver
+LIB = -fopenmp -lpthread 
+#LIB  += -L${PROGRESS_PATH}/lib -lprogress -L${BML_PATH}/lib -lbml_fortran -lbml
+#LIB += -fopenmp -L${OLCF_MAGMA_ROOT}/lib  -lmagma
 LIB += -lm -lgfortran
-LIB += -fopenmp -lpthread -L/sw/crusher/spack-envs/base/opt/cray-sles15-zen3/gcc-11.2.0/openblas-0.3.17-fip547hyhcrii2xgj5rmge3oyxgnfhkp/lib -lopenblas
 # for metis
-LIB += -L$(METIS_PATH)/lib -lmetis
+#LIB += -L$(METIS_PATH)/lib -lmetis
 LIB += $(FFLAGS)
 
 
@@ -74,8 +73,8 @@ ifeq ($(MAGMA), ON)
 endif
 
 ifeq ($(PROGRESS), ON)
-	LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml_fortran -lbml
-	FFLAGS += -I$(BML_PATH)/../include -I$(PROGRESS_PATH)/../include  -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml_fortran -lbml
+	LIB += -L$(PROGRESS_PATH)lib -lprogress -L$(BML_PATH)lib -lbml_fortran -lbml
+	FFLAGS += -I$(BML_PATH)include -I$(PROGRESS_PATH)include  -L$(PROGRESS_PATH)lib -lprogress -L$(BML_PATH)lib -lbml_fortran -lbml
 endif
 
 ifeq ($(GRAPH), ON) 
