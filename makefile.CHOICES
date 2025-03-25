@@ -46,9 +46,11 @@ FFLAGS =  -ffree-line-length-none -fopenmp -lpthread
 FFLAGS += -O2 -g 
 FFLAGS += -I${BML_PATH}include
 FFLAGS += -I${PROGRESS_PATH}include
-FFLAGS += -L/projects/shared/spack/var/spack/environments/cheng-han/.spack-env/._view/4l2ndkdhuy7g6cjzb2ocqusx6y2zqv7r/targets/x86_64-linux/lib -lnvToolsExt
+#FFLAGS += -L/projects/shared/spack/var/spack/environments/cheng-han/.spack-env/._view/4l2ndkdhuy7g6cjzb2ocqusx6y2zqv7r/targets/x86_64-linux/lib -lnvToolsExt
+FFLAGS += -lnvToolsExt
 FFLAGS += -ffree-line-length-none 
-FFLAGS += -L/projects/shared/spack/var/spack/environments/cheng-han/.spack-env/view/lib -lopenblas
+FFLAGS += -lopenblas
+#FFLAGS += -L/projects/shared/spack/var/spack/environments/cheng-han/.spack-env/view/lib -lopenblas
 FFLAGS += -fopenmp -lm -fPIC -g -O0 -fcheck=all --check=bounds -lm -fPIC 
 LINKFLAG = $(FFLAGS)
 
