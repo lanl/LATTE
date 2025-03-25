@@ -90,7 +90,7 @@ parawrite.F90 parafileopen.F90 wrtcfgs.F90 wrtrestart.F90 pbc.F90
 addqdep.F90 allocatecoulomb.F90 allocatenebarrays.F90  allocatexbo.F90  
 atomcharge.F90 avepress.F90 avetemp.F90 bldnewH.F90 bldspinH.F90 
 conjgradient.F90 coulomb_ewald.F90 coulomb_oldskool.F90 coulomb_rspace.F90 
-coultailcoef.F90 deallocateall.F90 deallocatecoulomb.F90 
+coultailcoef.F90 deallocateall.F90 deallocateallprogress.F90 deallocatecoulomb.F90 
 deallocatenebarrays.F90  deallocatexbo.F90 
 fermiallocate.F90 fermideallocate.F90 
    gershgorin.F90 getbndfil.F90 
@@ -122,7 +122,7 @@ readppotD.F90 pairpot_plusD.F90  tbfit.F90 fire.F90 angfactor.F90
 build_integral_map.F90 tb_forces.F90 dfdx_HS.F90 genorbitallist.F90 
 ktb_forces.F90 genHonsite.F90 gencutofflist.F90 getcorrs.F90 
 Canon_DM_PRT.F90 can_resp.F90 getdeltaq_resp.F90  bldnewHS_sp.F90 tb_forcesprogress.F90
-adddftbu_progress.F90 hubbardforce_prg.F90) 
+adddftbu_progress.F90 hubbardforce_prg.F90 getdvals.F90) 
 
 foreach(_m MYMODULES MYSUBS DBCSR)
   set(${_m}_SOURCES)
