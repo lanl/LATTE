@@ -66,7 +66,7 @@ if(DOXYGEN_FOUND)
     COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile)
 endif()
 
-set(MYMODULES  myprecision.F90 constants_mod.F90 setuparray.F90 coulombarray.F90 
+set(MYMODULES nvtx_mod.F90 myprecision.F90 constants_mod.F90 setuparray.F90 coulombarray.F90 
 diagarray.F90 fermicommon.F90 mdarray.F90 neblistarray.F90 
 nonoarray.F90 nonoarrayprogress.F90 ppotarray.F90 purearray.F90 relaxcommon.F90 restartarray.F90 
 sparsearray.F90 spinarray.F90 univarray.F90 virialarray.F90 xboarray.F90 
@@ -122,7 +122,7 @@ readppotD.F90 pairpot_plusD.F90  tbfit.F90 fire.F90 angfactor.F90
 build_integral_map.F90 build_general_integral_map.F90 tb_forces.F90 dfdx_HS.F90 genorbitallist.F90 
 ktb_forces.F90 genHonsite.F90 gencutofflist.F90 getcorrs.F90 
 Canon_DM_PRT.F90 can_resp.F90 getdeltaq_resp.F90  bldnewHS_sp.F90 tb_forcesprogress.F90
-adddftbu_progress.F90 hubbardforce_prg.F90 getdvals.F90 nvtx_mod.F90) 
+adddftbu_progress.F90 hubbardforce_prg.F90 getdvals.F90) 
 
 foreach(_m MYMODULES MYSUBS DBCSR)
   set(${_m}_SOURCES)
