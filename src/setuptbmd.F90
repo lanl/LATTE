@@ -91,11 +91,15 @@ SUBROUTINE SETUPTBMD(NEWSYSTEM)
   call nvtxStartRange("GETMDF",4)
 #ifdef MAKELIBON
   IF (LIBINIT) THEN
-    IF (MAXVAL(COULOMBV) == 0.D0 .AND. MINVAL(COULOMBV) == 0.D0) THEN
-      IF(VERBOSE >= 1) WRITE(*,*) "Partial charges not computed yet ..."
-      CALL GETMDF(0, LIBCALLS)
+    IF (KEEPMEM .EQ. 1 .AND. COMPFLAG .EQ. 1) THEN
+      EVALS = 0.0D0
     ELSE
-      CALL GETMDF(1, LIBCALLS)
+      IF (MAXVAL(COULOMBV) == 0.D0 .AND. MINVAL(COULOMBV) == 0.D0) THEN
+        IF(VERBOSE >= 1) WRITE(*,*) "Partial charges not computed yet ..."
+        CALL GETMDF(0, LIBCALLS)
+      ELSE
+        CALL GETMDF(1, LIBCALLS)
+      ENDIF
     ENDIF
   ELSE
 #endif

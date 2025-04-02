@@ -149,7 +149,7 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/LATTEConfig.cmake" "${CMAKE_CURRENT_B
 add_library(LATTE::latte ALIAS latte)
 if(PROGRESS)
   target_link_libraries(latte PRIVATE
-    ${PROGRESS_LIBRARIES})
+    ${PROGRESS_LIBRARIES} nvToolsExt)
 else()
   target_link_libraries(latte PRIVATE
     ${CUDA_cublas_LIBRARY}
@@ -184,7 +184,7 @@ else()
   set(LATTE LATTE_${PRECISION})
 endif()
 add_executable(${LATTE} ${CMAKE_CURRENT_SOURCE_DIR}/../src/latte.F90)
-target_link_libraries(${LATTE} latte ${PROGRESS_LIBRARIES} ${BML_LIBRARIES})
+target_link_libraries(${LATTE} latte ${PROGRESS_LIBRARIES} ${BML_LIBRARIES} nvToolsExt)
 target_include_directories(${LATTE} PRIVATE ${MPI_Fortran_INCLUDE_PATH} ${PROGRESS_INCLUDE_DIRS} ${BML_INCLUDE_DIRS})
 target_compile_definitions(${LATTE} PRIVATE XSYEVD XHEEVD ${PRECISION}PREC GPU${GPUOPT} DBCSR_${DBCSR_OPT} MPI_${DO_MPI} PROGRESS${PROGRESS} MAKELIB${MAKELIB})
 install(TARGETS ${LATTE} DESTINATION ${CMAKE_INSTALL_BINDIR})
