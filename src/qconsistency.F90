@@ -115,11 +115,13 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ELSE
            CALL KGETRHO
         ENDIF
+        
 #ifdef MAKELIBON
         IF (COMPFLAG == 2)THEN 
             RETURN ! Return w/o caluculate density matrix/charges
         ENDIF
 #endif
+
 
 #ifdef PROGRESSON
         IF (DFTBU .AND. KON==0) CALL BML_COPY_NEW(ORTHOBO_BML,DO_BML_OLD)
@@ -295,6 +297,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
         ELSE
            CALL KGETRHO
         ENDIF
+
 #ifdef MAKELIBON        
         IF (COMPFLAG == 2)THEN
            RETURN ! Return w/o calculate density matrix/charges
