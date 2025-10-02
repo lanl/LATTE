@@ -40,7 +40,7 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
   USE DIAGARRAY
   USE NONOARRAY
 #endif
-  USE NVTX_MOD
+!   USE NVTX_MOD
 
   IMPLICIT NONE
 
@@ -90,9 +90,9 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
 
 #ifdef PROGRESSON
                 IF (LATTEINEXISTS) THEN  !orthogonalize from progress lib if latte.in exists
-                   call nvtxStartRange("ORTHOMYH",5) 
+                  !  call nvtxStartRange("ORTHOMYH",5) 
                    CALL ORTHOMYHPRG
-                   call nvtxEndRange   
+                  !  call nvtxEndRange   
                 ELSE
                    CALL ORTHOMYH
                 ENDIF
@@ -145,9 +145,9 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            IF (KON .EQ. 0) THEN
 #ifdef PROGRESSON
               IF (LATTEINEXISTS) THEN  !deorthogonalize from progress lib if latte.in exists
-                 call nvtxStartRange("DEORTHOMYRHO",5)
+               !   call nvtxStartRange("DEORTHOMYRHO",5)
                  CALL DEORTHOMYRHOPRG
-                 call nvtxEndRange
+               !   call nvtxEndRange
               ELSE
                  CALL DEORTHOMYRHO
               ENDIF
@@ -268,9 +268,9 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            IF (KON .EQ. 0) THEN
 #ifdef PROGRESSON
               IF (LATTEINEXISTS) THEN  !orthogonalize from progress lib if latte.in exists
-                 call nvtxStartRange("ORTHOMYH",6) 
+               !   call nvtxStartRange("ORTHOMYH",6) 
                  CALL ORTHOMYHPRG
-                 call nvtxEndRange  
+               !   call nvtxEndRange  
               ELSE
                  CALL ORTHOMYH
               ENDIF
@@ -332,9 +332,9 @@ SUBROUTINE QCONSISTENCY(SWITCH, MDITER)
            IF (KON .EQ. 0) THEN
 #ifdef PROGRESSON
               IF (LATTEINEXISTS) THEN  !deorthogonalize from progress lib if latte.in exists
-                 call nvtxStartRange("DEORTHOMYRHO",6)
+               !   call nvtxStartRange("DEORTHOMYRHO",6)
                  CALL DEORTHOMYRHOPRG
-                 call nvtxEndRange
+               !   call nvtxEndRange
               ELSE
                  CALL DEORTHOMYRHO
               ENDIF

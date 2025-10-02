@@ -39,7 +39,7 @@ MODULE LATTE_LIB
   USE NONOARRAY
   USE CONSTRAINTS_MOD
   USE UNIVARRAY
-  USE NVTX_MOD
+  ! USE NVTX_MOD
 
 #ifdef PROGRESSON
   USE PRG_PROGRESS_MOD, ONLY: PRG_VERSION
@@ -1224,7 +1224,7 @@ CONTAINS
       OPEN(UNIT=6, FILE=OUTFILE, FORM="formatted", POSITION="append")
     ENDIF
  
-    call nvtxStartRange("INIT",3)  
+    ! call nvtxStartRange("INIT",3)  
     IF(NEWSYSTEM == 1)THEN
 
       CALL DEALLOCATEALL()
@@ -1393,7 +1393,7 @@ CONTAINS
       FLUSH(6)
 
     ENDIF
-    call nvtxEndRange
+    ! call nvtxEndRange
     !End of initialization
 #ifdef MAKELIBON
 
@@ -1568,7 +1568,7 @@ CONTAINS
     IF(VERBOSE >= 1) WRITE(*,*)"LIBCALLS",LIBCALLS
 
     IF(VERBOSE >= 1) MLSI = TIME_MLS()
-    call nvtxStartRange("GETMDF",4)
+    ! call nvtxStartRange("GETMDF",4)
     IF(LIBCALLS > 0) THEN
 !      IF (MAXVAL(DELTAQ) == 0.D0 .AND. MINVAL(DELTAQ) == 0.D0) THEN ! Check if we have already computed charges
 #ifdef MAKELIBON
@@ -1585,7 +1585,7 @@ CONTAINS
       write(*,*) "DVALS", DVALS
       flush(6)
     ENDIF
-    call nvtxEndRange
+    ! call nvtxEndRange
     IF(VERBOSE >= 1) WRITE(*,*)"Time for GETMDF =", TIME_MLS()-MLSI
 
 #ifdef MAKELIBON

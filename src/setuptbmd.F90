@@ -33,7 +33,7 @@ SUBROUTINE SETUPTBMD(NEWSYSTEM)
   USE NONOARRAY
   USE MYPRECISION
   USE LATTEPARSER
-  USE NVTX_MOD
+  ! USE NVTX_MOD
 
   IMPLICIT NONE
 
@@ -46,7 +46,7 @@ SUBROUTINE SETUPTBMD(NEWSYSTEM)
   INTEGER :: FLAGAND, NEWSYSTEM
 
   IF (EXISTERROR) RETURN
-  call nvtxStartRange("SETUPTBMD",3) 
+  ! call nvtxStartRange("SETUPTBMD",3) 
   !
   ! Read MDcontroller to determine what kind of MD simulation to do
   !
@@ -88,7 +88,7 @@ SUBROUTINE SETUPTBMD(NEWSYSTEM)
   IF (PLUSDON .EQ. 1 .AND. (.NOT. ALLOCATED(FPLUSD))) ALLOCATE(FPLUSD(3,NATS))
 
   IF(VERBOSE >= 1)WRITE(*,*)"Getting MD forces ..."
-  call nvtxStartRange("GETMDF",4)
+  ! call nvtxStartRange("GETMDF",4)
 #ifdef MAKELIBON
   IF (LIBINIT) THEN
     IF (KEEPMEM .EQ. 1 .AND. COMPFLAG .EQ. 1) THEN
@@ -107,12 +107,12 @@ SUBROUTINE SETUPTBMD(NEWSYSTEM)
 #ifdef MAKELIBON
   ENDIF
 #endif
-  call nvtxEndRange 
+  ! call nvtxEndRange 
 
   CUMDT = ZERO
 
   TOTSCF = 0
-  call nvtxEndRange 
+  ! call nvtxEndRange 
   RETURN
 
 END SUBROUTINE SETUPTBMD

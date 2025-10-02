@@ -34,7 +34,7 @@ else
 	mainSource = latte.F90
 endif
 
-MYMODULES = nvtx_mod.F90 myprecision.F90 constants_mod.F90 setuparray.F90 coulombarray.F90 nonoarrayprogress.F90\
+MYMODULES = myprecision.F90 constants_mod.F90 setuparray.F90 coulombarray.F90 nonoarrayprogress.F90\
 diagarray.F90 fermicommon.F90 mdarray.F90 neblistarray.F90 dmarray.F90 \
 nonoarray.F90 ppotarray.F90 purearray.F90 relaxcommon.F90 restartarray.F90 \
 sparsearray.F90 spinarray.F90 univarray.F90 virialarray.F90 xboarray.F90 \

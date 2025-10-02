@@ -32,7 +32,7 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
   USE TIMER_MOD
   USE MIXER_MOD
   USE LATTE_LIB
-  USE NVTX_MOD
+  !USE NVTX_MOD
 
   IMPLICIT NONE
 
@@ -91,9 +91,9 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
      !IF (SPONLY .EQ. 0) THEN
      !   CALL BLDNEWHS_SP
      !ELSE
-        call nvtxStartRange("BLDNEWHS",7)
+        !call nvtxStartRange("BLDNEWHS",7)
         CALL BLDNEWHS
-        call nvtxEndRange
+        ! call nvtxEndRange
      !ENDIF
 
   ELSE
@@ -206,9 +206,9 @@ SUBROUTINE GETMDF(SWITCH, CURRITER)
      CALL QNEUTRAL(SWITCH, CURRITER) ! Local charge neutrality
   ELSE
      IF(VERBOSE >= 1)WRITE(*,*)"Doing QCONSISTENCY ..."
-     call nvtxStartRange("QCONSISTENCY",5)
+    !  call nvtxStartRange("QCONSISTENCY",5)
      CALL QCONSISTENCY(SWITCH, CURRITER) ! Self consistent charge transfer
-     call nvtxEndRange
+    !  call nvtxEndRange
   ENDIF
 
   IF(FAILSAFE)THEN
