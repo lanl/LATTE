@@ -341,7 +341,7 @@ CONTAINS
     call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,zqt_bml)
     call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptaux_bml)
     call bml_multiply(zmat_bml,evecs_bml,zq_bml, 1.0d0,0.0d0,NUMTHRESH)
-    call bml_transpose(zq_bml,zqt_bml)
+    call bml_transpose_new(zq_bml,zqt_bml)
 
     DO IS = 1, NSPIN
       dr = 0.D0
@@ -742,7 +742,7 @@ CONTAINS
       call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,zqt_bml)
       call bml_zero_matrix(lt%bml_type,bml_element_real,LATTEPREC,HDIM,HDIM,ptaux_bml)
       call bml_multiply(zmat_bml,evecs_bml,zq_bml, 1.0d0,0.0d0,NUMTHRESH)
-      call bml_transpose(zq_bml,zqt_bml)
+      call bml_transpose_new(zq_bml,zqt_bml)
       ALLOCATE(NUMEL(NATS))
       ALLOCATE(DUMMY_ARRAY(NATS))
       NUMEL = 0.0d0
@@ -1778,7 +1778,7 @@ CONTAINS
     CALL BML_EXPORT_TO_DENSE(DELTA_BML, Delta_DO)
 
     CALL BML_MULTIPLY(DELTA_BML,ZMAT_BML,Y_BML,1.0_DP,0.0_DP,NUMTHRESH)
-    CALL BML_TRANSPOSE(ZMAT_BML, AUX_BML)
+    CALL BML_TRANSPOSE_NEW(ZMAT_BML, AUX_BML)
     CALL BML_MULTIPLY(Y_BML,AUX_BML, X_BML,  1.0_DP,0.0_DP,NUMTHRESH)
     CALL BML_MULTIPLY(X_BML,OVER_BML,AUX_BML,1.0_DP,0.0_DP,NUMTHRESH)
 
@@ -2190,18 +2190,18 @@ CONTAINS
 
       CALL BML_COPY_NEW(ZMAT_BML, AUX_BML)
       CALL BML_MULTIPLY(AUX_BML,DMV_BML(K),Y_BML,1.0D0,0.0D0,NUMTHRESH)
-      CALL BML_TRANSPOSE(ZMAT_BML, AUX_BML)
+      CALL BML_TRANSPOSE_NEW(ZMAT_BML, AUX_BML)
       CALL BML_MULTIPLY(Y_BML,AUX_BML, X_BML,1.0D0,0.0D0,NUMTHRESH)
       CALL BML_MULTIPLY(X_BML,OVER_BML,Y_BML,1.0D0,0.0D0,NUMTHRESH)
 
       CALL BML_EXPORT_TO_DENSE(Y_BML, Delta_DS)
 
-      CALL BML_TRANSPOSE(Y_BML, AUX_BML)
+      CALL BML_TRANSPOSE_NEW(Y_BML, AUX_BML)
       CALL BML_MULTIPLY(AUX_BML,SU_BML,X_BML,1.0D0,0.0D0,NUMTHRESH)
       CALL BML_MULTIPLY(SU_BML, X_BML, Y_BML,1.0D0,0.0D0,NUMTHRESH)
       ! H1 stored in X_BML
       CALL BML_ADD(X_BML,Y_BML,-0.25D0,-0.25D0,NUMTHRESH)
-      CALL BML_TRANSPOSE(X_BML, AUX_BML)
+      CALL BML_TRANSPOSE_NEW(X_BML, AUX_BML)
 
       ! H_1 stored in X_BML
       CALL BML_ADD(X_BML,AUX_BML,1.0D0,1.0D0,NUMTHRESH)
