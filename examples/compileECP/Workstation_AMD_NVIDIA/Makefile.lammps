@@ -1,0 +1,15 @@
+progress_PATH = /home/cnegre/LATTE_ECP/examples/compileECP/Pompero/qmd-progress
+bml_PATH = /home/cnegre/LATTE_ECP/examples/compileECP/Pompero/bml
+latte_SYSLIB += -L/lib64/ -lcublas -lcudart -lcusolver
+latte_SYSLIB += -I/include
+latte_SYSLIB += ../../lib/latte/filelink.o -llatte
+latte_SYSLIB += -L/projects/shared/spack/opt/spack/linux-ubuntu22.04-zen4/gcc-11.4.0/magma-2.9.0-brkm5qdkhezbomtt36p54a7iyagrbcso/lib -lmagma -lm -lgfortran
+latte_SYSLIB += -L/projects/shared/spack/opt/spack/linux-ubuntu22.04-zen4/gcc-11.4.0/metis-5.1.0-pdxbuygwakvh2qaxiskhf3qkyyk5cmiv/lib -lmetis
+latte_SYSINC  +=  -I/home/cnegre/LATTE_ECP/examples/compileECP/Pompero/bml/install/include -I/home/cnegre/LATTE_ECP/examples/compileECP/Pompero/qmd-progress/install/include
+latte_SYSINC  += -Wl,--copy-dt-needed-entries
+latte_SYSINC += -I/projects/shared/spack/opt/spack/linux-ubuntu22.04-zen4/gcc-11.4.0/metis-5.1.0-pdxbuygwakvh2qaxiskhf3qkyyk5cmiv/include 
+latte_SYSLIB  += -L/home/cnegre/LATTE_ECP/examples/compileECP/Pompero/bml/install/lib -lprogress -L/home/cnegre/LATTE_ECP/examples/compileECP/Pompero/qmd-progress/install/lib -lbml_fortran -lbml
+latte_SYSLIB += -fopenmp 
+latte_SYSLIB += -fopenmp -lpthread 
+latte_SYSLIB += -Wl,--copy-dt-needed-entries 
+latte_SYSLIB += -llapack -lblas 

@@ -1,0 +1,89 @@
+
+
+
+#
+# Compilation and link flags for LATTE
+#
+
+# Precision - double or single
+PRECISION = DOUBLE
+#PRECISION = SINGLE
+
+# Make the latte library
+# AR and RUNLIB executable default path to compile 
+# latte as a library (change accordingly)
+MAKELIB = ON
+AR = /usr/bin/ar cq
+RANLIB = /usr/bin/ranlib
+MY_PATH=$(shell pwd)
+
+# Use PROGRESS and BML libraries
+PROGRESS = ON
+GRAPH = OFF
+PROGRESS_PATH= $(MY_PATH)/../../qmd-progress/install/lib
+BML_PATH= $(MY_PATH)/../../bml/install/lib
+MAGMA_PATH = /projects/shared/spack/opt/spack/linux-ubuntu22.04-zen4/gcc-11.4.0/magma-2.9.0-brkm5qdkhezbomtt36p54a7iyagrbcso
+METIS_PATH=/projects/shared/spack/opt/spack/linux-ubuntu22.04-zen4/gcc-11.4.0/metis-5.1.0-pdxbuygwakvh2qaxiskhf3qkyyk5cmiv
+OPENBLAS_ROOT=/projects/shared/spack/opt/spack/linux-ubuntu22.04-zen4/gcc-11.4.0/openblas-0.3.29-rkyeghbb75cznhj3vy5e5ik4mqeud45b
+# Use METIS library for graph partitioning
+METIS = OFF
+
+# GPU available - OFF or ON
+GPUOPT = OFF
+
+# Using DBCSR library from cp2k? OFF or ON
+DBCSR_OPT = OFF
+
+# Parallelizing over k-points?
+MPIOPT = OFF
+
+#
+# CPU Fortran options
+#
+
+FC = gfortran
+FCL = $(FC)
+
+FFLAGS =  -ffree-line-length-none -fopenmp -lpthread -Wmissing-include-dirs 
+FFLAGS += -O2 -g -DNDEBUG -fopenmp -fopenmp 
+FFLAGS += -I${PROGRESS_PATH}/../../build/src -I${BML_PATH}/../include
+FFLAGS += -I${PROGRESS_PATH}/../../build/src -I${PROGRESS_PATH}/../include
+FFLAGS += -ffree-line-length-none  -O2 -g -DNDEBUG -fopenmp -fopenmp
+LINKFLAG = $(FFLAGS)
+
+
+
+LIB = -fopenmp -lpthread -L${OPENBLAS_ROOT}/lib -lopenblas
+LIB += -L${ROCM_PATH}/lib -lcublas
+LIB += -L${MAGMA_PATH}/lib -lmagma
+LIB  += -L${PROGRESS_PATH} -lprogress -L${BML_PATH} -lbml_fortran -lbml
+LIB += -fopenmp -L${OLCF_MAGMA_ROOT}/lib  -lmagma -L${ROCM_PATH}/lib -lcublas -lcusolver
+LIB += -lm -lgfortran
+LIB += -fopenmp -lpthread -L${OPENBLAS_ROOT}/lib -lopenblas
+LIB += $(FFLAGS)
+
+# Uncomment for coverage
+#CVR = OFF
+ifeq ($(CVR), ON)
+  FFLAGS += -fprofile-arcs -ftest-coverage
+  LINKFLAG += -fprofile-arcs -ftest-coverage
+endif
+
+ifeq ($(PROGRESS), ON)
+  LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml_fortran -lbml
+  FFLAGS += -I$(BML_PATH)/../include -I$(PROGRESS_PATH)/../include
+endif
+
+ifeq ($(GRAPH), ON)
+  LIB += -L$(METIS_PATH)/lib -lmetis
+  FFLAGS += -I$(METIS_PATH)/include
+endif
+
+#
+# GPU options
+#
+
+GPU_CUDA_LIB = -L${OLCF_CUDA_ROOT}/lib64/ -lcublas -lcudart
+
+GPU_ARCH = sm_89
+
