@@ -1,0 +1,36 @@
+#!/bin/sh
+
+all='export LD_LIBRARY_PATH=$LD_LIBRARY_PATH'
+algo=`spack find --path | grep magma`
+var=$(echo $algo | awk '{print $NF}')
+echo $var
+echo "export MAGMA_PATH="$var"" > paths.sh
+all=`echo ""$all"/lib/:"$var""`
+
+algo=`spack find --path | grep cuda`
+var=$(echo $algo | awk '{print $NF}')
+echo $var
+echo "export CUDA_PATH="$var"" >> paths.sh
+all=`echo ""$all"/lib/:"$var""`
+
+algo=`spack find --path | grep bml`
+var=$(echo $algo | awk '{print $NF}')
+echo $var
+echo "export BML_PATH="$var"" >> paths.sh
+all=`echo ""$all"/lib/:"$var""`
+
+algo=`spack find --path | grep openblas`
+var=$(echo $algo | awk '{print $NF}')
+echo $var
+echo "export OPENBLAS_PATH="$var"" >> paths.sh
+all=`echo ""$all"/lib/:"$var""`
+
+algo=`pwd`
+var=$algo/qmd-progress/install/
+echo $var
+echo "export PROGRESS_PATH="$var"" >> paths.sh 
+all=`echo ""$all"/lib/:"$var""`
+
+echo $all >> paths.sh
+
+

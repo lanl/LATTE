@@ -20,11 +20,13 @@ MY_PATH=$(shell pwd)
 # Use PROGRESS and BML libraries
 PROGRESS = ON
 GRAPH = OFF
-PROGRESS_PATH= $(MY_PATH)/../../qmd-progress/install/lib
-BML_PATH= $(MY_PATH)/../../bml/install/lib
-MAGMA_PATH = /projects/shared/spack/opt/spack/linux-ubuntu22.04-zen4/gcc-11.4.0/magma-2.9.0-brkm5qdkhezbomtt36p54a7iyagrbcso
-METIS_PATH=/projects/shared/spack/opt/spack/linux-ubuntu22.04-zen4/gcc-11.4.0/metis-5.1.0-pdxbuygwakvh2qaxiskhf3qkyyk5cmiv
-OPENBLAS_ROOT=/projects/shared/spack/opt/spack/linux-ubuntu22.04-zen4/gcc-11.4.0/openblas-0.3.29-rkyeghbb75cznhj3vy5e5ik4mqeud45b
+LPROGRESS_PATH=${PROGRESS_PATH}
+LBML_PATH=${BML_PATH}
+LMAGMA_PATH=${MAGMA_PATH}
+LMETIS_PATH=${METIS_PATH}
+LOPENBLAS_PATH=${OPENBLAS_PATH}
+LCUDA_PATH=${CUDA_PATH}
+
 # Use METIS library for graph partitioning
 METIS = OFF
 
@@ -46,20 +48,19 @@ FCL = $(FC)
 
 FFLAGS =  -ffree-line-length-none -fopenmp -lpthread -Wmissing-include-dirs 
 FFLAGS += -O2 -g -DNDEBUG -fopenmp -fopenmp 
-FFLAGS += -I${PROGRESS_PATH}/../../build/src -I${BML_PATH}/../include
-FFLAGS += -I${PROGRESS_PATH}/../../build/src -I${PROGRESS_PATH}/../include
+FFLAGS += -I$(LPROGRESS_PATH)/include -I$(LBML_PATH)/include
 FFLAGS += -ffree-line-length-none  -O2 -g -DNDEBUG -fopenmp -fopenmp
 LINKFLAG = $(FFLAGS)
 
 
 
-LIB = -fopenmp -lpthread -L${OPENBLAS_ROOT}/lib -lopenblas
-LIB += -L${ROCM_PATH}/lib -lcublas
-LIB += -L${MAGMA_PATH}/lib -lmagma
-LIB  += -L${PROGRESS_PATH} -lprogress -L${BML_PATH} -lbml_fortran -lbml
-LIB += -fopenmp -L${OLCF_MAGMA_ROOT}/lib  -lmagma -L${ROCM_PATH}/lib -lcublas -lcusolver
+LIB = -fopenmp -lpthread -L$(LOPENBLAS_PATH)/lib -lopenblas
+LIB += -L$(LCUDA_PATH)/lib -lcublas
+LIB += -L$(LMAGMA_PATH)/lib -lmagma
+LIB  += -L$(LPROGRESS_PATH)/lib -lprogress -L$(LBML_PATH)/lib -lbml_fortran -lbml
+LIB += -fopenmp -L$(LMAGMA_PATH)/lib  -lmagma -L$(LCUDA_PATH)/lib -lcublas -lcusolver
 LIB += -lm -lgfortran
-LIB += -fopenmp -lpthread -L${OPENBLAS_ROOT}/lib -lopenblas
+LIB += -fopenmp -lpthread -L$(LOPENBLAS_PATH)/lib -lopenblas
 LIB += $(FFLAGS)
 
 # Uncomment for coverage
@@ -70,20 +71,20 @@ ifeq ($(CVR), ON)
 endif
 
 ifeq ($(PROGRESS), ON)
-  LIB += -L$(PROGRESS_PATH) -lprogress -L$(BML_PATH) -lbml_fortran -lbml
-  FFLAGS += -I$(BML_PATH)/../include -I$(PROGRESS_PATH)/../include
+  LIB += -L$(LPROGRESS_PATH)/lib -lprogress -L$(LBML_PATH)/lib -lbml_fortran -lbml
+  FFLAGS += -I$(LBML_PATH)/include -I$(LPROGRESS_PATH)/include
 endif
 
 ifeq ($(GRAPH), ON)
-  LIB += -L$(METIS_PATH)/lib -lmetis
-  FFLAGS += -I$(METIS_PATH)/include
+  LIB += -L$(LMETIS_PATH)/lib -lmetis
+  FFLAGS += -I$(LMETIS_PATH)/include
 endif
 
 #
 # GPU options
 #
 
-GPU_CUDA_LIB = -L${OLCF_CUDA_ROOT}/lib64/ -lcublas -lcudart
+GPU_CUDA_LIB = -L${LCUDA_PATH}/lib64/ -lcublas -lcudart
 
-GPU_ARCH = sm_89
+GPU_ARCH = sm_86
 

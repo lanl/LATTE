@@ -1,7 +1,28 @@
 INSTALATION INSTRUCTIONS
 ========================
+Here we asume that we are in $HOME as the base directory (`cd `) 
 
-Load an appropriate environment with the mpif90 compiler, oenblas, cublas, magma, and metis library.
+Git clone spack to machine:
+			$> git clone -b v1.1.1 https://github.com/spack/spack.git spack_latte_lammps 
+
+Run:
+                	$> . ~/spack_latte_lammps/share/spack/setup-env.sh  
+
+Now install the compiler you want:
+                        $> spack install gcc@12.3.0 (for example, pick your favorite version)
+
+Now create environment
+                        $> spack env create latte_lammps
+
+Enter environment
+                        $> spack env activate latte_lammps -p
+
+Build bml
+                        $> spack add bml@master+cusolver+magma%gcc@12.3.0 ^magma+cuda cuda_arch=89
+
+                        $> spack concretize
+
+                        $> spack install -v -j 64    (-v = verbose, -j = build in parallel w 64 cpus)
 
 Clone the repo: 
 
@@ -15,9 +36,9 @@ Clone all module (this will clone LATTE again)
 
 	./clone_all_codes.sh
 
-Build and install bml
+Create a source file with all the relevant path
 
-	./build_bml.sh
+	./get_spack_paths ; source paths.sh 
 
 Build and install progress
 
@@ -30,3 +51,13 @@ Build and install LATTE
 Build and install LAMMPS
 
 	./build_lammps
+
+
+## Runing an example via LAMMPS 
+
+Go into the example folders
+
+	cd $HOME/LATTE_ECP/examples/compileECP/Workstation_AMD_NVIDIA/lammps/examples/latte
+
+	../../src/lmp_serial < in.latte.sucrose
+
