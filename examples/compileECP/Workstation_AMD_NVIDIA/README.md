@@ -61,9 +61,11 @@ Build and install LAMMPS:
 
 ## Running an example via LAMMPS 
 
-Go into the example folders:
+Get into the example folders:
 
 	cd $HOME/LATTE_ECP/examples/compileECP/Workstation_AMD_NVIDIA/lammps/examples/latte
 
 	../../src/lmp_serial < in.latte.sucrose
+
+From another terminal, one can type `nvidia-smi` to see the GPU load and double check that the code is using the available GPUS.
 
