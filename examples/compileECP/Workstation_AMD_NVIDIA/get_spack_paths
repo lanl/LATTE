@@ -29,7 +29,7 @@ algo=`pwd`
 var=$algo/qmd-progress/install/
 echo $var
 echo "export PROGRESS_PATH="$var"" >> paths.sh 
-all=`echo ""$all"/lib/:"$var""`
+all=`echo ""$all"/lib/:"$var"/lib/"`
 
 echo $all >> paths.sh
 
