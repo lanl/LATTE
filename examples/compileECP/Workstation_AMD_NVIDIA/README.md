@@ -10,9 +10,20 @@ Run:
 
 	. ~/spack_latte_lammps/share/spack/setup-env.sh  
 
+Check current compilers that spack knows about:
+
+	spack compiler find 
+
+View all these compilers: 
+
+	vi ~/.spack/packages.yaml
+
+Pick a system compiler you typically use and remove all the rest of the 
+blocks of codes for the other compilers.
+
 Now install the compiler you want (for example, pick your favorite version):
 
-	spack install gcc@12.3.0 
+	spack install -j 64 gcc@12.3.0 
 
 Now create environment:
 
